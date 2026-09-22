@@ -32,13 +32,18 @@
  * front of the classifier.
  */
 
-import type { CandidateReply, SocialSource, SourceCredentials } from "@signalscout/engine";
+import type {
+  CandidateReply,
+  ProviderChoices,
+  SocialSource,
+  SourceCredentials,
+} from "@signalscout/engine";
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { matches, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { recordStageRun } from "../monitors/stage-runs.js";
 import { readProviderChoices } from "../sources/choices.js";
-import { loadCeiling } from "./ceiling.js";
+import { type Ceiling, loadCeiling } from "./ceiling.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
 import type { RepliesPayload } from "./queues.js";
@@ -179,6 +184,424 @@ interface Thread {
   readonly repliesJudgedTo: number;
 }
 
+/** What every phase of one run needs, so a phase takes one argument for it. */
+interface RepliesRun {
+  readonly db: StepContext["db"];
+  readonly logger: StepContext["logger"];
+  readonly monitorId: string;
+  readonly userId: string;
+}
+
+/** A connector that can open a thread. */
+type ReplyReader = SocialSource & Required<Pick<SocialSource, "fetchReplies">>;
+
+/**
+ * Whether this connector can open a thread. A guard rather than an inline
+ * check, so the answer narrows the connector itself when it is handed on.
+ */
+function readsReplies(connector: SocialSource | undefined): connector is ReplyReader {
+  return connector?.fetchReplies !== undefined;
+}
+
+/**
+ * The guard, before anything is asked of a provider.
+ *
+ * The same rule the poll follows and for the same reason: a page is billed
+ * when it is fetched, so the only place to refuse is before the call. This
+ * step can be reached with the cap already spent, because the poll that
+ * produced these posts spent some of it.
+ */
+async function refuseAtCap(run: RepliesRun, ids: readonly string[]): Promise<boolean> {
+  const budget = await enforceBudget(run.db, run.monitorId);
+  if (!budget.exhausted) return false;
+
+  /**
+   * Say so on the threads that were mid-walk, then stop.
+   *
+   * Found by the first live run of the loop: the guard refused a batch and
+   * returned, so no thread recorded *why* it had stopped growing. The
+   * inbox's "the monitor reached its budget" could never appear, and a
+   * short thread read as a judgement about the conversation when it was a
+   * judgement about the month — the exact confusion that sentence exists
+   * to prevent.
+   *
+   * Only threads already being read are marked. A thread this job never
+   * opened has nothing to explain. And `budget` is the one stop reason
+   * `replies` treats as temporary: the check above lets a thread stopped
+   * this way resume, because the money runs out, not the conversation.
+   */
+  await run.db
+    .update(posts)
+    .set({ repliesStopped: "budget" })
+    .where(
+      and(
+        inArray(posts.id, [...ids]),
+        eq(posts.kind, "post"),
+        isNotNull(posts.repliesBatchStart),
+        isNull(posts.repliesStopped),
+      ),
+    );
+
+  run.logger.warn(
+    { monitorId: run.monitorId, capMicros: budget.capMicros, reason: budget.reason },
+    "replies refused: the monitor is at its budget cap",
+  );
+  return true;
+}
+
+/** The posts this job was handed, as threads it may open. */
+async function readThreads(db: RepliesRun["db"], ids: readonly string[]): Promise<Thread[]> {
+  return (
+    db
+      .select({
+        id: posts.id,
+        source: posts.source,
+        externalId: posts.externalId,
+        url: posts.url,
+        replyCount: posts.replyCount,
+        repliesPartial: posts.repliesPartial,
+        repliesReadAt: posts.repliesReadAt,
+        repliesCursor: posts.repliesCursor,
+        repliesBatchStart: posts.repliesBatchStart,
+        repliesEmptyBatches: posts.repliesEmptyBatches,
+        repliesStopped: posts.repliesStopped,
+        repliesStoppedAtCount: posts.repliesStoppedAtCount,
+        repliesJudgedTo: posts.repliesJudgedTo,
+      })
+      .from(posts)
+      // `kind = 'post'` is what stops this looping. A reply has no thread of
+      // its own, and opening one would be a second bill for the same words.
+      .where(and(inArray(posts.id, [...ids]), eq(posts.kind, "post")))
+  );
+}
+
+/**
+ * Which provider fetches each platform, read once per job.
+ *
+ * The same rule the poll follows, and read the same way: every registered
+ * candidate is asked for its key first, because one connected provider is
+ * the common deployment and it must not be asked a question it has one
+ * answer to. `registry.only` refuses rather than guesses when two could
+ * run and nobody has chosen.
+ */
+function connectorsFor(
+  run: RepliesRun,
+  registry: CollectOptions["registry"],
+  credentialsFor: CollectOptions["credentialsFor"],
+  choices: ProviderChoices,
+): (source: string) => Promise<SocialSource | undefined> {
+  const sources = new Map<string, SocialSource | undefined>();
+
+  return async (source) => {
+    if (sources.has(source)) return sources.get(source);
+
+    const keyed = new Map<string, SourceCredentials>();
+    for (const candidate of registry.forPlatform(source)) {
+      const found = await credentialsFor(candidate, run.userId);
+      if (found) keyed.set(candidate.provider.id, found);
+    }
+
+    let chosen: SocialSource | undefined;
+
+    if (keyed.size > 0) {
+      try {
+        chosen = registry.only(source, { choices, among: [...keyed.keys()] });
+      } catch (error) {
+        // Two providers could run and nobody has chosen, or the choice names
+        // one that cannot. Retrying fixes neither, and picking for them
+        // spends somebody's money on a default.
+        run.logger.error(
+          { monitorId: run.monitorId, source, err: error },
+          "replies skipped for this platform",
+        );
+        chosen = undefined;
+      }
+    }
+
+    sources.set(source, chosen);
+    return chosen;
+  };
+}
+
+/**
+ * The batch before this one held no lead, twice running.
+ *
+ * US-048's rule, and the arithmetic is under `maxEmptyBatches`. The
+ * count is of *consecutive* empty batches, so a thread that goes quiet
+ * for fifty comments and then produces a lead has its counter reset
+ * rather than carrying a grudge.
+ */
+/**
+ * Judge the batch that has been classified, **before** buying another.
+ *
+ * This is the seam between two jobs, and getting it wrong is invisible.
+ * `replies` buys a batch and can say nothing about it: the verdicts
+ * arrive later, from the classifier. So the judgement is made here, at
+ * the start of the next pass, over the range `repliesJudgedTo` and
+ * `repliesBatchStart` bound — the comments bought last time and scored
+ * since.
+ *
+ * The first version of this counted matches **after** reading, from the
+ * batch it had just bought, which nothing had scored yet. It counted
+ * zero every time, so every thread would have died after three batches
+ * however good it was. A live run found it before the suite did, because
+ * the suite drove one batch per job and never let two batches meet.
+ */
+async function judgeLastBatch(
+  run: RepliesRun,
+  post: Thread,
+  grewSinceStopping: boolean,
+): Promise<{ readonly readTo: number; readonly emptyBatches: number; readonly closed: boolean }> {
+  const judgedTo = grewSinceStopping ? 0 : post.repliesJudgedTo;
+  const readTo = grewSinceStopping ? 0 : (post.repliesBatchStart ?? 0);
+  let emptyBatches = grewSinceStopping ? 0 : post.repliesEmptyBatches;
+
+  if (readTo <= judgedTo) return { readTo, emptyBatches, closed: false };
+
+  const [judged] = await run.db
+    .select({ found: sql<number>`count(*)::int` })
+    .from(matches)
+    .innerJoin(posts, eq(posts.id, matches.postId))
+    .where(
+      and(
+        eq(matches.monitorId, run.monitorId),
+        eq(posts.parentPostId, post.id),
+        gte(posts.threadPosition, judgedTo),
+        lt(posts.threadPosition, readTo),
+      ),
+    );
+
+  const found = judged?.found ?? 0;
+
+  // Consecutive, so a thread that goes quiet and then produces a lead
+  // has its counter reset rather than carrying a grudge. At
+  // `maxEmptyBatches` of one that reset never gets the chance to matter,
+  // and it is kept because the number is a setting rather than a law.
+  emptyBatches = found > 0 ? 0 : emptyBatches + 1;
+
+  run.logger.debug(
+    { monitorId: run.monitorId, postId: post.id, from: judgedTo, to: readTo, found, emptyBatches },
+    "batch judged",
+  );
+
+  if (emptyBatches < maxEmptyBatches) return { readTo, emptyBatches, closed: false };
+
+  await run.db
+    .update(posts)
+    .set({
+      repliesStopped: "threshold",
+      repliesEmptyBatches: emptyBatches,
+      repliesJudgedTo: readTo,
+      repliesStoppedAtCount: post.replyCount ?? null,
+    })
+    .where(eq(posts.id, post.id));
+
+  run.logger.info(
+    { monitorId: run.monitorId, postId: post.id, emptyBatches },
+    "thread closed: a batch held no lead",
+  );
+  return { readTo, emptyBatches, closed: true };
+}
+
+/** What one batch bought, for the thread's row and the run's totals. */
+interface BatchRead {
+  readonly pages: number;
+  readonly partial: boolean;
+  readonly positionOffset: number;
+  readonly cursor: string | undefined;
+  readonly units: number;
+  readonly storedIds: readonly string[];
+}
+
+/**
+ * One **batch**, which is pages until `replyBatchSize` comments are held.
+ *
+ * The walk ends on whichever comes first: the batch being full, the
+ * connector saying `done`, the page bound, or a page that returned
+ * nothing. The last is not redundant — US-020 measured an X thread whose
+ * `has_more: true` led to an empty page, so a cursor is not a promise
+ * that anything is behind it.
+ *
+ * `maxPagesPerThread` survives as a bound on one job rather than on one
+ * thread: a batch of 50 is normally one page, and a provider handing
+ * back tiny pages must not be able to spend a batch's worth of credits
+ * reaching fifty comments.
+ */
+async function readBatch(
+  run: RepliesRun,
+  {
+    post,
+    connector,
+    credentials,
+    ceiling,
+    since,
+    batchStart,
+    cursor: startCursor,
+    wantThisBatch,
+  }: {
+    readonly post: Thread;
+    readonly connector: ReplyReader;
+    readonly credentials: SourceCredentials;
+    readonly ceiling: Ceiling | null;
+    readonly since: Date;
+    readonly batchStart: number;
+    readonly cursor: string | undefined;
+    readonly wantThisBatch: number;
+  },
+): Promise<BatchRead> {
+  let cursor = startCursor;
+  let pages = 0;
+  let partial = true;
+  let readThisBatch = 0;
+  /**
+   * How many items the provider has returned for this thread so far.
+   *
+   * Counted from `itemsReturned` rather than from the replies we kept, so
+   * a page whose items were dropped still moves the numbering on. US-048
+   * reads these positions, and a position that closed the gap over a
+   * dropped item would say a comment sat higher in the thread than it did.
+   */
+  let positionOffset = batchStart;
+  let units = 0;
+  const storedIds: string[] = [];
+
+  while (pages < maxPagesPerThread && readThisBatch < wantThisBatch) {
+    // Each page is one of the pair's day. US-287.
+    if (ceiling && !ceiling.hasRoom(post.id)) break;
+    ceiling?.charge(post.id);
+
+    const result = await connector.fetchReplies({
+      postUrl: post.url,
+      postExternalId: post.externalId,
+      credentials,
+      since,
+      positionOffset,
+      ...(cursor ? { cursor } : {}),
+    });
+
+    pages += 1;
+    units += result.unitsConsumed;
+    partial = result.partial;
+    positionOffset += result.itemsReturned;
+    readThisBatch += result.itemsReturned;
+
+    await recordSourceUsage(run.db, {
+      userId: run.userId,
+      monitorId: run.monitorId,
+      source: post.source as Source,
+      provider: connector.provider.id as Provider,
+      units: result.unitsConsumed,
+      // The pair's own price for a reply page, which is not always the
+      // price of a search. US-028's lesson: a guard fed the wrong unit
+      // price lets a monitor spend a multiple of its cap.
+      pricePerUnitMicros: connector.replyPricePerUnitMicros ?? connector.pricePerUnitMicros,
+    });
+
+    if (result.replies.length > 0) {
+      const stored = await run.db
+        .insert(posts)
+        .values(
+          result.replies.map((reply) =>
+            toReplyRow(post.id, post.source as Source, connector.provider.id as Provider, reply),
+          ),
+        )
+        .onConflictDoUpdate({
+          target: [posts.source, posts.externalId],
+          // The same rule the poll follows: refreshing the text here would
+          // let a second read resurrect words the author had removed.
+          set: { fetchedAt: sql`now()` },
+        })
+        .returning({ id: posts.id });
+
+      storedIds.push(...stored.map((row) => row.id));
+    }
+
+    if (result.next.status !== "ready") break;
+    // A cursor that led nowhere. Paging on would ask the same question
+    // again and be charged for the same silence.
+    if (result.replies.length === 0) break;
+
+    cursor = result.next.cursor;
+  }
+
+  return { pages, partial, positionOffset, cursor, units, storedIds };
+}
+
+/** Write where this thread's reading stands, so the next pass resumes there. */
+async function recordProgress(
+  run: RepliesRun,
+  post: Thread,
+  {
+    read: { pages, partial, positionOffset, cursor },
+    firstBatch,
+    readAt,
+    readTo,
+    emptyBatches,
+    batchStart,
+  }: {
+    readonly read: BatchRead;
+    readonly firstBatch: boolean;
+    readonly readAt: Date;
+    readonly readTo: number;
+    readonly emptyBatches: number;
+    readonly batchStart: number;
+  },
+): Promise<void> {
+  /**
+   * What was read, and how honestly.
+   *
+   * Written from the last answer the connector gave and never from "we ran
+   * out of cursors" or "we hit our own page bound". A top-level
+   * `has_more: false` arrives on threads missing half their comments, so
+   * recording that as complete would mean never coming back for the rest —
+   * and a thread this job stopped reading is partial whatever the provider
+   * said about the page it stopped on.
+   */
+  const stoppedEarly = pages >= maxPagesPerThread && partial;
+
+  /**
+   * The end of the thread, said by the connector rather than by us.
+   *
+   * `partial === false` is positive evidence that there is no more, which
+   * is a different claim from having run out of cursors. Only that closes
+   * a thread as `end`.
+   */
+  const reachedTheEnd = !partial;
+  const reachedTheCeiling = positionOffset >= maxCommentsPerThread;
+
+  const stopped = reachedTheEnd ? "end" : reachedTheCeiling ? "ceiling" : null;
+
+  await run.db
+    .update(posts)
+    .set({
+      repliesPartial: stoppedEarly ? true : partial,
+      // Written when a walk begins and left alone while it runs, so the
+      // next walk's window is the moment this one started rather than the
+      // moment it happened to finish.
+      ...(firstBatch ? { repliesReadAt: readAt } : {}),
+      repliesCursor: cursor ?? null,
+      repliesBatchStart: positionOffset,
+      repliesJudgedTo: readTo,
+      repliesEmptyBatches: emptyBatches,
+      repliesStopped: stopped,
+      // The count reading stopped at, so growth can re-open the thread.
+      ...(stopped === null ? {} : { repliesStoppedAtCount: post.replyCount ?? null }),
+    })
+    .where(eq(posts.id, post.id));
+
+  run.logger.debug(
+    {
+      monitorId: run.monitorId,
+      postId: post.id,
+      batchStart,
+      readTo: positionOffset,
+      emptyBatches,
+      stopped,
+    },
+    "batch read",
+  );
+}
+
 export function createRepliesStep({
   registry,
   credentialsFor,
@@ -245,82 +668,15 @@ export function createRepliesStep({
       }
     };
 
-    /**
-     * The guard, before anything is asked of a provider.
-     *
-     * The same rule the poll follows and for the same reason: a page is billed
-     * when it is fetched, so the only place to refuse is before the call. This
-     * step can be reached with the cap already spent, because the poll that
-     * produced these posts spent some of it.
-     */
-    const budget = await enforceBudget(db, monitorId);
+    const run: RepliesRun = { db, logger, monitorId, userId: monitor.userId };
 
-    if (budget.exhausted) {
-      /**
-       * Say so on the threads that were mid-walk, then stop.
-       *
-       * Found by the first live run of the loop: the guard refused a batch and
-       * returned, so no thread recorded *why* it had stopped growing. The
-       * inbox's "the monitor reached its budget" could never appear, and a
-       * short thread read as a judgement about the conversation when it was a
-       * judgement about the month — the exact confusion that sentence exists
-       * to prevent.
-       *
-       * Only threads already being read are marked. A thread this job never
-       * opened has nothing to explain. And `budget` is the one stop reason
-       * `replies` treats as temporary: the check above lets a thread stopped
-       * this way resume, because the money runs out, not the conversation.
-       */
-      await db
-        .update(posts)
-        .set({ repliesStopped: "budget" })
-        .where(
-          and(
-            inArray(posts.id, ids),
-            eq(posts.kind, "post"),
-            isNotNull(posts.repliesBatchStart),
-            isNull(posts.repliesStopped),
-          ),
-        );
-
-      logger.warn(
-        { monitorId, capMicros: budget.capMicros, reason: budget.reason },
-        "replies refused: the monitor is at its budget cap",
-      );
+    if (await refuseAtCap(run, ids)) {
       await writeStageRun({ outcome: "refused", itemsOut: 0, stopReason: "budget_exhausted" });
       return;
     }
 
-    const candidates: Thread[] = await db
-      .select({
-        id: posts.id,
-        source: posts.source,
-        externalId: posts.externalId,
-        url: posts.url,
-        replyCount: posts.replyCount,
-        repliesPartial: posts.repliesPartial,
-        repliesReadAt: posts.repliesReadAt,
-        repliesCursor: posts.repliesCursor,
-        repliesBatchStart: posts.repliesBatchStart,
-        repliesEmptyBatches: posts.repliesEmptyBatches,
-        repliesStopped: posts.repliesStopped,
-        repliesStoppedAtCount: posts.repliesStoppedAtCount,
-        repliesJudgedTo: posts.repliesJudgedTo,
-      })
-      .from(posts)
-      // `kind = 'post'` is what stops this looping. A reply has no thread of
-      // its own, and opening one would be a second bill for the same words.
-      .where(and(inArray(posts.id, ids), eq(posts.kind, "post")));
+    const candidates = await readThreads(db, ids);
 
-    /**
-     * Which provider fetches each platform, read once per job.
-     *
-     * The same rule the poll follows, and read the same way: every registered
-     * candidate is asked for its key first, because one connected provider is
-     * the common deployment and it must not be asked a question it has one
-     * answer to. `registry.only` refuses rather than guesses when two could
-     * run and nobody has chosen.
-     */
     /**
      * The oldest a reply may be on a thread nobody has read yet.
      *
@@ -331,35 +687,13 @@ export function createRepliesStep({
      */
     const floor = new Date(Date.now() - defaultReplyWindowDays * 86_400_000);
 
-    const choices = await readProviderChoices(db, monitor.userId);
-    const sources = new Map<string, SocialSource | undefined>();
+    const connectorFor = connectorsFor(
+      run,
+      registry,
+      credentialsFor,
+      await readProviderChoices(db, monitor.userId),
+    );
 
-    const connectorFor = async (source: string): Promise<SocialSource | undefined> => {
-      if (sources.has(source)) return sources.get(source);
-
-      const keyed = new Map<string, SourceCredentials>();
-      for (const candidate of registry.forPlatform(source)) {
-        const found = await credentialsFor(candidate, monitor.userId);
-        if (found) keyed.set(candidate.provider.id, found);
-      }
-
-      let chosen: SocialSource | undefined;
-
-      if (keyed.size > 0) {
-        try {
-          chosen = registry.only(source, { choices, among: [...keyed.keys()] });
-        } catch (error) {
-          // Two providers could run and nobody has chosen, or the choice names
-          // one that cannot. Retrying fixes neither, and picking for them
-          // spends somebody's money on a default.
-          logger.error({ monitorId, source, err: error }, "replies skipped for this platform");
-          chosen = undefined;
-        }
-      }
-
-      sources.set(source, chosen);
-      return chosen;
-    };
     let opened = 0;
     let skipped = 0;
     let pagesBought = 0;
@@ -448,79 +782,10 @@ export function createRepliesStep({
         continue;
       }
 
-      /**
-       * The batch before this one held no lead, twice running.
-       *
-       * US-048's rule, and the arithmetic is under `maxEmptyBatches`. The
-       * count is of *consecutive* empty batches, so a thread that goes quiet
-       * for fifty comments and then produces a lead has its counter reset
-       * rather than carrying a grudge.
-       */
-      /**
-       * Judge the batch that has been classified, **before** buying another.
-       *
-       * This is the seam between two jobs, and getting it wrong is invisible.
-       * `replies` buys a batch and can say nothing about it: the verdicts
-       * arrive later, from the classifier. So the judgement is made here, at
-       * the start of the next pass, over the range `repliesJudgedTo` and
-       * `repliesBatchStart` bound — the comments bought last time and scored
-       * since.
-       *
-       * The first version of this counted matches **after** reading, from the
-       * batch it had just bought, which nothing had scored yet. It counted
-       * zero every time, so every thread would have died after three batches
-       * however good it was. A live run found it before the suite did, because
-       * the suite drove one batch per job and never let two batches meet.
-       */
-      const judgedTo = grewSinceStopping ? 0 : post.repliesJudgedTo;
-      const readTo = grewSinceStopping ? 0 : (post.repliesBatchStart ?? 0);
-      let emptyBatches = grewSinceStopping ? 0 : post.repliesEmptyBatches;
-
-      if (readTo > judgedTo) {
-        const [judged] = await db
-          .select({ found: sql<number>`count(*)::int` })
-          .from(matches)
-          .innerJoin(posts, eq(posts.id, matches.postId))
-          .where(
-            and(
-              eq(matches.monitorId, monitorId),
-              eq(posts.parentPostId, post.id),
-              gte(posts.threadPosition, judgedTo),
-              lt(posts.threadPosition, readTo),
-            ),
-          );
-
-        const found = judged?.found ?? 0;
-
-        // Consecutive, so a thread that goes quiet and then produces a lead
-        // has its counter reset rather than carrying a grudge. At
-        // `maxEmptyBatches` of one that reset never gets the chance to matter,
-        // and it is kept because the number is a setting rather than a law.
-        emptyBatches = found > 0 ? 0 : emptyBatches + 1;
-
-        logger.debug(
-          { monitorId, postId: post.id, from: judgedTo, to: readTo, found, emptyBatches },
-          "batch judged",
-        );
-
-        if (emptyBatches >= maxEmptyBatches) {
-          await db
-            .update(posts)
-            .set({
-              repliesStopped: "threshold",
-              repliesEmptyBatches: emptyBatches,
-              repliesJudgedTo: readTo,
-              repliesStoppedAtCount: post.replyCount ?? null,
-            })
-            .where(eq(posts.id, post.id));
-
-          logger.info(
-            { monitorId, postId: post.id, emptyBatches },
-            "thread closed: a batch held no lead",
-          );
-          skipped += 1;
-          continue;
-        }
+      const { readTo, emptyBatches, closed } = await judgeLastBatch(run, post, grewSinceStopping);
+      if (closed) {
+        skipped += 1;
+        continue;
       }
 
       /**
@@ -541,7 +806,7 @@ export function createRepliesStep({
       // declaration `SocialSource.fetchReplies` makes by being absent, and it
       // is why a monitor may ask for replies on a platform that has none
       // without the poll failing.
-      if (!connector?.fetchReplies) {
+      if (!readsReplies(connector)) {
         skipped += 1;
         continue;
       }
@@ -551,36 +816,6 @@ export function createRepliesStep({
         skipped += 1;
         continue;
       }
-
-      /**
-       * One **batch**, which is pages until `replyBatchSize` comments are held.
-       *
-       * The walk ends on whichever comes first: the batch being full, the
-       * connector saying `done`, the page bound, or a page that returned
-       * nothing. The last is not redundant — US-020 measured an X thread whose
-       * `has_more: true` led to an empty page, so a cursor is not a promise
-       * that anything is behind it.
-       *
-       * `maxPagesPerThread` survives as a bound on one job rather than on one
-       * thread: a batch of 50 is normally one page, and a provider handing
-       * back tiny pages must not be able to spend a batch's worth of credits
-       * reaching fifty comments.
-       */
-      let cursor: string | undefined = grewSinceStopping
-        ? undefined
-        : (post.repliesCursor ?? undefined);
-      let pages = 0;
-      let partial = true;
-      let readThisBatch = 0;
-      /**
-       * How many items the provider has returned for this thread so far.
-       *
-       * Counted from `itemsReturned` rather than from the replies we kept, so
-       * a page whose items were dropped still moves the numbering on. US-048
-       * reads these positions, and a position that closed the gap over a
-       * dropped item would say a comment sat higher in the thread than it did.
-       */
-      let positionOffset = 0;
 
       /**
        * This thread's own window, and the mark the next read will use.
@@ -632,7 +867,6 @@ export function createRepliesStep({
        * would count the batch that has just finished.
        */
       const batchStart = restarting ? 0 : (post.repliesBatchStart ?? 0);
-      positionOffset = batchStart;
 
       const roomLeft = maxCommentsPerThread - batchStart;
 
@@ -648,126 +882,30 @@ export function createRepliesStep({
 
       const wantThisBatch = Math.min(replyBatchSize, roomLeft);
 
-      while (pages < maxPagesPerThread && readThisBatch < wantThisBatch) {
-        // Each page is one of the pair's day. US-287.
-        if (ceiling && !ceiling.hasRoom(post.id)) break;
-        ceiling?.charge(post.id);
-
-        const result = await connector.fetchReplies({
-          postUrl: post.url,
-          postExternalId: post.externalId,
-          credentials,
-          since,
-          positionOffset,
-          ...(cursor ? { cursor } : {}),
-        });
-
-        pages += 1;
-        spentUnits += result.unitsConsumed;
-        partial = result.partial;
-        positionOffset += result.itemsReturned;
-        readThisBatch += result.itemsReturned;
-
-        await recordSourceUsage(db, {
-          userId: monitor.userId,
-          monitorId,
-          source: post.source as Source,
-          provider: connector.provider.id as Provider,
-          units: result.unitsConsumed,
-          // The pair's own price for a reply page, which is not always the
-          // price of a search. US-028's lesson: a guard fed the wrong unit
-          // price lets a monitor spend a multiple of its cap.
-          pricePerUnitMicros: connector.replyPricePerUnitMicros ?? connector.pricePerUnitMicros,
-        });
-
-        if (result.replies.length > 0) {
-          const stored = await db
-            .insert(posts)
-            .values(
-              result.replies.map((reply) =>
-                toReplyRow(
-                  post.id,
-                  post.source as Source,
-                  connector.provider.id as Provider,
-                  reply,
-                ),
-              ),
-            )
-            .onConflictDoUpdate({
-              target: [posts.source, posts.externalId],
-              // The same rule the poll follows: refreshing the text here would
-              // let a second read resurrect words the author had removed.
-              set: { fetchedAt: sql`now()` },
-            })
-            .returning({ id: posts.id });
-
-          storedReplyIds.push(...stored.map((row) => row.id));
-        }
-
-        if (result.next.status !== "ready") break;
-        // A cursor that led nowhere. Paging on would ask the same question
-        // again and be charged for the same silence.
-        if (result.replies.length === 0) break;
-
-        cursor = result.next.cursor;
-      }
+      const read = await readBatch(run, {
+        post,
+        connector,
+        credentials,
+        ceiling,
+        since,
+        batchStart,
+        cursor: restarting ? undefined : (post.repliesCursor ?? undefined),
+        wantThisBatch,
+      });
 
       opened += 1;
-      pagesBought += pages;
+      pagesBought += read.pages;
+      spentUnits += read.units;
+      storedReplyIds.push(...read.storedIds);
 
-      /**
-       * What was read, and how honestly.
-       *
-       * Written from the last answer the connector gave and never from "we ran
-       * out of cursors" or "we hit our own page bound". A top-level
-       * `has_more: false` arrives on threads missing half their comments, so
-       * recording that as complete would mean never coming back for the rest —
-       * and a thread this job stopped reading is partial whatever the provider
-       * said about the page it stopped on.
-       */
-      const stoppedEarly = pages >= maxPagesPerThread && partial;
-
-      /**
-       * The end of the thread, said by the connector rather than by us.
-       *
-       * `partial === false` is positive evidence that there is no more, which
-       * is a different claim from having run out of cursors. Only that closes
-       * a thread as `end`.
-       */
-      const reachedTheEnd = !partial;
-      const reachedTheCeiling = positionOffset >= maxCommentsPerThread;
-
-      const stopped = reachedTheEnd ? "end" : reachedTheCeiling ? "ceiling" : null;
-
-      await db
-        .update(posts)
-        .set({
-          repliesPartial: stoppedEarly ? true : partial,
-          // Written when a walk begins and left alone while it runs, so the
-          // next walk's window is the moment this one started rather than the
-          // moment it happened to finish.
-          ...(firstBatch ? { repliesReadAt: readAt } : {}),
-          repliesCursor: cursor ?? null,
-          repliesBatchStart: positionOffset,
-          repliesJudgedTo: readTo,
-          repliesEmptyBatches: emptyBatches,
-          repliesStopped: stopped,
-          // The count reading stopped at, so growth can re-open the thread.
-          ...(stopped === null ? {} : { repliesStoppedAtCount: post.replyCount ?? null }),
-        })
-        .where(eq(posts.id, post.id));
-
-      logger.debug(
-        {
-          monitorId,
-          postId: post.id,
-          batchStart,
-          readTo: positionOffset,
-          emptyBatches,
-          stopped,
-        },
-        "batch read",
-      );
+      await recordProgress(run, post, {
+        read,
+        firstBatch,
+        readAt,
+        readTo,
+        emptyBatches,
+        batchStart,
+      });
     }
 
     logger.info(

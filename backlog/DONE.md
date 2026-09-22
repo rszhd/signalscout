@@ -2,7 +2,7 @@
 
 # Done
 
-204 finished.
+205 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -63,6 +63,7 @@
 | US-264 | [The monitor form sets the minimum score](done/2026-09/US-264-the-monitor-form-sets-the-minimum-score.md) | feature | shipped | 2026-09 |
 | US-261 | [The spacing scale lives in design.md](done/2026-09/US-261-the-spacing-scale-lives-in-design-md.md) | chore | shipped | 2026-09 |
 | US-259 | [AGENTS.md is cut to its rules](done/2026-09/US-259-agents-md-is-cut-to-its-rules.md) | chore | shipped | 2026-09 |
+| US-258 | [The four densest files lose their inline stories](done/2026-09/US-258-the-four-densest-files-lose-their-inline-stories.md) | chore | shipped | 2026-09 |
 | US-250 | [The next four documents are cut to their rules](done/2026-09/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | shipped | 2026-09 |
 | US-249 | [Recurring procedures are skills, and two checks are hooks](done/2026-09/US-249-recurring-procedures-are-skills-and-two-checks-are-hooks.md) | chore | shipped | 2026-09 |
 | US-248 | [schema.ts is split by table family](done/2026-09/US-248-schema-ts-is-split-by-table-family.md) | chore | shipped | 2026-09 |

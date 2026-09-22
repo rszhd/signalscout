@@ -41,6 +41,12 @@ file on the next run. Nothing flows the other way: a comment on an issue is
 for people, and the script never reads one. A ticket that reaches `done/` or
 `parked/` has its issue closed, with the resolution as the reason.
 
+**Commit the numbers the run writes back.** A number that never reaches `dev`
+is not fatal: the next run adopts the one open issue titled with the ticket's
+id instead of opening another. With two such issues it opens nothing and
+exits 1, and `--check` names a second open issue beside the one a file
+records. Close the extra one by hand.
+
 Two frontmatter fields serve it. `issue:` is the number, written back by the
 script — do not set it by hand. `labels:` is a list the script puts on the
 issue beside `ticket`, and it is how `good first issue` reaches a newcomer:

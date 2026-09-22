@@ -121,3 +121,22 @@ and is still not written.
 
 - 2026-09-22T20:10+08:00 — US-309 built `pnpm verdicts`, so the half of this ticket that had no method now has one: judge in the inbox, then run one command for the table, the per-platform split, the boundary and the answer. The hour of reading is still the owner's and still the whole remaining cost.
 - 2026-09-22T20:10+08:00 — **Two numbers here are out of date.** The database holds **763** unjudged matches, not 40 — it has grown since 6 September, and judging all of them is not an evening. `pnpm verdicts --sample=40` picks a spread across score bands and platforms, which is better evidence about the boundary than the top forty would be. And the five verdicts described above are not in `feedback`: it holds 8 rows, all `good`, all Reddit posts, none superseded. The reasoning above stands; the arithmetic needs redoing against what is actually stored.
+
+- 2026-09-22T21:40+08:00 — **Twenty-six verdicts given, and the score works.** 14 good, 12 not relevant, all Reddit posts, all on this owner's account. A good lead outscores a not-relevant one **94.1% of the time** (Mann-Whitney, exact p = 5e-10). The sample is small and the effect is not: chance does not produce this.
+
+  | Score | Verdict |
+  |---:|---|
+  | 77, 73, 66, 61, 54, 53, 52 | good |
+  | 49 | good, and one not relevant |
+  | 46, 46, 45 | good |
+  | 44 | not relevant |
+  | 43 | good |
+  | 42, 40, 40 | not relevant |
+  | 40 | good |
+  | 38, 35, 34, 34, 31, 30, 30 | not relevant |
+
+  **The boundary is 43, not 56.** This ticket's Context predicted near 56 from five verdicts that are no longer in the database; twenty-six say 43. Between **40 and 49** the score decides nothing — that is the overlap band. A cut at 43 loses one good lead and admits two not-relevant ones.
+
+  **`defaultMinimumScore` of 30 is too low, and that is now measured.** Everything scored below 38 was not relevant, eight out of eight. US-022 reached the same conclusion by another route.
+
+- 2026-09-22T21:40+08:00 — **Still open, and what is missing is the per-platform split.** All 26 verdicts are Reddit. This owner's account holds 283 unjudged matches and every one is Reddit; the X, YouTube, TikTok and LinkedIn matches in this database belong to test accounts, so they cannot be judged from here. So the honest claim today is *the score works on Reddit*, not *the score works*. Closing this ticket needs verdicts on the other platforms, which needs either monitors on those platforms under a judging account, or BUG-311 fixed so the tooling stops pointing at matches the reader cannot open.

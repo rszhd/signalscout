@@ -15,6 +15,12 @@
 # number back into the ticket's frontmatter as `issue:`. A ticket that reaches
 # done/ or parked/ has its issue closed on the next run.
 #
+# The write-back is the only link from a file to its issue, and it can be lost:
+# a run on a branch that never merges leaves the issue open and the file
+# without its number. So before opening one, the script looks for an open
+# issue already titled with the ticket's id and adopts it; with two, it stops
+# rather than choosing. BUG-323.
+#
 # Needs `gh`, authenticated, with write access to the repository.
 
 set -euo pipefail
@@ -72,13 +78,20 @@ body() {
 }
 
 # set_field <file> <key> <value> — add or replace one frontmatter line.
+#
+# awk rather than `sed -i`, which takes different arguments on macOS, because
+# `pnpm test` runs this script on a contributor's machine (BUG-323).
 set_field() {
-  local file="$1" key="$2" value="$3"
-  if grep -qE "^${key}:" "$file"; then
-    sed -i -E "0,/^${key}:.*/s##${key}: ${value}#" "$file"
-  else
-    sed -i -E "0,/^id:.*/s##&\n${key}: ${value}#" "$file"
-  fi
+  local file="$1" key="$2" value="$3" has=0 tmp
+  grep -qE "^${key}:" "$file" && has=1
+  tmp="$(mktemp)"
+  awk -v key="$key" -v value="$value" -v has="$has" '
+    !done && has && index($0, key ":") == 1 { print key ": " value; done = 1; next }
+    { print }
+    !done && !has && /^id:/ { print key ": " value; done = 1 }
+  ' "$file" > "$tmp"
+  cat "$tmp" > "$file"
+  rm -f "$tmp"
 }
 
 # want_labels <frontmatter value> — one label per line, `ticket` first.
@@ -92,8 +105,18 @@ want_labels() {
 
 say() { printf '%s\n' "$*"; }
 
+# Every open ticket issue, as `<number>\t<title>` lines. Read once, here, so a
+# run costs one list call however many tickets lack a number.
+open_issues="$(gh issue list --repo "$REPO" --label ticket --state open --limit 1000 --json number,title -q '.[] | "\(.number)\t\(.title)"')"
+
+# issues_for <id> — the open ticket issues whose title starts `<id>: `.
+issues_for() {
+  printf '%s\n' "$open_issues" | awk -F'\t' -v prefix="$1: " 'index($2, prefix) == 1 { print $1 }'
+}
+
 stale=0
-declare -a created=()
+failed=0
+declare -a written=()
 
 while IFS= read -r -d '' file; do
   rel="${file#"$ROOT/"}"
@@ -108,6 +131,28 @@ while IFS= read -r -d '' file; do
 
   case "$status" in
     todo|doing)
+      # A loop, not `mapfile`: macOS still ships bash 3.2.
+      same=()
+      while IFS= read -r n; do same+=("$n"); done < <(issues_for "$id")
+      if [ -z "$issue" ] && [ "${#same[@]}" -gt 1 ]; then
+        stale=1
+        failed=1
+        say "sync: $rel has no issue: and ${#same[@]} open issues carry $id ($(printf '#%s ' "${same[@]}" | sed 's/ $//; s/ /, /g')); close all but one, then run again" >&2
+        continue
+      fi
+      if [ -z "$issue" ] && [ "${#same[@]}" -eq 1 ]; then
+        stale=1
+        case "$mode" in
+          check) say "no issue: $rel (#${same[0]} carries its id; a sync adopts it)"; continue ;;
+          dry)   say "would adopt #${same[0]} for $id"; continue ;;
+          sync)
+            issue="${same[0]}"
+            set_field "$file" issue "$issue"
+            written+=("#$issue $want")
+            say "adopted #$issue for $id"
+            ;;
+        esac
+      fi
       if [ -z "$issue" ]; then
         stale=1
         case "$mode" in
@@ -119,12 +164,20 @@ while IFS= read -r -d '' file; do
             url="$(body "$file" | gh issue create "${args[@]}")"
             number="${url##*/}"
             set_field "$file" issue "$number"
-            created+=("#$number $want")
+            written+=("#$number $want")
             say "opened #$number for $id"
             ;;
         esac
         continue
       fi
+      # A second open issue is a mirror that disagrees with the file, and no
+      # run can tell which one people have been reading, so it is named and
+      # left for a person to close.
+      for other in ${same[@]+"${same[@]}"}; do
+        [ "$other" = "$issue" ] && continue
+        stale=1
+        say "duplicate: #$other also carries $id; $rel names #$issue"
+      done
       have="$(gh issue view "$issue" --repo "$REPO" --json title,state,labels -q '.title + "\t" + .state + "\t" + ([.labels[].name] | sort | join(","))' 2>/dev/null || true)"
       if [ -z "$have" ]; then
         stale=1
@@ -192,5 +245,5 @@ if [ "$mode" = check ]; then
   exit 1
 fi
 
-[ ${#created[@]} -gt 0 ] && say "opened ${#created[@]} issue(s); commit the ticket files so the numbers are recorded"
-exit 0
+[ ${#written[@]} -gt 0 ] && say "wrote ${#written[@]} issue number(s); commit the ticket files so the numbers are recorded"
+exit "$failed"

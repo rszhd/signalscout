@@ -2,7 +2,7 @@
 
 # Open tickets
 
-41 open — 0 doing, 32 todo, 9 parked (2 p1, 27 p2, 12 p3).
+40 open — 0 doing, 31 todo, 9 parked (2 p1, 26 p2, 12 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -33,7 +33,6 @@
 | p2 | US-320 | [The app deploys in one click](todo/US-320-the-app-deploys-in-one-click.md) | feature | todo | 2026-09-23T05:44+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
-| p2 | BUG-323 | [A lost write-back opens a second issue for one ticket](todo/BUG-323-a-lost-write-back-opens-a-second-issue.md) | bug | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |

@@ -23,6 +23,14 @@
  * plan, and one that always ran it would overspend. The balance is capped
  * at one full turn, so a monitor paused for a week runs one turn on resume.
  *
+ * **The first poll runs the whole turn.** US-291. A new monitor is where a
+ * person finds out whether the product works, and one search out of four
+ * does not show them. So the first poll runs every unit and charges every
+ * unit; the balance goes as far negative as the turn is heavy and the
+ * following hours repay it, as they do for one heavy unit. The day's spend
+ * is the same, front-loaded. It is charged, not free: a free poll could be
+ * had again by making the monitor again.
+ *
  * **Off unless the application sets it.** `pollCreditsPerHour` null means
  * every search on every platform, every poll — what every monitor does
  * today. The weights come from the application too, as `creditWeights` on
@@ -46,6 +54,8 @@ export interface RotationState {
   readonly creditsPerHour: number;
   readonly balance: number;
   readonly cursor: number;
+  /** Whether this is the monitor's first poll ever, which runs the whole turn. US-291. */
+  readonly first?: boolean;
 }
 
 export interface Turn {
@@ -96,6 +106,14 @@ export function nextTurn(state: RotationState): Turn {
   // paused is not owed.
   let balance = Math.min(state.balance + creditsPerHour, Math.max(creditsPerHour, fullTurn));
   let cursor = state.cursor % units.length;
+
+  // The first poll: every unit from the cursor round, charged in full. The
+  // cursor ends where it began, as a whole turn does.
+  if (state.first) {
+    const whole = [...units.slice(cursor), ...units.slice(0, cursor)];
+    return { units: whole, balance: balance - fullTurn, cursor };
+  }
+
   const chosen: Unit[] = [];
 
   for (let i = 0; i < units.length; i += 1) {

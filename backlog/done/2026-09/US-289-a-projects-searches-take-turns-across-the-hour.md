@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-22T01:10+08:00
 parent:
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -96,8 +96,9 @@ column null.
       a platform once however many of its searches ran.
 - [x] `docs/pipeline.md` says how a rotating monitor polls and that it is
       off unless an application sets the column.
-- [ ] `docs/releasing.md` names the version; the application pins it and
-      writes the column (US-285 there).
+- [x] `docs/releasing.md` names the version; the application pins it and
+      writes the column (US-285 there). 0.13.0, cut 2026-09-22 on PR #29,
+      pinned by the hosted product the same night.
 
 ## Notes
 
@@ -116,6 +117,8 @@ column null.
   LinkedIn on a one-credit plan; a slot that always ran it would overspend.
 
 ## Log
+
+- 2026-09-22T03:25+08:00 — Cut as 0.13.0 and pinned. Shipped.
 
 - 2026-09-22T02:30+08:00 — Reshaped from platforms to searches on the
   owner's word: four searches on one platform must take turns too. Both

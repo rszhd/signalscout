@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-21T17:55+08:00
 parent:
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -104,8 +104,8 @@ arithmetic the worker already does, over the same discoveries join.
       counts against the channel as a pair of its own.
 - [x] `docs/costs.md` says the ceiling exists, that it is off unless an
       application sets it, and what the `ceiling` stage means on the screen.
-- [ ] `docs/releasing.md` names the version; the application pins it
-      (US-285 there ticks its two pipeline boxes).
+- [x] `docs/releasing.md` names the version; the application pins it
+      (US-285 there ticks its two pipeline boxes). 0.12.0, cut 2026-09-21.
 
 ## Notes
 
@@ -123,6 +123,8 @@ arithmetic the worker already does, over the same discoveries join.
   the drop row says why they were not read.
 
 ## Log
+
+- 2026-09-22T03:25+08:00 — Cut as 0.12.0 and pinned. Shipped.
 
 - 2026-09-21T19:40+08:00 — Built on `feature/us-287-pair-ceiling`.
   `worker/ceiling.ts` holds the rule and `ceiling.test.ts` its eight cases,

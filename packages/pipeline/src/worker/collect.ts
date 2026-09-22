@@ -483,6 +483,10 @@ export function createCollectStep({
        * search that sat out an hour picks up where it left off; a platform
        * that does not take turns keeps them under the empty query, as every
        * row written before the column did.
+       *
+       * The first poll ever runs the whole turn (US-291). `last_polled_at`
+       * is still empty here — it is marked in the next statement — so it is
+       * the fact.
        */
       const turn =
         monitor.pollCreditsPerHour === null
@@ -497,6 +501,7 @@ export function createCollectStep({
               creditsPerHour: Number(monitor.pollCreditsPerHour),
               balance: Number(monitor.pollCreditBalance),
               cursor: monitor.pollCursor,
+              first: monitor.lastPolledAt === null,
             });
       const unitsThisPoll: readonly Unit[] = turn
         ? turn.units

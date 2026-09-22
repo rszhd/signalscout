@@ -91,6 +91,13 @@ describe("a poll whose searches take turns", () => {
     await db.delete(monitors);
   });
 
+  /**
+   * A monitor that has polled before, so the cases below are about the
+   * turn-by-turn rule and not the first poll, which runs the whole turn
+   * (US-291) and has a case of its own.
+   */
+  const polledBefore = new Date(Date.now() - 3_600_000);
+
   async function poll(registry: Registry, monitorId: string, weights = {}) {
     await createCollectStep({ registry, credentialsFor: credentials, creditWeights: weights })(
       { monitorId },
@@ -134,6 +141,7 @@ describe("a poll whose searches take turns", () => {
       sources: ["reddit", "x", "youtube"],
       generatedQueries: { reddit: ["a"], x: ["b"], youtube: ["c"] },
       pollCreditsPerHour: "1",
+      lastPolledAt: polledBefore,
     });
 
     for (let i = 0; i < 4; i += 1) await poll(registry, monitorId);
@@ -150,6 +158,7 @@ describe("a poll whose searches take turns", () => {
       sources: ["reddit"],
       generatedQueries: { reddit: ["a", "b", "c", "d"] },
       pollCreditsPerHour: "1",
+      lastPolledAt: polledBefore,
     });
 
     for (let i = 0; i < 5; i += 1) await poll(registry, monitorId);
@@ -168,6 +177,7 @@ describe("a poll whose searches take turns", () => {
       sources: ["linkedin", "reddit"],
       generatedQueries: { linkedin: ["hiring tools"], reddit: ["flaky tests"] },
       pollCreditsPerHour: "1",
+      lastPolledAt: polledBefore,
     });
 
     await poll(registry, monitorId, { linkedin: 5 });
@@ -195,6 +205,29 @@ describe("a poll whose searches take turns", () => {
     await poll(registry, monitorId);
     expect(asked(registry, "reddit")).toEqual([["a"], ["b"]]);
     expect(await lastRunSources(monitorId)).toEqual(["reddit", "x"]);
+  });
+
+  /**
+   * The first poll runs the whole turn. US-291. A new monitor with four
+   * searches on a trial's sixth of a credit an hour is asked on every
+   * platform at once, charged for all four, and then waits out the repayment.
+   */
+  it("runs every search on a monitor's first poll, and then waits out the repayment", async () => {
+    const registry = fourPlatforms();
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x", "youtube", "tiktok"],
+      generatedQueries: { reddit: ["a"], x: ["b"], youtube: ["c"], tiktok: ["d"] },
+      pollCreditsPerHour: "0.167",
+    });
+
+    await poll(registry, monitorId);
+    expect(await lastRunSources(monitorId)).toEqual(["reddit", "x", "youtube", "tiktok"]);
+    expect((await stateOf(monitorId)).balance).toBeCloseTo(0.167 - 4, 3);
+
+    // The second poll is not the first: nothing runs, no row.
+    await poll(registry, monitorId);
+    expect(await runCount(monitorId)).toBe(1);
+    expect(asked(registry, "reddit")).toEqual([["a"]]);
   });
 
   it("polls every search on every platform when the column is null, as before", async () => {

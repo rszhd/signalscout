@@ -14,30 +14,23 @@
  * the price that pair bills. The platform is described in
  * `sources/platforms.ts` and the provider in `./provider.ts`.
  *
- * US-057 added it because US-056 measured three providers for one platform and
- * this is the only one that answers "who said this in the last hour".
- *
- * **Every post in the capture was under ninety minutes old** — ten posts across
- * a 71-minute page. ScrapeCreators' newest was three days old and SocialCrawl
- * orders by relevance across weeks. This connector is not the cheap one: fifty
- * posts cost $0.10 on a free Apify plan, against $0.0094 through ScrapeCreators
- * and $0.2030 through SocialCrawl. It is the fresh one, and US-052 already
- * argued why that is what a lead is worth.
+ * **It is the fresh connector, not the cheap one** — it is chosen for the
+ * posts under two hours old that the others do not reach. docs/history.md,
+ * *Sources*, holds what US-056 measured across the three providers, and
+ * docs/costs.md holds the price.
  *
  * Four measured facts shape what is below.
  *
- * 1. **`sortBy: "date"` selects recent posts but does not order them.** The
- *    captured ten came back 04:43, 04:30, 04:29, 05:15, 05:14, 04:48, 04:37,
- *    04:11, 04:04, 05:12. So no page may be read as older than the next, and
- *    `x.ts`'s early-stop rule is absent here as it is on every LinkedIn
- *    connector.
+ * 1. **`sortBy: "date"` selects recent posts but does not order them.** No
+ *    page may be read as older than the next, so `x.ts`'s early-stop rule is
+ *    absent here as it is on every LinkedIn connector.
  * 2. **The id is the activity id**, the same number SocialCrawl returns as
  *    `id`, so a post collected there is not bought again here.
  * 3. **The bill settles after the run ends.** `client.ts` owns that, and it is
  *    why `unitsConsumed` is derived from a settled total rather than from the
  *    item count.
- * 4. **A run that matches nothing still costs $0.00105.** An empty poll is not
- *    a free poll.
+ * 4. **A run that matches nothing still costs money.** An empty poll is not a
+ *    free poll.
  */
 import { linkedInPlatform } from "../../platforms.js";
 import type {

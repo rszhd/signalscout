@@ -2,8 +2,7 @@
  * The poll step: ask every source a monitor names for what is new, and store
  * what comes back.
  *
- * This is the first code in the repository that calls a real connector. Read
- * docs/sources.md before changing it.
+ * Read docs/sources.md before changing it.
  *
  * Correctness-critical: cursor and deduplication. A source that answers with
  * `next.status === "wait"` has usually already started work that was billed —
@@ -420,13 +419,11 @@ export function createCollectStep({
        * polls at all; `notify` leaves it running and each poll is refused here
        * in turn, so the monitor starts again by itself next month.
        *
-       * The poll is refused whole, including a collection this monitor has
-       * already paid for and not yet read. That snapshot is a loss the guard
-       * cannot recover: reading it would spend no more at the source but would
-       * send every post it holds to the classifier, which is money past the cap.
-       * The continuation row stays, so raising the cap reads it rather than
-       * paying for the query again. US-014 is the ticket that stops a query
-       * whose cost the person never saw.
+       * The poll is refused whole, including a collection already paid for and
+       * not yet read: reading it would spend nothing more at the source but
+       * would send every post it holds to the classifier, which is money past
+       * the cap. The continuation row stays, so raising the cap reads it rather
+       * than paying for the query again.
        *
        * Logged as an error, not a warning. A monitor that has stopped collecting
        * is the one thing about this product a person must not learn from an
@@ -997,9 +994,8 @@ export function createCollectStep({
        * row already in the table; it says nothing about two rows arriving
        * together, and no `do update` variant does.
        *
-       * The scoped Reddit search makes this ordinary. Five queries across eight
-       * subreddits is forty searches, and a post matching two of those queries
-       * comes back twice into one batch.
+       * The scoped Reddit search makes this ordinary: a post matching two of a
+       * monitor's queries comes back twice into one batch.
        *
        * Keyed by `(source, external_id)` and nothing else, because that pair is
        * the unique index: the same post through two providers is one post,

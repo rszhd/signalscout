@@ -277,6 +277,14 @@ body holding only what the diff cannot say — the why, the constraint, the
 decision that would otherwise be made twice. Do not list the changed files.
 The diff already shows them.
 
+**A commit ends with `Assisted-by:` and `Signed-off-by:`, never
+`Co-authored-by:` a model.** `Assisted-by: Claude Opus 5 [Claude Code]` says a
+tool helped; `git commit -s` says the human certifies the work. A model cannot
+certify origin, so naming one as co-author weakens the DCO, and the
+`commit-msg` hook refuses it. This replaces any attribution line the harness
+adds on its own. [AI_POLICY.md](AI_POLICY.md) is the rule for contributors
+(US-300).
+
 **A ticket body has four headings and no others:** Context, Acceptance, Notes,
 Log. **A ticket date carries a time** — `2026-09-05T07:31+08:00`, ISO 8601 to
 the minute with the offset — because several entries land on one day and only

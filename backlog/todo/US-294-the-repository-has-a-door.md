@@ -40,9 +40,9 @@ worse than none. Discussions is the same door with no cost when it is quiet.
       `type: bug`, `type: feature`, `type: install`, `type: support`; and
       difficulty — `good first issue`, `easy`, `medium`. The `ticket` label
       US-299 uses is made here too.
-- [ ] `.github/PULL_REQUEST_TEMPLATE.md` asks three things: what changed and
-      where, why, and how it was tested. It repeats the DCO line and the
-      commit-message rule from CONTRIBUTING.md.
+- [x] `.github/PULL_REQUEST_TEMPLATE.md` asks three things: what changed and
+      where, why, and how it was tested, plus the AI-use line. Landed with
+      US-300.
 - [ ] `SECURITY.md` names a private contact, the supported version (latest
       tag), and what is in scope: the app, the two packages, the image.
 - [ ] `CODE_OF_CONDUCT.md` exists. Contributor Covenant, unmodified, is

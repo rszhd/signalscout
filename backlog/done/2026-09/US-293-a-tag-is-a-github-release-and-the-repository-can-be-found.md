@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-22T16:00+08:00
 parent:
 area: tooling
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -26,18 +26,18 @@ visibility the project can buy.
 
 ## Acceptance
 
-- [ ] `release.yml` creates a GitHub Release for the tag after the publish
+- [x] `release.yml` creates a GitHub Release for the tag after the publish
       job succeeds, with the tag's CHANGELOG.md section as the body. A tag
       whose section is missing fails the step and says so.
-- [ ] `release-ui.yml` does the same for `ui-v*` tags, from the UI package's
+- [x] `release-ui.yml` does the same for `ui-v*` tags, from the UI package's
       changelog section.
-- [ ] Every existing `v*` tag has a Release, backfilled from CHANGELOG.md.
-- [ ] The repository has topics: at least `social-listening`,
+- [x] Every existing `v*` tag has a Release, backfilled from CHANGELOG.md.
+- [x] The repository has topics: at least `social-listening`,
       `lead-generation`, `intent-data`, `reddit`, `self-hosted`, `open-source`,
       `typescript`. The homepage URL is https://www.signalscout.run.
-- [ ] The default branch decision is recorded here in the Log: either `main`
-      becomes default, with the reason, or `dev` stays, with the reason.
-- [ ] docs/releasing.md says that the Release is made by CI and what to do
+- [x] The default branch decision is recorded here in the Log: `main` is
+      the default since 2026-09-22.
+- [x] docs/releasing.md says that the Release is made by CI and what to do
       when the step fails.
 
 ## Notes
@@ -53,3 +53,5 @@ visibility the project can buy.
 ## Log
 
 - 2026-09-22T16:00+08:00 — Written from a gap review against the Postiz playbook.
+- 2026-09-22T17:05+08:00 — Shipped. `scripts/release-notes.mjs` prints a tag's CHANGELOG.md section and exits 1 without one; it was run on all 18 tags and found every section. Both release workflows end in a job that makes the Release from it, after npm has the packages. Backfilled 18 Releases with `gh release create`, oldest first. Topics and homepage set. The Release job itself runs for the first time on the next tag.
+- 2026-09-22T17:05+08:00 — Default branch: `main`, on the owner's decision. A visitor now sees the released code and the README the image matches. The cost is that a fork's pull request targets `main` unless the contributor changes it; CONTRIBUTING.md and the PR template say to. CI keeps `main` by name for `:latest`, so the setting cannot undo the publish.

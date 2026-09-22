@@ -38,6 +38,10 @@ coding agent, and you may use one too. The rule is that you understand
 every line you submit, say what you used, and sign the commit as yourself —
 `Assisted-by:` for the tool, never `Co-authored-by:` a model.
 
+**Open the pull request against `dev`.** `main` is what is released and
+what the image is built from; `dev` is where work lands first. GitHub
+offers `main` because it is the default branch — change it.
+
 **Find or write a ticket.** `backlog/OPEN.md` lists what is agreed and waiting.
 A ticket's **Context** holds the reasoning the code cannot, and its
 **Acceptance** list is what "done" means.

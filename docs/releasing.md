@@ -142,6 +142,18 @@ say they can be mixed.
 
 5. Watch the *Release* workflow. It publishes nothing until the checks pass,
    and it says which step refused if one does.
+6. The last job makes the GitHub Release, titled with the tag and holding
+   the tag's section of CHANGELOG.md. It runs after npm has the packages,
+   so a refused publish leaves no Release naming a version nobody can
+   install. It is what a watcher of this repository receives.
+
+**When the Release job fails**, the cause is the changelog: the tag has no
+`## 0.2.0 — date` heading, or the section under it is empty. Add the
+section on `main`, then re-run the failed job from the workflow's page. Do
+not move the tag. The packages are already on npm at that number, and a
+tag that moves points a Release at a commit npm did not build.
+`node scripts/release-notes.mjs v0.2.0` prints what the job will use, and
+exits 1 for the same reasons it does.
 
 Check first, locally, what CI will check: `pnpm build && pnpm release:verify`
 against the Postgres `pnpm db:up` starts. It packs, installs into

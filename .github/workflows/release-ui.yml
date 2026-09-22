@@ -74,3 +74,27 @@ jobs:
       - name: Publish
         run: |
           pnpm --filter @signalscout/ui publish --access public --no-git-checks --provenance
+
+  # The same last step as release.yml: the Releases page names the version
+  # once npm has it, from the UI's own CHANGELOG.md heading. US-293.
+  release:
+    name: Publish the GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: The changelog has this version
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > notes.md
+      - name: Create the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            --verify-tag

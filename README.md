@@ -161,9 +161,10 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
 keys that spend money and an inbox of your own research.
 
 [docs/self-hosting.md](docs/self-hosting.md) is the whole install: the two
-secrets and why they are not in the file you copied, the proxy, the settings
-that decide whether this instance takes registrations, and the SQL for finding
-out why a monitor stopped finding things.
+secrets and why they are not in the file you copied, **upgrading**, **backing
+up and what a dump does not contain**, the proxy, the settings that decide
+whether this instance takes registrations, and the SQL for finding out why a
+monitor stopped finding things.
 
 ---
 

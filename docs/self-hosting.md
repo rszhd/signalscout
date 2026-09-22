@@ -88,9 +88,83 @@ instance whose volume already exists locks the app out of its own database.
 
 ### The image
 
-`docker compose up` alone pulls a published image so a server never compiles
-anything. **That image is not published yet**, so the build command above is
-the one to use until it is.
+`docker compose up` pulls `ghcr.io/rszhd/signalscout`, which CI builds from
+`main` and publishes, so a server never compiles anything. It is public and
+needs no registry login.
+
+Tags: the full version (`0.13.1`), the major and minor (`0.13`), and
+`latest`, which follows `main`. `SIGNALSCOUT_IMAGE` in `.env` pins one.
+
+**Published for `linux/amd64` and `linux/arm64`**, so the cheap ARM boxes run
+it: Hetzner's Ampere line, Oracle's free tier, a Raspberry Pi. Docker picks
+the right one; `docker manifest inspect ghcr.io/rszhd/signalscout:latest`
+lists both.
+
+---
+
+## Upgrading
+
+```bash
+docker compose exec -T postgres pg_dump -U intentwatch intentwatch | gzip > backup.sql.gz
+docker compose pull
+docker compose up -d
+```
+
+**Back up first.** A release can carry a migration, and a migration is not
+reversible. *Backing up* below is the whole procedure and what a dump does
+not contain.
+
+The `migrate` container runs to completion before the app starts, so the
+app never serves a database it has not migrated. Watch it:
+`docker compose logs migrate`. It prints `migrations applied to <database>`
+when it is done.
+
+**When the migrate container fails**, the app does not start, and that is
+deliberate — a half-migrated database serving requests is worse than one
+serving none. Read its log first: a migration that refused says which. To go
+back, restore the dump and pin the version you were on:
+
+```bash
+echo "SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1" >> .env
+docker compose up -d
+```
+
+Restoring is what makes that safe. The old image against an already-migrated
+database is not a state this project tests, and a column the old code does
+not know about is the least of what can go wrong there.
+
+**Pin a version on an instance you care about.** `latest` follows `main`, so
+it moves when `main` does. A pinned instance upgrades when you change one
+line, which is when you have read what changed:
+[CHANGELOG.md](../CHANGELOG.md), or the Releases page.
+
+---
+
+## Backing up
+
+One database holds everything the instance knows: your provider keys, your
+monitors, and the inbox of what they found.
+
+```bash
+docker compose exec -T postgres pg_dump -U intentwatch intentwatch | gzip > signalscout-$(date +%F).sql.gz
+```
+
+Restore into an empty database:
+
+```bash
+gunzip -c signalscout-2026-09-22.sql.gz | docker compose exec -T postgres psql -U intentwatch intentwatch
+```
+
+**`ENCRYPTION_KEY` is not in the dump, and without it the dump is not a
+backup.** Provider keys and model keys are stored encrypted with it. A
+database restored under a different key holds rows that cannot be read: the
+application boots, refuses to decrypt them, and every key has to be entered
+again. **`AUTH_SECRET` is not in it either** — losing that one only signs
+everybody out.
+
+Both live in `.env`, which `pg_dump` never sees. Back up that file alongside
+the dump, and keep it somewhere the dump is not, since together they are the
+whole instance. [secrets.md](secrets.md) says what each one protects.
 
 ---
 
@@ -214,6 +288,13 @@ SMTP setup and the contract a webhook receiver must implement.
 ---
 
 ## When a monitor stops finding things
+
+**Read `docker compose ps` first.** The app container carries a healthcheck
+against `/api/health`, so it says `healthy` or `unhealthy` rather than only
+`Up` — a process that is alive and no longer answering is the one failure a
+restart policy cannot see, and this is where it shows. The worker has no
+healthcheck because it serves no port; whether it is working is a question
+about polls, and the SQL below answers it.
 
 The queue is tables in your own Postgres, so looking at it is SQL and needs no
 extra tool.

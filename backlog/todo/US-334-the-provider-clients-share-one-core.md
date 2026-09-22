@@ -1,5 +1,6 @@
 ---
 id: US-334
+issue: 82
 title: The provider clients share one core
 type: chore
 priority: p2

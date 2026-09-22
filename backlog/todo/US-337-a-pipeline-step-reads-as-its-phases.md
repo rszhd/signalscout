@@ -1,5 +1,6 @@
 ---
 id: US-337
+issue: 85
 title: A pipeline step reads as its phases
 type: chore
 priority: p3

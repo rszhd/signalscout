@@ -1,5 +1,6 @@
 ---
 id: US-335
+issue: 83
 title: The paid-run scripts share one harness
 type: chore
 priority: p3

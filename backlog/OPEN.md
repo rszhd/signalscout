@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 0 doing, 27 todo, 5 parked (1 p1, 21 p2, 10 p3).
+31 open — 0 doing, 26 todo, 5 parked (1 p1, 20 p2, 10 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,7 +22,6 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
-| p2 | US-295 | [A self-hoster runs the published image without git or Node](todo/US-295-a-self-hoster-runs-the-image-without-git-or-node.md) | feature | todo | 2026-09-22T16:04+08:00 |
 | p2 | US-296 | [The contributing section says what help is wanted, before what is refused](todo/US-296-the-contributing-section-says-what-help-is-wanted.md) | chore | todo | 2026-09-22T16:06+08:00 |
 | p2 | US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](todo/US-299-every-open-ticket-is-a-github-issue.md) | chore | todo | 2026-09-22T16:28+08:00 |
 | p2 | US-301 | [A newcomer has a map that fits on one page](todo/US-301-a-newcomer-has-a-map-that-fits-on-one-page.md) | chore | todo | 2026-09-22T16:32+08:00 |

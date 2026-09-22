@@ -179,3 +179,35 @@ sweeps every monitor with settings, so a lost enqueue cannot lose a match.
 row outlives its poll row routinely. When the poll is trimmed, the stage keeps
 its walk and loses its `poll_run_id`. A screen reads that as "this collection,
 poll unknown" and must not guess.
+
+---
+
+## Adding a migration
+
+Two streams, each with its own journal and its own migrations table.
+Pipeline tables are `packages/pipeline/src/db/schema.ts` with
+`packages/pipeline/drizzle`; account tables are `apps/api/src/db/` with
+`apps/api/drizzle`. The pipeline never joins an account table, so a new table
+belongs to whichever half owns it, and never to both.
+
+1. **Decide the stream**, by that rule.
+2. **Edit the schema.** If the value is one of the arrays in
+   `packages/engine/src/vocabulary.ts`, or `modelCallPurposes`, stop and read
+   the next paragraph before going on.
+3. **Run `pnpm db:generate`** from the root. Never write the SQL by hand: it
+   writes the file *and* the `meta/_journal.json` entry, and a file the
+   journal does not name is applied nowhere.
+4. **Check the number**: `ls packages/pipeline/drizzle | tail -3`, or
+   `apps/api/drizzle`. One migration number, one file. Two branches that each
+   took the next number merge cleanly and break at boot, so if another branch
+   or worktree took it, regenerate.
+5. **`pnpm db:migrate`**, then `pnpm test`. `db/migrations.test.ts` in each
+   stream fails by name when the journal and the folder disagree.
+6. **Say so in the ticket** if the change reaches a consumer: a migration is a
+   minor version, never a patch ([releasing.md](releasing.md)).
+
+**The array that is also a check constraint.** A value added to
+`vocabulary.ts` or to `modelCallPurposes` is a value the database still
+refuses, and TypeScript does not know it. Three times a full suite passed, the
+call succeeded, the money was spent, and recording it failed. Write the
+migration in the same change as the array.

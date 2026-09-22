@@ -105,3 +105,72 @@ jobs:
         run: |
           pnpm --filter @signalscout/engine --filter @signalscout/pipeline \
             publish --access public --no-git-checks --provenance
+
+  # The image the tag names, so a self-hoster can pin one. CI publishes
+  # `:latest` and `:sha-…` on every push to main; neither says which version
+  # it is, and docker-compose.yml's SIGNALSCOUT_IMAGE is the documented way
+  # to pin. The build is cached from CI's, so this re-tags rather than
+  # recompiles. US-295.
+  image:
+    name: Tag the image with the version
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          # `0.13.1` and `0.13`. Not `latest`: that is main's, and a tag can
+          # point at a commit main has moved past.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+
+  # After npm has it, the Releases page says so. The body is the tag's
+  # CHANGELOG.md section, and a tag without one fails here rather than
+  # publish a Release that says nothing — the changelog is written for
+  # exactly this reader. Last, so a refused publish leaves no Release
+  # claiming a version npm does not have. US-293.
+  release:
+    name: Publish the GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: The changelog has this version
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > notes.md
+      - name: Create the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            --verify-tag

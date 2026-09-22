@@ -58,6 +58,38 @@ jobs:
       - name: The backlog lists match the ticket files
         run: backlog/index.sh --check
 
+      # Only on main, and only for this repository's own pushes: the check
+      # reads issues through `gh`, and a fork's job has no token that can.
+      # It reports rather than fails, because an unmirrored ticket is a
+      # missing view, not a broken build — `backlog/sync.sh` fixes it in one
+      # run. US-299.
+      - name: The issue mirror matches the ticket files
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: backlog/sync.sh --check
+
+      # The DCO is the whole contribution agreement, so a commit without the
+      # line has no agreement. Checked on pull requests from a fork only:
+      # the owner's release branches carry commits from before the rule and
+      # the commit-msg hook covers the owner from now on. AI_POLICY.md,
+      # US-300.
+      - name: Every commit from outside is signed off
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Through the API, because the checkout is one commit deep and the
+        # base is not in it.
+        run: |
+          unsigned=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" --paginate \
+            -q '.[] | select(.commit.message | test("Signed-off-by:") | not) | "\(.sha) \(.commit.message | split("\n")[0])"')
+          if [ -n "$unsigned" ]; then
+            echo "::error::A commit lacks Signed-off-by. Use git commit -s. See CONTRIBUTING.md."
+            echo "$unsigned"
+            exit 1
+          fi
+
       - run: pnpm lint
       # Biome has no rule for a raw colour or a raw spacing value, and those
       # are what keep two applications on one brand. US-270.
@@ -111,11 +143,11 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             # `main` by name, not `is_default_branch`. That macro reads a
-            # setting in a web interface: this repository's default is `dev`,
-            # which CI never runs on, so the condition was false on every run
-            # that could publish and `:latest` was never made — while
-            # docker-compose.yml asked for it by default and README.md told
-            # people to run it.
+            # setting in a web interface. When the default was `dev` — which
+            # CI never runs on — the condition was false on every run that
+            # could publish and `:latest` was never made, while
+            # docker-compose.yml asked for it by default. The default is
+            # `main` since US-293; the name stays so a click cannot undo it.
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=sha,format=long
 

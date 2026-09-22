@@ -1,5 +1,6 @@
 ---
 id: US-233
+issue: 50
 title: A dry run estimates the pair it is about to call
 type: bug
 priority: p2

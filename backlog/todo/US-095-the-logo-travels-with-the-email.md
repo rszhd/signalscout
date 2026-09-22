@@ -1,5 +1,7 @@
 ---
 id: US-095
+labels: [help wanted, medium]
+issue: 46
 title: The logo travels with the email
 type: feature
 priority: p3

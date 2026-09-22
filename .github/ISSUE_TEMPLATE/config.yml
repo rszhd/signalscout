@@ -1,0 +1,10 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: Question, or trouble installing
+    url: https://github.com/rszhd/signalscout/discussions
+    about: Ask in Discussions. An install that will not start is a question until it is reproduced.
+
+  - name: Security issue
+    url: https://github.com/rszhd/signalscout/security/advisories/new
+    about: Report it privately through a GitHub Security Advisory. Never in a public issue.

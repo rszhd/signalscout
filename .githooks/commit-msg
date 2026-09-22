@@ -1,0 +1,11 @@
+#!/bin/sh
+# A model is not an author. A commit that used a tool says so with
+# `Assisted-by:`; `Co-authored-by:` names a person who can sign off, and a
+# model cannot. AI_POLICY.md holds the reason. US-300.
+set -e
+if grep -iE '^co-authored-by:.*(claude|anthropic|gpt|openai|copilot|codex|gemini|cursor|noreply@anthropic\.com)' "$1" >/dev/null; then
+  echo "commit-msg: a model is named in Co-authored-by:. Use" >&2
+  echo "  Assisted-by: Claude Opus 5 [Claude Code]" >&2
+  echo "and sign off as yourself with git commit -s. See AI_POLICY.md." >&2
+  exit 1
+fi

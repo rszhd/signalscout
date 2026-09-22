@@ -1,5 +1,7 @@
 ---
 id: US-062
+labels: [help wanted, medium]
+issue: 45
 title: A real model's drafts are replayed
 type: chore
 priority: p2

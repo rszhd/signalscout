@@ -1,5 +1,7 @@
 ---
 id: US-243
+labels: [good first issue, easy]
+issue: 51
 title: One Instagram comment link is opened
 type: chore
 priority: p3

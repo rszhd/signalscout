@@ -1,5 +1,6 @@
 ---
 id: US-018
+issue: 36
 title: A mutation sweep proves the suite is sensitive
 type: chore
 priority: p3

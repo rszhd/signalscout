@@ -2,7 +2,14 @@
 # Node process serving the API and the built UI on one port.
 #
 # The app image is pulled, never built here. It is built in CI and published, so
-# a 1 GB server never compiles anything. To build it yourself:
+# a 1 GB server never compiles anything, and this file works on its own — a
+# `curl` of it beside a `.env` is the whole install (docs/self-hosting.md).
+#
+# `latest` follows main. To pin a version, set SIGNALSCOUT_IMAGE in .env:
+#
+#   SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1
+#
+# To build it yourself, which needs a checkout:
 #
 #   docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
 

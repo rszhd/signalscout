@@ -5,24 +5,18 @@ description: Add or change a table or a column in either migration stream, with 
 
 # Add a migration
 
-The rules are in `AGENTS.md`, *Rules that are easy to break*. This is the
-order.
+**The procedure is [`docs/pipeline.md`](../../../docs/pipeline.md), *Adding a
+migration*.** Read it and follow it; it is written for a person and it is the
+same six steps. The rules behind them are in `AGENTS.md`, *Rules that are easy
+to break*.
 
-1. Decide the stream. Pipeline tables: `packages/pipeline/src/db/schema.ts`
-   and `packages/pipeline/drizzle`. Account tables: `apps/api/src/db/` and
-   `apps/api/drizzle`. The pipeline never joins an account table.
-2. Edit the schema. If the value is one of the arrays in
-   `packages/engine/src/vocabulary.ts` or `modelCallPurposes`, the check
-   constraint is built from it and **the suite will not notice a missing
-   migration**: write it in this same change.
-3. Run `pnpm db:generate` from the root. Never write the SQL by hand. It
-   writes the file **and** the `meta/_journal.json` entry; a file the journal
-   does not name is applied nowhere.
-4. Check the number: `ls packages/pipeline/drizzle | tail -3` (or
-   `apps/api/drizzle`). One migration number, one file. If another branch or
-   worktree took the same number, regenerate.
-5. `pnpm db:migrate` against the folder's own Postgres, then `pnpm test`.
-   `db/migrations.test.ts` in each stream fails by name when the journal and
-   the folder disagree.
-6. If the change reaches the cloud application, say so in the ticket: a
-   migration is a minor version for the consumer (`docs/releasing.md`).
+Three things cost the most when they are forgotten, so they are here too:
+
+- **A value added to `vocabulary.ts` or `modelCallPurposes` is also a check
+  constraint**, and the suite will not notice the missing migration. Write it
+  in the same change.
+- **`pnpm db:generate`, never hand-written SQL.** It writes the
+  `meta/_journal.json` entry, and a migration the journal does not name is
+  applied nowhere.
+- **One migration number, one file.** Two worktrees cannot see each other's,
+  so check `ls packages/pipeline/drizzle | tail -3` before committing.

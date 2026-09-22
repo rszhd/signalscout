@@ -52,6 +52,9 @@ finish something, say which half you proved.
 
 ## Before you start a task
 
+0. If you have not worked here before, read [`docs/map.md`](docs/map.md)
+   first. It is the ten-minute shape of the repository, written for a person,
+   and this file assumes it.
 1. Find its ticket in [`backlog/OPEN.md`](backlog/OPEN.md). If there is no
    ticket, ask whether to write one first. Read its **Context**: it holds the
    reasoning that the code cannot.
@@ -277,10 +280,30 @@ body holding only what the diff cannot say — the why, the constraint, the
 decision that would otherwise be made twice. Do not list the changed files.
 The diff already shows them.
 
+**A commit ends with `Assisted-by:` and `Signed-off-by:`, never
+`Co-authored-by:` a model.** `Assisted-by: Claude Opus 5 [Claude Code]` says a
+tool helped; `git commit -s` says the human certifies the work. A model cannot
+certify origin, so naming one as co-author weakens the DCO, and the
+`commit-msg` hook refuses it. This replaces any attribution line the harness
+adds on its own. [AI_POLICY.md](AI_POLICY.md) is the rule for contributors
+(US-300).
+
 **A ticket body has four headings and no others:** Context, Acceptance, Notes,
 Log. **A ticket date carries a time** — `2026-09-05T07:31+08:00`, ISO 8601 to
 the minute with the offset — because several entries land on one day and only
 the time says which came first.
+
+**A comment says what the code cannot.** Three things: the constraint that
+the next reader would break, the trap that has already caught somebody, and
+the decision that would otherwise be made twice. Two things it is not. **A
+measurement goes to [docs/history.md](docs/history.md)**, which owns
+measurements — a comment saying one platform gave 720 matches at an average
+of 48 is a reading from one instance on one day, and in the code it is a
+number nobody can check. **A story about how the code came to be goes to its
+ticket's Log.** A ticket id may stay when it is the only pointer to a
+decision, and then it is one id at the end of one sentence, not a heading.
+`node scripts/comment-density.mjs` says where the dense files are; it does not
+say which comments are wrong, because that is a judgment per comment (US-302).
 
 **A file header holds the contract, not the story.** What the file does, the
 invariants it keeps, the failure shape, and the ticket that holds the rest —

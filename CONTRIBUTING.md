@@ -21,8 +21,9 @@ The `-s` adds:
 Signed-off-by: Your Name <your@email>
 ```
 
-That line is the whole ceremony. It is not a copyright assignment and it gives
-nobody rights over your other work. The full text of what you are certifying is
+That line is the whole ceremony, and it is not optional: a pull request from
+outside this repository fails CI when a commit lacks it. It is not a
+copyright assignment and it gives nobody rights over your other work. The full text of what you are certifying is
 at [developercertificate.org](https://developercertificate.org/), and it is
 short enough to read.
 
@@ -32,13 +33,32 @@ this project wants patches from.
 
 ## Before you write code
 
-**Find or write a ticket.** `backlog/OPEN.md` lists what is agreed and waiting.
-A ticket's **Context** holds the reasoning the code cannot, and its
-**Acceptance** list is what "done" means.
+**Read [AI_POLICY.md](AI_POLICY.md).** This repository is written with an AI
+coding agent, and you may use one too. The rule is that you understand
+every line you submit, say what you used, and sign the commit as yourself —
+`Assisted-by:` for the tool, never `Co-authored-by:` a model.
 
-**Read [AGENTS.md](AGENTS.md).** It is the working agreement for this
-repository — for people and for AI tools alike — and it holds the rules that
-are easy to break by accident.
+**Open the pull request against `dev`.** `main` is what is released and
+what the image is built from; `dev` is where work lands first. GitHub
+offers `main` because it is the default branch — change it.
+
+**Start with a labelled issue.** The ones marked
+[good first issue or help wanted](https://github.com/rszhd/signalscout/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22%2C%22help+wanted%22)
+were chosen because each fits one evening. An issue labelled `good first
+issue` is written by hand, not by an agent — the label exists so a person
+learns the code ([AI_POLICY.md](AI_POLICY.md)).
+
+**Or find a ticket.** `backlog/OPEN.md` lists what is agreed and waiting, and
+every open one has an issue. A ticket's **Context** holds the reasoning the
+code cannot, and its **Acceptance** list is what "done" means.
+
+**Read [docs/map.md](docs/map.md).** Ten minutes: what runs, which folder
+does what, one poll and one request end to end, and where the reasoning lives.
+It is the page written for you.
+
+**Then [AGENTS.md](AGENTS.md).** Same ground, written for an AI coding agent
+and organised around what changes the next edit. It holds the rules that are
+easy to break by accident.
 
 Four of them matter more than the rest:
 
@@ -116,4 +136,27 @@ diff already shows them.
 An issue that says what you expected, what happened, and how to reproduce it is
 worth more than a patch that guesses. If it touches money, a provider's
 behaviour or a credential, say what you measured and what you inferred — this
-repository keeps those apart on purpose.
+repository keeps those apart on purpose. The
+[bug form](https://github.com/rszhd/signalscout/issues/new/choose) asks for
+both.
+
+**A question is not an issue.** Questions, and an install that will not start,
+go to [Discussions](https://github.com/rszhd/signalscout/discussions). An
+install problem becomes an issue once somebody reproduces it.
+
+**A security hole is never a public issue.** It goes through a
+[Security Advisory](https://github.com/rszhd/signalscout/security/advisories/new),
+privately. [SECURITY.md](SECURITY.md) says what is in scope and what a report
+must contain.
+
+## How a request becomes work
+
+The ticket files under `backlog/` are the plan, and GitHub Issues are the
+door. A request arrives as an issue. If it is agreed, it becomes a ticket
+file whose **Notes** names the issue, and the issue gets a comment with the
+ticket's link and stays open until the file reaches `done/`. Nothing flows
+back the other way: the file is the source, and a comment on the issue is for
+people, not for the backlog.
+
+An issue nobody agreed to is closed with a sentence saying why. It is not
+left for a bot to close in silence six months later.

@@ -1,5 +1,6 @@
 ---
 id: US-231
+issue: 48
 title: A triage rule is compared by a harness, not by hand
 type: chore
 priority: p2

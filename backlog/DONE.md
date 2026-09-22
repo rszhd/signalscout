@@ -2,7 +2,7 @@
 
 # Done
 
-193 finished.
+204 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -29,6 +29,17 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-302 | [A comment says what the code cannot, and a number goes to history](done/2026-09/US-302-a-comment-says-what-the-code-cannot-and-a-number-goes-to-history.md) | chore | shipped | 2026-09 |
+| US-301 | [A newcomer has a map that fits on one page](done/2026-09/US-301-a-newcomer-has-a-map-that-fits-on-one-page.md) | chore | shipped | 2026-09 |
+| US-300 | [The project says how AI may be used, by the owner and by a contributor](done/2026-09/US-300-the-project-says-how-ai-may-be-used.md) | chore | shipped | 2026-09 |
+| US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](done/2026-09/US-299-every-open-ticket-is-a-github-issue.md) | chore | shipped | 2026-09 |
+| US-297 | [The README has a roadmap a visitor can read](done/2026-09/US-297-the-readme-has-a-roadmap-a-visitor-can-read.md) | chore | shipped | 2026-09 |
+| US-296 | [The contributing section says what help is wanted, before what is refused](done/2026-09/US-296-the-contributing-section-says-what-help-is-wanted.md) | chore | shipped | 2026-09 |
+| US-295 | [A self-hoster runs the published image without git or Node](done/2026-09/US-295-a-self-hoster-runs-the-image-without-git-or-node.md) | feature | shipped | 2026-09 |
+| US-294 | [The repository has a door](done/2026-09/US-294-the-repository-has-a-door.md) | chore | shipped | 2026-09 |
+| US-293 | [A tag is a GitHub Release, and the repository can be found](done/2026-09/US-293-a-tag-is-a-github-release-and-the-repository-can-be-found.md) | chore | shipped | 2026-09 |
+| US-292 | [The README's first screen shows the product and names the cloud](done/2026-09/US-292-the-readme-s-first-screen-shows-the-product-and-the-cloud.md) | chore | shipped | 2026-09 |
+| US-291 | [A monitor's first poll runs every search](done/2026-09/US-291-a-monitors-first-poll-runs-every-search.md) | feature | shipped | 2026-09 |
 | US-289 | [A project's searches take turns across the hour](done/2026-09/US-289-a-projects-searches-take-turns-across-the-hour.md) | feature | shipped | 2026-09 |
 | US-287 | [A pair puts at most so many posts to the classifier a day](done/2026-09/US-287-a-pair-puts-at-most-so-many-posts-to-the-classifier-a-day.md) | feature | shipped | 2026-09 |
 | US-283 | [The mark carries its own style](done/2026-09/US-283-the-mark-carries-its-own-style.md) | chore | shipped | 2026-09 |

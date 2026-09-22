@@ -127,6 +127,20 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      # arm64 is cross-built under emulation, so it is slow, so it is built
+      # only where it is published. A pull request builds amd64 alone to
+      # prove the Dockerfile still works and stays quick; a break that is
+      # arm64-only therefore appears at merge rather than in the pull
+      # request. That is the trade, and it is small because nothing in this
+      # image is architecture-specific — Alpine, Node, and a lockfile that
+      # already carries the linux-arm64 esbuild and rollup binaries. If the
+      # build time becomes the problem, the fix is a native `ubuntu-24.04-arm`
+      # runner and a manifest merge, not dropping the platform. US-306.
+      - uses: docker/setup-qemu-action@v3
+        if: github.event_name == 'push'
+        with:
+          platforms: arm64
+
       # Pull requests build the image to prove the Dockerfile still works. A
       # push to main publishes it, because that is what a self-hoster pulls.
       - name: Log in to the registry
@@ -156,6 +170,7 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' }}
+          platforms: ${{ github.event_name == 'push' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

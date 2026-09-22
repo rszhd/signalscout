@@ -152,6 +152,28 @@ services:
       WORKER_IN_PROCESS: ${WORKER_IN_PROCESS:-true}
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
+    # `restart: unless-stopped` brings back a process that exited. It does
+    # nothing for one that is alive and no longer answering, which is the
+    # state `docker compose ps` most needs to show and could not. The route
+    # is open on purpose — `apps/api/src/auth.ts` says why — so an
+    # unreachable instance and a signed-out one do not look alike here.
+    #
+    # `node -e`, because the image has neither curl nor wget, and adding a
+    # package to it for a healthcheck is the wrong trade. US-308.
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # The migrations run before this container starts, so a cold boot is
+      # already past them here; this covers the Node process itself.
+      start_period: 20s
     depends_on:
       postgres:
         condition: service_healthy
@@ -162,6 +184,11 @@ services:
   # Started only when COMPOSE_PROFILES=worker. Set that together with
   # WORKER_IN_PROCESS=false; on their own, either one leaves you with no worker
   # or with two.
+  #
+  # No healthcheck, unlike `app`. This process serves no port — it takes jobs
+  # from pg-boss — so there is nothing to ask. Whether it is working is a
+  # question about polls, and `poll_runs` answers it:
+  # docs/self-hosting.md, *When a monitor stops finding things*. US-308.
   worker:
     profiles: ["worker"]
     image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}

@@ -158,6 +158,29 @@ The scope is one sentence: **find conversations with intent.**
 
 ---
 
+## Roadmap
+
+**Next is detection quality, not a seventh platform.** Thirty human verdicts
+on real matches, to say whether the score is right (US-033); a harness that
+compares a triage rule instead of arguing about it (US-231); and an evaluation
+model for the cheap stage that decides what the good model reads (US-232).
+
+**Refused, and staying refused.** Publishing a reply from here — the draft ends
+at the clipboard. Sentiment charts, share of voice, competitor analytics, a
+CRM. And another social network before the existing ones reliably produce
+useful matches; the rule has been crossed four times, each on the owner's
+decision and each recorded in its ticket.
+
+**Measured, not guessed.** The first question is not stars or signups. It is
+whether people who run this receive matches they find valuable, and whether
+they keep the monitors running.
+
+[backlog/OPEN.md](backlog/OPEN.md) is every open ticket with its reasoning.
+[PLAN.md](PLAN.md) is why the scope is one sentence. This section is written
+by hand and says less than both on purpose.
+
+---
+
 ## Repository
 
 | | |

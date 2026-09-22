@@ -6,7 +6,7 @@ priority: p3
 created: 2026-09-22T16:08+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -22,13 +22,13 @@ list for the rest.
 
 ## Acceptance
 
-- [ ] README.md has a *Roadmap* section, above the repository table, with:
+- [x] README.md has a *Roadmap* section, above the repository table, with:
       the next two or three tickets in plain words, the standing refusals
       (publishing, analytics, a seventh source until detection is proven),
       and links to PLAN.md and backlog/OPEN.md.
-- [ ] It is short enough that it stays true for a month without editing.
+- [x] It is short enough that it stays true for a month without editing.
       Nothing in it names a date.
-- [ ] `backlog/index.sh` is not changed; the section is hand-written and
+- [x] `backlog/index.sh` is not changed; the section is hand-written and
       says so.
 
 ## Notes
@@ -39,3 +39,4 @@ list for the rest.
 ## Log
 
 - 2026-09-22T16:08+08:00 — Written from a gap review against the Postiz playbook.
+- 2026-09-22T18:00+08:00 — Shipped. Four short paragraphs between *What this is not* and *Repository*: what is next, what is refused, how the project judges itself, and the two links for the rest. It names three ticket ids and no dates, so it stays true until those three close.

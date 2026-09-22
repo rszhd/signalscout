@@ -102,6 +102,156 @@ function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
   };
 }
 
+/** What the call ledger and the inbox already say about this batch. */
+interface Ledger {
+  readonly candidates: (typeof posts.$inferSelect)[];
+  readonly alreadyScored: ReadonlySet<string | null>;
+  readonly alreadyMatched: ReadonlySet<string | null>;
+  readonly attemptsByPost: ReadonlyMap<string | null, number>;
+}
+
+async function readLedger(
+  db: Database,
+  monitor: typeof monitors.$inferSelect,
+  ids: readonly string[],
+  newPostsPerPairPerDay: number | undefined,
+): Promise<Ledger> {
+  const monitorId = monitor.id;
+
+  // Both questions are about this monitor at this version, and both are asked
+  // of the call ledger. `matches` cannot answer either one: a post scored
+  // below the threshold is money spent that leaves no match behind.
+  const thisVersion = and(
+    eq(modelCalls.monitorId, monitorId),
+    eq(modelCalls.monitorVersion, monitor.version),
+    inArray(modelCalls.postId, [...ids]),
+    // Other kinds of call are recorded in the same table and are not this.
+    eq(modelCalls.purpose, "classification"),
+  );
+
+  /**
+   * A post the ceiling refused on an earlier day is not read on a later one.
+   * US-287: the day's posts are the day's, and a backlog drained at 25 a day
+   * would be the ceiling in name only. The drop row is what says so.
+   */
+  const refusedBefore = db
+    .select({ postId: filterDrops.postId })
+    .from(filterDrops)
+    .where(and(eq(filterDrops.monitorId, monitorId), eq(filterDrops.stage, "ceiling")));
+
+  const [candidates, scored, failures, matched] = await Promise.all([
+    db
+      .select()
+      .from(posts)
+      .where(
+        and(
+          inArray(posts.id, [...ids]),
+          isNull(posts.deletedAt),
+          ...(newPostsPerPairPerDay === undefined ? [] : [notInArray(posts.id, refusedBefore)]),
+        ),
+      ),
+    db
+      .selectDistinct({ postId: modelCalls.postId })
+      .from(modelCalls)
+      .where(and(thisVersion, eq(modelCalls.outcome, "scored"))),
+    db
+      .select({ postId: modelCalls.postId, attempts: count() })
+      .from(modelCalls)
+      // "How often did the model refuse this post", for this question.
+      .where(and(thisVersion, ne(modelCalls.outcome, "scored")))
+      .groupBy(modelCalls.postId),
+    // Not the skip — that is `scored` above. This says which posts are in
+    // the inbox already, so a re-score under a new version updates the row
+    // it finds instead of announcing it as something new.
+    db
+      .select({ postId: matches.postId })
+      .from(matches)
+      .where(and(eq(matches.monitorId, monitorId), inArray(matches.postId, [...ids]))),
+  ]);
+
+  return {
+    candidates,
+    alreadyScored: new Set(scored.map((row) => row.postId)),
+    alreadyMatched: new Set(matched.map((row) => row.postId)),
+    attemptsByPost: new Map(failures.map((row) => [row.postId, Number(row.attempts)])),
+  };
+}
+
+/**
+ * One transaction, because the ledger row is what stops this post being
+ * scored again. Two statements could leave the row written and the match
+ * missing, and nothing afterwards would notice or repair it.
+ */
+async function writeMatch(
+  db: Database,
+  record: (
+    tx: Queryable,
+    postId: string,
+    outcome: ModelCallOutcome,
+    call: ModelCall,
+  ) => Promise<void>,
+  monitorId: string,
+  postId: string,
+  outcome: {
+    readonly call: ModelCall;
+    readonly classification: Parameters<typeof scoreColumns>[0];
+  },
+): Promise<{ id: string } | undefined> {
+  return db.transaction(async (tx) => {
+    await record(tx, postId, "scored", outcome.call);
+
+    const [inserted] = await tx
+      .insert(matches)
+      .values({ monitorId, postId, ...scoreColumns(outcome.classification) })
+      // A match from an earlier version keeps its row. Its scores are
+      // rewritten to the ones this version gave, because the inbox shows
+      // the monitor a person has now. What a person did to the row —
+      // reading it, saving it, a verdict against the version that earned
+      // it — is theirs and is left alone.
+      .onConflictDoUpdate({
+        target: [matches.monitorId, matches.postId],
+        set: scoreColumns(outcome.classification),
+      })
+      .returning({ id: matches.id });
+
+    return inserted;
+  });
+}
+
+/**
+ * The threads whose next batch is now decidable. US-048.
+ *
+ * A thread is read fifty comments at a time and the decision to buy the
+ * next fifty needs the verdicts on the last fifty — which exist only here,
+ * at the end of classification. So this closes the loop: replies buys a
+ * batch, the filter and this step judge it, and this sends the thread back
+ * for another.
+ *
+ * The rule itself is deliberately not here. This step knows nothing about
+ * batches, thresholds or ceilings; it says "these threads have been
+ * judged" and `replies.ts` decides what that is worth. A step that scores
+ * posts should not also own how deep a thread is read.
+ */
+async function sendJudgedThreads(
+  db: Database,
+  boss: StepContext["boss"],
+  { monitorId, walkId, pollRunId }: ClassifyPayload,
+  ids: readonly string[],
+): Promise<void> {
+  const parents = await db
+    .selectDistinct({ id: posts.parentPostId })
+    .from(posts)
+    .where(and(inArray(posts.id, [...ids]), eq(posts.kind, "reply")));
+
+  const threadIds = parents.map((row) => row.id).filter((id): id is string => id !== null);
+
+  if (threadIds.length > 0) {
+    // The thread's own poll travels with it: a reply belongs to the poll
+    // that found the post above it. US-211.
+    await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId, pollRunId });
+  }
+}
+
 export function createClassifyStep({
   classifierFor,
   newPostsPerPairPerDay,
@@ -195,15 +345,11 @@ export function createClassifyStep({
 
     const ids = [...postIds];
 
-    // Both questions are about this monitor at this version, and both are asked
-    // of the call ledger. `matches` cannot answer either one: a post scored
-    // below the threshold is money spent that leaves no match behind.
-    const thisVersion = and(
-      eq(modelCalls.monitorId, monitorId),
-      eq(modelCalls.monitorVersion, monitor.version),
-      inArray(modelCalls.postId, ids),
-      // Other kinds of call are recorded in the same table and are not this.
-      eq(modelCalls.purpose, "classification"),
+    const { candidates, alreadyScored, alreadyMatched, attemptsByPost } = await readLedger(
+      db,
+      monitor,
+      ids,
+      newPostsPerPairPerDay,
     );
 
     /**
@@ -215,46 +361,6 @@ export function createClassifyStep({
      * with no thread, scores it low, and nobody is told a lie about who wrote
      * what.
      */
-    /**
-     * A post the ceiling refused on an earlier day is not read on a later one.
-     * US-287: the day's posts are the day's, and a backlog drained at 25 a day
-     * would be the ceiling in name only. The drop row is what says so.
-     */
-    const refusedBefore = db
-      .select({ postId: filterDrops.postId })
-      .from(filterDrops)
-      .where(and(eq(filterDrops.monitorId, monitorId), eq(filterDrops.stage, "ceiling")));
-
-    const [candidates, scored, failures, matched] = await Promise.all([
-      db
-        .select()
-        .from(posts)
-        .where(
-          and(
-            inArray(posts.id, ids),
-            isNull(posts.deletedAt),
-            ...(newPostsPerPairPerDay === undefined ? [] : [notInArray(posts.id, refusedBefore)]),
-          ),
-        ),
-      db
-        .selectDistinct({ postId: modelCalls.postId })
-        .from(modelCalls)
-        .where(and(thisVersion, eq(modelCalls.outcome, "scored"))),
-      db
-        .select({ postId: modelCalls.postId, attempts: count() })
-        .from(modelCalls)
-        // "How often did the model refuse this post", for this question.
-        .where(and(thisVersion, ne(modelCalls.outcome, "scored")))
-        .groupBy(modelCalls.postId),
-      // Not the skip — that is `scored` above. This says which posts are in
-      // the inbox already, so a re-score under a new version updates the row
-      // it finds instead of announcing it as something new.
-      db
-        .select({ postId: matches.postId })
-        .from(matches)
-        .where(and(eq(matches.monitorId, monitorId), inArray(matches.postId, ids))),
-    ]);
-
     const threads = await loadThreads(db, candidates);
 
     /**
@@ -272,10 +378,6 @@ export function createClassifyStep({
             newPostsPerPairPerDay,
           );
     const refused: string[] = [];
-
-    const alreadyScored = new Set(scored.map((row) => row.postId));
-    const alreadyMatched = new Set(matched.map((row) => row.postId));
-    const attemptsByPost = new Map(failures.map((row) => [row.postId, Number(row.attempts)]));
 
     const profile = profileOf(monitor);
     const matchIds: string[] = [];
@@ -402,28 +504,7 @@ export function createClassifyStep({
         continue;
       }
 
-      // One transaction, because the ledger row is what stops this post being
-      // scored again. Two statements could leave the row written and the match
-      // missing, and nothing afterwards would notice or repair it.
-      const row = await db.transaction(async (tx) => {
-        await record(tx, post.id, "scored", outcome.call);
-
-        const [inserted] = await tx
-          .insert(matches)
-          .values({ monitorId, postId: post.id, ...scoreColumns(outcome.classification) })
-          // A match from an earlier version keeps its row. Its scores are
-          // rewritten to the ones this version gave, because the inbox shows
-          // the monitor a person has now. What a person did to the row —
-          // reading it, saving it, a verdict against the version that earned
-          // it — is theirs and is left alone.
-          .onConflictDoUpdate({
-            target: [matches.monitorId, matches.postId],
-            set: scoreColumns(outcome.classification),
-          })
-          .returning({ id: matches.id });
-
-        return inserted;
-      });
+      const row = await writeMatch(db, record, monitorId, post.id, outcome);
 
       if (row && !alreadyMatched.has(post.id)) matchIds.push(row.id);
     }
@@ -516,32 +597,7 @@ export function createClassifyStep({
     // and a failure on a later post must not hold back the ones that worked.
     await sendNotify(boss, { monitorId, matchIds, walkId, pollRunId });
 
-    /**
-     * The threads whose next batch is now decidable. US-048.
-     *
-     * A thread is read fifty comments at a time and the decision to buy the
-     * next fifty needs the verdicts on the last fifty — which exist only here,
-     * at the end of classification. So this closes the loop: replies buys a
-     * batch, the filter and this step judge it, and this sends the thread back
-     * for another.
-     *
-     * The rule itself is deliberately not here. This step knows nothing about
-     * batches, thresholds or ceilings; it says "these threads have been
-     * judged" and `replies.ts` decides what that is worth. A step that scores
-     * posts should not also own how deep a thread is read.
-     */
-    const parents = await db
-      .selectDistinct({ id: posts.parentPostId })
-      .from(posts)
-      .where(and(inArray(posts.id, ids), eq(posts.kind, "reply")));
-
-    const threadIds = parents.map((row) => row.id).filter((id): id is string => id !== null);
-
-    if (threadIds.length > 0) {
-      // The thread's own poll travels with it: a reply belongs to the poll
-      // that found the post above it. US-211.
-      await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId, pollRunId });
-    }
+    await sendJudgedThreads(db, boss, { monitorId, postIds, walkId, pollRunId }, ids);
 
     if (retryable > 0) {
       throw new Error(

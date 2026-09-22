@@ -1,0 +1,47 @@
+name: Feature request
+description: Something the product should do and does not.
+labels: ["type: feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **A new social network is refused by default.** PLAN.md's rule is that
+        no further platform is added until the existing ones reliably produce
+        useful matches. A *provider* for a platform already fetched is a
+        different request, and a welcome one — say which you mean below.
+
+  - type: textarea
+    id: what
+    validations:
+      required: true
+    attributes:
+      label: What it should do
+      description: One or two sentences. The behaviour, not the implementation.
+
+  - type: textarea
+    id: why
+    validations:
+      required: true
+    attributes:
+      label: Why you need it
+      description: >
+        What you are doing today instead, and what that costs you. A request
+        with a use case behind it is the one that gets built.
+
+  - type: textarea
+    id: how
+    validations:
+      required: false
+    attributes:
+      label: How you would do it
+      description: If you have read the code, say where you think it goes.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Before you send it
+      options:
+        - label: I read *What this is not* in the README, and this is not on that list.
+          required: true
+        - label: If this adds a platform, I read the rule above and I am asking anyway.
+          required: false

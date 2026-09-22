@@ -126,4 +126,27 @@ diff already shows them.
 An issue that says what you expected, what happened, and how to reproduce it is
 worth more than a patch that guesses. If it touches money, a provider's
 behaviour or a credential, say what you measured and what you inferred — this
-repository keeps those apart on purpose.
+repository keeps those apart on purpose. The
+[bug form](https://github.com/rszhd/signalscout/issues/new/choose) asks for
+both.
+
+**A question is not an issue.** Questions, and an install that will not start,
+go to [Discussions](https://github.com/rszhd/signalscout/discussions). An
+install problem becomes an issue once somebody reproduces it.
+
+**A security hole is never a public issue.** It goes through a
+[Security Advisory](https://github.com/rszhd/signalscout/security/advisories/new),
+privately. [SECURITY.md](SECURITY.md) says what is in scope and what a report
+must contain.
+
+## How a request becomes work
+
+The ticket files under `backlog/` are the plan, and GitHub Issues are the
+door. A request arrives as an issue. If it is agreed, it becomes a ticket
+file whose **Notes** names the issue, and the issue gets a comment with the
+ticket's link and stays open until the file reaches `done/`. Nothing flows
+back the other way: the file is the source, and a comment on the issue is for
+people, not for the backlog.
+
+An issue nobody agreed to is closed with a sentence saying why. It is not
+left for a bot to close in silence six months later.

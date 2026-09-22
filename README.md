@@ -181,6 +181,7 @@ The scope is one sentence: **find conversations with intent.**
 | [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
 | [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
 | [AI_POLICY.md](AI_POLICY.md) | How AI may be used here, by the owner and by a contributor |
+| [SECURITY.md](SECURITY.md) | Reporting a hole privately, and what is in scope |
 
 ---
 
@@ -209,6 +210,13 @@ This repository is written with an AI coding agent, and you may use one too.
 [AI_POLICY.md](AI_POLICY.md) is the rule: understand every line you submit,
 say what you used, sign as yourself. [AGENTS.md](AGENTS.md) is what the agent
 reads.
+
+**Where to put what.** A question, or an install that will not start, goes to
+[Discussions](https://github.com/rszhd/signalscout/discussions). A bug or a
+request goes to [the forms](https://github.com/rszhd/signalscout/issues/new/choose).
+A security hole goes to a
+[private advisory](https://github.com/rszhd/signalscout/security/advisories/new),
+never to an issue — [SECURITY.md](SECURITY.md) says what is in scope.
 
 ---
 

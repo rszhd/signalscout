@@ -1,0 +1,74 @@
+name: Bug report
+description: Something behaves differently from what the documents say.
+labels: ["type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A question is not a bug. Questions and install trouble go to
+        [Discussions](https://github.com/rszhd/signalscout/discussions).
+
+  - type: textarea
+    id: expected
+    validations:
+      required: true
+    attributes:
+      label: What you expected
+      description: What should have happened, and where you read that it would.
+
+  - type: textarea
+    id: happened
+    validations:
+      required: true
+    attributes:
+      label: What happened
+      description: Paste the error, the log line or the screen. Remove your keys first.
+
+  - type: textarea
+    id: reproduce
+    validations:
+      required: true
+    attributes:
+      label: How to reproduce it
+      description: The steps, from a fresh instance if you can.
+      placeholder: |
+        1. Make a monitor with …
+        2. Run …
+        3. The inbox shows …
+
+  - type: textarea
+    id: measured
+    validations:
+      required: true
+    attributes:
+      label: What you measured, and what you inferred
+      description: >
+        This repository keeps the two apart on purpose. A number you read
+        from a log, a database or a provider's dashboard is a measurement.
+        Everything else is an inference, and saying which is which saves the
+        next reader from testing your guess as if it were data.
+      placeholder: |
+        Measured: the poll wrote 0 rows to `matches`, and `model_calls` has 41 rows for it.
+        Inferred: the classifier is scoring everything below the floor.
+
+  - type: input
+    id: version
+    validations:
+      required: true
+    attributes:
+      label: Version
+      description: The image tag, the package version, or the commit.
+      placeholder: "0.13.1"
+
+  - type: dropdown
+    id: install
+    validations:
+      required: true
+    attributes:
+      label: How you run it
+      options:
+        - Docker, the published image
+        - Docker, built from source
+        - pnpm dev
+        - The packages, in my own application
+        - SignalScout Cloud

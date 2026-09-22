@@ -42,9 +42,15 @@ every line you submit, say what you used, and sign the commit as yourself —
 what the image is built from; `dev` is where work lands first. GitHub
 offers `main` because it is the default branch — change it.
 
-**Find or write a ticket.** `backlog/OPEN.md` lists what is agreed and waiting.
-A ticket's **Context** holds the reasoning the code cannot, and its
-**Acceptance** list is what "done" means.
+**Start with a labelled issue.** The ones marked
+[good first issue or help wanted](https://github.com/rszhd/signalscout/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22%2C%22help+wanted%22)
+were chosen because each fits one evening. An issue labelled `good first
+issue` is written by hand, not by an agent — the label exists so a person
+learns the code ([AI_POLICY.md](AI_POLICY.md)).
+
+**Or find a ticket.** `backlog/OPEN.md` lists what is agreed and waiting, and
+every open one has an issue. A ticket's **Context** holds the reasoning the
+code cannot, and its **Acceptance** list is what "done" means.
 
 **Read [AGENTS.md](AGENTS.md).** It is the working agreement for this
 repository — for people and for AI tools alike — and it holds the rules that

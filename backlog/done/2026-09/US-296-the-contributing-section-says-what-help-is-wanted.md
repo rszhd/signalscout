@@ -7,7 +7,7 @@ priority: p2
 created: 2026-09-22T16:06+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -30,15 +30,15 @@ in the section.
 
 ## Acceptance
 
-- [ ] The Contributing section leads with a short list of what helps now:
+- [x] The Contributing section leads with a short list of what helps now:
       verdicts on real matches, a provider for an existing platform, a
       captured fixture, a doc fix. The connector rule follows it, unchanged
       in substance.
-- [ ] At least five of the issues US-299 mirrors carry `good first issue`
+- [x] At least five of the issues US-299 mirrors carry `good first issue`
       or `help wanted`, chosen because a newcomer can finish each in one
       evening. The label is set on the ticket file (see US-299's `labels:`
       field) so the mirror carries it, never on the issue by hand.
-- [ ] CONTRIBUTING.md's *Before you write code* points at the labelled
+- [x] CONTRIBUTING.md's *Before you write code* points at the labelled
       issues as the place to start.
 
 ## Notes
@@ -53,3 +53,6 @@ in the section.
 
 - 2026-09-22T16:06+08:00 — Written from a gap review against the Postiz playbook.
 - 2026-09-22T16:32+08:00 — The hand-made mirror of five issues became US-299's script; this ticket now only chooses which tickets get the newcomer labels.
+- 2026-09-22T19:20+08:00 — Shipped. The README's Contributing section now opens with five things that help and a link to the labelled issues; the seventh-network refusal follows, unchanged in substance. CONTRIBUTING.md points at the same labels and repeats that a `good first issue` is written by hand.
+- 2026-09-22T19:20+08:00 — Five chosen, each read against "one evening for somebody new": BUG-013 (#34) and US-243 (#51) as `good first issue, easy` — one is a localised UI bug, the other is opening a link and recording what two searches returned. US-095 (#46) and US-062 (#45) as `help wanted, medium`, because both need something the newcomer must supply: SMTP for one, a paid model call for the other. US-033 (#32) as `help wanted`, because it needs a running instance and no code at all — it is work for a user, not a programmer. US-258 and US-099 were considered and left out: both are judgment across many files.
+- 2026-09-22T19:20+08:00 — The first sync of these labels found a bug in US-299's script. `want_labels` emitted no trailing newline, so `read` returned false on the last line and the final label of every ticket was dropped silently. `easy` never reached either issue. Fixed by printing the newline, with a comment saying why it matters; the mirror then settled and `--check` agrees.

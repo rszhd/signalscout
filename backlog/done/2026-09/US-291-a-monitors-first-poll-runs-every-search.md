@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-22T14:40+08:00
 parent:
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -42,21 +42,21 @@ test walks a trial's first day in a loop.
 
 ## Acceptance
 
-- [ ] `nextTurn` with `first: true` returns every unit in the monitor's
+- [x] `nextTurn` with `first: true` returns every unit in the monitor's
       order, whatever the balance, and a balance of the hour's credits
       (capped as today) minus the whole turn. The cursor is unchanged: a
       full turn ends where it began.
-- [ ] A trial-shaped state — four units, 0.167 credits an hour, balance
+- [x] A trial-shaped state — four units, 0.167 credits an hour, balance
       zero — runs four units on the first poll, nothing for the next 22
       polls, and one unit on the 23rd. Over the first 24 polls it spends
       four credits, the same as before.
-- [ ] `first: false` (and absent) behaves exactly as today; every existing
+- [x] `first: false` (and absent) behaves exactly as today; every existing
       case in `rotation.test.ts` passes unchanged.
-- [ ] `collect.ts` passes `first: monitor.lastPolledAt === null`, and a
+- [x] `collect.ts` passes `first: monitor.lastPolledAt === null`, and a
       step test (`rotation-steps.test.ts`) shows a new monitor with more
       searches than its hour covers collecting from every one of them on
       the first poll and from none on the second.
-- [ ] `docs/pipeline.md`'s turn paragraph says the first poll is the whole
+- [x] `docs/pipeline.md`'s turn paragraph says the first poll is the whole
       turn, and `CHANGELOG.md` carries it under the next version.
 
 ## Notes
@@ -69,3 +69,9 @@ test walks a trial's first day in a loop.
   capped at one.
 
 ## Log
+
+- 2026-09-22T14:55+08:00 — Built, cut as 0.13.1 (PR #30, tag re-run after
+  the merge) and pinned in the hosted application. `rotation.test.ts` 14
+  cases and `rotation-steps.test.ts` 6 pass; the whole pipeline suite was
+  not run here because the local Postgres, shared with the hosted dev
+  stack, ran out of connections — CI ran it green on the release.

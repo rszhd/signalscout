@@ -96,9 +96,10 @@ The code says what it does. It does not say why, on purpose.
 
 - **A ticket's Context** holds the reasoning behind one change.
   `backlog/OPEN.md` lists the open ones, and every one has a GitHub issue.
-- **[docs/history.md](history.md)** holds what each ticket measured, in order.
-  Go there when a number or a threshold looks arbitrary — it was measured, and
-  that page says against what.
+- **A ticket's Log** holds what it measured. When a number or a threshold
+  looks arbitrary, the comment or the page beside it names the ticket, and
+  that ticket's Log says what it was measured against.
+  [`backlog/DONE.md`](../backlog/DONE.md) lists every finished one.
 - **A page per subject** holds the rules: [sources.md](sources.md) for
   connectors, [costs.md](costs.md) for money, [secrets.md](secrets.md) for
   credentials, [testing.md](testing.md) for tests, [design.md](design.md) for

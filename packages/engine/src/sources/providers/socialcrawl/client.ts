@@ -11,8 +11,9 @@
  *
  * Every shape below was captured, not read from the documentation, and the
  * endpoints disagree with each other on cursors, on whether an empty search
- * is free and on whether one exists at all. docs/history.md, *Sources: what
- * was measured*, lists what each capture settled.
+ * is free and on whether one exists at all. Each capture's findings are in
+ * the Log of the ticket that added the platform; US-028's lists the four
+ * where LinkedIn contradicted X.
  */
 import type { SourceRuntime } from "../../types.js";
 

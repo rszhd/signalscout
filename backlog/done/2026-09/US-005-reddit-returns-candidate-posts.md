@@ -156,3 +156,9 @@ a permanent full copy.
   evidence. The connector's own code has only ever replayed them. Its handling
   of a failed collection, of a snapshot that expires, and of any rate limit has
   never met the provider. Budget that into the first ticket that schedules it.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. **The terms, as read.** Bright Data's Master Service
+  Agreement makes the customer warrant that their use violates no third-party
+  rights and indemnify Bright Data if it does. Two clauses to re-read before a
+  hosted launch: a customer may not redistribute collected data "to offer a
+  similar or competitive product", and the customer is solely responsible for
+  the lawful grounds for personal data.

@@ -3,7 +3,7 @@
 SignalScout runs on your API keys, so it must answer two questions: what has
 this monitor spent, and how do I stop it spending more. This page holds the
 rules behind both answers and what the answer is not. The measurements are in
-[history.md](history.md) under *Costs*.
+the Logs of US-013, US-014 and US-158, and of the ticket each rule names.
 
 ---
 

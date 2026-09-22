@@ -1,7 +1,7 @@
 # Adding a source
 
-This page holds the rules. What was measured, and when, is in
-[history.md](history.md) under *Sources*, with the ticket that measured it.
+This page holds the rules. What was measured, and when, is in the Log of the
+ticket that measured it.
 
 A source has two axes, and US-024 separated them.
 
@@ -120,7 +120,8 @@ transport and an `EndpointProfile` per platform for what differs.
 **One provider is either by elimination or by convenience, and the two are
 not written down the same way.** Say which. A platform with one provider by
 convenience is an open question; by elimination, a closed one, with the
-measurements in history.md.
+measurements in the ticket that eliminated the others — US-122 for LinkedIn,
+US-160 for Instagram.
 
 ---
 

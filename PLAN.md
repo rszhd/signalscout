@@ -126,8 +126,8 @@ Six platforms are monitored, through ten connectors — of which nine are
 offered, because a connector can ship and not be offered. Reddit and X came
 first, and the signals they carry are written out below. STACK.md holds what
 the economics of a source do to the build, docs/sources.md holds what each
-connector can and cannot do, and docs/history.md records what each one has been
-measured doing.
+connector can and cannot do, and each connector's ticket records what it has
+been measured doing.
 
 ## Reddit
 

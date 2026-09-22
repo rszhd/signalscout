@@ -187,3 +187,7 @@ cost nothing. The screen should not invent a cost that does not exist.
   every failure path of the cost test: an expired snapshot, a collection the
   provider reports as failed, and a rate limit have still only been simulated.
   450 tests pass, with lint and typecheck.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. The "flaky end to end tests" sample at $10.80 a month
+  polled hourly is $648.00 polled every minute. A monitor whose plan was
+  measured at **$164 a month against a $10 cap** is the case the flag exists
+  for.

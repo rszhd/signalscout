@@ -2,9 +2,9 @@
 
 The rules the tests follow, what we deliberately do not test, and the one
 thing that changes when the code is written by an AI assistant rather than a
-second person. Most rules here were paid for in another repository; the
-incidents behind them, and this project's own measurements, are in
-[history.md](history.md) under *Testing*.
+second person. Most rules here were paid for in another repository, and
+US-312's Log keeps the incidents recorded from it. This project's own count
+of deliberate mutations is in US-018's Log.
 
 ---
 

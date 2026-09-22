@@ -3,8 +3,8 @@
 SignalScout has one account by default, and a setting that opens registration
 for a deployment that wants many. This document says how the first one is
 made, what the login protects, and the one thing you must do before the
-instance has a public address. The decisions behind it are in
-[history.md](history.md) under *Accounts*.
+instance has a public address. The decisions behind it are in the Logs of
+US-017, US-066 and US-092.
 
 ---
 

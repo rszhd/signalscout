@@ -3,7 +3,7 @@
 This file is the single source. `CLAUDE.md` imports it, so Claude Code and
 Codex read the same rules. It is loaded into every session, so it holds only
 what changes what you do next. What the project has measured, and the
-incident behind each rule below, is in [docs/history.md](docs/history.md),
+incident behind each rule below, is in the Log of the ticket the rule names,
 read on demand.
 
 SignalScout finds public conversations from people describing a problem your
@@ -68,8 +68,8 @@ finish something, say which half you proved.
    a cap, a usage row, or a figure shown to a person.
 6. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
 7. Read [`docs/instruments.md`](docs/instruments.md) before running anything
-   that spends money, and [`docs/history.md`](docs/history.md) when you need
-   to know why a number or a decision is what it is.
+   that spends money. To know why a number or a decision is what it is, read
+   the Log of the ticket that the code or the page names.
 
 **Five procedures are skills**, in `.claude/skills/`: `add-migration`,
 `capture-fixture`, `measure-scoring-change`, `cut-release`, `worktree`. Load
@@ -296,20 +296,19 @@ the time says which came first.
 **A comment says what the code cannot.** Three things: the constraint that
 the next reader would break, the trap that has already caught somebody, and
 the decision that would otherwise be made twice. Two things it is not. **A
-measurement goes to [docs/history.md](docs/history.md)**, which owns
-measurements — a comment saying one platform gave 720 matches at an average
-of 48 is a reading from one instance on one day, and in the code it is a
-number nobody can check. **A story about how the code came to be goes to its
-ticket's Log.** A ticket id may stay when it is the only pointer to a
+measurement stays in its ticket's Log** — a comment saying one platform gave
+720 matches at an average of 48 is a reading from one instance on one day,
+and in the code it is a number nobody can check. **A story about how the code
+came to be goes to its ticket's Log.** A ticket id may stay when it is the only pointer to a
 decision, and then it is one id at the end of one sentence, not a heading.
 `node scripts/comment-density.mjs` says where the dense files are; it does not
 say which comments are wrong, because that is a judgment per comment (US-302).
 
 **A file header holds the contract, not the story.** What the file does, the
 invariants it keeps, the failure shape, and the ticket that holds the rest —
-about fifteen lines. The measurement and the incident go in the ticket's Log
-or in `docs/history.md`, which are read once; a header is paid for every time
-the file is opened. Match this shape, not the density of the file next to it.
+about fifteen lines. The measurement and the incident go in the ticket's Log,
+which is read once; a header is paid for every time the file is opened.
+Match this shape, not the density of the file next to it.
 
 ---
 

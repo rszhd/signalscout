@@ -218,7 +218,6 @@ by hand and says less than both on purpose.
 | [docs/design.md](docs/design.md) | The shared theme, tokens, the spacing scale and controls |
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
 | [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
-| [docs/history.md](docs/history.md) | What each ticket measured, in the order it happened |
 | [CHANGELOG.md](CHANGELOG.md) | What each published package version changed for a consumer |
 | [packages/engine/](packages/engine/README.md) | The stateless half, on npm: connectors, model calls, the cipher |
 | [packages/pipeline/](packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |

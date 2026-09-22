@@ -2,7 +2,7 @@
 
 # Open tickets
 
-31 open — 0 doing, 23 todo, 8 parked (1 p1, 18 p2, 12 p3).
+30 open — 0 doing, 22 todo, 8 parked (1 p1, 17 p2, 12 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,7 +22,6 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
-| p2 | US-312 | [history.md is retired into the tickets that hold its evidence](todo/US-312-history-md-is-retired-into-the-tickets.md) | chore | todo | 2026-09-23T09:00+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |

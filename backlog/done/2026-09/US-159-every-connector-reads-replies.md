@@ -138,3 +138,7 @@ were out of date and were corrected: Apify's actor offers a server-side
 - 2026-09-17T01:26+08:00 — Audited the fixtures. Six X handles and one
   LinkedIn name had leaked; both scrubbers fixed and both files rewritten.
   2,055 tests pass, lint and typecheck clean. Nothing has met a live poll.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. SocialData's `/twitter/tweets/<id>/comments` answers
+  200 where an invented path answers 404, and the 404 is free, so the endpoint
+  was found by asking rather than from documentation. A LinkedIn run with
+  `scrapeReplies: true` charged the same two events as one without.

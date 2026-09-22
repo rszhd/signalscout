@@ -217,7 +217,7 @@ export interface CandidateReply extends CandidatePost {
    *
    * Keeping it is what let US-048 measure that leads sit *deeper* than a
    * platform's own ranking suggests, so a batched read must not stop early.
-   * docs/history.md, *Sources*, has the numbers.
+   * US-048's Log has the numbers.
    *
    * Absent where a connector cannot say.
    */
@@ -234,8 +234,7 @@ export interface ReplyRequest {
    * Return nothing said at or before this time.
    *
    * **A thread outlives the post above it**, so without this a five-year-old
-   * comment arrives as a lead (US-034 measured one; docs/history.md,
-   * *Sources*).
+   * comment arrives as a lead (US-034 measured one; its Log has it).
    *
    * **A connector applies it itself, whatever the provider offers**, and most
    * offer nothing: where the platform orders newest first the cut is a cheap

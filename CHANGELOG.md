@@ -11,8 +11,8 @@ number and its own tag (`ui-vX.Y.Z`) and moves with neither of them.
 **An entry says what a consumer must know**, not what the diff shows. A renamed
 export, a changed option, a table that moved: those belong here. A refactor
 nobody outside this repository can see does not.
-[docs/history.md](docs/history.md) is the other record — every ticket, in the
-order it happened, including the ones that changed nothing a consumer imports.
+[backlog/DONE.md](backlog/DONE.md) is the other record — every finished
+ticket, including the ones that changed nothing a consumer imports.
 
 **What the number means, and how it is chosen, is in
 [docs/releasing.md](docs/releasing.md)** under *What the number means*: one

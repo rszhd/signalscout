@@ -174,3 +174,15 @@ a wrong guess there drops posts silently where the current code merely pays.
   Migration 0058 applied to the production database with a collection in flight
   and seeded both platforms from `last_polled_at`, so the box about surviving an
   upgrade is closed by a real upgrade rather than by a test.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. **An empty scoped Reddit search is refunded.**
+  `Brand24 too expensive` inside r/SaaS returned nothing and cost **0
+  credits**, twice. SocialCrawl's X search was already known to refund an
+  empty page; on `/v1/reddit/subreddit/search` it holds too. A page that
+  matches nothing is free and a page that matches is one credit, so the money
+  lost here paid for pages that *did* match and were then dropped by our own
+  window, not for empty answers.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. **The production monitor is paused, and the owner paused it.** It
+  was found that way with **$1.06 spent of a $5.00 cap**, so the budget guard
+  is not the cause; the owner pressed Pause while the monitor was spending and
+  collecting nothing. The screen says `Paused`, which is the truth. A live
+  instance whose only monitor does not poll is a decision, not a bug.

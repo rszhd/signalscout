@@ -9,11 +9,10 @@
  *   node scripts/comment-density.mjs --min=25     with --blocks, the threshold
  *
  * A comment says what the code cannot: the constraint, the trap, the decision
- * that would otherwise be made twice. A measurement belongs in
- * docs/history.md, which owns measurements, and a story about how the code
- * came to be belongs in its ticket's Log. This script does not know which is
- * which — a person reads the block and decides. It says where to look, and it
- * gives the next run something to compare against. US-302.
+ * that would otherwise be made twice. A measurement and a story about how the
+ * code came to be both belong in the ticket's Log. This script does not know
+ * which is which — a person reads the block and decides. It says where to
+ * look, and it gives the next run something to compare against. US-302.
  *
  * It counts a line, not a token: a `//` or a `*` at the start of a line, and
  * the `/*` that opens a block. A trailing comment after code is not counted,

@@ -2,7 +2,7 @@
 
 Companion to [PLAN.md](PLAN.md). PLAN.md says what we build. This says what we
 build it with, and why. What each platform and provider was measured doing is
-in [docs/history.md](docs/history.md); this page holds the choices.
+in the Log of the ticket that measured it; this page holds the choices.
 
 ## Constraints that decided everything
 

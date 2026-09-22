@@ -1,8 +1,7 @@
 # Secrets at rest
 
-What is encrypted, what is not, and how to change the key. The decisions and
-their tickets are in [history.md](history.md) under *Secrets*; this page
-holds the rules.
+What is encrypted, what is not, and how to change the key. The decisions are
+in the Logs of the tickets this page names; this page holds the rules.
 
 ---
 

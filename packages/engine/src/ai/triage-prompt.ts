@@ -14,7 +14,7 @@
  *   because the first capture deleted PLAN.md's `mild-problem-signal`
  *   without that line.
  *
- * docs/history.md, *Costs* and *Model*, hold the numbers behind each.
+ * The Logs of US-030, US-221 and US-229 hold the numbers behind each.
  */
 
 import { describeSignals } from "../signals.js";

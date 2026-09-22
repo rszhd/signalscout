@@ -95,3 +95,7 @@ never set `BILLING_MODE`, which is every instance that exists.
 - 2026-09-16T13:49+08:00 — Written as step four of US-151.
 - 2026-09-16T20:10+08:00 — Built. The private repository rszhd/signalscout-cloud was made from apps/api, apps/web, admin and landing, pinned to 0.1.0 from npm; its suite (48 files, 778 tests), its image and a fresh-database migration passed here and on a runner. Production was cut over at 11:27 UTC: the box pulled the cloud image, reported healthy and served the digest CI built. This PR removes what only the cloud used — Stripe, billing, BILLING_MODE, the subscriptions table, the landing site, the staging overlay and both deploy workflows — and gives CI a push trigger on main so the self-hosted image is still published. Not done here: the three deploy secrets still exist on this repository and should be deleted by hand; the cloud repository carries a copy of insertMonitor until the pipeline's testing entry exports it.
 - 2026-09-16T20:40+08:00 — The owner asked for the admin panel to go too: it counts registrations, which is the hosted product's question. `admin/`, its route, `ADMIN_EMAILS` and the `/admin` static root are removed; the cloud repository already carries them.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. The migrations the split needed dropped nothing a live
+  instance holds: the pipeline's 0059 is a comment, the application's 0000
+  creates only what is missing, and its 0001 drops the subscriptions table an
+  instance on this code never wrote to.

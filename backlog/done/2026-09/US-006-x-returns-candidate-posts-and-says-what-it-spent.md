@@ -237,3 +237,6 @@ US-013 shipped, so this ticket no longer waits on it.
   now, not a provider, and this ticket delivers one provider for it. The $0.005
   price belongs to X's own API and must not be copied onto another provider.
   US-013 and US-014 have since shipped, so the sequencing note is history.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. A refused key answers differently per provider: Bright
+  Data sends `Invalid credentials` as a bare string, ScrapeCreators
+  `{"message":"Invalid API key"}`.

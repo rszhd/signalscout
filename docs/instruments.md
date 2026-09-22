@@ -3,8 +3,8 @@
 These are the only commands in this repository that spend money. Each asks a
 real provider or a real model something and records what it said, because an
 answer we wrote would be evidence about our own schema and none about the
-provider. What each first run found is in [history.md](history.md) under
-*Instruments*.
+provider. What each first run found is in the Log of the ticket that added
+the instrument.
 
 Three rules cover all of them.
 

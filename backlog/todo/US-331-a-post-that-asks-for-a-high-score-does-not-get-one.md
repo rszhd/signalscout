@@ -1,5 +1,6 @@
 ---
 id: US-331
+issue: 79
 title: A post that asks for a high score does not get one
 type: feature
 priority: p2

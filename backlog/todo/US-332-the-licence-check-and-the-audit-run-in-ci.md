@@ -1,5 +1,6 @@
 ---
 id: US-332
+issue: 80
 title: The licence check and the audit run in CI and pass
 type: chore
 priority: p3

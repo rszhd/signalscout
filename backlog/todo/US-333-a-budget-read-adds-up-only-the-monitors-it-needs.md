@@ -1,5 +1,6 @@
 ---
 id: US-333
+issue: 81
 labels: [help wanted, medium]
 title: A budget read adds up only the monitors it needs
 type: chore

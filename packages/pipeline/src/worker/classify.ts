@@ -60,8 +60,9 @@ import {
 import { recordFilterDrops } from "../filter/drops.js";
 import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
 import { loadCeiling } from "./ceiling.js";
+import { sendNotify } from "./notify.js";
 import type { ClassifyPayload } from "./queues.js";
-import { notifyQueue, repliesQueue } from "./queues.js";
+import { repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -139,7 +140,7 @@ export function createClassifyStep({
     };
 
     if (postIds.length === 0) {
-      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId, pollRunId });
+      await sendNotify(boss, { monitorId, matchIds: [], walkId, pollRunId });
       return;
     }
 
@@ -188,7 +189,7 @@ export function createClassifyStep({
         },
         monitor.userId,
       );
-      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId, pollRunId });
+      await sendNotify(boss, { monitorId, matchIds: [], walkId, pollRunId });
       return;
     }
 
@@ -513,7 +514,7 @@ export function createClassifyStep({
 
     // Sent before the throw below, on purpose. The matches above are written
     // and a failure on a later post must not hold back the ones that worked.
-    await boss.send(notifyQueue, { monitorId, matchIds, walkId, pollRunId });
+    await sendNotify(boss, { monitorId, matchIds, walkId, pollRunId });
 
     /**
      * The threads whose next batch is now decidable. US-048.

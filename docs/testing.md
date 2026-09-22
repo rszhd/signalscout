@@ -244,6 +244,15 @@ before reading a red run as a regression. `vitest.config.ts` holds it off with
 `--maxWorkers` by hand only to go lower: six workers were tried, and
 `classify.test.ts` failed two runs in four under load.
 
+**A timeout on a queue can be a job that was never queued.** `send` returns
+null when a queue's policy refuses a job, and nothing throws. A test that
+waits on that job's effect then fails as a timeout, more often on a slower
+machine, and reads as load. `notify` is a `stately` queue, and its jobs were
+sent without a key, so every monitor shared one queued slot. That was
+BUG-021, the classify timeouts on CI. Before calling a timeout load, check
+whether the job exists. A test that needs a job to stay queued runs with no
+worker on that queue, as `worker/notify.test.ts` does.
+
 **A worker test that costs seconds a test is a polling interval.**
 `WORKER_POLLING_INTERVAL_SECONDS` is set to pg-boss's floor of 0.5 for the
 suite alone; it once accounted for 397 of 435 seconds of file time. If a

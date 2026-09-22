@@ -52,6 +52,9 @@ finish something, say which half you proved.
 
 ## Before you start a task
 
+0. If you have not worked here before, read [`docs/map.md`](docs/map.md)
+   first. It is the ten-minute shape of the repository, written for a person,
+   and this file assumes it.
 1. Find its ticket in [`backlog/OPEN.md`](backlog/OPEN.md). If there is no
    ticket, ask whether to write one first. Read its **Context**: it holds the
    reasoning that the code cannot.

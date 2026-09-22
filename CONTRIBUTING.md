@@ -52,9 +52,13 @@ learns the code ([AI_POLICY.md](AI_POLICY.md)).
 every open one has an issue. A ticket's **Context** holds the reasoning the
 code cannot, and its **Acceptance** list is what "done" means.
 
-**Read [AGENTS.md](AGENTS.md).** It is the working agreement for this
-repository — for people and for AI tools alike — and it holds the rules that
-are easy to break by accident.
+**Read [docs/map.md](docs/map.md).** Ten minutes: what runs, which folder
+does what, one poll and one request end to end, and where the reasoning lives.
+It is the page written for you.
+
+**Then [AGENTS.md](AGENTS.md).** Same ground, written for an AI coding agent
+and organised around what changes the next edit. It holds the rules that are
+easy to break by accident.
 
 Four of them matter more than the rest:
 

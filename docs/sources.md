@@ -297,6 +297,31 @@ Record what each captured call did to the account's balance in a `ledger.json`
 beside the fixtures. A claim that a probe is free is a claim about somebody's
 bill, and the ledger is the evidence.
 
+### Capturing one, in order
+
+Every capture spends real money, so the order matters more than the speed.
+
+1. **Find the script** beside the fixtures:
+   `packages/engine/src/sources/providers/<provider>/<platform>-fixtures/capture.mjs`,
+   or a `capture:*` script in `packages/engine/package.json` for a model. Read
+   its header for the flags it takes — `--only=comments`, `--lean`,
+   `--model=`.
+2. **Read its cost line** in [instruments.md](instruments.md), *The captures*,
+   and say the number out loud before running. Anything over a few cents is
+   the owner's call, not yours.
+3. **Run it with the key in the environment**, never on the command line,
+   where it reaches the shell history.
+4. **Read every file it wrote, before committing.** Search for names, handles
+   and URLs that identify a person. Three captures leaked identity past a
+   scrubber that looked right. When one does, fix the scrubber and re-capture
+   — never hand-edit the payload, which makes it a record of our editing.
+5. **Check `ledger.json`** says what each call cost, and that `manifest.json`
+   merged rather than replaced.
+6. **Replay**: run the test that reads the fixture. If an expected value
+   moves, the behaviour changed — say which and why in the commit.
+7. **Put the numbers and the date in the ticket's Log**, where the next
+   person looking at the price will go.
+
 The fake source's fixtures are `CandidatePost` values, our own shape. Use it
 to test everything downstream of a connector; it can run out of allowance and
 hand back a short page.

@@ -90,6 +90,17 @@ describe("which addresses are the public internet's", () => {
     expect(isPublicAddress("::ffff:93.184.216.34")).toBe(true);
   });
 
+  it("unwraps the hex spelling too, which is the one a URL produces", () => {
+    // BUG-328. `new URL("https://[::ffff:127.0.0.1]/").hostname` is
+    // `[::ffff:7f00:1]`: the parser rewrites the dotted tail as two hex groups.
+    expect(isPublicAddress("::ffff:7f00:1")).toBe(false);
+    expect(isPublicAddress("::ffff:a9fe:a9fe")).toBe(false);
+    expect(isPublicAddress("::ffff:a00:1")).toBe(false);
+    expect(isPublicAddress("0:0:0:0:0:ffff:7f00:1")).toBe(false);
+    expect(isPublicAddress("::7f00:1")).toBe(false);
+    expect(isPublicAddress("::ffff:5db8:d822")).toBe(true);
+  });
+
   it("ignores a zone index, which is part of the address a client accepts", () => {
     expect(isPublicAddress("fe80::1%eth0")).toBe(false);
   });
@@ -143,6 +154,28 @@ describe("checking a hostname before the request", () => {
       PrivateAddressError,
     );
     await expect(assertPublicHost("93.184.216.34", never)).resolves.toBeUndefined();
+  });
+
+  it("checks a literal in the brackets a URL keeps, without asking a resolver", async () => {
+    // BUG-328. The transport passes `URL.hostname`, which keeps the brackets on
+    // an IPv6 literal. Without this the literal went to the resolver, which
+    // refused it for being unresolvable rather than for being private.
+    const never: ResolveHost = async () => {
+      throw new Error("the resolver was called for a literal address");
+    };
+
+    for (const url of [
+      "https://[::1]/hook",
+      "https://[::ffff:127.0.0.1]/hook",
+      "https://[::ffff:169.254.169.254]/hook",
+    ]) {
+      await expect(assertPublicHost(new URL(url).hostname, never)).rejects.toThrow(
+        PrivateAddressError,
+      );
+    }
+    await expect(
+      assertPublicHost(new URL("https://[2606:4700::1111]/hook").hostname, never),
+    ).resolves.toBeUndefined();
   });
 
   it("leaves a name that resolves to nothing alone", async () => {

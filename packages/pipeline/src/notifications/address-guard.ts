@@ -78,26 +78,69 @@ function isPublicIPv4(address: string): boolean {
  * alone waves it through — which is the mistake this function exists to not
  * make.
  */
+/**
+ * The eight 16-bit groups of an IPv6 address, or null when it is not one.
+ *
+ * Every check below reads these numbers rather than the text, because one
+ * address has many spellings: `::1` and `0:0:0:0:0:0:0:1`, or
+ * `::ffff:127.0.0.1` and `::ffff:7f00:1`, which is the one a URL produces.
+ * A check written against one spelling passes the others (BUG-328).
+ */
+function hextets(address: string): number[] | null {
+  let value = address;
+
+  // A dotted IPv4 tail is two groups written another way.
+  const dotted = /(\d+\.\d+\.\d+\.\d+)$/.exec(value);
+  if (dotted?.[1]) {
+    const parts = octets(dotted[1]);
+    if (!parts) return null;
+    const high = ((parts[0] << 8) | parts[1]).toString(16);
+    const low = ((parts[2] << 8) | parts[3]).toString(16);
+    value = `${value.slice(0, -dotted[1].length)}${high}:${low}`;
+  }
+
+  const halves = value.split("::");
+  if (halves.length > 2) return null;
+
+  const head = halves[0] ? halves[0].split(":") : [];
+  const tail = halves[1] ? halves[1].split(":") : [];
+  const missing = 8 - head.length - tail.length;
+  if (halves.length === 1 ? missing !== 0 : missing < 1) return null;
+
+  const groups = [...head, ...Array<string>(halves.length === 2 ? missing : 0).fill("0"), ...tail];
+  const numbers = groups.map((group) =>
+    /^[0-9a-f]{1,4}$/.test(group) ? Number.parseInt(group, 16) : Number.NaN,
+  );
+
+  return numbers.some(Number.isNaN) ? null : numbers;
+}
+
 function isPublicIPv6(address: string): boolean {
-  const value = address.toLowerCase().split("%")[0] ?? "";
+  const groups = hextets(address.toLowerCase().split("%")[0] ?? "");
+  if (!groups) return false;
 
-  // IPv4-mapped and IPv4-compatible, in both the dotted and the hex spellings.
-  const mapped = /^::(?:ffff:)?(\d+\.\d+\.\d+\.\d+)$/.exec(value);
-  if (mapped?.[1]) return isPublicIPv4(mapped[1]);
+  const [a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0] = groups;
+  const firstFive = a === 0 && b === 0 && c === 0 && d === 0 && e === 0;
 
-  if (value === "::" || value === "::1") return false; // unspecified, loopback
-  if (value.startsWith("fe8") || value.startsWith("fe9")) return false; // link-local
-  if (value.startsWith("fea") || value.startsWith("feb")) return false; // link-local
-  if (/^f[cd]/.test(value)) return false; // unique-local, fc00::/7
-  if (value.startsWith("ff")) return false; // multicast
-  if (value.startsWith("2001:db8")) return false; // documentation
-  if (value.startsWith("64:ff9b")) return false; // NAT64
-  if (/^100:(?::|0)/.test(value) || value === "100::") return false; // discard-only
+  // Unspecified and loopback: `::` and `::1`, however they are written.
+  if (firstFive && f === 0 && g === 0 && h <= 1) return false;
+
+  // IPv4-mapped (::ffff:0:0/96) and IPv4-compatible (::/96): the last 32 bits
+  // are an IPv4 address, and it is that address the connection reaches.
+  if (firstFive && (f === 0xffff || f === 0)) {
+    return isPublicIPv4(`${g >> 8}.${g & 0xff}.${h >> 8}.${h & 0xff}`);
+  }
+
+  if ((a & 0xffc0) === 0xfe80) return false; // link-local, fe80::/10
+  if ((a & 0xfe00) === 0xfc00) return false; // unique-local, fc00::/7
+  if ((a & 0xff00) === 0xff00) return false; // multicast
+  if (a === 0x2001 && b === 0x0db8) return false; // documentation
+  if (a === 0x0064 && b === 0xff9b) return false; // NAT64
+  if (a === 0x0100 && b === 0 && c === 0 && d === 0) return false; // discard-only
 
   return true;
 }
 
-/** Whether the public internet routes this address to somebody who is not us. */
 export function isPublicAddress(address: string): boolean {
   if (isIPv4(address)) return isPublicIPv4(address);
   if (isIPv6(address)) return isPublicIPv6(address);
@@ -140,14 +183,19 @@ export const resolveHost: ResolveHost = async (hostname) => {
  * was a typo.
  */
 export async function assertPublicHost(hostname: string, resolve: ResolveHost): Promise<void> {
+  // `URL.hostname` keeps the brackets on an IPv6 literal, and a bracketed
+  // literal is neither an address to `isIPv6` nor a name a resolver knows.
+  const bare =
+    hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
+
   // A literal address needs no lookup, and passing one to a resolver is how a
   // check gets skipped by something that does not recognise its own input.
-  if (isIPv4(hostname) || isIPv6(hostname)) {
-    if (!isPublicAddress(hostname)) throw new PrivateAddressError(hostname, hostname);
+  if (isIPv4(bare) || isIPv6(bare)) {
+    if (!isPublicAddress(bare)) throw new PrivateAddressError(hostname, bare);
     return;
   }
 
-  const addresses = await resolve(hostname);
+  const addresses = await resolve(bare);
 
   for (const address of addresses) {
     if (!isPublicAddress(address)) throw new PrivateAddressError(hostname, address);

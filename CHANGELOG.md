@@ -54,13 +54,27 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+## 0.14.0 — 2026-09-23
+
 **Changed.** A provider's `Retry-After` is read one way for every connector
 (US-334): seconds or an HTTP date, rounded up, and never more than an hour
 (`maximumRetryAfterSeconds`). A wait of zero, a time already past or a value
 that is not a wait takes the connector's own fallback, where three connectors
 used to retry at once. A connector's `waitUntil` can therefore be earlier than
-before for a long wait, and later for a zero one. No export changed, so the
-version is a patch.
+before for a long wait, and later for a zero one. No export changed.
+
+**Changed.** `draftContext` takes the user id before the match id and
+answers only for a match on that account's monitor (BUG-330). A consumer
+that calls it passes the signed-in user. **Added.** `readOwnedEstimate(db,
+userId, id)`, a cost test read that answers only for the account that started
+it; `readEstimate` still answers for the whole instance, for the worker. A
+changed signature on an export, so the version is a minor.
+
+**Fixed.** `isPublicAddress` reads an IPv6 address by its groups, so every
+spelling of one address gets one answer: an IPv4-mapped address in hex, as a
+URL writes it, is checked as the IPv4 address it carries (BUG-328).
+`assertPublicHost` accepts the bracketed literal `URL.hostname` returns and
+checks it without a lookup.
 
 ## 0.13.1 — 2026-09-22
 

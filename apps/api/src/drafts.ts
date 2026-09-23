@@ -102,7 +102,7 @@ export async function registerDraftRoutes(
         });
       }
 
-      const row = await draftContext(db, request.params.id);
+      const row = await draftContext(db, sessionUserId(request), request.params.id);
 
       if (!row) return reply.code(404).send({ message: "No match has that id." });
 

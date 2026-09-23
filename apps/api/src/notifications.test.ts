@@ -357,6 +357,10 @@ it("refuses an obviously local receiver at once where signup is open", async () 
       "https://169.254.169.254/latest/meta-data",
       "https://10.1.2.3/hook",
       "https://[::1]/hook",
+      // BUG-328. The URL parser writes these as `[::ffff:7f00:1]` and
+      // `[::ffff:a9fe:a9fe]`, a spelling the check once let through.
+      "https://[::ffff:127.0.0.1]/hook",
+      "https://[::ffff:169.254.169.254]/latest/meta-data",
     ]) {
       const refused = await enable(url);
       expect(refused.statusCode, url).toBe(409);

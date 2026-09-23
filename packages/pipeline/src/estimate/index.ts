@@ -25,6 +25,7 @@ export {
   type ProbeProgress,
   type ProbeReport,
   readEstimate,
+  readOwnedEstimate,
   recordProbeProgress,
   refuseEstimate,
   reportFor,

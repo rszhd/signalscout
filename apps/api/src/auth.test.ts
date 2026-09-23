@@ -14,6 +14,8 @@ import { randomUUID } from "node:crypto";
 import {
   createDatabase,
   createLogger,
+  createProject,
+  createReplyPrompt,
   type Database,
   feedback,
   matches,
@@ -24,7 +26,9 @@ import {
   replyPrompts,
   replyVoicePresets,
   sourceProviders,
+  startEstimate,
 } from "@signalscout/pipeline";
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { accountExists, createAuth } from "./auth/auth.js";
 import { unclaimedUserId } from "./auth/user.js";
@@ -55,7 +59,7 @@ describe("the session gate", () => {
 
   async function server(): Promise<ApiServer> {
     const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: secret });
-    return buildServer({ env, logger, db, queryGenerator: null });
+    return buildServer({ env, logger, db, queryGenerator: null, authRateLimit: false });
   }
 
   /** Empty every table this file writes, so each case starts on a clean instance. */
@@ -106,6 +110,42 @@ describe("the session gate", () => {
           { url: route.url, method: route.method, status: response.statusCode },
           `${route.method} ${route.url} answered without a session`,
         ).toEqual({ url: route.url, method: route.method, status: 401 });
+      }
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * BUG-329. The router decodes a path before it matches, so a percent-encoded
+   * spelling of `/api` reaches the same handler. A gate that reads the raw URL
+   * sees a path that does not start with `/api/` and lets it through.
+   */
+  it("refuses them however the path is spelled", async () => {
+    await clear();
+    const app = await server();
+
+    try {
+      const guarded = app.registeredRoutes.filter(
+        (route) => route.url.startsWith("/api/") && !isOpenPath(route.url),
+      );
+
+      expect(guarded.length).toBeGreaterThan(10);
+
+      for (const route of guarded) {
+        const url = route.url.replace(/:[^/]+/g, "00000000-0000-0000-0000-000000000000");
+
+        for (const spelling of [
+          url.replace(/^\/api/, "/%61pi"),
+          url.replace(/^\/api/, "/%61%70%69"),
+        ]) {
+          const response = await app.inject({ method: route.method as "GET", url: spelling });
+
+          expect(
+            { url: spelling, method: route.method, status: response.statusCode },
+            `${route.method} ${spelling} answered without a session`,
+          ).toEqual({ url: spelling, method: route.method, status: 401 });
+        }
       }
     } finally {
       await app.close();
@@ -200,7 +240,7 @@ describe("the session gate", () => {
         AUTH_SIGNUP: signup,
       });
 
-      return buildServer({ env, logger, db, queryGenerator: null });
+      return buildServer({ env, logger, db, queryGenerator: null, authRateLimit: false });
     }
 
     it("is closed when nothing says otherwise", async () => {
@@ -345,6 +385,7 @@ describe("the session gate", () => {
         db,
         queryGenerator: null,
         auth: createAuth({
+          rateLimit: false,
           db,
           secret,
           signup: "open",
@@ -544,6 +585,7 @@ describe("the session gate", () => {
         db,
         queryGenerator: null,
         auth: createAuth({
+          rateLimit: false,
           db,
           secret,
           signup: "open",
@@ -696,7 +738,7 @@ describe("the session gate", () => {
         AUTH_TRUSTED_ORIGINS: origin,
       });
 
-      return buildServer({ env, logger, db, queryGenerator: null });
+      return buildServer({ env, logger, db, queryGenerator: null, authRateLimit: false });
     }
 
     it("accepts the origin it was told to trust", async () => {
@@ -973,6 +1015,99 @@ describe("the session gate", () => {
    * rewrite" is only true if the reads are already scoped — and the day a
    * second account exists is a bad day to find out they are not.
    */
+  /**
+   * BUG-327. Better Auth limits sign-in to three tries in ten seconds per
+   * client, and it knows the client only by the address it is handed. Left to
+   * itself it read `X-Forwarded-For`, which a client writes, and it was off
+   * unless `NODE_ENV` said production.
+   */
+  describe("the sign-in rate limit", () => {
+    async function tryToSignIn(
+      app: ApiServer,
+      remoteAddress: string,
+      headers: Record<string, string> = {},
+    ) {
+      return app.inject({
+        method: "POST",
+        url: `${authBasePath}/sign-in/email`,
+        remoteAddress,
+        headers,
+        payload: { email: "nobody@example.com", password: "not-the-password" },
+      });
+    }
+
+    /** The limiter on, as every deployment has it. */
+    async function limited(): Promise<ApiServer> {
+      const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: secret });
+      return buildServer({ env, logger, db, queryGenerator: null });
+    }
+
+    it("refuses a fourth try in ten seconds from one address", async () => {
+      await clear();
+      const app = await limited();
+
+      try {
+        const statuses = [];
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+          statuses.push((await tryToSignIn(app, "203.0.113.9")).statusCode);
+        }
+
+        expect(statuses.slice(0, 3)).not.toContain(429);
+        expect(statuses[3]).toBe(429);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("does not give a direct client a new allowance for each address it invents", async () => {
+      await clear();
+      const app = await limited();
+
+      try {
+        const statuses = [];
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+          const invented = `198.51.100.${attempt + 1}`;
+          const answer = await tryToSignIn(app, "203.0.113.10", {
+            "x-forwarded-for": invented,
+            "x-signalscout-client-ip": invented,
+          });
+          statuses.push(answer.statusCode);
+        }
+
+        expect(statuses[3]).toBe(429);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("keeps two people behind one proxy apart", async () => {
+      await clear();
+      const app = await limited();
+
+      try {
+        // A proxy on the private network in front, as Traefik is.
+        const proxy = "172.18.0.2";
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          await tryToSignIn(app, proxy, { "x-forwarded-for": "198.51.100.1" });
+        }
+
+        expect(
+          (await tryToSignIn(app, proxy, { "x-forwarded-for": "198.51.100.1" })).statusCode,
+        ).toBe(429);
+        expect(
+          (await tryToSignIn(app, proxy, { "x-forwarded-for": "198.51.100.2" })).statusCode,
+        ).not.toBe(429);
+        // What the client put in front of the proxy's own entry is not believed.
+        expect(
+          (await tryToSignIn(app, proxy, { "x-forwarded-for": "192.0.2.77, 198.51.100.1" }))
+            .statusCode,
+        ).toBe(429);
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
   describe("what one account can see of another's", () => {
     /** A monitor owned by whoever is named, written straight into the table. */
     async function monitorFor(userId: string, name: string): Promise<string> {
@@ -996,6 +1131,133 @@ describe("the session gate", () => {
       const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: secret });
       return buildServer({ session: asUser(userId), env, logger, db, queryGenerator: null });
     }
+
+    /**
+     * Every route that names a record, asked by a stranger with the owner's own
+     * ids. US-336, after BUG-330: two routes read by id alone and no test
+     * noticed, because the cross-account cases were written per route. This one
+     * walks what the build registered, so the next route is in it on the day it
+     * is added.
+     *
+     * A write gets a valid body where the route has one, so the answer comes
+     * from the handler and not from validation. Whatever the answer, nothing of
+     * the owner's may be read or changed.
+     */
+    it("answers every route that names a record as if the owner's did not exist", async () => {
+      await clear();
+      const owner = "second-account";
+      const secret = "OWNER-ONLY-TEXT";
+
+      const monitorId = await monitorFor(owner, secret);
+      const project = await createProject(db, owner, {
+        name: secret,
+        product: secret,
+        idealCustomer: "Buyers",
+        problem: "A problem",
+      });
+      const prompt = await createReplyPrompt(db, owner, { name: secret, instruction: secret });
+      const [post] = await db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: "sweep-1",
+          url: "https://reddit.com/r/x/sweep-1",
+          excerpt: secret,
+          postedAt: new Date(),
+        })
+        .returning({ id: posts.id });
+      if (!post) throw new Error("The post was not inserted.");
+      const [match] = await db
+        .insert(matches)
+        .values({
+          monitorId,
+          postId: post.id,
+          score: 90,
+          relevance: 90,
+          problemFit: 90,
+          icpFit: 90,
+          intent: 90,
+          urgency: 50,
+          intentType: "problem",
+          reasons: [secret],
+        })
+        .returning({ id: matches.id });
+      if (!match) throw new Error("The match was not inserted.");
+      const estimateId = await startEstimate(db, {
+        userId: owner,
+        pollIntervalSeconds: 3600,
+        pollDays: [0, 1, 2, 3, 4, 5, 6],
+        probes: [{ source: "reddit", kind: "query", term: secret } as never],
+      });
+
+      /** Which of the owner's ids a route's `:id` names, by where the route lives. */
+      const idFor = (url: string): string | undefined => {
+        if (url.startsWith("/api/monitors/estimates/")) return estimateId;
+        if (url.startsWith("/api/monitors/")) return monitorId;
+        if (url.startsWith("/api/matches/")) return match.id;
+        if (url.startsWith("/api/projects/")) return project.id;
+        if (url.startsWith("/api/reply-prompts/")) return prompt.id;
+        return undefined;
+      };
+
+      const bodies: Record<string, unknown> = {
+        "PATCH /api/monitors/:id": { name: "Taken over" },
+        "PUT /api/monitors/:id/budget": { monthlyCapMicros: 0, onExhausted: "pause" },
+        "PUT /api/matches/:id/saved": { saved: true },
+        "PUT /api/matches/:id/verdict": { verdict: "not_relevant" },
+        "PATCH /api/projects/:id": { name: "Taken over" },
+        "PATCH /api/reply-prompts/:id": { name: "Taken over" },
+      };
+
+      const app = await serverAs("first-account");
+      const answered: string[] = [];
+
+      try {
+        const routes = app.registeredRoutes.filter(
+          (route) =>
+            route.method !== "HEAD" && route.url.includes("/:id") && idFor(route.url) !== undefined,
+        );
+
+        // A build where this list is short is a build this test says little about.
+        expect(routes.length).toBeGreaterThan(15);
+
+        for (const route of routes) {
+          const key = `${route.method} ${route.url}`;
+          const url = route.url.replace(":id", idFor(route.url) as string);
+          const response = await app.inject({
+            method: route.method as "GET",
+            url,
+            ...(route.method === "GET" || route.method === "DELETE"
+              ? {}
+              : { payload: bodies[key] ?? {} }),
+          });
+
+          expect(
+            response.statusCode,
+            `${key} answered ${response.statusCode}`,
+          ).toBeGreaterThanOrEqual(400);
+          expect(response.body, `${key} showed the owner's text`).not.toContain(secret);
+          if (response.statusCode !== 400) answered.push(key);
+        }
+
+        // Most routes reached their handler rather than stopping at validation.
+        expect(answered.length).toBeGreaterThan(routes.length / 2);
+
+        // Nothing of the owner's moved.
+        const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId));
+        expect({ name: monitor?.name, pausedAt: monitor?.pausedAt }).toEqual({
+          name: secret,
+          pausedAt: null,
+        });
+        expect((await db.select().from(projects)).map((row) => row.name)).toEqual([secret]);
+        expect((await db.select().from(replyPrompts)).map((row) => row.name)).toContain(secret);
+        expect(await db.select().from(feedback)).toEqual([]);
+        const [savedMatch] = await db.select().from(matches).where(eq(matches.id, match.id));
+        expect(savedMatch?.savedAt ?? null).toBeNull();
+      } finally {
+        await app.close();
+      }
+    });
 
     it("lists only the monitors the person asking owns", async () => {
       await clear();

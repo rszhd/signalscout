@@ -262,6 +262,15 @@ If Caddy, nginx or another Traefik already fronts this machine, keep it: set
 [accounts.md](accounts.md) has both paths and the proxy header a TLS
 terminator must send.
 
+**The sign-in limit counts by the client's address**, three tries in ten
+seconds, and the proxy is what knows it. `TRUST_PROXY` says which connections
+may name the client in `X-Forwarded-For`. Left empty it trusts loopback and the
+private networks, which is where Traefik, Caddy or nginx on this machine or its
+Docker network sits, and nothing from the internet. If the proxy reaches the
+app from a public address, name that address: `TRUST_PROXY=203.0.113.4`. With
+no proxy at all, `TRUST_PROXY=off` stops a client on the local network naming
+itself.
+
 ---
 
 ## The worker

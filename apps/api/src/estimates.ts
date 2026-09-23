@@ -24,7 +24,8 @@ import {
   notOfferedReason,
   platforms,
   probesFor,
-  readEstimate,
+  type readEstimate,
+  readOwnedEstimate,
   refuseEstimate,
   reportFor,
   searchQuerySchemaFor,
@@ -245,7 +246,7 @@ export async function registerEstimateRoutes(
         await refuseEstimate(db, estimateId, "The cost test could not be queued for the worker.");
       }
 
-      const run = await readEstimate(db, estimateId);
+      const run = await readOwnedEstimate(db, sessionUserId(request), estimateId);
       if (!run) throw new Error("The cost test was not written.");
 
       return reply.code(202).send(toResponse(run, sources));
@@ -260,7 +261,7 @@ export async function registerEstimateRoutes(
       response: { 200: reportSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const run = await readEstimate(db, request.params.id);
+      const run = await readOwnedEstimate(db, sessionUserId(request), request.params.id);
       if (!run) return reply.code(404).send({ message: "No cost test has that id." });
 
       return toResponse(run, sources);

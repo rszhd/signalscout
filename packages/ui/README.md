@@ -211,6 +211,15 @@ floor — so each application keeps the request and hands the rows in, and what
 only one API sends is an optional prop: `more` and `onShowOlder`, a query row's
 `note`, the lead groups to offer. Their rules are in `monitor-parts.css`.
 
+Three more followed (US-354). `Notifications` is a whole screen, like
+`ReplyVoices`: both products call the same two routes, so it fetches for
+itself, and the fields only the self-hosted API sends are optional. The
+page passes the monitor's address and, self-hosted, the sentence for an
+account signed with the instance's own secret. `LoginFrame` is the page
+around a sign-in form; the form is the child and stays each application's.
+`DraftFromDocument` drafts a project's four answers from a page or a file;
+where it sits, and the space around it, is the page's.
+
 ## The words
 
 `monitor.ts` holds what both products *say* about a monitor, a poll, a stage

@@ -219,22 +219,6 @@
   padding: 0 var(--space-5) var(--space-5);
   border: 0;
 }
-.project-editor .draft-controls {
-  align-items: stretch;
-}
-.project-editor .draft-controls input {
-  max-width: 100%;
-}
-.project-editor .draft-controls > input {
-  padding: var(--space-3);
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-}
-.project-editor .draft-file:focus-within {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
 .project-fields {
   border: 0;
   padding: 0;

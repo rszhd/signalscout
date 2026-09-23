@@ -35,8 +35,9 @@ Each match carries a score from 0 to 100, and the reasons behind it:
 - **Fit with your customer** — are they the kind of person who buys from you?
 - **Intent** — are they looking for a solution, or only complaining?
 
-You read the reasons, not only the number. When a score is wrong, say so with
-a verdict, and the monitor learns what you meant.
+You read the reasons, not only the number. When a score is wrong, mark the
+match **Not relevant**: it leaves your inbox, and your verdicts are kept, so
+you can export them and see how often the score was right.
 
 ## What SignalScout does not do
 

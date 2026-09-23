@@ -36,6 +36,10 @@ than a sentence:
 - **A diagram** shows an order or a relation: what happens to a post, which
   setting changes what. Write it as a ` ```mermaid ` block. It stays text,
   so the next change to the code can change the diagram in the same commit.
+  **Top to bottom (`flowchart TD`) unless it has four short boxes or
+  fewer.** Mermaid shrinks a wide diagram to the page's width, and at six
+  boxes left to right the labels are too small to read. Look at the page
+  after `npm run build` and a fresh `npm run preview`.
 - **A hero picture** that rarely changes may be drawn in Excalidraw. Commit
   the `.excalidraw` source beside the exported SVG.
 

@@ -23,9 +23,9 @@ the self-hosted build and the cloud where they agree.
 
 ## Acceptance
 
-- [ ] *Getting started*: what SignalScout does and does not do, and the
+- [x] *Getting started*: what SignalScout does and does not do, and the
       first project, first monitor and first match, in that order.
-- [ ] *Using SignalScout*: projects, monitors, the inbox, verdicts, reply
+- [x] *Using SignalScout*: projects, monitors, the inbox, verdicts, reply
       drafts, notifications, CSV export, each one page.
 - [ ] Every screen name and button label on a page matches the application.
 - [ ] Where the cloud differs, the page says so in one line and links to the
@@ -48,3 +48,8 @@ A screenshot is stored beside its page. `site/README.md` holds the rules.
 - 2026-09-23T11:17+08:00 — Screenshots wait for the owner: the UI is being polished first, and a
   screenshot of the screen before the polish is one to take twice. No seed
   data and no screenshot script yet.
+- 2026-09-23T11:24+08:00 — The text and diagrams of both sections, each label read from the
+  screen's source. A screenshot's place is an HTML comment,
+  `<!-- screenshot: … -->`, which a reader does not see and the script will
+  find. One claim written earlier was wrong and is fixed: a verdict does not
+  change how the next post is scored; nothing in scoring reads it.

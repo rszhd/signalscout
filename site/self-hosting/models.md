@@ -7,7 +7,7 @@ one runs once per monitor, and one writes text with your name on it.
 ## The five jobs
 
 ```mermaid
-flowchart LR
+flowchart TD
   plan["Writing the search plan<br/>once per monitor"] --> posts["Posts collected"]
   posts --> sim["Similarity<br/>optional, very cheap"]
   sim --> triage["Triage<br/>one question per post"]

@@ -54,7 +54,20 @@ export default withMermaid(
       sidebar: [
         {
           text: "Getting started",
-          items: [{ text: "What SignalScout does", link: "/getting-started/" }],
+          items: [
+            { text: "What SignalScout does", link: "/getting-started/" },
+            { text: "Your first match", link: "/getting-started/first-match" },
+          ],
+        },
+        {
+          text: "Using SignalScout",
+          items: [
+            { text: "Projects", link: "/using/projects" },
+            { text: "Monitors", link: "/using/monitors" },
+            { text: "The inbox", link: "/using/inbox" },
+            { text: "Reply drafts", link: "/using/replies" },
+            { text: "Notifications", link: "/using/notifications" },
+          ],
         },
         {
           text: "Self-hosting",

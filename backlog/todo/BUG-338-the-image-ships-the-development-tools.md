@@ -1,5 +1,6 @@
 ---
 id: BUG-338
+issue: 86
 title: The image ships the development tools
 type: bug
 priority: p2

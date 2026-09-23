@@ -92,3 +92,10 @@ to it.
   `.vitepress/theme/brand.css` resets it. And a preview server started before
   a rebuild serves the old chunks, so a diagram renders empty: restart the
   preview after every build.
+- 2026-09-23T12:20+08:00 — The owner corrected the triage advice: "cheaper than scoring" is
+  not enough; a triage model must be cheap *and* reliable at its one
+  question, or the stage is off. A cheap model that drops real leads saves
+  money by losing the product, and no screen shows it. The rule is now said
+  that way on the site's models and costs pages, in both example env files
+  (so the configuration reference shows it), in `docs/costs.md`, which also
+  names the triage loop that proves a candidate reliable, and in the README.

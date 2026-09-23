@@ -15,7 +15,7 @@ So the best way to spend less is a narrower search, not a stricter filter.
 flowchart LR
   fetch["Fetch posts<br/>💲 data provider"] --> kw["Keyword match<br/>free"]
   kw --> sim["Similarity<br/>💲 tiny"]
-  sim --> tri["Triage<br/>💲 cheap model"]
+  sim --> tri["Triage<br/>💲 one question per post"]
   tri --> score["Scoring<br/>💲💲 good model"]
 ```
 

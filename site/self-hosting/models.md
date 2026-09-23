@@ -20,7 +20,7 @@ flowchart TD
 |---|---|---|
 | **Writing the search plan** | Turns your four answers into the phrases and channels a monitor searches. | Your strongest model. It runs once per monitor, and it decides every post the monitor will ever collect. |
 | **Similarity** | Compares a post with your monitor before any model is paid to read it. | An embedding model. Optional. |
-| **Triage** | Asks one question about each post: could this author be a person to reach? | A **cheaper** model than scoring, or turn it off. |
+| **Triage** | Asks one question about each post: could this author be a person to reach? | A model that is **cheaper** than scoring **and reliable** at this question, or none: turn it off. |
 | **Scoring posts** | Reads a post and scores it. | A good model. This is the most expensive call. |
 | **Drafting a reply** | Writes the reply you see when you press **Draft reply**. | A model that writes well. It never posts anything. |
 
@@ -45,11 +45,20 @@ lists them all.
 
 ## Two rules that save money
 
-**Triage must be cheaper than scoring, or off.** Triage reads every post that
-the free filters keep, and scoring then reads the ones triage keeps. So the
-saving is only the price difference between the two models. With the same
-model on both, triage makes the bill larger, not smaller. If you have no
-cheaper model, set `AI_TRIAGE=off`.
+**Triage needs a model that is cheap and reliable, or none at all.**
+
+- **Cheap**, because triage reads every post the free filters keep, and
+  scoring then reads the ones triage keeps. The saving is only the price
+  difference between the two models. With the same model on both, triage
+  makes the bill larger, not smaller.
+- **Reliable**, because a post triage drops never reaches scoring and never
+  reaches your inbox. A cheap model that drops real leads saves money by
+  losing the leads you run SignalScout for, and nothing shows it.
+
+If you have no model that is both, set `AI_TRIAGE=off`. Every post then goes
+to scoring: it costs more, and it hides nothing. If you do run triage, watch
+the monitor page for a while: it counts the posts triage kept back. Many drops
+and a quiet inbox is the sign to turn it off and compare.
 
 **Similarity needs a provider that has embeddings.** Anthropic and DeepSeek do
 not offer embeddings. On those, name another provider in

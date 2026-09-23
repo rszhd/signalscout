@@ -56,11 +56,11 @@ Instagram ─┘                                                                
 ```
 
 **The cheap stages matter.** A post has to match a word, then clear a
-similarity threshold, then survive a one-word question from a cheap model,
-before the good model is paid to read it. On keyword noise that removes most of
-the bill. Inside a topical subreddit it removes almost nothing, because
-everything there is already about the subject — so the arithmetic on the
-monitor form assumes the expensive case.
+similarity threshold, then survive a one-word question from a triage model that
+must be cheap and reliable, or switched off, before the good model is paid to
+read it. On keyword noise that removes most of the bill. Inside a topical
+subreddit it removes almost nothing, because everything there is already about
+the subject — so the arithmetic on the monitor form assumes the expensive case.
 
 **Nothing is posted from here.** A match has a *Draft reply* button that asks a
 model once and puts the text in a box with a copy action. Publishing to a

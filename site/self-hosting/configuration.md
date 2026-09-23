@@ -402,8 +402,10 @@ nothing still triages, on the model it already has — which is the most
 expensive arrangement there is. AI_TRIAGE=off is how you switch the stage
 off; leaving the model blank is not.
 
-So: name a model cheaper than AI_MODEL, or set AI_TRIAGE=off. Doing neither
-costs you money.
+So: name a triage model that is cheaper than AI_MODEL *and* reliable at this
+one question, or set AI_TRIAGE=off. Doing neither costs you money. A cheap
+model that is not reliable costs you leads instead, and nothing in the inbox
+shows it: a post triage drops never reaches the scorer.
 
 That is measured, not assumed, and it surprised us. A one-word answer was
 supposed to be the saving. It is not: a reasoning model bills its own
@@ -421,8 +423,8 @@ The default above — claude-haiku-4-5 with nothing cheaper carried — has no
 gap, so a deployment that keeps it pays for triage in money and is repaid
 only in a quieter inbox.
 
-"on" or "off". On is the default and the answer while a cheaper triage model
-exists. Off sends every post the free stages kept straight to the classifier,
+"on" or "off". On is the default and the answer while a triage model exists
+that is both cheaper than the scorer and reliable at the question. Off sends every post the free stages kept straight to the classifier,
 and is the right answer when the two stages would run the same model: with no
 price gap the stage costs 48% more, and it keeps the one risk a cascade has —
 a dropped post leaves no row, no inbox entry and nothing to notice. US-177.

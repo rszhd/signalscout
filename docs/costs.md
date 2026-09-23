@@ -70,7 +70,7 @@ know what you owe.
 
 ### Triage is a model call, not a free stage
 
-The pre-filter's third stage asks a cheap model one question about every item
+The pre-filter's third stage asks a second model one question about every item
 the first two kept, so it spends on the items it keeps as well as the ones it
 drops. A one-word answer is not a short call: a reasoning model bills its
 thinking as output, and a triage call costs about what the classification it
@@ -81,12 +81,20 @@ classifier ten times dearer than the triage model made the bill 61% smaller;
 the same model on both stages made it 37% larger. The worker warns at startup
 when the two match.
 
-**A deployment with no cheaper model switches the stage off with
+**A triage model must be cheap *and* reliable at its one question, or there
+is none.** Cheap is the saving; reliable is the risk. A triage drop leaves no
+match, no inbox entry and nothing for a person to notice, so a cheap model
+that drops real leads saves money by losing the product, and looks like a
+quiet week. Reliable is measured, never assumed: the triage loop in
+[instruments.md](instruments.md) — `capture:triage`, `capture:scores`, then
+`live:triage-score` — shows what a candidate kept and what its drops would
+have scored. A candidate is promoted only when its drops score low.
+
+**A deployment with no model that is both switches the stage off with
 `AI_TRIAGE=off`.** Leaving `AI_TRIAGE_MODEL` blank does not switch it off; it
-runs triage on the classifier's own model, which costs more and keeps the one
-risk a cascade has: a triage drop leaves no row, no inbox entry and nothing
-for a person to notice. A cascade is worth that risk only when the second
-reader is much dearer.
+runs triage on the classifier's own model, which costs more and keeps the
+risk. A cascade is worth that risk only when the second reader is much
+dearer and the first is proven.
 
 **An evaluation model is the cheapest triage available and it is not
 promoted.** `AI_TRIAGE_PROVIDER=typesafe` with `AI_TRIAGE_MODEL=jev-latest`
@@ -235,7 +243,7 @@ has now seen the number.
 
 Three stages sit between collection and the model: a free keyword and
 subreddit match, a similarity comparison that costs one embedding per post,
-and triage, which asks a cheap model one question per surviving item. The
+and triage, which asks a second model one question per surviving item. The
 third exists because the first two measure *subject*, and no similarity
 threshold separates a person asking from the experts replying under them.
 

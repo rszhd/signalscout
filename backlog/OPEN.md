@@ -2,7 +2,7 @@
 
 # Open tickets
 
-62 open — 4 doing, 49 todo, 9 parked (4 p1, 39 p2, 19 p3).
+61 open — 3 doing, 49 todo, 9 parked (4 p1, 38 p2, 19 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -10,7 +10,6 @@
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
-| p2 | US-336 | [Every read the API calls takes its account](doing/US-336-every-read-the-api-calls-takes-its-account.md) | chore | doing | 2026-09-23T06:46+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |

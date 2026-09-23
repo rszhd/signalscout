@@ -609,6 +609,22 @@ export async function matchOwner(db: Database, matchId: string): Promise<string 
   return row?.userId;
 }
 
+/**
+ * Whether this match is on one of this account's monitors. What a route asks
+ * before it records a verdict. `matchOwner` stays exported because a package
+ * export is read outside this repository too. US-336.
+ */
+export async function ownsMatch(db: Database, userId: string, matchId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: matches.id })
+    .from(matches)
+    .innerJoin(monitors, eq(matches.monitorId, monitors.id))
+    .where(and(eq(matches.id, matchId), eq(monitors.userId, userId)))
+    .limit(1);
+
+  return row !== undefined;
+}
+
 export async function setMatchSaved(
   db: Database,
   userId: string,

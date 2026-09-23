@@ -95,6 +95,20 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+**Added.** A twin that takes the user id for each pipeline function that
+addressed one monitor or match by id alone (US-336): `getOwnedMonitor`,
+`updateOwnedMonitor`, `pauseOwnedMonitor`, `resumeOwnedMonitor`,
+`deleteOwnedMonitor`, `getOwnedBudget`, `setOwnedBudget`, `clearOwnedBudget`,
+`checkOwnedBudget`, `readOwnedNotificationSettings`,
+`saveOwnedNotificationSettings` and `ownsMatch`. Each takes `userId` after the
+database. For a monitor the account does not own, each answers what its twin
+answers for an id that does not exist: `undefined`, `false`, `null`, or a
+budget with no spend and no cap. `setOwnedBudget` and
+`saveOwnedNotificationSettings` answer `undefined`, where their twins would
+throw. The unchecked functions stay, unchanged, for a caller that acts for
+the whole instance, such as the worker. New exports to call, so the version
+is a minor.
+
 ## 0.14.0 — 2026-09-23
 
 **Changed.** A provider's `Retry-After` is read one way for every connector

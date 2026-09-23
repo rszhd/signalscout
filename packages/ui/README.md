@@ -179,9 +179,9 @@ a mark of its own. Those are layout.
 
 `ReplyVoices` is a whole screen, and the first (US-277). It may be one because
 it carries no product decision: a voice is a name and an instruction, stored
-per account, and nothing about who pays for a model touches it. The rule in
-both `AGENTS.md` files says it this way — a screen that is the same screen in
-both products may be shared; a screen that carries the product may not. The
+per account, and nothing about who pays for a model touches it. A screen
+that carries the product is not one component, but it still looks the same in
+both products: its look is here, and only its features differ (US-371). The
 route that renders it stays each application's own, and so does its place in
 the navigation. `ReplyDraft` is the second (US-278): the composer a match opens,
 which followed the hosted layout before it moved, so the package holds the

@@ -22,6 +22,17 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Added.** The look of the monitor list and the monitor page (US-371), in
+the one stylesheet: the overview, the toolbar and filters, the table, the
+group headings, and the page's header, tabs, sections, key figures and
+settings panel. The markup stays each application's. A consumer deletes its
+own rules for those classes — `.monitors-*`, `.monitor-table*`,
+`.monitor-detail-*`, `.monitor-key-*`, `.monitor-settings-*`,
+`.monitor-section-*` and the rest listed at the top of
+`monitor-screens.css` — and keeps only rules for its own features. The list
+marks a monitor that needs attention with `.needs-attention` on its row and
+on `.monitors-overview`.
+
 **Added.** The inbox's frame around the list (US-370): `InboxFilters`,
 `ArrivedBanner`, `MatchListHeading` and `ShowMore`, with the words
 `inboxOrders`, `scoreFilters` and `activeFilters`. The monitor picker shows

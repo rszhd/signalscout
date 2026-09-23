@@ -1,9 +1,19 @@
-# SignalScout
+<p align="center">
+  <a href="https://www.signalscout.run">
+    <img src="docs/img/banner.png" alt="SignalScout: the useful conversation is hiding in the noise. Beside it, the inbox: conversations ranked by score, one open with its problem fit, ICP fit and intent.">
+  </a>
+</p>
 
-**AI intent monitoring you can self-host.** Find the people publicly
-describing the problem your product solves — and read why each one scored.
+<p align="center">
+  <b>AI intent monitoring you can self-host.</b> Find the people publicly
+  describing the problem your product solves — and read why each one scored.
+</p>
 
-![The SignalScout inbox: Reddit conversations ranked by score, one open with its problem fit, ICP fit and intent, and the reasons the model gave](docs/img/inbox.jpg)
+<p align="center">
+  <a href="https://www.signalscout.run"><b>Try SignalScout Cloud</b></a> •
+  <a href="https://docs.signalscout.run"><b>Docs</b></a> •
+  <a href="#running-it"><b>Self-host it</b></a>
+</p>
 
 You describe what you sell, who buys it, and what problem you solve.
 SignalScout searches Reddit, X, LinkedIn, YouTube, TikTok and Instagram, reads

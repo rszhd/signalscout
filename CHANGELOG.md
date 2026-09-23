@@ -22,6 +22,8 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Changed.** The score breakdown's bars are ink, not the accent (US-377).
+
 **Fixed.** A monitor page with three key figures draws the third on a
 second row with a full-width line above it (US-376).
 

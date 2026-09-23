@@ -59,3 +59,7 @@ triage-score-cache-*.json.tmp
 # The eval dataset is built from a run record and a database, and it carries
 # real people's post text. `pnpm eval:dataset` rebuilds it in seconds.
 evals/*/dataset.json
+
+# The documentation site's build and cache (US-342).
+site/.vitepress/cache/
+site/.vitepress/dist/

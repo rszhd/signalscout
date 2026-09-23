@@ -86,13 +86,11 @@ The scale is what makes the site read as one site. 9px beside 8px does not
 visibly disagree; 9px beside 11px does, and after a hundred edits no two gaps
 match.
 
-**`pnpm lint:css` enforces it**, because Biome has no CSS rule for this. The
-stylelint script names its files explicitly: `index.css` and the un-migrated
-page stylesheets are grandfathered, since a page that still uses old values
-cannot be enforced until it has adopted the scale. When a page is migrated,
-add its stylesheet to the `lint:css` command and to the migration list below.
-A new rule in a migrated file that uses a raw px spacing value is a lint
-error.
+**`pnpm lint:css` enforces it**, because Biome has no CSS rule for this. It
+reads every stylesheet in `packages/ui/src/styles` and `apps/web/src/styles`,
+so a new page stylesheet is checked from its first line. A raw px spacing
+value there is a lint error. One file is outside it: the application's
+`index.css`, which still holds older values.
 
 Two things stay out of it: the email templates, which are a separate renderer
 that cannot read the CSS scale and copy the palette rather than the spacing;

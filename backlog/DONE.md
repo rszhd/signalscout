@@ -2,10 +2,11 @@
 
 # Done
 
-218 finished.
+223 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-339 | [The docs say what the code does](done/2026-09/BUG-339-the-docs-say-what-the-code-does.md) | bug | shipped | 2026-09 |
 | BUG-330 | [A cost test and a draft read only their own account](done/2026-09/BUG-330-a-cost-test-and-a-draft-read-only-their-account.md) | bug | shipped | 2026-09 |
 | BUG-329 | [The session gate reads the route, not the URL](done/2026-09/BUG-329-the-session-gate-reads-the-route-not-the-url.md) | bug | shipped | 2026-09 |
 | BUG-328 | [The webhook guard reads every spelling of an address](done/2026-09/BUG-328-the-webhook-guard-reads-every-spelling-of-an-address.md) | bug | shipped | 2026-09 |
@@ -34,6 +35,10 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-347 | [PLAN.md holds the product rules and nothing else](done/2026-09/US-347-plan-md-holds-the-product-rules-and-nothing-else.md) | chore | shipped | 2026-09 |
+| US-346 | [The contributor docs say only what a contributor needs](done/2026-09/US-346-the-contributor-docs-say-only-what-a-contributor-needs.md) | chore | shipped | 2026-09 |
+| US-344 | [A self-hoster installs and runs SignalScout from the docs](done/2026-09/US-344-a-self-hoster-installs-and-runs-from-the-docs.md) | feature | shipped | 2026-09 |
+| US-342 | [The documentation has a site, at docs.signalscout.run](done/2026-09/US-342-the-documentation-has-a-site.md) | feature | shipped | 2026-09 |
 | US-337 | [A pipeline step reads as its phases](done/2026-09/US-337-a-pipeline-step-reads-as-its-phases.md) | chore | shipped | 2026-09 |
 | US-334 | [The provider clients share one core](done/2026-09/US-334-the-provider-clients-share-one-core.md) | chore | shipped | 2026-09 |
 | US-332 | [The licence check and the audit run in CI and pass](done/2026-09/US-332-the-licence-check-and-the-audit-run-in-ci.md) | chore | shipped | 2026-09 |

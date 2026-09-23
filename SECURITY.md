@@ -29,8 +29,8 @@ team behind it — [AI_POLICY.md](AI_POLICY.md) says plainly who reads the code.
 
 - **An instance you configured differently from the documents.** Serving the
   app without TLS, or with `AUTH_SIGNUP=open` where you did not mean it, is a
-  deployment choice. [docs/self-hosting.md](docs/self-hosting.md) says what
-  each setting admits.
+  deployment choice. [The self-hosting guide](https://docs.signalscout.run/self-hosting/)
+  says what each setting admits.
 - **A data provider's platform, or a model provider's.** Their keys are in
   your instance and their agreements are yours. Report to them.
 - **SignalScout Cloud**, which is a separate product on separate servers.

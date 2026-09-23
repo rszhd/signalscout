@@ -10,7 +10,7 @@
  * **Why a real receiver rather than a test double.** Every test in the suite
  * stubs `fetch`, so what is proven there is that we build a signature — not
  * that a receiver on the other end of a socket can verify one. That is the
- * whole point of an HMAC contract, and docs/notifications.md tells a customer
+ * whole point of an HMAC contract, and site/self-hosting/webhooks.md tells a customer
  * to implement it. So this starts an HTTPS server, gives it the secret, and
  * makes it check: the timestamp, the body, the constant-time compare and the
  * delivery id, exactly as the document describes them.
@@ -126,7 +126,7 @@ function makeCertificates(dir: string): { ca: string; cert: string; key: string 
 }
 
 /**
- * The receiver, written from docs/notifications.md and from nothing else.
+ * The receiver, written from site/self-hosting/webhooks.md and from nothing else.
  *
  * This is the customer's half of the contract. It verifies the way that
  * document says to: read the raw bytes before parsing, recompute the HMAC over

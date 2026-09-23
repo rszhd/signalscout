@@ -6,6 +6,11 @@ here links to the page that says it properly.
 [AGENTS.md](../AGENTS.md) is the same ground written for an AI coding agent:
 denser, and organised around what changes the next edit. Read this one first.
 
+**This page and everything in `docs/` is for people who change the code.**
+How to install, run and use SignalScout is on
+[docs.signalscout.run](https://docs.signalscout.run), whose source is
+[`site/`](../site/README.md). Change what a user sees, change that page.
+
 ---
 
 ## What runs
@@ -47,7 +52,7 @@ which monitor is due.
 3. **Filter, cheaply, three times.** A keyword match
    (`engine/src/filter/keywords.ts`), then an embedding threshold
    (`engine/src/ai/embed.ts`), then a one-word question to a cheap model
-   (`engine/src/ai/probe.ts`). `worker/filter.ts` runs them in that order.
+   (`engine/src/ai/triage.ts`). `worker/filter.ts` runs them in that order.
 4. **Classify.** `worker/classify.ts` calls the good model through
    `engine/src/ai/classify.ts` and gets relevance, problem fit, ICP fit,
    intent and urgency back.
@@ -104,6 +109,8 @@ The code says what it does. It does not say why, on purpose.
   connectors, [costs.md](costs.md) for money, [secrets.md](secrets.md) for
   credentials, [testing.md](testing.md) for tests, [design.md](design.md) for
   screens.
+- **The site** holds what a user is told. Its configuration reference is
+  generated from `.env.example`.
 - **[PLAN.md](../PLAN.md)** is the product and **[STACK.md](../STACK.md)** is
   why each tool beat the alternative.
 

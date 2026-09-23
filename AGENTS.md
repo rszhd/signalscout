@@ -275,6 +275,12 @@ Do not invent a command that does not exist yet — check `package.json` first.
 voice, one idea per sentence. No idioms, no metaphors. Say "the tests pass",
 not "green".
 
+**What a user reads is on the site, in `site/`.** A change to a screen's
+label, a setting, a default or a limit changes its page there in the same
+commit; `docs/` is for contributors. A setting's comment in `.env.example` is
+the text the site's configuration reference shows. `site/README.md` holds the
+rules for a page (US-342).
+
 **Commit messages stay under 300 words.** Subject as a prose sentence, then a
 body holding only what the diff cannot say — the why, the constraint, the
 decision that would otherwise be made twice. Do not list the changed files.

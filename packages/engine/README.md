@@ -34,7 +34,7 @@ in a script with no Postgres anywhere near it.
 | | |
 |---|---|
 | `sources/` | Six platforms through five data providers, behind one interface |
-| `ai/` | Query writing, triage, classification, reply drafting, embeddings |
+| `ai/` | Describing a product, query writing, triage, classification, reply drafting, embeddings |
 | `filter/` | The pre-filter's keyword stage. Free, and crude on purpose |
 | `estimate/` | What a search plan would collect and what it would cost |
 | `secrets/` | AES-256-GCM for a credential that must survive a backup leaking |
@@ -80,7 +80,7 @@ const result = await reddit.search({
 
 result.posts;         // CandidatePost[]
 result.unitsConsumed; // what the provider billed, which is not the post count
-result.next;          // "done", "more" with a cursor, or "wait"
+result.next;          // "done", "ready" with a cursor, or "wait"
 ```
 
 **Read `next`, never `result.posts.length`.** A source may return fewer posts
@@ -101,8 +101,9 @@ has both lists.
 ## Model calls
 
 One client over the Vercel AI SDK, for Anthropic, OpenAI, Google and any
-OpenAI-compatible endpoint. Five jobs:
+OpenAI-compatible endpoint. Six jobs:
 
+- **describe** — draft the four answers from a document the person already wrote, such as a landing page;
 - **queries** — write a monitor's search strings from the four answers a person gave;
 - **triage** — one cheap call, one word back: could this author be a person to reach;
 - **classify** — score one post against one monitor;

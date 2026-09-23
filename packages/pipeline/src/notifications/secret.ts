@@ -28,7 +28,7 @@ import { webhookSecrets } from "../db/schema.js";
 /**
  * 32 bytes as hex, which is 64 characters.
  *
- * The same size docs/notifications.md tells a self-hoster to generate with
+ * The same size site/self-hosting/webhooks.md tells a self-hoster to generate with
  * `openssl rand -hex 32`, so the two halves of one instance cannot disagree
  * about what a secret looks like, and `WEBHOOK_SIGNING_SECRET`'s own minimum of
  * 32 characters is comfortably cleared.

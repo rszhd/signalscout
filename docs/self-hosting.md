@@ -187,8 +187,8 @@ Where `AUTH_SIGNUP=open`, the keys in `.env` are ignored, so a stranger who
 registers cannot spend yours.
 
 ```env
-BRIGHTDATA_API_KEY=      # Bright Data — Reddit
-SCRAPECREATORS_API_KEY=  # ScrapeCreators — Reddit
+BRIGHTDATA_API_KEY=      # Bright Data — Reddit. Switched off in this build
+SCRAPECREATORS_API_KEY=  # ScrapeCreators — Reddit, YouTube, TikTok
 SOCIALCRAWL_API_KEY=     # SocialCrawl — Reddit, X, YouTube, TikTok, Instagram
 SOCIALDATA_API_KEY=''    # SocialData — X. Quote it; the key can contain a pipe
 APIFY_API_TOKEN=         # Apify — LinkedIn
@@ -209,8 +209,9 @@ answer; a collection already running finishes at the provider that started it.
 Until you choose, a poll refuses to start rather than pick for you, because
 picking would spend money at a provider you did not.
 
-This product asks a model four different things — scoring, triage, similarity
-and drafting a reply — and each is configured on its own.
+This product asks a model five different things — scoring, triage,
+similarity, writing a monitor's search plan and drafting a reply — and each is
+configured on its own.
 [costs.md](costs.md) says why triage must be the cheaper model, and
 `.env.example` carries a working pair with the prices it was measured at.
 Anthropic publishes no embedding endpoint, so the similarity stage needs

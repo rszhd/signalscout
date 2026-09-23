@@ -35,7 +35,7 @@ US-094. Every message carries a plain-text part and an HTML part. The text is
 the message and the HTML is a presentation of it, so a client that shows only
 text loses the styling and nothing else.
 
-The palette is copied from `apps/web/src/styles/tokens.css` into
+The palette is copied from `packages/ui/src/styles/tokens.css` into
 `packages/pipeline/src/notifications/email-theme.ts`, because a mail client has no
 external stylesheet and no CSS variables. **Change a colour in one and change
 it in the other.** The copy is deliberate and it is made once: that file holds

@@ -33,14 +33,14 @@ describe("the login frame", () => {
 
   it("says what the product passes under the story and in the footer", async () => {
     screen = await mount(
-      <LoginFrame storyNote="Your data." footer="Open-source AI intent monitoring.">
+      <LoginFrame storyNote="Your data." footer="AI intent monitoring you can self-host.">
         <form />
       </LoginFrame>,
     );
 
     expect(screen.container.querySelector(".login-story-footer")?.textContent).toBe("Your data.");
     expect(screen.container.querySelector(".login-footer")?.textContent).toBe(
-      "Open-source AI intent monitoring.",
+      "AI intent monitoring you can self-host.",
     );
   });
 });

@@ -159,7 +159,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
   return (
     <LoginFrame
       storyNote="Your accounts. Your API keys. Your data."
-      footer="Open-source AI intent monitoring."
+      footer="AI intent monitoring you can self-host."
     >
       {sentTo ? (
         /*

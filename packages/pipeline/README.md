@@ -22,7 +22,7 @@ SDK.
 
 So it does not know who is logged in, who may poll, or who is paying. Those are
 the application's questions, and they arrive as arguments. That is what lets
-one open-source app and one hosted app run this same code.
+one self-hosted app and one hosted app run this same code.
 
 ---
 
@@ -165,4 +165,7 @@ says what each version changed for a consumer.
 
 ## License
 
-[Apache-2.0](https://github.com/rszhd/signalscout/blob/main/LICENSE).
+Fair source, under the
+[Functional Source License](https://github.com/rszhd/signalscout/blob/main/LICENSE)
+(FSL-1.1-ALv2). Each version becomes Apache-2.0 two years after its release.
+Versions up to 0.14.0 were published under Apache-2.0 and stay under it.

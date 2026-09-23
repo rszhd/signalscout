@@ -22,6 +22,13 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**License.** From this version the package is fair source, under the
+Functional Source License (FSL-1.1-ALv2), not Apache-2.0 (US-379). You may use
+it, change it and run it, in a business too. You may not sell it or offer it
+in a product or service that competes with SignalScout. Each version becomes
+Apache-2.0 two years after its release. Earlier versions keep Apache-2.0.
+The package now ships its `LICENSE`.
+
 **Changed.** The score breakdown's bars are ink, not the accent (US-377).
 
 **Fixed.** A monitor page with three key figures draws the third on a
@@ -140,6 +147,13 @@ takes a `size` and carries its one rule in the stylesheet, so a consumer
 sets no rule for the mark (US-283).
 
 ## Unreleased
+
+**License.** From this version the package is fair source, under the
+Functional Source License (FSL-1.1-ALv2), not Apache-2.0 (US-379). You may use
+it, change it and run it, in a business too. You may not sell it or offer it
+in a product or service that competes with SignalScout. Each version becomes
+Apache-2.0 two years after its release. Earlier versions keep Apache-2.0.
+The package now ships its `LICENSE`.
 
 **Added.** A twin that takes the user id for each pipeline function that
 addressed one monitor or match by id alone (US-336): `getOwnedMonitor`,

@@ -103,7 +103,8 @@ export default withMermaid(
       },
 
       footer: {
-        message: "Apache-2.0. The self-hosted build and the cloud share these guides.",
+        message:
+          "Fair source, under FSL-1.1-ALv2. The self-hosted build and the cloud share these guides.",
       },
     },
 

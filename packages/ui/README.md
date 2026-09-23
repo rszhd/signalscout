@@ -10,7 +10,7 @@ cool neutral backgrounds, muted blue for actions and selection, and restrained
 borders. The goal is to make the next useful action obvious while keeping
 secondary information available on demand.
 
-**Two applications wear this, and their screens differ.** The open-source
+**Two applications wear this, and their screens differ.** The self-hosted
 application and the hosted one are forks of one app (US-151, US-239) and are
 meant to look like one product. So the brand lives here and the screens do
 not: a layout, a page stylesheet and a route table belong to each

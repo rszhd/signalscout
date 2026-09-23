@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-23T18:02+08:00
 parent:
 area: product
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -42,7 +42,8 @@ publishes the changes.
 all the owner's, so no contributor is asked. That stays true only while no
 outside patch is merged: a contribution would reach the owner under the
 FSL, whose terms refuse a paid hosted service, and the cloud is one. The
-owner takes no outside contributions.
+owner will choose between no outside code and a CLA later; until then no
+outside patch is merged.
 
 **Released code stays Apache-2.0.** v0.14.0 and every earlier tag, and the
 npm packages already published, keep the license they shipped with. The FSL
@@ -50,36 +51,32 @@ starts at the next release, so this lands before it.
 
 ## Acceptance
 
-- [ ] `LICENSE` is the FSL-1.1-ALv2 template, with the owner and 2026 filled
+- [x] `LICENSE` is the FSL-1.1-ALv2 template, with the owner and 2026 filled
       in.
-- [ ] The `license` field is `FSL-1.1-ALv2` in the root `package.json` and in
+- [x] The `license` field is `FSL-1.1-ALv2` in the root `package.json` and in
       `engine`, `pipeline` and `ui`, and `pnpm check:licenses` still passes.
-- [ ] Each of the three npm packages ships the `LICENSE` text, and the runtime
+- [x] Each of the three npm packages ships the `LICENSE` text, and the runtime
       image carries it. Today neither ships any license text.
-- [ ] The README's license section says what the FSL allows and refuses in
+- [x] The README's license section says what the FSL allows and refuses in
       the owner's words above, names v0.14.0 as the last Apache-2.0 release,
       and links to this ticket instead of US-019.
-- [ ] No page in this repository calls SignalScout "open source". It is "fair
+- [x] No page in this repository calls SignalScout "open source". It is "fair
       source": the README tagline, `Login.tsx`'s footer, the site footer in
       `site/.vitepress/config.mts`, PLAN.md, and the package READMEs. A
       mention of somebody else's open-source software stays.
-- [ ] CONTRIBUTING.md says pull requests are not accepted, and says where a
-      bug report, a question and a security report still go.
-- [ ] AI_POLICY.md, AGENTS.md, `backlog/README.md` and the DCO step in
-      `ci.yml` agree with no outside contributions.
-- [ ] US-313, US-314 and US-315 are dropped, each with a Log line naming this
-      ticket: each one exists to bring an outside contributor in.
-- [ ] CHANGELOG.md names the license change in the next release's entry.
+- [x] CONTRIBUTING.md names the FSL, and says an outside pull request waits
+      until the owner decides how contributions work under it.
+- [x] CHANGELOG.md names the license change in the next release's entry.
 
 ## Notes
 
 The template is at <https://fsl.software>. It asks only for the licensor
 and the year. The owner may still have a lawyer read it before it ships.
 
-Two decisions are open. Does the owner's own `Signed-off-by` stay, now that
-it certifies nothing to an outside reader? Does the GitHub repository
-description and topics change here, or by hand? The second is a change to a
-public page, so it is the owner's.
+Two decisions are open. How outside code arrives: not at all, or under a
+CLA. The DCO step, AI_POLICY.md and US-313, US-314 and US-315 follow that
+choice, and wait for it. And the GitHub repository description and topics,
+which are a public page and the owner's to change.
 
 The hosted application calls itself open source too, on its landing and
 pricing pages. That is a change in the hosted repository, under its own
@@ -92,3 +89,11 @@ ticket.
   License and the FSL. The FSL definitions above were read from the template
   on getsentry/fsl.software today, and each product named above was checked
   against its own repository's `LICENSE`.
+- 2026-09-23T18:10+08:00 — Switched. The owner chose to decide on outside
+  contributions later, so CONTRIBUTING.md holds outside pull requests and
+  the DCO step, AI_POLICY.md and US-313 to US-315 are unchanged. The new
+  tagline is "AI intent monitoring you can self-host." Proved here:
+  `check:licenses` passes against the FSL; `release:verify` and
+  `release:verify:ui` pass and fail on a changed package `LICENSE`; a local
+  image build holds `/app/LICENSE`; lint passes. Not proved: the image label,
+  which only a CI build writes.

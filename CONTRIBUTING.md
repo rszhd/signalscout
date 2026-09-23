@@ -1,11 +1,19 @@
 # Contributing
 
-Thank you for looking. This is a small project and a patch is welcome.
+Thank you for looking.
+
+**Pull requests from outside wait for now.** The project moved from
+Apache-2.0 to the [Functional Source License](LICENSE) (US-379). A patch under
+that license could not be used in the hosted application, so the owner is
+deciding how outside code arrives: not at all, or under a contributor license
+agreement. Until then, no outside pull request is merged. A bug report, a
+question and a security report are welcome now — see *Reporting something*
+below.
 
 ## The license, and how your work arrives
 
-The project is [Apache-2.0](LICENSE), and contributions come in under the same
-license.
+The project is under the [Functional Source License](LICENSE), and
+contributions come in under the same license.
 
 There is no CLA. Instead the project uses the **Developer Certificate of
 Origin**: you add one line to each commit saying you have the right to submit
@@ -27,9 +35,10 @@ copyright assignment and it gives nobody rights over your other work. The full t
 at [developercertificate.org](https://developercertificate.org/), and it is
 short enough to read.
 
-A CLA was considered and refused. It would let the project be relicensed later
-without asking anybody, and that convenience is not worth deterring the people
-this project wants patches from.
+A CLA was considered and refused under Apache-2.0. It would let the project be
+relicensed later without asking anybody, and that convenience was not worth
+deterring the people this project wanted patches from. The move to the FSL
+reopens the question.
 
 ## Before you write code
 

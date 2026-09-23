@@ -14,7 +14,7 @@
  * needs a renderer and is the browser's business, not this script's.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -57,6 +57,15 @@ try {
     "package/dist/assets/mark-small.svg",
   ]) {
     if (!listing.includes(file)) fail(`ships no ${file.replace("package/", "")}`);
+  }
+
+  // The FSL asks that every copy carry its terms (US-379). npm takes LICENSE
+  // from the package folder, never from the repository root, so the folder
+  // holds a copy and this checks the copy has not drifted.
+  const license = readFileSync(join(root, "LICENSE"), "utf8");
+  if (!listing.includes("package/LICENSE")) fail("ships no LICENSE");
+  else if (run("tar", ["-xOzf", tarball, "package/LICENSE"]) !== license) {
+    fail("ships a LICENSE that differs from the repository's");
   }
 
   // The harness renders and so needs react-dom; the words and the components do

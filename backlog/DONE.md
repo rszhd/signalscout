@@ -2,7 +2,7 @@
 
 # Done
 
-237 finished.
+238 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -37,6 +37,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-379 | [The code is fair source, under the FSL](done/2026-09/US-379-the-code-is-fair-source-under-the-fsl.md) | feature | shipped | 2026-09 |
 | US-377 | [The score breakdown's bars are ink, not the accent](done/2026-09/US-377-score-bars-are-ink.md) | chore | shipped | 2026-09 |
 | US-376 | [A key figure that wraps to a second row keeps its border](done/2026-09/US-376-a-wrapped-key-figure-keeps-its-border.md) | bug | shipped | 2026-09 |
 | US-375 | [The lead breakdown switch is the underline switch the inbox uses](done/2026-09/US-375-lead-breakdown-uses-the-view-switch.md) | chore | shipped | 2026-09 |

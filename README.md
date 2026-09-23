@@ -1,7 +1,7 @@
 # SignalScout
 
-**Open-source AI intent monitoring.** Find the people publicly describing the
-problem your product solves — and read why each one scored.
+**AI intent monitoring you can self-host.** Find the people publicly
+describing the problem your product solves — and read why each one scored.
 
 ![The SignalScout inbox: Reddit conversations ranked by score, one open with its problem fit, ICP fit and intent, and the reasons the model gave](docs/img/inbox.jpg)
 
@@ -113,16 +113,27 @@ The scope is one sentence: **find conversations with intent.**
 - **A security hole:** a
   [private advisory](https://github.com/rszhd/signalscout/security/advisories/new),
   never an issue. [SECURITY.md](SECURITY.md) says what is in scope.
-- **To change the code:** start with [CONTRIBUTING.md](CONTRIBUTING.md) and
-  [docs/map.md](docs/map.md).
-  [Issues labelled **good first issue** or **help wanted**](https://github.com/rszhd/signalscout/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22%2C%22help+wanted%22)
-  are a good place to begin.
+- **To change the code for your own use:** start with
+  [docs/map.md](docs/map.md). Pull requests from outside wait for now;
+  [CONTRIBUTING.md](CONTRIBUTING.md) says why.
 
 The help that needs no code: if you run an instance, say whether the score on
 your matches was right ([#32](https://github.com/rszhd/signalscout/issues/32)).
 
 ## License
 
-[Apache-2.0](LICENSE). Use it, change it, run it inside your company, sell a
-service built on it. [US-019](backlog/done/2026-09/US-019-the-project-has-a-license.md)
-says why it is not AGPL.
+SignalScout is **fair source**, under the
+[Functional Source License](LICENSE) (FSL-1.1-ALv2). The source is public,
+but it is not open source.
+
+**You may** self-host it and use it, in a business too. You may change the
+code and run your changed copy. An agency may run its own instance to find
+leads for its clients, and send them the results.
+
+**You may not** sell the code or a changed copy, sell it as a hosted
+service, or give your clients a login to your instance.
+
+**Each version becomes Apache-2.0 two years after its release.** Versions up
+to 0.14.0 were released under Apache-2.0 and stay under it.
+[US-379](backlog/done/2026-09/US-379-the-code-is-fair-source-under-the-fsl.md) says
+why the license changed.

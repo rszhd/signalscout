@@ -152,7 +152,7 @@ the short list, so a decision is not reopened by accident.
 - **Bring your own keys, for both AI and social APIs.** The user holds the
   account and pays the provider. This is not a fallback mode; it is the
   product.
-- **Self-hostable first.** The open-source build is the whole application.
+- **Self-hostable first.** The self-hosted build is the whole application.
   Nothing is removed to make the hosted version worth paying for.
 - **The hosted version is a separate private repository** on the two packages
   this one publishes, since US-155. Billing, plans and the cloud's screens

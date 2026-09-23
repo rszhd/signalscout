@@ -2,7 +2,7 @@
   "name": "@signalscout/ui",
   "version": "0.0.0",
   "description": "SignalScout's brand: the token contract, the shared controls, the mark, and the words both applications say about a monitor.",
-  "license": "Apache-2.0",
+  "license": "FSL-1.1-ALv2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rszhd/signalscout.git",

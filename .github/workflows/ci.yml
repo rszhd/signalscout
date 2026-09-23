@@ -173,6 +173,10 @@ jobs:
             # `main` since US-293; the name stays so a click cannot undo it.
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=sha,format=long
+          # GitHub may not recognise the FSL, and this label would then
+          # carry whatever it guessed from the repository (US-379).
+          labels: |
+            org.opencontainers.image.licenses=FSL-1.1-ALv2
 
       - id: build
         uses: docker/build-push-action@v6

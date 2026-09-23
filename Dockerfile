@@ -42,6 +42,10 @@ COPY --from=build /app/apps/api/drizzle apps/api/drizzle
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/web/dist apps/web/dist
 
+# The FSL asks that every copy carry its terms (US-379), and an image is a
+# copy.
+COPY LICENSE ./
+
 # The test files are compiled with everything else. They import vitest, which
 # is not installed here, so remove them rather than ship a broken import.
 RUN find packages apps \( -name '*.test.js' -o -name '*.test.d.ts' -o -name '*.test.js.map' \) \

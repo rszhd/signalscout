@@ -145,6 +145,10 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+          # GitHub may not recognise the FSL, and this label would then
+          # carry whatever it guessed from the repository (US-379).
+          labels: |
+            org.opencontainers.image.licenses=FSL-1.1-ALv2
 
       - uses: docker/build-push-action@v6
         with:

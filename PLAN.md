@@ -8,7 +8,7 @@ structural.
 
 ## What we’re building
 
-An **open-source AI intent monitoring tool** that watches social platforms and
+A **fair-source AI intent monitoring tool** that watches social platforms and
 surfaces conversations from people who may actually need what you sell.
 
 Traditional social listening answers *who mentioned my brand*. This product
@@ -16,7 +16,7 @@ answers one question:
 
 > Who is publicly talking about a problem my product can solve?
 
-**Open source first.** The self-hosted build is the whole application, and it
+**Self-hosted first.** The self-hosted build is the whole application, and it
 is not cut down to make a hosted version worth paying for. Self-hosted, the
 user brings the keys: a data provider's for each platform, and a model's. They
 own the accounts and pay for their own usage.

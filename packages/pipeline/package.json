@@ -2,7 +2,7 @@
   "name": "@signalscout/pipeline",
   "version": "0.0.0",
   "description": "The stateful half of SignalScout: monitors, posts, matches, cursors, the budget guard and the jobs, with their migrations.",
-  "license": "Apache-2.0",
+  "license": "FSL-1.1-ALv2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rszhd/signalscout.git",

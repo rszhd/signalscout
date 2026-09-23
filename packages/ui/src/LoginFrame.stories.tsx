@@ -51,6 +51,6 @@ export const Hosted: Story = {};
 export const SelfHosted: Story = {
   args: {
     storyNote: "Your accounts. Your API keys. Your data.",
-    footer: "Open-source AI intent monitoring.",
+    footer: "AI intent monitoring you can self-host.",
   },
 };

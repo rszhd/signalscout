@@ -60,6 +60,29 @@ semantics a screen must not get wrong:
 theme class not served by a component (e.g. a page's own `text-button`) stays a
 plain class until a component earns it. Components never import `packages/pipeline`.
 
+## The preview
+
+Every exported component renders on its own in Storybook, with fixture data
+and no server (US-351):
+
+    pnpm --filter @signalscout/ui storybook        # http://localhost:6006
+    pnpm --filter @signalscout/ui storybook:build  # a static copy in storybook-static/
+
+**A new component comes with its stories**, one per state a screen puts it
+in: loading, empty, refused, the confirmation that replaces the actions. A
+story sits beside its component as `<Name>.stories.tsx`. `tsconfig.json`
+leaves the stories out of `dist`, and `tsconfig.stories.json` typechecks them.
+
+- **A component that fetches** names its answers in `parameters.api`, keyed
+  by method and path; `.storybook/api.ts` answers in place of `fetch`. A call
+  no story names answers 404 and warns in the console.
+- **The preview wears what an application wears**: this package's
+  stylesheet, over Tailwind's reset and Figtree. A component that looks wrong
+  here and right in an application depends on a rule the application holds,
+  and that rule belongs here (BUG-356 was the first).
+- **The stories are not tests yet.** Storybook's Vitest addon supports
+  Vitest 3 and 4, and this repository is on 5.
+
 ## Spacing
 
 Spacing is on the scale, not on a value. The scale lives in

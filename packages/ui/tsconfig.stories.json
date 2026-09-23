@@ -1,0 +1,15 @@
+{
+  // The preview and its stories, typechecked and never emitted. US-351.
+  // `tsconfig.json` builds the package and leaves these out of `dist`.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "types": [],
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*.stories.tsx", "src/bundler.d.ts", ".storybook/*.ts", ".storybook/*.tsx"]
+}

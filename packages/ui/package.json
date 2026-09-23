@@ -43,7 +43,9 @@
   },
   "scripts": {
     "build": "tsc --build && node scripts/copy-static.mjs",
-    "typecheck": "tsc --build"
+    "storybook": "storybook dev -p 6006 --host localhost --no-open",
+    "storybook:build": "storybook build -o storybook-static",
+    "typecheck": "tsc --build && tsc -p tsconfig.stories.json"
   },
   "peerDependencies": {
     "react": ">=19",
@@ -51,14 +53,21 @@
     "react-router": ">=8"
   },
   "devDependencies": {
+    "@fontsource/figtree": "5.3.0",
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/react-vite": "10.6.0",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
+    "@vitejs/plugin-react": "6.1.1",
     "jsdom": "^30.0.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-router": "8.3.1",
+    "storybook": "10.6.0",
+    "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
+    "vite": "8.2.2",
     "vitest": "5.0.0"
   },
   "publishConfig": {

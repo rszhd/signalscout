@@ -86,6 +86,19 @@ export const envSchema = z.object({
    */
   APP_URL: blankIsUnset(z.string().min(1).optional()),
 
+  /**
+   * Which connections may say who the client is, through `X-Forwarded-For`.
+   * BUG-327.
+   *
+   * Unset trusts loopback and the private networks, where a reverse proxy in
+   * front of this process sits: behind Traefik the address it adds is the
+   * client, and a client reaching the port directly from the internet cannot
+   * name itself. `off` trusts nobody and reads the connection only. Anything
+   * else is a comma-separated list of addresses or ranges, as Fastify's
+   * `trustProxy` takes it. The sign-in rate limit counts by this address.
+   */
+  TRUST_PROXY: blankIsUnset(z.string().min(1).optional()),
+
   HOST: z.string().min(1).default("0.0.0.0"),
 
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),

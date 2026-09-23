@@ -136,6 +136,23 @@ export async function startEstimate(
   return run.id;
 }
 
+/**
+ * One account's cost test, or nothing when the id is not theirs.
+ *
+ * What the API reads. `readEstimate` answers for the whole instance because
+ * the worker runs every account's tests; a person may read only their own,
+ * and a test that is somebody else's gets the answer an unknown id gets.
+ * BUG-330.
+ */
+export async function readOwnedEstimate(
+  db: Database,
+  userId: string,
+  id: string,
+): Promise<EstimateRun | undefined> {
+  const run = await readEstimate(db, id);
+  return run && run.userId === userId ? run : undefined;
+}
+
 export async function readEstimate(db: Database, id: string): Promise<EstimateRun | undefined> {
   const [row] = await db.select().from(queryEstimates).where(eq(queryEstimates.id, id)).limit(1);
   if (!row) return undefined;

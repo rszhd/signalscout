@@ -2,11 +2,15 @@
 
 # Done
 
-215 finished.
+219 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
 | BUG-339 | [The docs say what the code does](done/2026-09/BUG-339-the-docs-say-what-the-code-does.md) | bug | shipped | 2026-09 |
+| BUG-330 | [A cost test and a draft read only their own account](done/2026-09/BUG-330-a-cost-test-and-a-draft-read-only-their-account.md) | bug | shipped | 2026-09 |
+| BUG-329 | [The session gate reads the route, not the URL](done/2026-09/BUG-329-the-session-gate-reads-the-route-not-the-url.md) | bug | shipped | 2026-09 |
+| BUG-328 | [The webhook guard reads every spelling of an address](done/2026-09/BUG-328-the-webhook-guard-reads-every-spelling-of-an-address.md) | bug | shipped | 2026-09 |
+| BUG-327 | [The sign-in limit counts one address per client](done/2026-09/BUG-327-the-sign-in-limit-counts-one-address-per-client.md) | bug | shipped | 2026-09 |
 | BUG-323 | [A lost write-back opens a second issue for one ticket](done/2026-09/BUG-323-a-lost-write-back-opens-a-second-issue.md) | bug | shipped | 2026-09 |
 | BUG-288 | [A reason that says "high-intent" about the post is refused as a score](done/2026-09/BUG-288-a-reason-that-says-high-intent-about-the-post-is-refused-as-a-score.md) | bug | fixed | 2026-09 |
 | BUG-033 | [The image does not know the UI package](done/2026-09/BUG-033-the-image-does-not-know-the-ui-package.md) | bug | shipped | 2026-09 |

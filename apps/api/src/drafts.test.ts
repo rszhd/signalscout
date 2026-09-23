@@ -15,17 +15,22 @@
  */
 import type { Database } from "@signalscout/pipeline";
 import {
+  budgets,
   createDatabase,
   createLogger,
   createReplyPrompt,
   listReplyPrompts,
+  matches,
+  modelCalls,
+  monitors,
+  posts,
   replyPrompts,
 } from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { unclaimedUserId } from "./auth/user.js";
 import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner, createTestDatabase, type TestDatabase } from "./testing.js";
+import { asOwner, asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -235,5 +240,114 @@ describe("drafting without a model", () => {
     } finally {
       await app.close();
     }
+  });
+});
+
+/**
+ * BUG-330. A draft's prompt carries the monitor's product, buyer and problem,
+ * and the post, so drafting on somebody else's match hands their brief to
+ * whoever asked, and the call counts against their cap. Another account gets
+ * the answer an unknown id gets.
+ *
+ * The monitor sits at a zero cap, so the owner's request stops at the budget
+ * and no case here reaches a model.
+ */
+describe("drafting on another account's match", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: (() => Promise<void>) | undefined;
+  let matchId: string;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("api_drafts_scope");
+    ({ db, close } = createDatabase(database.url));
+
+    const [monitor] = await db
+      .insert(monitors)
+      .values({
+        userId: "the-owner",
+        name: "Theirs",
+        product: "A test runner that records browser flows",
+        idealCustomer: "Small SaaS teams with no QA engineer",
+        problem: "End-to-end tests break when the UI changes",
+        signals: ["problem"],
+        sources: ["reddit"],
+      })
+      .returning({ id: monitors.id });
+    const [post] = await db
+      .insert(posts)
+      .values({
+        source: "reddit",
+        externalId: "scope-1",
+        url: "https://reddit.com/r/SaaS/comments/scope-1",
+        excerpt: "How are small teams handling regression testing?",
+        postedAt: new Date(),
+      })
+      .returning({ id: posts.id });
+    if (!monitor || !post) throw new Error("The rows were not inserted.");
+
+    const [match] = await db
+      .insert(matches)
+      .values({
+        monitorId: monitor.id,
+        postId: post.id,
+        score: 90,
+        relevance: 90,
+        problemFit: 90,
+        icpFit: 90,
+        intent: 90,
+        urgency: 50,
+        intentType: "problem",
+        reasons: ["Asks for a tool"],
+      })
+      .returning({ id: matches.id });
+    if (!match) throw new Error("The match was not inserted.");
+    matchId = match.id;
+
+    await db
+      .insert(budgets)
+      .values({ monitorId: monitor.id, monthlyCapMicros: 0, onExhausted: "notify" });
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  async function draftAs(userId: string) {
+    const app = await buildServer({
+      session: asUser(userId),
+      // A key the route can build a drafter from. Nothing is called with it:
+      // the owner stops at the cap and a stranger at the lookup.
+      env: loadEnv({
+        DATABASE_URL: database.url,
+        AI_PROVIDER: "openai",
+        AI_API_KEY: "not-a-real-key",
+      }),
+      logger,
+      db,
+      queryGenerator: null,
+    });
+
+    try {
+      return await app.inject({
+        method: "POST",
+        url: `/api/matches/${matchId}/draft`,
+        payload: {},
+      });
+    } finally {
+      await app.close();
+    }
+  }
+
+  it("reaches the owner's own monitor", async () => {
+    expect((await draftAs("the-owner")).statusCode).toBe(402);
+  });
+
+  it("is refused to another account as if the match did not exist", async () => {
+    const answer = await draftAs("a-stranger");
+
+    expect(answer.statusCode).toBe(404);
+    expect(await db.select().from(modelCalls)).toEqual([]);
   });
 });

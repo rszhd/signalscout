@@ -346,7 +346,6 @@
   color: var(--ink);
   background: var(--surface);
   box-shadow: var(--shadow);
-  scrollbar-gutter: stable;
 }
 
 .app-dialog::backdrop {

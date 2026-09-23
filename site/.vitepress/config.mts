@@ -47,7 +47,7 @@ export default withMermaid(
       nav: [
         { text: "Getting started", link: "/getting-started/" },
         { text: "Self-hosting", link: "/self-hosting/" },
-        { text: "Cloud", link: "https://www.signalscout.run" },
+        { text: "Cloud", link: "/cloud/" },
         { text: "GitHub", link: repository },
       ],
 
@@ -67,6 +67,13 @@ export default withMermaid(
             { text: "The inbox", link: "/using/inbox" },
             { text: "Reply drafts", link: "/using/replies" },
             { text: "Notifications", link: "/using/notifications" },
+          ],
+        },
+        {
+          text: "SignalScout Cloud",
+          items: [
+            { text: "How the cloud differs", link: "/cloud/" },
+            { text: "Plans and billing", link: "/cloud/billing" },
           ],
         },
         {

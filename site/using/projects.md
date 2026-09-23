@@ -14,6 +14,11 @@ flowchart TD
 Most people need one project. Add another for a second product or a client
 you work for, so each inbox stays about one business.
 
+::: info On SignalScout Cloud
+A project is one monitor, made with it. Your plan sets how many projects
+you may have. See [SignalScout Cloud](../cloud/).
+:::
+
 ## Create a project
 
 Open **Projects**, then **New project**. Give it a name, and answer three

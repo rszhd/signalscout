@@ -56,3 +56,8 @@ the **Writing voice** under **Voice and guidance**.
 
 Each draft is one call to the AI model, on the **Drafting a reply** model.
 A draft is written only when you press the button, never on a schedule.
+
+::: info On SignalScout Cloud
+Your plan includes a number of reply drafts each month. The **Billing**
+screen shows how many are left.
+:::

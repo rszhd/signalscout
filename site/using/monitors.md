@@ -4,6 +4,12 @@ A monitor is one search that keeps running on a schedule. It belongs to a
 project, watches the platforms you pick, and puts what it finds in that
 project's inbox.
 
+::: info On SignalScout Cloud
+Each project has one monitor, set up with the project in four steps. There
+is no budget, schedule or minimum score to set: your plan decides them, and
+the monitor page shows the schedule. See [Plans and billing](../cloud/billing).
+:::
+
 ## What a monitor does on each run
 
 ```mermaid

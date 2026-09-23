@@ -47,6 +47,12 @@ you finish:
 5. **Schedule & budget.** How often to look, and the most it may spend in a
    month.
 
+::: info On SignalScout Cloud
+A project and its monitor are made together, in four steps: there is no
+schedule or budget step, because your plan sets both.
+[SignalScout Cloud](../cloud/) says more.
+:::
+
 <!-- screenshot: the search plan step, one platform expanded -->
 
 ## 3. Test the plan, then start

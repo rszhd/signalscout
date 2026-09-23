@@ -28,7 +28,7 @@ the self-hosted build and the cloud where they agree.
 - [x] *Using SignalScout*: projects, monitors, the inbox, verdicts, reply
       drafts, notifications, CSV export, each one page.
 - [ ] Every screen name and button label on a page matches the application.
-- [ ] Where the cloud differs, the page says so in one line and links to the
+- [x] Where the cloud differs, the page says so in one line and links to the
       cloud section.
 - [ ] Every page has a screenshot or a diagram where one is clearer than a
       paragraph.

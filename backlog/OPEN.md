@@ -2,7 +2,7 @@
 
 # Open tickets
 
-51 open — 4 doing, 38 todo, 9 parked (3 p1, 32 p2, 16 p3).
+56 open — 4 doing, 43 todo, 9 parked (3 p1, 35 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -36,6 +36,9 @@
 | p2 | US-319 | [A self-hoster can check where the image came from](todo/US-319-a-self-hoster-can-check-where-the-image-came-from.md) | chore | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-320 | [The app deploys in one click](todo/US-320-the-app-deploys-in-one-click.md) | feature | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-331 | [A post that asks for a high score does not get one](todo/US-331-a-post-that-asks-for-a-high-score-does-not-get-one.md) | feature | todo | 2026-09-23T06:41+08:00 |
+| p2 | US-351 | [The UI package has a component preview](todo/US-351-the-ui-package-has-a-component-preview.md) | chore | todo | 2026-09-23T13:51+08:00 |
+| p2 | US-352 | [The inbox is built from shared components](todo/US-352-the-inbox-is-built-from-shared-components.md) | chore | todo | 2026-09-23T13:51+08:00 |
+| p2 | US-353 | [The monitor screens share their parts](todo/US-353-the-monitor-screens-share-their-parts.md) | chore | todo | 2026-09-23T13:51+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
@@ -47,6 +50,8 @@
 | p3 | US-326 | [The npm packages ship no paid-run or debugging scripts](todo/US-326-the-npm-packages-ship-no-paid-run-scripts.md) | chore | todo | 2026-09-23T06:27+08:00 |
 | p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
+| p3 | US-354 | [The login frame, the notification settings and the document draft are shared](todo/US-354-the-login-frame-notifications-and-document-draft-are-shared.md) | chore | todo | 2026-09-23T13:51+08:00 |
+| p3 | US-355 | [The sidebar is built from shared parts](todo/US-355-the-sidebar-is-built-from-shared-parts.md) | chore | todo | 2026-09-23T13:51+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | BUG-348 | [The issue sync says an issue is missing when it could not look](todo/BUG-348-sync-says-an-issue-is-missing-when-it-could-not-look.md) | bug | todo | 2026-09-23T12:28+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |

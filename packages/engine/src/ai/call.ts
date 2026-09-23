@@ -46,7 +46,17 @@ import { estimateCostMicros, schemaGoesInThePrompt } from "./provider.js";
 function schemaComplaint(cause: unknown): string | undefined {
   if (cause === undefined || cause === null) return undefined;
 
-  const message = cause instanceof Error ? cause.message : String(cause);
+  // BUG-383. A validation error's message starts with the model's whole
+  // answer, so the cut below kept the answer and lost the rule it broke. The
+  // validator's own issues are the reason, so they are what is kept.
+  const issues =
+    TypeValidationError.isInstance(cause) && cause.cause instanceof z.ZodError
+      ? cause.cause.issues
+          .map((issue) => `${issue.path.join(".") || "answer"}: ${issue.message}`)
+          .join("; ")
+      : undefined;
+
+  const message = issues ?? (cause instanceof Error ? cause.message : String(cause));
   const tidy = message.replace(/\s+/g, " ").trim();
 
   return tidy === "" ? undefined : tidy.slice(0, 400);

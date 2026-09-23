@@ -100,6 +100,7 @@ export {
   buildQuerySystemPrompt,
   buildQueryUserPrompt,
   createQueryGenerator,
+  type DroppedQuery,
   maximumQueries,
   maximumSubreddits,
   minimumQueries,

@@ -305,7 +305,7 @@ describe("the monitor routes", () => {
   describe("writing the queries", () => {
     it("returns them and records what the call cost", async () => {
       await withServer(
-        { queryGenerator: stubGenerator({ status: "generated", plan, call }) },
+        { queryGenerator: stubGenerator({ status: "generated", plan, dropped: [], call }) },
         async (app) => {
           const response = await app.inject({
             method: "POST",
@@ -408,7 +408,7 @@ describe("the monitor routes", () => {
 
     it("refuses answers too short to write a query from", async () => {
       await withServer(
-        { queryGenerator: stubGenerator({ status: "generated", plan, call }) },
+        { queryGenerator: stubGenerator({ status: "generated", plan, dropped: [], call }) },
         async (app) => {
           const response = await app.inject({
             method: "POST",
@@ -1294,7 +1294,7 @@ describe("the monitor routes", () => {
         timeoutMs: 30_000,
         generate: async (_answers, wanted) => {
           asked = wanted;
-          return { status: "generated", plan, call };
+          return { status: "generated", plan, dropped: [], call };
         },
       };
 

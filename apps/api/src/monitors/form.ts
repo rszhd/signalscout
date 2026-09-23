@@ -203,6 +203,12 @@ export function registerFormRoutes(app: ApiServer, context: MonitorContext): voi
         });
       }
 
+      // BUG-383: a line that broke a rule is left out rather than refusing the
+      // plan. The log is where somebody finds out the model keeps doing it.
+      if (outcome.dropped.length > 0) {
+        request.log.info({ dropped: outcome.dropped }, "the model wrote queries the plan left out");
+      }
+
       return {
         // Copied into plain arrays: the plan is readonly and the response
         // schema is not, and a cast here would hide the next shape change.

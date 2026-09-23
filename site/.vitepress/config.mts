@@ -81,6 +81,10 @@ export default withMermaid(
 
     vite: {
       plugins: [llmstxt({ domain: "https://docs.signalscout.run" })],
+      // Mermaid imports CommonJS modules (fastdom among them). The build
+      // bundles them, but the dev server serves them as they are, and the
+      // page stays blank on "does not provide an export named 'default'".
+      optimizeDeps: { include: ["mermaid"] },
     },
   }),
 );

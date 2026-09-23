@@ -1,0 +1,100 @@
+/*
+ * `MonitoringBar`: what the monitoring is doing, above the matches. US-352.
+ *
+ * The status word is a pill with a dot here, the hosted look. Every property
+ * it needs is stated below rather than taken from `.monitor-status`, which the
+ * monitor screens still style for themselves (US-353).
+ */
+
+.inbox-monitoring {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  font-size: var(--text-sm);
+}
+
+.inbox-monitoring .monitor-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.inbox-monitoring .monitor-status::before {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+  content: "";
+}
+
+.inbox-monitoring .monitor-status.running {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.inbox-monitoring .monitor-status.running:not(.quiet)::before {
+  animation: running-status-blink 1.4s ease-in-out infinite;
+}
+
+.inbox-monitoring .monitor-status.paused,
+.inbox-monitoring .monitor-status.running.quiet {
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+}
+
+.inbox-monitoring .monitor-status.stopped {
+  color: var(--warning);
+  background: var(--surface-soft);
+}
+
+.inbox-monitoring-now {
+  margin: 0;
+  color: var(--muted-strong);
+  font-weight: 500;
+}
+
+.inbox-monitoring-last {
+  margin: 0;
+  color: var(--muted);
+}
+
+.inbox-monitor-link {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.inbox-monitor-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 820px) {
+  .inbox-monitoring {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .inbox-monitoring-last {
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inbox-monitoring .monitor-status.running:not(.quiet)::before {
+    animation: none;
+  }
+}

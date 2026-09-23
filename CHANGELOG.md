@@ -22,6 +22,17 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Added.** The inbox's parts (US-352): `MatchCard`, one row of the list;
+`MatchDetail`, the reading pane, with a slot for a product's own action beside
+the conversation link; and `MonitoringBar`, the line above both, which takes
+the monitor's address. The words about a match move with them: `Match`,
+`Verdict`, `whereItCameFrom`, `threadDepth`, `opensThreadOnly`,
+`platformLabel` and `limitWords`. `@signalscout/ui/testing` adds a `match`
+fixture. Their rules are in the one stylesheet, with the hosted look; a
+consumer deletes its own copy of the inbox's `.match-*`, `.detail-*`,
+`.verdict-*`, `.score-*` and `.inbox-monitoring*` rules. `.visually-hidden`
+joins the theme.
+
 **Fixed.** `Field` carries its own layout: the label, the hint and the control
 on three lines, the input's border, padding and focus ring (BUG-356). Those
 rules lived in each application's `index.css`, so the component looked right

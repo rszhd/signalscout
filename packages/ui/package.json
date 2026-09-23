@@ -48,6 +48,7 @@
     "typecheck": "tsc --build && tsc -p tsconfig.stories.json"
   },
   "peerDependencies": {
+    "@fontsource/figtree": ">=5",
     "react": ">=19",
     "react-dom": ">=19",
     "react-router": ">=8"

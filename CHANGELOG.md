@@ -22,6 +22,14 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Changed.** The package loads the font and sets the base type (US-369).
+`styles.css` now loads Figtree at 400, 500, 600 and 700 and holds the base
+rules — box sizing, the body's size, line height, letter spacing and
+smoothing, and `font: inherit` for controls. **`@fontsource/figtree` is a
+new peer dependency**: install it beside the package. A consumer deletes its
+own Figtree imports and those base rules. A consumer that loaded no 600 face
+drew every weight-600 rule at 700; it now draws them at 600.
+
 **Added.** The navigation's parts (US-355): `NavItem`, `NavIcon` with its
 icon names, `AccountIdentity` and `SignOut`, and the sidebar's look — the
 sidebar, the phone's bottom bar and the account sheet — in the one

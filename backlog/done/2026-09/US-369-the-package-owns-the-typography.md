@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-23T16:00+08:00
 parent: US-270
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -38,18 +38,18 @@ is to move it too:
 
 ## Acceptance
 
-- [ ] `@signalscout/ui/styles.css` loads Figtree at 400, 500, 600 and 700,
+- [x] `@signalscout/ui/styles.css` loads Figtree at 400, 500, 600 and 700,
       and `@fontsource/figtree` is a peer dependency.
-- [ ] The base type rules are in the package; this application's
+- [x] The base type rules are in the package; this application's
       `index.css` and the preview's `preview.css` no longer hold them or
       import a font.
-- [ ] A test fails for a `font-weight` the package's stylesheets use and do
+- [x] A test fails for a `font-weight` the package's stylesheets use and do
       not load.
-- [ ] A browser shows weight 600 lighter than 700 in this application; the
+- [x] A browser shows weight 600 lighter than 700 in this application; the
       Log says how it was checked.
-- [ ] The tarball works outside the workspace with the font resolved:
+- [x] The tarball works outside the workspace with the font resolved:
       `pnpm release:verify:ui` passes.
-- [ ] US-271 in the hosted repository says its font imports and base rules
+- [x] US-271 in the hosted repository says its font imports and base rules
       go with the rest.
 
 ## Notes
@@ -63,3 +63,14 @@ is to move it too:
 
 - 2026-09-23T16:00+08:00 — Written after the owner asked how to standardise
   the type, mid-release. The release waits for it.
+- 2026-09-23T16:06+08:00 — Shipped. `fonts.css` loads the four faces and `base.css` holds the
+  base rules, taken from the hosted `index.css`, which also smoothed type on
+  macOS (`-webkit-font-smoothing: antialiased`); this application did not.
+  **Checked in a browser** through Chrome's debugging protocol, on the login
+  page: on `dev` the page loaded 400, 500 and 700, and a line at 600 measured
+  341.1px, the same as at 700; on this branch it loaded 600, and the line
+  measured 337.4px against 341.1px at 700. The body is `antialiased`. The
+  weight test fails, naming each stylesheet, with the 600 face removed. The
+  production bundle and the static preview both carry the 600 face, and the
+  tarball resolves all four faces in a clean `npm install`. 2,407 tests pass.
+

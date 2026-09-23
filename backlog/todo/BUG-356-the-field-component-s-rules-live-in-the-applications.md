@@ -3,7 +3,7 @@ id: BUG-356
 title: The Field component's rules live in the applications
 type: bug
 priority: p2
-created: 2026-09-23T14:40+08:00
+created: 2026-09-23T14:02+08:00
 parent: US-270
 area: web
 resolution:
@@ -52,5 +52,5 @@ raw shadow colour, and spacing of 3px, 7px, 10px and 11px.
 
 ## Log
 
-- 2026-09-23T14:40+08:00 — Found by the component preview on its first run
+- 2026-09-23T14:02+08:00 — Found by the component preview on its first run
   (US-351). The hosted application's `index.css` holds the same block.

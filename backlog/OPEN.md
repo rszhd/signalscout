@@ -2,7 +2,7 @@
 
 # Open tickets
 
-60 open — 3 doing, 48 todo, 9 parked (4 p1, 38 p2, 18 p3).
+64 open — 3 doing, 52 todo, 9 parked (4 p1, 42 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -43,6 +43,10 @@
 | p2 | US-363 | [The eval set is frozen, and split into a tuning half and a held-out half](todo/US-363-the-eval-set-is-frozen-and-split.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p2 | US-365 | [An eval reports its uncertainty](todo/US-365-an-eval-reports-its-uncertainty.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p2 | US-366 | [An eval run records what produced it](todo/US-366-an-eval-run-records-what-produced-it.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-371 | [The monitor list and the monitor page look the same in both products](todo/US-371-the-monitor-screens-look-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
+| p2 | US-372 | [The monitor form looks the same in both products](todo/US-372-the-monitor-form-looks-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
+| p2 | US-373 | [The projects page and the project form look the same in both products](todo/US-373-the-projects-page-looks-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
+| p2 | US-374 | [The login card, onboarding and the remaining base rules look the same in both products](todo/US-374-the-login-card-onboarding-and-base-look-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |

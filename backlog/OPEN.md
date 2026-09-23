@@ -2,13 +2,14 @@
 
 # Open tickets
 
-48 open — 1 doing, 38 todo, 9 parked (2 p1, 31 p2, 15 p3).
+48 open — 2 doing, 37 todo, 9 parked (2 p1, 31 p2, 15 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
+| p2 | BUG-338 | [The image ships the development tools](doing/BUG-338-the-image-ships-the-development-tools.md) | bug | doing | 2026-09-23T07:58+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -37,7 +38,6 @@
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
-| p2 | BUG-338 | [The image ships the development tools](todo/BUG-338-the-image-ships-the-development-tools.md) | bug | todo | 2026-09-23T07:58+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |

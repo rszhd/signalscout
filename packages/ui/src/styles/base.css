@@ -1,0 +1,46 @@
+/*
+ * The base every page sits on: box sizing, the body's type, and controls
+ * that take the page's font. US-369.
+ *
+ * Each application copied these into its own `index.css`, and the copies
+ * drifted: the hosted one smooths type on macOS and this one did not. The
+ * family itself is on `:root`, in `tokens.css`.
+ */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+a {
+  color: inherit;
+}

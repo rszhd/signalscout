@@ -14,7 +14,7 @@
  * needs a renderer and is the browser's business, not this script's.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,6 +48,8 @@ try {
     "package/dist/styles/styles.css",
     "package/dist/styles/tokens.css",
     "package/dist/styles/theme.css",
+    "package/dist/styles/fonts.css",
+    "package/dist/styles/base.css",
     "package/dist/styles/project-card.css",
     "package/dist/styles/reply-voices.css",
     "package/dist/styles/reply-draft.css",
@@ -55,6 +57,15 @@ try {
     "package/dist/assets/mark-small.svg",
   ]) {
     if (!listing.includes(file)) fail(`ships no ${file.replace("package/", "")}`);
+  }
+
+  // The FSL asks that every copy carry its terms (US-379). npm takes LICENSE
+  // from the package folder, never from the repository root, so the folder
+  // holds a copy and this checks the copy has not drifted.
+  const license = readFileSync(join(root, "LICENSE"), "utf8");
+  if (!listing.includes("package/LICENSE")) fail("ships no LICENSE");
+  else if (run("tar", ["-xOzf", tarball, "package/LICENSE"]) !== license) {
+    fail("ships a LICENSE that differs from the repository's");
   }
 
   // The harness renders and so needs react-dom; the words and the components do
@@ -109,13 +120,20 @@ try {
     join(project, "use.mjs"),
     [
       'import { formatMicros, platformName, pollSummary } from "@signalscout/ui";',
-      'import { readFileSync } from "node:fs";',
+      'import { existsSync, readFileSync } from "node:fs";',
       'if (formatMicros(15_000) !== "$0.015") throw new Error("formatMicros");',
       'if (platformName("reddit") !== "Reddit") throw new Error("platformName");',
       'const run = { units: 0, outcome: "collected", postsReturned: 7, postsNew: 2, sources: [], stopReason: null };',
       'if (!pollSummary(run, { spend: false }).includes("7 posts")) throw new Error("pollSummary");',
       'const tokens = readFileSync("node_modules/@signalscout/ui/dist/styles/tokens.css", "utf8");',
       'if (!tokens.includes("--accent")) throw new Error("tokens.css");',
+      // The font is a peer: npm installs it beside the package, and every face
+      // fonts.css imports must be a file there, or type falls back to another
+      // weight with no error anywhere. US-369.
+      'const fonts = readFileSync("node_modules/@signalscout/ui/dist/styles/fonts.css", "utf8");',
+      'const faces = [...fonts.matchAll(/@import "([^"]+)"/g)].map((m) => m[1]);',
+      'if (faces.length < 4) throw new Error("fonts.css imports " + faces.length + " faces");',
+      'for (const face of faces) if (!existsSync("node_modules/" + face)) throw new Error("unresolved " + face);',
       'console.log("ok");',
     ].join("\n"),
   );

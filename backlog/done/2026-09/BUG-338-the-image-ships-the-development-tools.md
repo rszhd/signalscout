@@ -7,7 +7,7 @@ priority: p2
 created: 2026-09-23T07:58+08:00
 parent: US-332
 area: release
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -35,7 +35,7 @@ the "production" tree: both came in by this door. The migrator does not need
 - [x] The runtime stage of the image holds none of `vitest`, `vite`,
       `jsdom`, `lightningcss`, `drizzle-kit`, `esbuild` or `mongodb`,
       and the Log lists the `node_modules` size before and after.
-- [ ] An image built from the change boots: the migrator runs, `/api/health`
+- [x] An image built from the change boots: the migrator runs, `/api/health`
       answers, and one sign-in works. The Log says how it was run.
 - [x] `pnpm licenses list --prod` and `pnpm audit --prod` no longer report
       `lightningcss` or `esbuild`.
@@ -84,3 +84,16 @@ the "production" tree: both came in by this door. The migrator does not need
   inside the build accepted the hook and the lockfile ("Lockfile is up to
   date"). CI builds the image on a pull request and on `main`; that run
   closes the second box.
+- 2026-09-23T13:33+08:00 — Closed on the published image. `ghcr.io/rszhd/signalscout:0.14.0`
+  holds none of the seven tools: 162 packages and 151 MB of `node_modules`,
+  against 237 and 279 MB in the older `:staging` image and 331 MB in the
+  `:latest` measured when this was written; the image is 476 MB. Booted with
+  the repository's `docker-compose.yml` in a compose project of its own:
+  the migrator exited 0, `/api/health` answered with the worker in process,
+  a sign-up, a sign-in and a signed-in read each answered 200, and the page
+  loaded. The same run answered 401 to `/%61pi/monitors` signed out, so
+  BUG-329's fix is live in the release too.
+
+  The first boot attempt reported answers that were not the image's: a
+  leftover API from the runtime-stage test held port 3099. It was stopped
+  and the project recreated before the results above were read.

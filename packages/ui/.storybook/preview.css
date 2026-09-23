@@ -1,0 +1,8 @@
+/*
+ * What an application puts under the package's stylesheet, so a story looks
+ * the way a screen does: Tailwind's reset, which both applications import, in
+ * a layer below every unlayered rule. The font and the base type are the
+ * package's own (US-369).
+ */
+@import "tailwindcss/preflight.css" layer(base);
+@import "../src/styles/styles.css";

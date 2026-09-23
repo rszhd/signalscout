@@ -2,6 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database } from "../db/client.js";
 import { notificationSettings } from "../db/schema.js";
+import { ownsMonitor } from "../monitors/owner.js";
 
 export const notificationInputSchema = z
   .object({
@@ -117,6 +118,32 @@ export async function saveNotificationSettings(
     .returning();
   if (!row) throw new Error("Notification settings were not saved.");
   return row;
+}
+
+/*
+ * The same two, for a route: only the account that owns the monitor. US-336.
+ * A stranger reads what an unknown id reads, and a save that would fail on an
+ * unknown id answers `undefined`.
+ */
+
+export async function readOwnedNotificationSettings(
+  db: Database,
+  userId: string,
+  monitorId: string,
+) {
+  if (!(await ownsMonitor(db, userId, monitorId))) return null;
+  return readNotificationSettings(db, monitorId);
+}
+
+export async function saveOwnedNotificationSettings(
+  db: Database,
+  userId: string,
+  monitorId: string,
+  input: NotificationInput,
+  now = new Date(),
+) {
+  if (!(await ownsMonitor(db, userId, monitorId))) return undefined;
+  return saveNotificationSettings(db, monitorId, input, now);
 }
 
 export async function notificationIssues(db: Database) {

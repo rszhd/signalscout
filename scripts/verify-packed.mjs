@@ -18,13 +18,14 @@
  *   pnpm release:verify              # needs a built workspace and a Postgres
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const packages = ["engine", "pipeline"];
+const license = readFileSync(join(root, "LICENSE"), "utf8");
 
 function run(command, args, options = {}) {
   return execFileSync(command, args, { stdio: ["ignore", "pipe", "inherit"], ...options })
@@ -58,6 +59,14 @@ try {
     if (!listing.includes("package/dist/index.js")) fail(`${name} ships no dist/index.js`);
     if (!listing.includes("package/dist/index.d.ts")) fail(`${name} ships no dist/index.d.ts`);
     if (listing.some((file) => file.startsWith("package/src/"))) fail(`${name} ships src/`);
+
+    // The FSL asks that every copy carry its terms (US-379). npm takes LICENSE
+    // from the package folder, never from the repository root, so the folder
+    // holds a copy and this checks the copy has not drifted.
+    if (!listing.includes("package/LICENSE")) fail(`${name} ships no LICENSE`);
+    if (run("tar", ["-xOzf", tarballs[name], "package/LICENSE"]) !== license.trim()) {
+      fail(`${name} ships a LICENSE that differs from the repository's`);
+    }
 
     // The `development` condition points at src, which is not in the tarball.
     // publishConfig replaces exports at pack time; this checks that it did.

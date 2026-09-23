@@ -1,11 +1,19 @@
 # Contributing
 
-Thank you for looking. This is a small project and a patch is welcome.
+Thank you for looking.
+
+**Pull requests from outside wait for now.** The project moved from
+Apache-2.0 to the [Functional Source License](LICENSE) (US-379). A patch under
+that license could not be used in the hosted application, so the owner is
+deciding how outside code arrives: not at all, or under a contributor license
+agreement. Until then, no outside pull request is merged. A bug report, a
+question and a security report are welcome now — see *Reporting something*
+below.
 
 ## The license, and how your work arrives
 
-The project is [Apache-2.0](LICENSE), and contributions come in under the same
-license.
+The project is under the [Functional Source License](LICENSE), and
+contributions come in under the same license.
 
 There is no CLA. Instead the project uses the **Developer Certificate of
 Origin**: you add one line to each commit saying you have the right to submit
@@ -27,9 +35,10 @@ copyright assignment and it gives nobody rights over your other work. The full t
 at [developercertificate.org](https://developercertificate.org/), and it is
 short enough to read.
 
-A CLA was considered and refused. It would let the project be relicensed later
-without asking anybody, and that convenience is not worth deterring the people
-this project wants patches from.
+A CLA was considered and refused under Apache-2.0. It would let the project be
+relicensed later without asking anybody, and that convenience was not worth
+deterring the people this project wanted patches from. The move to the FSL
+reopens the question.
 
 ## Before you write code
 
@@ -74,6 +83,33 @@ Four of them matter more than the rest:
   you wrote is evidence about our parser and none at all about the wire
   format. Instagram alone contradicted three of its provider's documented
   claims, and each would have shipped as a silent fault.
+
+## Every document
+
+| | |
+|---|---|
+| [PLAN.md](PLAN.md) | What we are building, and why |
+| [STACK.md](STACK.md) | What we are building it with, and why not the alternatives |
+| [docs/pipeline.md](docs/pipeline.md) | The worker's run in order, the caps that stop it, and what each step writes |
+| [docs/sources.md](docs/sources.md) | Adding a platform, adding a provider, switching one off |
+| [docs/costs.md](docs/costs.md) | What our spend figure is, and what it is wrong about |
+| [docs/secrets.md](docs/secrets.md) | Where a key lives, what encryption promises, what rotation does |
+| [docs/accounts.md](docs/accounts.md) | Who may register, whose keys pay, what the login protects |
+| [docs/notifications.md](docs/notifications.md) | The outbox, what an email is, the signing secret, where a webhook may point |
+| [docs/deletions.md](docs/deletions.md) | How a removed post stops being shown |
+| [docs/self-hosting.md](docs/self-hosting.md) | Adding a setting, the image, and what the install guide promises |
+| [docs/design.md](docs/design.md) | This application's screens and layouts |
+| [packages/ui/](packages/ui/README.md) | The brand both applications wear: tokens, the spacing scale, shared controls |
+| [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
+| [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
+| [docs/releasing.md](docs/releasing.md) | Cutting a version of the packages and the image |
+| [CHANGELOG.md](CHANGELOG.md) | What each published package version changed for a consumer |
+| [packages/engine/](packages/engine/README.md) | The stateless half, on npm: connectors, model calls, the cipher |
+| [packages/pipeline/](packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |
+| [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
+| [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
+| [AI_POLICY.md](AI_POLICY.md) | How AI may be used here, by the owner and by a contributor |
+| [SECURITY.md](SECURITY.md) | Reporting a hole privately, and what is in scope |
 
 ## Running it
 

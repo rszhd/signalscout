@@ -21,7 +21,42 @@ export { Dialog } from "./components/Dialog.js";
 export { Field } from "./components/Field.js";
 export { FormError, type FormErrorProps } from "./components/FormError.js";
 export { PageState, type PageStateProps } from "./components/PageState.js";
+export {
+  type DraftedProject,
+  DraftFromDocument,
+  type DraftFromDocumentProps,
+} from "./DraftFromDocument.js";
+export {
+  ArrivedBanner,
+  InboxFilters,
+  type InboxFiltersProps,
+  MatchListHeading,
+  ShowMore,
+} from "./InboxFilters.js";
+export { LeadSources, type LeadSourcesProps } from "./LeadSources.js";
+export { LoginFrame, type LoginFrameProps } from "./LoginFrame.js";
 export { ageLabel, platformName, providerName, untilLabel } from "./labels.js";
+export { MatchCard, type MatchCardProps } from "./MatchCard.js";
+export { MatchDetail, type MatchDetailProps } from "./MatchDetail.js";
+export { MonitorHistory, type MonitorHistoryProps } from "./MonitorHistory.js";
+export { MonitoringBar, type MonitoringBarProps } from "./MonitoringBar.js";
+export { MonitorStatus, type MonitorStatusProps } from "./MonitorStatus.js";
+export {
+  activeFilters,
+  type InboxFilterState,
+  type InboxOrder,
+  inboxOrders,
+  limitWords,
+  type Match,
+  opensThreadOnly,
+  type PlatformLabel,
+  platformLabel,
+  postPreviewWordLimit,
+  scoreFilters,
+  threadDepth,
+  type Verdict,
+  whereItCameFrom,
+} from "./match.js";
 export {
   type ActivityEntry,
   type ActivityGroup,
@@ -63,7 +98,34 @@ export {
   useMonitorRefresh,
   workingRefreshMs,
 } from "./monitor.js";
+export {
+  defaultLeadDimensions,
+  inputKey,
+  type LeadBreakdown,
+  type LeadDimension,
+  type LeadDimensionWords,
+  type LeadGroup,
+  leadDimensionWords,
+  leadGroupName,
+  type QueryPerformanceRow,
+  type SearchInput,
+  searchInputs,
+} from "./monitor-stats.js";
+export {
+  AccountIdentity,
+  NavIcon,
+  type NavIconName,
+  NavItem,
+  type NavItemProps,
+  SignOut,
+} from "./Nav.js";
+export {
+  Notifications,
+  type NotificationsProps,
+  type SigningSecret,
+} from "./Notifications.js";
 export { ProjectCard, type ProjectCardProps } from "./ProjectCard.js";
+export { QueryPerformance, type QueryPerformanceProps } from "./QueryPerformance.js";
 export { ReplyDraft } from "./ReplyDraft.js";
 export { ReplyVoices } from "./ReplyVoices.js";
 export {

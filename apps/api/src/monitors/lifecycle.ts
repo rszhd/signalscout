@@ -5,14 +5,14 @@
  * because "check your credentials" is not a sentence anybody can act on.
  */
 import {
-  clearBudget,
-  deleteMonitor,
+  clearOwnedBudget,
+  deleteOwnedMonitor,
   describeMissingCredentials,
   exhaustedBehaviours,
-  pauseMonitor,
-  resumeMonitor,
-  setBudget,
-  updateMonitor,
+  pauseOwnedMonitor,
+  resumeOwnedMonitor,
+  setOwnedBudget,
+  updateOwnedMonitor,
 } from "@signalscout/pipeline";
 import { z } from "zod";
 import { ownedMonitor, sessionUserId } from "../auth.js";
@@ -45,7 +45,7 @@ export function registerLifecycleRoutes(app: ApiServer, context: MonitorContext)
       const off = switchedOffSources(options.sources, request.body.sources);
       if (off) return reply.code(422).send({ message: off });
 
-      const monitor = await updateMonitor(db, request.params.id, {
+      const monitor = await updateOwnedMonitor(db, sessionUserId(request), request.params.id, {
         ...request.body,
         ...filterSettings(request.body),
         ...replySettings(request.body),
@@ -68,7 +68,7 @@ export function registerLifecycleRoutes(app: ApiServer, context: MonitorContext)
         return reply.code(404).send({ message: "No monitor has that id." });
       }
 
-      const monitor = await pauseMonitor(db, request.params.id);
+      const monitor = await pauseOwnedMonitor(db, sessionUserId(request), request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
       return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
@@ -91,7 +91,12 @@ export function registerLifecycleRoutes(app: ApiServer, context: MonitorContext)
         return reply.code(404).send({ message: "No monitor has that id." });
       }
 
-      const result = await resumeMonitor(db, request.params.id, runtime);
+      const result = await resumeOwnedMonitor(
+        db,
+        sessionUserId(request),
+        request.params.id,
+        runtime,
+      );
       if (!result) return reply.code(404).send({ message: "No monitor has that id." });
 
       if (result.status === "blocked") {
@@ -138,7 +143,7 @@ export function registerLifecycleRoutes(app: ApiServer, context: MonitorContext)
       const monitor = await ownedMonitor(db, request, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      await setBudget(db, monitor.id, request.body);
+      await setOwnedBudget(db, monitor.userId, monitor.id, request.body);
 
       return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
@@ -166,7 +171,7 @@ export function registerLifecycleRoutes(app: ApiServer, context: MonitorContext)
       const monitor = await ownedMonitor(db, request, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      await clearBudget(db, monitor.id);
+      await clearOwnedBudget(db, monitor.userId, monitor.id);
 
       return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
@@ -184,7 +189,7 @@ export function registerLifecycleRoutes(app: ApiServer, context: MonitorContext)
         return reply.code(404).send({ message: "No monitor has that id." });
       }
 
-      const deleted = await deleteMonitor(db, request.params.id);
+      const deleted = await deleteOwnedMonitor(db, sessionUserId(request), request.params.id);
       if (!deleted) return reply.code(404).send({ message: "No monitor has that id." });
 
       return reply.code(204).send(null);

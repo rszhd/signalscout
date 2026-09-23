@@ -1,0 +1,13 @@
+/*
+ * Figtree, at every weight the package's rules ask for. US-369.
+ *
+ * Loaded here and nowhere else. With `font-synthesis: none` a browser draws a
+ * weight that is not loaded with the next heavier one, so a missing 600 made
+ * every semi-bold title bold in one application and not the other.
+ * `fonts.test.ts` fails when a rule asks for a weight this file does not load.
+ * `@fontsource/figtree` is a peer dependency, as React is.
+ */
+@import "@fontsource/figtree/latin-400.css";
+@import "@fontsource/figtree/latin-500.css";
+@import "@fontsource/figtree/latin-600.css";
+@import "@fontsource/figtree/latin-700.css";

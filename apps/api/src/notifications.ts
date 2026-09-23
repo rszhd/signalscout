@@ -9,9 +9,9 @@ import {
   notificationInputSchema,
   notificationReadiness,
   optionalEncryptionKey,
-  readNotificationSettings,
+  readOwnedNotificationSettings,
   readWebhookSecretHint,
-  saveNotificationSettings,
+  saveOwnedNotificationSettings,
   sharedInstance,
   webhookSecretEnvironment,
 } from "@signalscout/pipeline";
@@ -128,7 +128,7 @@ export async function registerNotificationRoutes(
   }
 
   async function read(id: string, userId: string) {
-    const row = await readNotificationSettings(db, id);
+    const row = await readOwnedNotificationSettings(db, userId, id);
     const signingSecret = await secretFor(userId);
 
     return {
@@ -201,7 +201,13 @@ export async function registerNotificationRoutes(
         const refusal = literalPrivateHost(request.body.webhookUrl);
         if (refusal) return reply.code(409).send({ message: refusal });
       }
-      await saveNotificationSettings(db, request.params.id, request.body);
+      const saved = await saveOwnedNotificationSettings(
+        db,
+        userId,
+        request.params.id,
+        request.body,
+      );
+      if (!saved) return reply.code(404).send({ message: "No monitor has that id." });
       return read(request.params.id, userId);
     },
   });

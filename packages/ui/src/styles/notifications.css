@@ -1,0 +1,282 @@
+/*
+ * `Notifications`: a monitor's digest, email and webhook settings. US-354.
+ *
+ * The hosted application's stylesheet for the screen, as it was: every rule
+ * hangs off the screen's own wrappers, so it needs no page around it.
+ */
+.notifications-page {
+  background: var(--background);
+}
+
+.notification-breadcrumb {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.notification-breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.notification-breadcrumb a:hover {
+  color: var(--accent-text);
+}
+
+.notifications-content {
+  max-width: var(--page-content-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--page-gutter) var(--space-12);
+}
+
+.notification-panel form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.notification-intro,
+.notification-webhook,
+.notification-save-bar {
+  grid-column: 1 / -1;
+}
+
+.notification-panel .notification-intro {
+  max-width: var(--reading-width);
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: var(--text-label);
+  line-height: 1.6;
+}
+
+.notification-panel fieldset {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.notification-panel legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.notification-section-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.notification-digest {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.notification-digest legend,
+.notification-digest .notification-section-note {
+  grid-column: 1 / -1;
+}
+
+.notification-panel label,
+.notification-webhook-controls {
+  min-width: 0;
+}
+
+.notification-panel label {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+.notification-panel input:not([type="checkbox"]),
+.notification-panel select {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+}
+
+.notification-panel input:not([type="checkbox"]):hover,
+.notification-panel select:hover {
+  border-color: var(--muted);
+}
+
+.notification-panel input:not([type="checkbox"]):focus-visible,
+.notification-panel select:focus-visible {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.notification-panel .notification-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+
+.notification-panel .notification-check input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+}
+
+.notification-webhook {
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+}
+
+.notification-webhook > legend,
+.notification-webhook > [role="status"],
+.notification-webhook > [role="alert"] {
+  grid-column: 1 / -1;
+}
+
+.notification-panel .notification-secret,
+.notification-webhook-controls {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+}
+
+.notification-panel .notification-secret {
+  padding: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.notification-panel .notification-secret p,
+.notification-panel .notification-save-bar p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.notification-panel .notification-secret .secondary-button {
+  justify-self: start;
+}
+
+.notification-panel .notification-secret output {
+  display: block;
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.notification-panel code {
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--quiet-accent-soft);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.notification-panel [role="status"],
+.notification-panel [role="alert"] {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.notification-panel [role="status"] {
+  color: var(--muted-strong);
+  background: var(--accent-soft);
+}
+
+.notification-panel [role="alert"] {
+  border-left: 3px solid var(--warning);
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+}
+
+.notification-save-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.notification-save-bar > div {
+  display: grid;
+  gap: var(--space-2);
+  max-width: var(--reading-width);
+}
+
+.notification-save-bar .primary-button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 820px) {
+  .notification-panel form,
+  .notification-webhook {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-intro,
+  .notification-webhook,
+  .notification-save-bar,
+  .notification-webhook > legend,
+  .notification-webhook > [role="status"],
+  .notification-webhook > [role="alert"] {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .notifications-content {
+    padding-top: var(--space-6);
+  }
+
+  .notification-panel fieldset {
+    padding: var(--space-5);
+  }
+
+  .notification-digest {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-digest legend,
+  .notification-digest .notification-section-note {
+    grid-column: 1;
+  }
+
+  .notification-save-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notification-save-bar .primary-button {
+    width: 100%;
+  }
+}

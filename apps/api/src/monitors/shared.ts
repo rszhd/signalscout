@@ -9,7 +9,7 @@
 import {
   type BudgetState,
   type ConnectorDescriptor,
-  checkBudget,
+  checkOwnedBudget,
   classifiedPostCounts,
   type Database,
   type FilterDropCounts,
@@ -226,7 +226,7 @@ export function toResponse(
 export async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
   const [state, drops, read, verdicts, found, collected, notifications, polls, stages] =
     await Promise.all([
-      checkBudget(db, monitor.id),
+      checkOwnedBudget(db, monitor.userId, monitor.id),
       filterDropCounts(db, [monitor.id]),
       classifiedPostCounts(db, [monitor.id]),
       verdictCounts(db, [monitor.id]),

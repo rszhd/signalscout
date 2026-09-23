@@ -20,7 +20,101 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
-## @signalscout/ui — Unreleased
+## @signalscout/ui — 0.2.0 — 2026-09-23
+
+**License.** From this version the package is fair source, under the
+Functional Source License (FSL-1.1-ALv2), not Apache-2.0 (US-379). You may use
+it, change it and run it, in a business too. You may not sell it or offer it
+in a product or service that competes with SignalScout. Each version becomes
+Apache-2.0 two years after its release. Earlier versions keep Apache-2.0.
+The package now ships its `LICENSE`.
+
+**Changed.** The score breakdown's bars are ink, not the accent (US-377).
+
+**Fixed.** A monitor page with three key figures draws the third on a
+second row with a full-width line above it (US-376).
+
+**Changed.** `LeadSources` draws its breakdown switch as the theme's
+`.view-switch`, the underline tabs the inbox uses, not a bar of pill
+buttons (US-375).
+
+**Added.** The look of the monitor list and the monitor page (US-371), in
+the one stylesheet: the overview, the toolbar and filters, the table, the
+group headings, and the page's header, tabs, sections, key figures and
+settings panel. The markup stays each application's. A consumer deletes its
+own rules for those classes — `.monitors-*`, `.monitor-table*`,
+`.monitor-detail-*`, `.monitor-key-*`, `.monitor-settings-*`,
+`.monitor-section-*` and the rest listed at the top of
+`monitor-screens.css` — and keeps only rules for its own features. The list
+marks a monitor that needs attention with `.needs-attention` on its row and
+on `.monitors-overview`.
+
+**Added.** The inbox's frame around the list (US-370): `InboxFilters`,
+`ArrivedBanner`, `MatchListHeading` and `ShowMore`, with the words
+`inboxOrders`, `scoreFilters` and `activeFilters`. The monitor picker shows
+only when a project has more than one monitor. A consumer deletes its own
+`.inbox-toolbar`, `.filter`, `.inbox-extra-filters`, `.list-heading` and
+`.inbox-arrived` rules.
+
+**Changed.** A dialog no longer reserves a scrollbar's width on its right
+(`.app-dialog` drops `scrollbar-gutter: stable`).
+
+**Changed.** The package loads the font and sets the base type (US-369).
+`styles.css` now loads Figtree at 400, 500, 600 and 700 and holds the base
+rules — box sizing, the body's size, line height, letter spacing and
+smoothing, and `font: inherit` for controls. **`@fontsource/figtree` is a
+new peer dependency**: install it beside the package. A consumer deletes its
+own Figtree imports and those base rules. A consumer that loaded no 600 face
+drew every weight-600 rule at 700; it now draws them at 600.
+
+**Added.** The navigation's parts (US-355): `NavItem`, `NavIcon` with its
+icon names, `AccountIdentity` and `SignOut`, and the sidebar's look — the
+sidebar, the phone's bottom bar and the account sheet — in the one
+stylesheet. A consumer keeps its own shell and deletes its `.sidebar`,
+`.nav-item`, `.signed-in-as`, `.sign-out` and `.account-sheet` rules. A rule
+for an item only its navigation has must load after the package's.
+`SignOut` no longer leaves an unhandled rejection when the server refuses.
+
+**Added.** `Notifications`, the notification settings screen, with the
+monitor's address and a `signingNotice` slot as props (US-354);
+`LoginFrame`, the page around a sign-in form, with `storyNote` and `footer`;
+and `DraftFromDocument`, with the `DraftedProject` type. Their rules are in
+the one stylesheet. A consumer deletes its own `notifications.css`, the
+`.login-page`/`.login-story`/`.login-header`/`.login-footer` rules, and the
+`.draft-from-document`/`.draft-controls`/`.draft-file` rules, keeping only
+the space its page gives the draft.
+
+**Added.** The monitor page's parts (US-353): `MonitorStatus`, the status
+pill; `MonitorHistory`, the polls and their stages, with optional paging;
+`QueryPerformance`, with an optional note per row; and `LeadSources`, which
+offers platforms, channels and intent unless the page names its groups. None
+of them fetches; the page passes the rows. The words move with them:
+`searchInputs`, `inputKey`, `leadGroupName`, `leadDimensionWords`,
+`defaultLeadDimensions` and the row types. `@signalscout/ui/testing` adds
+`pollEntry` and `stageEntry`. `.monitor-origin` and `.budget-error` join the
+theme. A consumer deletes its own `.monitor-status`, `.poll-history`,
+`.activity-*`, query and lead table rules. **Changed:** `MonitoringBar` renders
+`MonitorStatus`, so a stopped monitor's pill is the danger colour there too.
+
+**Added.** The inbox's parts (US-352): `MatchCard`, one row of the list;
+`MatchDetail`, the reading pane, with a slot for a product's own action beside
+the conversation link; and `MonitoringBar`, the line above both, which takes
+the monitor's address. The words about a match move with them: `Match`,
+`Verdict`, `whereItCameFrom`, `threadDepth`, `opensThreadOnly`,
+`platformLabel` and `limitWords`. `@signalscout/ui/testing` adds a `match`
+fixture. Their rules are in the one stylesheet, with the hosted look; a
+consumer deletes its own copy of the inbox's `.match-*`, `.detail-*`,
+`.verdict-*`, `.score-*` and `.inbox-monitoring*` rules. `.visually-hidden`
+joins the theme.
+
+**Fixed.** `Field` carries its own layout: the label, the hint and the control
+on three lines, the input's border, padding and focus ring (BUG-356). Those
+rules lived in each application's `index.css`, so the component looked right
+only inside one that held them. `--focus-ring` joins the tokens. A consumer
+deletes its own copy of the `.field` rules. **Check one thing when you do**:
+the package's stylesheet loads after a consumer's base stylesheet, so a rule
+there with the same specificity that styles an input inside a `Field` now
+loses to the package's. Raise its specificity.
 
 ## @signalscout/ui — 0.1.0 — 2026-09-20
 
@@ -52,7 +146,28 @@ the two products differ the words take an argument:
 takes a `size` and carries its one rule in the stylesheet, so a consumer
 sets no rule for the mark (US-283).
 
-## Unreleased
+## 0.15.0 — 2026-09-23
+
+**License.** From this version the package is fair source, under the
+Functional Source License (FSL-1.1-ALv2), not Apache-2.0 (US-379). You may use
+it, change it and run it, in a business too. You may not sell it or offer it
+in a product or service that competes with SignalScout. Each version becomes
+Apache-2.0 two years after its release. Earlier versions keep Apache-2.0.
+The package now ships its `LICENSE`.
+
+**Added.** A twin that takes the user id for each pipeline function that
+addressed one monitor or match by id alone (US-336): `getOwnedMonitor`,
+`updateOwnedMonitor`, `pauseOwnedMonitor`, `resumeOwnedMonitor`,
+`deleteOwnedMonitor`, `getOwnedBudget`, `setOwnedBudget`, `clearOwnedBudget`,
+`checkOwnedBudget`, `readOwnedNotificationSettings`,
+`saveOwnedNotificationSettings` and `ownsMatch`. Each takes `userId` after the
+database. For a monitor the account does not own, each answers what its twin
+answers for an id that does not exist: `undefined`, `false`, `null`, or a
+budget with no spend and no cap. `setOwnedBudget` and
+`saveOwnedNotificationSettings` answer `undefined`, where their twins would
+throw. The unchecked functions stay, unchanged, for a caller that acts for
+the whole instance, such as the worker. New exports to call, so the version
+is a minor.
 
 ## 0.14.0 — 2026-09-23
 

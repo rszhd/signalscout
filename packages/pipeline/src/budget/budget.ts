@@ -41,6 +41,7 @@ import {
   type Source,
 } from "../db/schema.js";
 import { pauseMonitor } from "../monitors/monitors.js";
+import { ownsMonitor } from "../monitors/owner.js";
 
 /** What one monitor spent since the start of the month, in micro-dollars. */
 export interface MonitorSpend {
@@ -574,6 +575,40 @@ export async function clearBudget(db: Database, monitorId: string): Promise<bool
   return removed.length > 0;
 }
 
+/*
+ * The cap, read and changed only by the account that owns the monitor. US-336.
+ * Each answers a stranger as its twin above answers an unknown id; `setBudget`
+ * would fail on one, so its twin answers `undefined`.
+ */
+
+export async function getOwnedBudget(
+  db: Database,
+  userId: string,
+  monitorId: string,
+): Promise<MonitorBudget | undefined> {
+  if (!(await ownsMonitor(db, userId, monitorId))) return undefined;
+  return getBudget(db, monitorId);
+}
+
+export async function setOwnedBudget(
+  db: Database,
+  userId: string,
+  monitorId: string,
+  budget: MonitorBudget,
+): Promise<MonitorBudget | undefined> {
+  if (!(await ownsMonitor(db, userId, monitorId))) return undefined;
+  return setBudget(db, monitorId, budget);
+}
+
+export async function clearOwnedBudget(
+  db: Database,
+  userId: string,
+  monitorId: string,
+): Promise<boolean> {
+  if (!(await ownsMonitor(db, userId, monitorId))) return false;
+  return clearBudget(db, monitorId);
+}
+
 /**
  * The rule, with nothing to read and nothing to write.
  *
@@ -634,6 +669,25 @@ export async function checkBudget(
   ]);
 
   return budgetState(spend, budget ?? null);
+}
+
+/**
+ * `checkBudget` for a route. A stranger is shown a monitor that spent nothing
+ * and has no cap, which is what `checkBudget` shows for an unknown id. US-336.
+ */
+export async function checkOwnedBudget(
+  db: Database,
+  userId: string,
+  monitorId: string,
+  now: Date = new Date(),
+): Promise<BudgetState> {
+  if (!(await ownsMonitor(db, userId, monitorId))) {
+    return budgetState(
+      { sourceMicros: 0, modelMicros: 0, totalMicros: 0, since: monthStart(now) },
+      null,
+    );
+  }
+  return checkBudget(db, monitorId, now);
 }
 
 /**

@@ -1,0 +1,50 @@
+/*
+ * `DraftFromDocument`: an address field, a page button and a file button.
+ * US-354.
+ *
+ * The space around it is the page's: it sits inside the project editor
+ * self-hosted and the monitor flow's first step hosted, and each pads it to
+ * its card.
+ */
+
+.draft-from-document {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.draft-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+.draft-controls > input {
+  flex: 1 1 240px;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.draft-file {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* The native file input stays in the page for a keyboard and a screen reader;
+   the label is what a person sees. */
+.draft-file input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.draft-file:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

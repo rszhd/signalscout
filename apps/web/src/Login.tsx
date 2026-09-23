@@ -1,4 +1,4 @@
-import { BrandLogo, codeFor, FormError, messageFor, requestJson } from "@signalscout/ui";
+import { codeFor, FormError, LoginFrame, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useState } from "react";
 
 /** Email authentication, with registration offered only when the instance allows it. */
@@ -157,68 +157,25 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
   }
 
   return (
-    <main className="login-page">
-      <header className="login-header">
-        <div className="login-brand">
-          <BrandLogo />
-          <span>SignalScout</span>
-        </div>
-        <span className="login-header-note">Conversations worth finding.</span>
-      </header>
-
-      <div className="login-layout">
-        <aside className="login-story" aria-labelledby="login-story-title">
-          <p className="login-eyebrow">A little less searching. A lot more signal.</p>
-          <h2 id="login-story-title">
-            Your next customer
-            <br />
-            is already talking.
-          </h2>
-          <p className="login-story-copy">
-            Find people describing the problem your product solves, and join the conversation when
-            it matters.
-          </p>
-          <ul className="login-story-points">
-            <li>
-              <span aria-hidden="true">01</span>
-              <p>
-                <strong>Find real demand</strong>
-                <span>Watch public conversations where customers already ask for help.</span>
-              </p>
-            </li>
-            <li>
-              <span aria-hidden="true">02</span>
-              <p>
-                <strong>Read for intent</strong>
-                <span>Bring the conversations most relevant to your product into one inbox.</span>
-              </p>
-            </li>
-            <li>
-              <span aria-hidden="true">03</span>
-              <p>
-                <strong>Stay in control</strong>
-                <span>You choose when to reply. SignalScout never posts for you.</span>
-              </p>
-            </li>
-          </ul>
-          <p className="login-story-footer">Your accounts. Your API keys. Your data.</p>
-        </aside>
-
-        {sentTo ? (
-          /*
+    <LoginFrame
+      storyNote="Your accounts. Your API keys. Your data."
+      footer="AI intent monitoring you can self-host."
+    >
+      {sentTo ? (
+        /*
             Where the person goes next is their inbox, so this replaces the
             form rather than sitting above it. Leaving the fields on screen
             would invite a second submit, which posts the same registration
             again and sends a second link.
           */
-          <section className="login-card" aria-labelledby="login-title">
-            <p className="login-eyebrow">One more step</p>
-            <h1 id="login-title">Check your email</h1>
-            <p className="page-subtitle">
-              We sent a confirmation link to <strong>{sentTo}</strong>. Open it to finish signing
-              in. The link works for 24 hours.
-            </p>
-            {/*
+        <section className="login-card" aria-labelledby="login-title">
+          <p className="login-eyebrow">One more step</p>
+          <h1 id="login-title">Check your email</h1>
+          <p className="page-subtitle">
+            We sent a confirmation link to <strong>{sentTo}</strong>. Open it to finish signing in.
+            The link works for 24 hours.
+          </p>
+          {/*
               The second sentence is the one that matters, and it is here
               because a person met this screen and read it as the product
               being broken.
@@ -232,125 +189,123 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
               possibility leaks nothing: it is true of every address, and it is
               the one way out of the loop.
             */}
-            <p className="login-note">
-              Nothing arrived? Look in the spam folder. If you already have an account with this
-              address, no link is sent — sign in instead. Signing in also sends a new link if you
-              still need one.
-            </p>
-            <p className="login-switch">
-              <button
-                type="button"
-                onClick={() => {
-                  setSentTo(null);
-                  setRegistering(false);
-                  setPassword("");
-                  setError(null);
-                }}
-              >
-                Back to sign in
-              </button>
-            </p>
-          </section>
-        ) : (
-          <section className="login-card" aria-labelledby="login-title">
-            <p className="login-eyebrow">{signingUp ? "Get started" : "Welcome back"}</p>
-            <h1 id="login-title">
-              {firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}
-            </h1>
-            <p className="page-subtitle">
-              {firstRun
-                ? "This instance has no account yet. The first one is yours, and signup closes behind it."
-                : signingUp
-                  ? "Your monitors, matches and saved replies are your own."
-                  : "Sign in to read your inbox."}
-            </p>
+          <p className="login-note">
+            Nothing arrived? Look in the spam folder. If you already have an account with this
+            address, no link is sent — sign in instead. Signing in also sends a new link if you
+            still need one.
+          </p>
+          <p className="login-switch">
+            <button
+              type="button"
+              onClick={() => {
+                setSentTo(null);
+                setRegistering(false);
+                setPassword("");
+                setError(null);
+              }}
+            >
+              Back to sign in
+            </button>
+          </p>
+        </section>
+      ) : (
+        <section className="login-card" aria-labelledby="login-title">
+          <p className="login-eyebrow">{signingUp ? "Get started" : "Welcome back"}</p>
+          <h1 id="login-title">
+            {firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}
+          </h1>
+          <p className="page-subtitle">
+            {firstRun
+              ? "This instance has no account yet. The first one is yours, and signup closes behind it."
+              : signingUp
+                ? "Your monitors, matches and saved replies are your own."
+                : "Sign in to read your inbox."}
+          </p>
 
-            <form className="field-stack" onSubmit={submit} aria-busy={busy}>
+          <form className="field-stack" onSubmit={submit} aria-busy={busy}>
+            {signingUp && (
+              <label className="field">
+                <span>Your name</span>
+                <input
+                  aria-label="Your name"
+                  autoComplete="name"
+                  placeholder="Alex Morgan"
+                  required
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </label>
+            )}
+
+            <label className="field">
+              <span>Email</span>
+              <input
+                aria-label="Email"
+                autoComplete="username"
+                placeholder="you@example.com"
+                required
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </label>
+
+            <label className="field">
+              <span>Password</span>
+              <input
+                aria-label="Password"
+                autoComplete={signingUp ? "new-password" : "current-password"}
+                placeholder={signingUp ? "Create a password" : "Enter your password"}
+                aria-describedby={signingUp ? "login-password-help" : undefined}
+                minLength={signingUp ? minimumPasswordLength : undefined}
+                required
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
               {signingUp && (
-                <label className="field">
-                  <span>Your name</span>
-                  <input
-                    aria-label="Your name"
-                    autoComplete="name"
-                    placeholder="Alex Morgan"
-                    required
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                </label>
+                <small id="login-password-help">
+                  Use at least {minimumPasswordLength} characters.
+                </small>
               )}
+            </label>
 
-              <label className="field">
-                <span>Email</span>
-                <input
-                  aria-label="Email"
-                  autoComplete="username"
-                  placeholder="you@example.com"
-                  required
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                />
-              </label>
+            {error && <FormError>{error}</FormError>}
 
-              <label className="field">
-                <span>Password</span>
-                <input
-                  aria-label="Password"
-                  autoComplete={signingUp ? "new-password" : "current-password"}
-                  placeholder={signingUp ? "Create a password" : "Enter your password"}
-                  aria-describedby={signingUp ? "login-password-help" : undefined}
-                  minLength={signingUp ? minimumPasswordLength : undefined}
-                  required
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                />
-                {signingUp && (
-                  <small id="login-password-help">
-                    Use at least {minimumPasswordLength} characters.
-                  </small>
-                )}
-              </label>
+            <button className="primary-button" disabled={busy} type="submit">
+              {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}
+            </button>
+          </form>
 
-              {error && <FormError>{error}</FormError>}
-
-              <button className="primary-button" disabled={busy} type="submit">
-                {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}
-              </button>
-            </form>
-
-            {/*
+          {/*
           Only where a second account is actually possible. On a closed instance
           this is absent rather than disabled: an offer that refuses is worse
           than no offer, because somebody will fill the form in first.
         */}
-            {!firstRun && signUpOpen && (
-              <p className="login-switch">
-                {registering ? "Already have an account? " : "New here? "}
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => {
-                    setRegistering(!registering);
-                    setError(null);
-                  }}
-                >
-                  {registering ? "Sign in" : "Create an account"}
-                </button>
-              </p>
-            )}
+          {!firstRun && signUpOpen && (
+            <p className="login-switch">
+              {registering ? "Already have an account? " : "New here? "}
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setRegistering(!registering);
+                  setError(null);
+                }}
+              >
+                {registering ? "Sign in" : "Create an account"}
+              </button>
+            </p>
+          )}
 
-            {firstRun && (
-              <p className="login-note">
-                Put this instance behind TLS before you open it to the internet. It holds provider
-                keys that spend money.
-              </p>
-            )}
-          </section>
-        )}
-      </div>
-      <footer className="login-footer">Open-source AI intent monitoring.</footer>
-    </main>
+          {firstRun && (
+            <p className="login-note">
+              Put this instance behind TLS before you open it to the internet. It holds provider
+              keys that spend money.
+            </p>
+          )}
+        </section>
+      )}
+    </LoginFrame>
   );
 }

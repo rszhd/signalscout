@@ -1,0 +1,404 @@
+/*
+ * The monitor screens' shared parts: `MonitorStatus`, `MonitorHistory`,
+ * `QueryPerformance` and `LeadSources`. US-353.
+ *
+ * The look is the hosted application's, whose rules were scoped to its
+ * monitor page. Nothing here needs that page as an ancestor, so a part is the
+ * same part in a list, a bar, a tab or a preview. The page around a part — its
+ * tabs, its section and its heading — is each application's.
+ */
+
+/* The status word */
+
+.monitor-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+.monitor-status::before {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+  content: "";
+}
+
+.monitor-status.running {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.monitor-status.running:not(.quiet)::before {
+  animation: running-status-blink 1.4s ease-in-out infinite;
+}
+
+.monitor-status.paused,
+.monitor-status.running.quiet {
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+}
+
+.monitor-status.stopped {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* The history */
+
+.poll-history {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-collection + .activity-collection {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+.activity-entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-stage-entries.grouped {
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--line);
+}
+
+.activity-entry {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: var(--space-1) var(--space-5);
+  padding: var(--space-3) 0;
+  font-size: var(--text-sm);
+}
+
+.activity-entry + .activity-entry {
+  border-top: 1px solid var(--line);
+}
+
+.poll-history-when {
+  grid-row: 1 / span 2;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.poll-history-what {
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.poll-entry .poll-history-what {
+  font-weight: 500;
+}
+
+.stage-entry .poll-history-what {
+  color: var(--muted-strong);
+}
+
+.poll-history-sources {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 2;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  color: var(--muted-strong);
+  font-size: var(--text-xs);
+}
+
+.poll-history-sources .brand-label {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.activity-record-end {
+  font-size: var(--text-xs);
+}
+
+/* The two tables */
+
+.query-performance-note,
+.lead-sources-note {
+  margin: 0 0 var(--space-5);
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.query-performance-note {
+  font-size: var(--text-xs);
+}
+
+.lead-sources-note {
+  font-size: var(--text-sm);
+}
+
+.query-performance-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+.query-performance-error p {
+  margin: 0;
+}
+
+.query-performance-table-scroll,
+.lead-performance-table-scroll {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.query-performance-table,
+.lead-performance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.query-performance-table :is(th, td),
+.lead-performance-table :is(th, td) {
+  padding: var(--space-4) var(--space-3);
+  text-align: left;
+  vertical-align: top;
+}
+
+.query-performance-table :is(th, td):first-child,
+.lead-performance-table :is(th, td):first-child {
+  padding-left: 0;
+}
+
+.query-performance-table :is(th, td):last-child,
+.lead-performance-table :is(th, td):last-child {
+  padding-right: 0;
+}
+
+.query-performance-table thead th,
+.lead-performance-table thead th {
+  padding-top: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.query-performance-table thead th:first-child {
+  width: 44%;
+}
+
+.lead-performance-table thead th:first-child {
+  width: 38%;
+}
+
+.query-performance-table tbody tr + tr > *,
+.lead-performance-table tbody tr + tr > * {
+  border-top: 1px solid var(--line);
+}
+
+.query-performance-table tbody th,
+.lead-performance-table tbody th {
+  font-weight: 400;
+}
+
+.query-performance-table tbody td,
+.lead-performance-table tbody td {
+  color: var(--muted-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.lead-performance-table tbody td,
+.query-performance-table time {
+  white-space: nowrap;
+}
+
+.query-performance-value,
+.query-performance-kind {
+  display: block;
+}
+
+.query-performance-value {
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.query-performance-kind {
+  margin-top: var(--space-1);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.query-performance-verdict {
+  color: var(--warning);
+}
+
+.query-performance-empty {
+  color: var(--muted);
+}
+
+/* The switch is the theme's `.view-switch`, the inbox's control. US-375. */
+.lead-breakdown-switch {
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+}
+
+.lead-breakdown-switch button {
+  white-space: nowrap;
+}
+
+.lead-sources-empty,
+.lead-breakdown-empty {
+  padding: var(--space-8) 0;
+  text-align: center;
+}
+
+.lead-sources-empty h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-label);
+}
+
+.lead-sources-empty p,
+.lead-breakdown-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.lead-source-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.lead-source-platform {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+/*
+ * On a phone a table row becomes a card, each cell printed with its column
+ * name from `data-label`. A changed `display` drops a table's meaning for a
+ * screen reader, so the markup names every role explicitly.
+ */
+@media (max-width: 600px) {
+  .activity-stage-entries.grouped {
+    margin-left: var(--space-2);
+    padding-left: var(--space-3);
+  }
+
+  .activity-entry {
+    grid-template-columns: 1fr;
+  }
+
+  .poll-history-when,
+  .poll-history-sources {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .poll-history-when {
+    white-space: normal;
+  }
+
+  .query-performance-table-scroll,
+  .lead-performance-table-scroll {
+    overflow-x: visible;
+  }
+
+  .query-performance-table,
+  .query-performance-table tbody,
+  .query-performance-table tr,
+  .lead-performance-table,
+  .lead-performance-table tbody,
+  .lead-performance-table tr {
+    display: block;
+  }
+
+  .query-performance-table thead,
+  .lead-performance-table thead {
+    display: none;
+  }
+
+  .query-performance-table tr,
+  .lead-performance-table tr {
+    padding: var(--space-4) 0;
+  }
+
+  .query-performance-table tbody tr:first-child,
+  .lead-performance-table tbody tr:first-child {
+    padding-top: 0;
+  }
+
+  .query-performance-table tbody tr + tr,
+  .lead-performance-table tbody tr + tr {
+    border-top: 1px solid var(--line);
+  }
+
+  .query-performance-table tbody tr + tr > *,
+  .lead-performance-table tbody tr + tr > * {
+    border-top: 0;
+  }
+
+  .query-performance-table tbody :is(th, td),
+  .lead-performance-table tbody :is(th, td) {
+    padding: var(--space-1) 0;
+  }
+
+  .query-performance-table tbody th,
+  .lead-performance-table tbody th {
+    margin-bottom: var(--space-2);
+  }
+
+  .query-performance-table tbody td,
+  .lead-performance-table tbody td {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: var(--space-3);
+    white-space: normal;
+  }
+
+  .query-performance-table tbody td::before,
+  .lead-performance-table tbody td::before {
+    color: var(--muted);
+    content: attr(data-label);
+    font-size: var(--text-xs);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monitor-status.running:not(.quiet)::before {
+    animation: none;
+  }
+}

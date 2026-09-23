@@ -7,7 +7,7 @@ priority: p2
 created: 2026-09-23T06:46+08:00
 parent:
 area: api
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -23,12 +23,12 @@ makes a package rule a failing test.
 
 ## Acceptance
 
-- [ ] Every function in `packages/pipeline` that `apps/api` calls to read or
+- [x] Every function in `packages/pipeline` that `apps/api` calls to read or
       change an account's rows takes the user id as an argument, and filters
       on it.
-- [ ] A boundary test fails when such a function has no user id argument, and
+- [x] A boundary test fails when such a function has no user id argument, and
       lists the ones that are deliberately instance-wide with the reason.
-- [ ] Every route has a test that a second account gets 404 or an empty
+- [x] Every route has a test that a second account gets 404 or an empty
       answer.
 
 ## Notes
@@ -63,3 +63,33 @@ makes a package rule a failing test.
 
   The third box is half done: every route with an id is covered, the list
   routes are not all.
+- 2026-09-23T15:30+08:00 — **Done, by the owner's choice: a twin beside each of
+  the twelve, not a changed signature.** The worker calls `getMonitor` and
+  `checkBudget` with no account, because it polls every account, so a
+  required user id did not fit those callers. The twins take `userId` after
+  the database, as `readOwnedEstimate` did in 0.14.0, and answer a stranger
+  what the unchecked function answers for an unknown id. Nothing is removed,
+  so the hosted application moves when it chooses.
+
+  `account-boundary.test.ts` reads the API's imports from the pipeline and
+  each function's parameters, as text: the TypeScript 7 compiler API is
+  marked unstable. 70 functions take the database; 60 take the account, or
+  an input type that requires one. The other ten are listed with a reason:
+  two boot checks, four counts over ids the caller passes, three reads of
+  every monitor that the route narrows (US-333), and `refuseEstimate` on the
+  row the same request made. The first box is true of every function that
+  addresses one record; those ten read past one account by design, which is
+  what the second box allows.
+
+  The sweep for routes without an id asks all 15 GET routes as a stranger
+  while the owner has one of everything and a spend no other row adds up to.
+  The owner, asking the same routes, sees their text on at least five, so an
+  absence is a refusal.
+
+  Each test was shown to fail: an owner check that always says yes fails ten
+  of the thirteen package cases, an unchecked import in `estimates.ts` fails
+  the boundary test by name, and a monitor list read for the wrong account
+  fails the sweep at `GET /api/monitors`. Full suite: 141 files, 2,400 tests.
+
+  Not reached by the boundary test: `projects.ts` and `leads.ts` query the
+  pipeline's tables directly. Both filter on the account today.

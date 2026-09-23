@@ -14,6 +14,8 @@
  * `react-dom` and a document, so it is imported only where a `jsdom`
  * environment is on.
  */
+
+export { pollEntry, stageEntry } from "./activity.js";
 export {
   button,
   field,
@@ -25,4 +27,5 @@ export {
   settle,
   setValue,
 } from "./harness.js";
+export { match } from "./matches.js";
 export { monitor, poll, testMonitorId, testProjectId } from "./monitors.js";

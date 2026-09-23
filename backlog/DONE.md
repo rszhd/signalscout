@@ -2,11 +2,13 @@
 
 # Done
 
-223 finished.
+240 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-356 | [The Field component's rules live in the applications](done/2026-09/BUG-356-the-field-component-s-rules-live-in-the-applications.md) | bug | shipped | 2026-09 |
 | BUG-339 | [The docs say what the code does](done/2026-09/BUG-339-the-docs-say-what-the-code-does.md) | bug | shipped | 2026-09 |
+| BUG-338 | [The image ships the development tools](done/2026-09/BUG-338-the-image-ships-the-development-tools.md) | bug | shipped | 2026-09 |
 | BUG-330 | [A cost test and a draft read only their own account](done/2026-09/BUG-330-a-cost-test-and-a-draft-read-only-their-account.md) | bug | shipped | 2026-09 |
 | BUG-329 | [The session gate reads the route, not the URL](done/2026-09/BUG-329-the-session-gate-reads-the-route-not-the-url.md) | bug | shipped | 2026-09 |
 | BUG-328 | [The webhook guard reads every spelling of an address](done/2026-09/BUG-328-the-webhook-guard-reads-every-spelling-of-an-address.md) | bug | shipped | 2026-09 |
@@ -35,11 +37,26 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-381 | [The README opens with a banner](done/2026-09/US-381-the-readme-opens-with-a-banner.md) | chore | shipped | 2026-09 |
+| US-379 | [The code is fair source, under the FSL](done/2026-09/US-379-the-code-is-fair-source-under-the-fsl.md) | feature | shipped | 2026-09 |
+| US-378 | [The README gets a self-hoster to a first match](done/2026-09/US-378-the-readme-gets-a-self-hoster-to-a-first-match.md) | feature | shipped | 2026-09 |
+| US-377 | [The score breakdown's bars are ink, not the accent](done/2026-09/US-377-score-bars-are-ink.md) | chore | shipped | 2026-09 |
+| US-376 | [A key figure that wraps to a second row keeps its border](done/2026-09/US-376-a-wrapped-key-figure-keeps-its-border.md) | bug | shipped | 2026-09 |
+| US-375 | [The lead breakdown switch is the underline switch the inbox uses](done/2026-09/US-375-lead-breakdown-uses-the-view-switch.md) | chore | shipped | 2026-09 |
+| US-371 | [The monitor list and the monitor page look the same in both products](done/2026-09/US-371-the-monitor-screens-look-the-same.md) | chore | shipped | 2026-09 |
+| US-370 | [The inbox filter bar is shared](done/2026-09/US-370-the-inbox-filter-bar-is-shared.md) | chore | shipped | 2026-09 |
+| US-369 | [The package owns the typography](done/2026-09/US-369-the-package-owns-the-typography.md) | chore | shipped | 2026-09 |
+| US-355 | [The sidebar is built from shared parts](done/2026-09/US-355-the-sidebar-is-built-from-shared-parts.md) | chore | shipped | 2026-09 |
+| US-354 | [The login frame, the notification settings and the document draft are shared](done/2026-09/US-354-the-login-frame-notifications-and-document-draft-are-shared.md) | chore | shipped | 2026-09 |
+| US-353 | [The monitor screens share their parts](done/2026-09/US-353-the-monitor-screens-share-their-parts.md) | chore | shipped | 2026-09 |
+| US-352 | [The inbox is built from shared components](done/2026-09/US-352-the-inbox-is-built-from-shared-components.md) | chore | shipped | 2026-09 |
+| US-351 | [The UI package has a component preview](done/2026-09/US-351-the-ui-package-has-a-component-preview.md) | chore | shipped | 2026-09 |
 | US-347 | [PLAN.md holds the product rules and nothing else](done/2026-09/US-347-plan-md-holds-the-product-rules-and-nothing-else.md) | chore | shipped | 2026-09 |
 | US-346 | [The contributor docs say only what a contributor needs](done/2026-09/US-346-the-contributor-docs-say-only-what-a-contributor-needs.md) | chore | shipped | 2026-09 |
 | US-344 | [A self-hoster installs and runs SignalScout from the docs](done/2026-09/US-344-a-self-hoster-installs-and-runs-from-the-docs.md) | feature | shipped | 2026-09 |
 | US-342 | [The documentation has a site, at docs.signalscout.run](done/2026-09/US-342-the-documentation-has-a-site.md) | feature | shipped | 2026-09 |
 | US-337 | [A pipeline step reads as its phases](done/2026-09/US-337-a-pipeline-step-reads-as-its-phases.md) | chore | shipped | 2026-09 |
+| US-336 | [Every read the API calls takes its account](done/2026-09/US-336-every-read-the-api-calls-takes-its-account.md) | chore | shipped | 2026-09 |
 | US-334 | [The provider clients share one core](done/2026-09/US-334-the-provider-clients-share-one-core.md) | chore | shipped | 2026-09 |
 | US-332 | [The licence check and the audit run in CI and pass](done/2026-09/US-332-the-licence-check-and-the-audit-run-in-ci.md) | chore | shipped | 2026-09 |
 | US-312 | [history.md is retired into the tickets that hold its evidence](done/2026-09/US-312-history-md-is-retired-into-the-tickets.md) | chore | shipped | 2026-09 |

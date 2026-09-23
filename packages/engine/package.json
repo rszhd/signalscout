@@ -2,7 +2,7 @@
   "name": "@signalscout/engine",
   "version": "0.0.0",
   "description": "The stateless half of SignalScout: connectors, model calls, the pre-filter, the estimate and the cipher. Input in, result and cost out.",
-  "license": "Apache-2.0",
+  "license": "FSL-1.1-ALv2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rszhd/signalscout.git",

@@ -2,17 +2,16 @@
 
 # Open tickets
 
-52 open — 5 doing, 38 todo, 9 parked (3 p1, 33 p2, 16 p3).
+63 open — 3 doing, 51 todo, 9 parked (4 p1, 41 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
-| p2 | US-336 | [Every read the API calls takes its account](doing/US-336-every-read-the-api-calls-takes-its-account.md) | chore | doing | 2026-09-23T06:46+08:00 |
+| p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
-| p2 | BUG-338 | [The image ships the development tools](doing/BUG-338-the-image-ships-the-development-tools.md) | bug | doing | 2026-09-23T07:58+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -37,6 +36,16 @@
 | p2 | US-319 | [A self-hoster can check where the image came from](todo/US-319-a-self-hoster-can-check-where-the-image-came-from.md) | chore | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-320 | [The app deploys in one click](todo/US-320-the-app-deploys-in-one-click.md) | feature | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-331 | [A post that asks for a high score does not get one](todo/US-331-a-post-that-asks-for-a-high-score-does-not-get-one.md) | feature | todo | 2026-09-23T06:41+08:00 |
+| p2 | US-357 | [An edit is formatted as it is written](todo/US-357-an-edit-is-formatted-as-it-is-written.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-358 | [One command checks a change](todo/US-358-one-command-checks-a-change.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-359 | [The rules for one folder load only in that folder](todo/US-359-rules-for-one-folder-load-only-there.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-361 | [One command says why a post is not in the inbox](todo/US-361-one-command-says-why-a-post-is-not-in-the-inbox.md) | feature | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-363 | [The eval set is frozen, and split into a tuning half and a held-out half](todo/US-363-the-eval-set-is-frozen-and-split.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-365 | [An eval reports its uncertainty](todo/US-365-an-eval-reports-its-uncertainty.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-366 | [An eval run records what produced it](todo/US-366-an-eval-run-records-what-produced-it.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p2 | US-372 | [The monitor form looks the same in both products](todo/US-372-the-monitor-form-looks-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
+| p2 | US-373 | [The projects page and the project form look the same in both products](todo/US-373-the-projects-page-looks-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
+| p2 | US-374 | [The login card, onboarding and the remaining base rules look the same in both products](todo/US-374-the-login-card-onboarding-and-base-look-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
@@ -48,6 +57,8 @@
 | p3 | US-326 | [The npm packages ship no paid-run or debugging scripts](todo/US-326-the-npm-packages-ship-no-paid-run-scripts.md) | chore | todo | 2026-09-23T06:27+08:00 |
 | p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
+| p3 | US-360 | [A pull request builds the image beside the checks](todo/US-360-a-pull-request-builds-the-image-beside-the-checks.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p3 | US-362 | [The worktree script finds what it left behind](todo/US-362-the-worktree-script-finds-what-it-left-behind.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | BUG-348 | [The issue sync says an issue is missing when it could not look](todo/BUG-348-sync-says-an-issue-is-missing-when-it-could-not-look.md) | bug | todo | 2026-09-23T12:28+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |

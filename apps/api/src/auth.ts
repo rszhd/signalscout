@@ -19,7 +19,7 @@
  * of their own instance.
  */
 
-import { type Database, getMonitor, type Logger, type Monitor } from "@signalscout/pipeline";
+import { type Database, getOwnedMonitor, type Logger, type Monitor } from "@signalscout/pipeline";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { type Auth, accountExists, clientAddressHeader } from "./auth/auth.js";
@@ -362,14 +362,13 @@ export async function registerAuthRoutes(
  * exist are the same fact to the person asking, and telling them apart would
  * confirm the id of a row they cannot read.
  *
- * `getMonitor` stays unscoped underneath, because the worker polls every
- * monitor on the instance and has no session to poll it with.
+ * The owner is checked in the query. `getMonitor`, which does not check, is
+ * the worker's: it polls every monitor on the instance and has no session.
  */
 export async function ownedMonitor(
   db: Database,
   request: FastifyRequest,
   id: string,
 ): Promise<Monitor | undefined> {
-  const monitor = await getMonitor(db, id);
-  return monitor && monitor.userId === sessionUserId(request) ? monitor : undefined;
+  return getOwnedMonitor(db, sessionUserId(request), id);
 }

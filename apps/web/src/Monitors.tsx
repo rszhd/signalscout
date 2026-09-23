@@ -26,6 +26,7 @@ import {
   anyWorking,
   BrandIcon,
   type Monitor,
+  MonitorStatus,
   messageFor,
   needsAttention,
   nextPollLabel,
@@ -196,7 +197,11 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     <div className="product-page monitors-page">
       <MonitorsHeader projectId={projectId} />
       <div className="monitors-content">
-        <div className="monitors-overview">
+        <div
+          className={
+            counts.attention > 0 ? "monitors-overview needs-attention" : "monitors-overview"
+          }
+        >
           <div>
             <h2>
               {counts.running} of {counts.all} active
@@ -400,7 +405,11 @@ function MonitorTable({
             const stage = stageOf(monitor);
 
             return (
-              <tr key={monitor.id} role="row">
+              <tr
+                key={monitor.id}
+                role="row"
+                className={needsAttention(monitor) ? "needs-attention" : undefined}
+              >
                 <th scope="row" role="rowheader">
                   <Link
                     className="monitor-table-name"
@@ -420,11 +429,7 @@ function MonitorTable({
                   </span>
                 </th>
                 <td role="cell" data-label="Status">
-                  <span
-                    className={`monitor-status ${running.tone}${running.attention ? " quiet" : ""}`}
-                  >
-                    {running.label}
-                  </span>
+                  <MonitorStatus {...running} />
                   {/* The stage in flight, under the status word. US-265. The
                       word says whether the monitor is running; this says what
                       the worker is doing for it at this moment. */}

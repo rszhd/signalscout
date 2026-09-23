@@ -10,11 +10,15 @@ cool neutral backgrounds, muted blue for actions and selection, and restrained
 borders. The goal is to make the next useful action obvious while keeping
 secondary information available on demand.
 
-**Two applications wear this, and their screens differ.** The open-source
+**Two applications wear this, and their screens differ.** The self-hosted
 application and the hosted one are forks of one app (US-151, US-239) and are
 meant to look like one product. So the brand lives here and the screens do
-not: a layout, a page stylesheet, a route table and a navigation shell belong
-to each application.
+not: a layout, a page stylesheet and a route table belong to each
+application. **A navigation's parts and look are shared; its structure is
+not** (US-355): the items, their icons, the signed-in person, signing out, the
+sidebar, the phone's bottom bar and the account sheet are here, and which
+items a navigation shows, in which order and under which heading is each
+application's shell.
 
 **The rule that keeps it one brand: a control here uses a token name and
 never a raw colour or a raw spacing value.** `pnpm lint:css` says it to CI.
@@ -59,6 +63,29 @@ semantics a screen must not get wrong:
 `docs/design.md` is the rule; the migration happens one screen at a time. A
 theme class not served by a component (e.g. a page's own `text-button`) stays a
 plain class until a component earns it. Components never import `packages/pipeline`.
+
+## The preview
+
+Every exported component renders on its own in Storybook, with fixture data
+and no server (US-351):
+
+    pnpm --filter @signalscout/ui storybook        # http://localhost:6006
+    pnpm --filter @signalscout/ui storybook:build  # a static copy in storybook-static/
+
+**A new component comes with its stories**, one per state a screen puts it
+in: loading, empty, refused, the confirmation that replaces the actions. A
+story sits beside its component as `<Name>.stories.tsx`. `tsconfig.json`
+leaves the stories out of `dist`, and `tsconfig.stories.json` typechecks them.
+
+- **A component that fetches** names its answers in `parameters.api`, keyed
+  by method and path; `.storybook/api.ts` answers in place of `fetch`. A call
+  no story names answers 404 and warns in the console.
+- **The preview wears what an application wears**: this package's
+  stylesheet, over Tailwind's reset and Figtree. A component that looks wrong
+  here and right in an application depends on a rule the application holds,
+  and that rule belongs here (BUG-356 was the first).
+- **The stories are not tests yet.** Storybook's Vitest addon supports
+  Vitest 3 and 4, and this repository is on 5.
 
 ## Spacing
 
@@ -152,13 +179,63 @@ a mark of its own. Those are layout.
 
 `ReplyVoices` is a whole screen, and the first (US-277). It may be one because
 it carries no product decision: a voice is a name and an instruction, stored
-per account, and nothing about who pays for a model touches it. The rule in
-both `AGENTS.md` files says it this way — a screen that is the same screen in
-both products may be shared; a screen that carries the product may not. The
+per account, and nothing about who pays for a model touches it. A screen
+that carries the product is not one component, but it still looks the same in
+both products: its look is here, and only its features differ (US-371). The
 route that renders it stays each application's own, and so does its place in
 the navigation. `ReplyDraft` is the second (US-278): the composer a match opens,
 which followed the hosted layout before it moved, so the package holds the
 newer one.
+
+## The parts of a screen
+
+The inbox is not one screen in the package: its filters, its paging and its
+address carry the product. Its parts are (US-352). `MatchCard` is a row of the
+list, `MatchDetail` the reading pane, and `MonitoringBar` the line above both.
+Each application's `Inbox` holds the state and the requests and renders them.
+
+- **The page decides; the part shows.** `MatchDetail` calls back with a
+  verdict or a save and changes nothing itself, so a refused request leaves
+  the pane as it was. `saving` and `judging` are the page's answer to "is one
+  in flight".
+- **A product's own action is a slot.** `MatchDetail`'s `actions` sits beside
+  the conversation link: self-hosted it holds *Copy link*.
+- **An address is a prop.** `MonitoringBar` takes `monitorHref`, because the
+  hosted product opens its one monitor's list and this one opens the monitor.
+- **The look is the hosted one**, whose `inbox.css` refined an older layer of
+  the same rules. The two layers are one file, `match.css`, and no rule needs
+  an `.inbox-page` ancestor, so the preview shows a part as a page does.
+
+The frame around the list followed (US-370): `InboxFilters` — the
+Inbox/Saved switch, the monitor picker, the order and the Filters panel —
+`ArrivedBanner`, `MatchListHeading` and `ShowMore`. The page holds the values
+and the requests; the bar holds only whether its panel is open. The monitor
+picker shows only when a project has more than one monitor, and
+`activeFilters` counts only what a person can see.
+
+The monitor page's parts followed (US-353): `MonitorStatus`, the status word
+every monitor screen shows; `MonitorHistory`, the polls and their stages;
+`QueryPerformance`, what each search input finds; and `LeadSources`, where the
+matches come from. **They fetch nothing.** The two APIs answer these reads in
+different shapes — the self-hosted one pages the history and sends a score
+floor — so each application keeps the request and hands the rows in, and what
+only one API sends is an optional prop: `more` and `onShowOlder`, a query row's
+`note`, the lead groups to offer. Their rules are in `monitor-parts.css`.
+
+Three more followed (US-354). `Notifications` is a whole screen, like
+`ReplyVoices`: both products call the same two routes, so it fetches for
+itself, and the fields only the self-hosted API sends are optional. The
+page passes the monitor's address and, self-hosted, the sentence for an
+account signed with the instance's own secret. `LoginFrame` is the page
+around a sign-in form; the form is the child and stays each application's.
+`DraftFromDocument` drafts a project's four answers from a page or a file;
+where it sits, and the space around it, is the page's.
+
+The navigation's parts came last (US-355): `NavItem` (a link, or a button
+that opens something), `NavIcon`, `AccountIdentity` and `SignOut`, with
+`sidebar.css` for the sidebar, the bottom bar and the account sheet. The
+shell that places them stays each application's, because the two navigations
+hold different things; an item only one of them has keeps its rules there.
 
 ## The words
 
@@ -170,6 +247,12 @@ polls a month" — and not the control that lets a person choose one, which the
 hosted product no longer offers (US-173 there). They are here for the reason the tokens are —
 a sentence written twice becomes two sentences, and "Found nothing" beside
 "Running" about one monitor is the failure US-104 exists to prevent.
+
+`match.ts` holds the words about one match: where it came from
+("Reddit · r/devops"), how much of a reply's thread was read and why it
+stopped, whether the link can open the reply or only the post, and how much of
+a post the pane shows before *Read more*. `band`, the two words for a score,
+stays in `monitor.ts`.
 
 Where the products differ, the difference is an argument and never a fork:
 

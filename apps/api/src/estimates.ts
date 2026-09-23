@@ -16,7 +16,7 @@ import {
   defaultPollIntervalSeconds,
   estimateProbeKinds,
   estimateStatuses,
-  getBudget,
+  getOwnedBudget,
   type JobSender,
   maximumQueries,
   maximumSubreddits,
@@ -225,7 +225,8 @@ export async function registerEstimateRoutes(
         // number a person is warned against has to be the number they will be
         // billed, not the one their browser guessed.
         pollDays = [...monitor.pollDays];
-        monthlyCapMicros = (await getBudget(db, monitorId))?.monthlyCapMicros ?? null;
+        monthlyCapMicros =
+          (await getOwnedBudget(db, monitor.userId, monitorId))?.monthlyCapMicros ?? null;
       }
 
       const estimateId = await startEstimate(db, {

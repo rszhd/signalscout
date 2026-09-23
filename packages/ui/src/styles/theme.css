@@ -214,6 +214,79 @@
   background: var(--accent-soft);
 }
 
+/*
+ * A quiet line of supporting text, and an inline refusal. The monitor screens
+ * named them first; the shared parts and several pages use both (US-353).
+ */
+.monitor-origin {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.budget-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+/* Named for a screen reader, silent on the page. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * `Field`: the label, the hint and the control, one per line. BUG-356.
+ * Every application's `index.css` held these, so the component looked right
+ * only inside one.
+ */
+.field > span {
+  display: block;
+  color: var(--muted-strong);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.field > small {
+  display: block;
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  outline: none;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: var(--text-body);
+}
+
+.field textarea {
+  min-height: 68px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--muted);
+  box-shadow: var(--focus-ring);
+}
+
 .disclosure summary {
   cursor: pointer;
   color: var(--muted);
@@ -273,7 +346,6 @@
   color: var(--ink);
   background: var(--surface);
   box-shadow: var(--shadow);
-  scrollbar-gutter: stable;
 }
 
 .app-dialog::backdrop {

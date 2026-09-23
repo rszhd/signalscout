@@ -1,4 +1,10 @@
-import { FormError, messageFor, ProjectCard, requestJson } from "@signalscout/ui";
+import {
+  DraftFromDocument,
+  FormError,
+  messageFor,
+  ProjectCard,
+  requestJson,
+} from "@signalscout/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { paths } from "./route.js";
@@ -72,117 +78,6 @@ interface Draft {
 }
 
 const empty: Draft = { name: "", product: "", idealCustomer: "", problem: "" };
-
-interface DraftedProject extends Draft {
-  missing: string[];
-  charactersRead: number;
-  truncated: boolean;
-}
-
-/**
- * Draft the four answers from a page or a file. US-050.
- *
- * The file is read here rather than uploaded, so the only thing that reaches
- * the server is its text: no multipart, no filename to sanitise, no temp file.
- *
- * **What comes back is a draft and not a decision.** These four fields are the
- * ones the classifier reads and `monitors.version` counts, so they are filled
- * in for a person to read, edit and save — nothing here writes anything.
- */
-function DraftFromDocument({
-  onDrafted,
-  disabled,
-  onBusy,
-}: {
-  onDrafted: (draft: DraftedProject) => void;
-  disabled: boolean;
-  onBusy: (busy: boolean) => void;
-}) {
-  const [url, setUrl] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [problem, setProblem] = useState<string | null>(null);
-
-  async function draft(body: Record<string, string>) {
-    setBusy(true);
-    onBusy(true);
-    setProblem(null);
-
-    try {
-      onDrafted(
-        await requestJson<DraftedProject>("/api/projects/describe", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(body),
-        }),
-      );
-    } catch (cause) {
-      // The server's own sentence: it names the host, the status or the file
-      // type. "Could not analyse" would throw away the part a person can act
-      // on.
-      setProblem(messageFor(cause, "The document could not be read."));
-    } finally {
-      setBusy(false);
-      onBusy(false);
-    }
-  }
-
-  async function fromFile(file: File | undefined) {
-    if (!file) return;
-
-    const type =
-      file.type ||
-      (file.name.endsWith(".md")
-        ? "text/markdown"
-        : file.name.endsWith(".html")
-          ? "text/html"
-          : "text/plain");
-
-    try {
-      await draft({ text: await file.text(), contentType: type, filename: file.name });
-    } catch (cause) {
-      setProblem(messageFor(cause, "The file could not be read."));
-    }
-  }
-
-  return (
-    <div className="draft-from-document">
-      <p className="page-subtitle">
-        Use your website or a text, Markdown or HTML file to draft the answers. Review them before
-        saving.
-      </p>
-
-      {problem && <FormError>{problem}</FormError>}
-
-      <div className="draft-controls">
-        <input
-          aria-label="Your product's address"
-          placeholder="https://example.com"
-          value={url}
-          disabled={disabled || busy}
-          onChange={(event) => setUrl(event.target.value)}
-        />
-        <button
-          className="secondary-button"
-          type="button"
-          disabled={disabled || busy || url.trim() === ""}
-          onClick={() => void draft({ url: url.trim() })}
-        >
-          {busy ? "Reading…" : "Read this page"}
-        </button>
-        <label className="secondary-button draft-file">
-          Add a file
-          <input
-            aria-label="A document about your product"
-            type="file"
-            accept=".txt,.md,.markdown,.html,text/plain,text/markdown,text/html"
-            disabled={disabled || busy}
-            onChange={(event) => void fromFile(event.target.files?.[0])}
-          />
-        </label>
-      </div>
-    </div>
-  );
-}
 
 /**
  * The list of projects, and the way into the two editor pages.

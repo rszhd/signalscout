@@ -15,5 +15,8 @@
     "types": ["node"],
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  // The stories are the preview's, not the package's: nothing a story imports
+  // belongs in `dist`. `tsconfig.stories.json` typechecks them. US-351.
+  "exclude": ["src/**/*.stories.tsx"]
 }

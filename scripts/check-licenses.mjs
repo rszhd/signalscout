@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Are the dependencies' licenses compatible with ours? US-019.
+ * Are the dependencies' licenses compatible with ours? US-019, US-379.
  *
  * A command rather than a paragraph, because the answer changes every time
  * somebody adds a dependency and a paragraph does not. It reads what pnpm
@@ -13,11 +13,12 @@
  *
  *     node scripts/check-licenses.mjs
  *
- * Apache-2.0 is our license, and it is permissive: it can take code under any
- * of the licenses below. What it cannot take is copyleft — GPL, LGPL, AGPL,
- * SSPL — because those would impose terms on everyone who receives this
- * software. That is the failure this guards against, and on 2026-09-06 the
- * production tree contained none.
+ * Our license is the FSL, which restricts how the software may be sold. Code
+ * under any of the licenses below may ship inside it, because each asks only
+ * for its notice. What it cannot take is copyleft — GPL, LGPL, AGPL, SSPL —
+ * because those would require the whole to be released under their own open
+ * terms, which the FSL refuses. That is the failure this guards against, and
+ * on 2026-09-23 the production tree contained none.
  */
 import { execFileSync } from "node:child_process";
 
@@ -72,7 +73,7 @@ for (const [license, entries] of Object.entries(report)) {
   );
 }
 
-console.log(`Checked ${packages} production packages against our Apache-2.0.`);
+console.log(`Checked ${packages} production packages against our FSL-1.1-ALv2.`);
 
 for (const [license, entries] of Object.entries(report)) {
   if (!allowed.has(license)) continue;

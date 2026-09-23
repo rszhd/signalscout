@@ -48,6 +48,8 @@ try {
     "package/dist/styles/styles.css",
     "package/dist/styles/tokens.css",
     "package/dist/styles/theme.css",
+    "package/dist/styles/fonts.css",
+    "package/dist/styles/base.css",
     "package/dist/styles/project-card.css",
     "package/dist/styles/reply-voices.css",
     "package/dist/styles/reply-draft.css",
@@ -109,13 +111,20 @@ try {
     join(project, "use.mjs"),
     [
       'import { formatMicros, platformName, pollSummary } from "@signalscout/ui";',
-      'import { readFileSync } from "node:fs";',
+      'import { existsSync, readFileSync } from "node:fs";',
       'if (formatMicros(15_000) !== "$0.015") throw new Error("formatMicros");',
       'if (platformName("reddit") !== "Reddit") throw new Error("platformName");',
       'const run = { units: 0, outcome: "collected", postsReturned: 7, postsNew: 2, sources: [], stopReason: null };',
       'if (!pollSummary(run, { spend: false }).includes("7 posts")) throw new Error("pollSummary");',
       'const tokens = readFileSync("node_modules/@signalscout/ui/dist/styles/tokens.css", "utf8");',
       'if (!tokens.includes("--accent")) throw new Error("tokens.css");',
+      // The font is a peer: npm installs it beside the package, and every face
+      // fonts.css imports must be a file there, or type falls back to another
+      // weight with no error anywhere. US-369.
+      'const fonts = readFileSync("node_modules/@signalscout/ui/dist/styles/fonts.css", "utf8");',
+      'const faces = [...fonts.matchAll(/@import "([^"]+)"/g)].map((m) => m[1]);',
+      'if (faces.length < 4) throw new Error("fonts.css imports " + faces.length + " faces");',
+      'for (const face of faces) if (!existsSync("node_modules/" + face)) throw new Error("unresolved " + face);',
       'console.log("ok");',
     ].join("\n"),
   );

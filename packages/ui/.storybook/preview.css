@@ -1,38 +1,8 @@
 /*
  * What an application puts under the package's stylesheet, so a story looks
- * the way a screen does. Both applications import Tailwind, whose reset sits
- * in a layer below every unlayered rule, and set Figtree and the base body
- * rules in their own `index.css`. This is the smallest copy of that base.
+ * the way a screen does: Tailwind's reset, which both applications import, in
+ * a layer below every unlayered rule. The font and the base type are the
+ * package's own (US-369).
  */
 @import "tailwindcss/preflight.css" layer(base);
-@import "@fontsource/figtree/latin-400.css";
-@import "@fontsource/figtree/latin-500.css";
-@import "@fontsource/figtree/latin-700.css";
 @import "../src/styles/styles.css";
-
-body {
-  background: var(--background);
-  font-size: var(--text-body);
-  line-height: 1.55;
-  letter-spacing: -0.006em;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-
-a {
-  color: inherit;
-}

@@ -19,6 +19,7 @@
   border-radius: 999px;
   font-size: var(--text-xs);
   font-weight: 600;
+  letter-spacing: normal;
 }
 
 .monitor-status::before {

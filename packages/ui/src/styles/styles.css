@@ -7,11 +7,14 @@
  * and looks like a crash until it gets one. A line added here is inside a
  * file Vite already watches.
  *
- * The order is the cascade. The tokens first, so everything after has them.
- * The theme next: the shared controls. Then each component's rules, which may
+ * The order is the cascade. The fonts first, then the tokens, so everything
+ * after has them, then the base every page sits on. The theme next: the
+ * shared controls. Then each component's rules, which may
  * lean on the theme's and never the reverse.
  */
+@import "./fonts.css";
 @import "./tokens.css";
+@import "./base.css";
 @import "./theme.css";
 @import "./project-card.css";
 @import "./reply-draft.css";

@@ -141,6 +141,7 @@
   font-size: var(--text-xs);
   font-weight: 500;
   line-height: 1.4;
+  letter-spacing: 0;
 }
 
 /* The signed-in person: a card in the sheet, a quiet row in the sidebar. */

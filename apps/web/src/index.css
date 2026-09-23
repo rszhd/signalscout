@@ -1,44 +1,6 @@
-@import "@fontsource/figtree/latin-400.css";
-@import "@fontsource/figtree/latin-500.css";
-@import "@fontsource/figtree/latin-700.css";
+/* Tailwind's reset, in a layer below every rule here. The font, the base
+   type and the controls' font come from @signalscout/ui (US-369). */
 @import "tailwindcss";
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  min-height: 100%;
-}
-
-body {
-  min-height: 100vh;
-  margin: 0;
-  background: var(--background);
-  font-size: var(--text-body);
-  line-height: 1.55;
-  letter-spacing: -0.006em;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-
-a {
-  color: inherit;
-}
 
 .product-note {
   margin-top: 29px;

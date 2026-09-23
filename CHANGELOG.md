@@ -22,6 +22,15 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Added.** `Notifications`, the notification settings screen, with the
+monitor's address and a `signingNotice` slot as props (US-354);
+`LoginFrame`, the page around a sign-in form, with `storyNote` and `footer`;
+and `DraftFromDocument`, with the `DraftedProject` type. Their rules are in
+the one stylesheet. A consumer deletes its own `notifications.css`, the
+`.login-page`/`.login-story`/`.login-header`/`.login-footer` rules, and the
+`.draft-from-document`/`.draft-controls`/`.draft-file` rules, keeping only
+the space its page gives the draft.
+
 **Added.** The monitor page's parts (US-353): `MonitorStatus`, the status
 pill; `MonitorHistory`, the polls and their stages, with optional paging;
 `QueryPerformance`, with an optional note per row; and `LeadSources`, which

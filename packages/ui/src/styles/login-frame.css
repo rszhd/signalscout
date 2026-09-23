@@ -1,0 +1,154 @@
+/*
+ * `LoginFrame`: the page around a sign-in form. US-354.
+ *
+ * The hosted look: a flat story panel beside the form. The form's card is
+ * each application's, in its own `login.css`.
+ */
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: var(--space-8) var(--page-gutter);
+  background: var(--background);
+}
+
+.login-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--ink);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.login-header-note,
+.login-footer,
+.login-story-footer {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.login-layout {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  align-items: center;
+  gap: var(--space-12);
+  width: min(1120px, 100%);
+  margin: var(--space-12) auto;
+}
+
+.login-story {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 560px;
+  padding: var(--space-12) var(--space-8);
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+}
+
+.login-eyebrow {
+  margin: 0 0 var(--space-4);
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.login-story h2 {
+  margin: 0;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.login-story-copy {
+  max-width: 44ch;
+  margin: var(--space-5) 0 var(--space-8);
+  color: var(--muted-strong);
+  font-size: var(--text-body);
+  line-height: 1.65;
+}
+
+.login-story-points {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--surface-brand);
+  list-style: none;
+}
+
+.login-story-points li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--surface-brand);
+}
+
+.login-story-points li > span {
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.login-story-points p {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.login-story-points strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.login-story-footer {
+  margin: var(--space-6) 0 0;
+}
+
+.login-footer {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+@media (max-width: 820px) {
+  .login-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .login-story {
+    width: min(480px, 100%);
+    min-height: 0;
+    justify-self: center;
+  }
+}
+
+@media (max-width: 440px) {
+  .login-page {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .login-header-note {
+    display: none;
+  }
+
+  .login-story {
+    padding: var(--space-6);
+  }
+}

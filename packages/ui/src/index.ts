@@ -21,7 +21,13 @@ export { Dialog } from "./components/Dialog.js";
 export { Field } from "./components/Field.js";
 export { FormError, type FormErrorProps } from "./components/FormError.js";
 export { PageState, type PageStateProps } from "./components/PageState.js";
+export {
+  type DraftedProject,
+  DraftFromDocument,
+  type DraftFromDocumentProps,
+} from "./DraftFromDocument.js";
 export { LeadSources, type LeadSourcesProps } from "./LeadSources.js";
+export { LoginFrame, type LoginFrameProps } from "./LoginFrame.js";
 export { ageLabel, platformName, providerName, untilLabel } from "./labels.js";
 export { MatchCard, type MatchCardProps } from "./MatchCard.js";
 export { MatchDetail, type MatchDetailProps } from "./MatchDetail.js";
@@ -93,6 +99,11 @@ export {
   type SearchInput,
   searchInputs,
 } from "./monitor-stats.js";
+export {
+  Notifications,
+  type NotificationsProps,
+  type SigningSecret,
+} from "./Notifications.js";
 export { ProjectCard, type ProjectCardProps } from "./ProjectCard.js";
 export { QueryPerformance, type QueryPerformanceProps } from "./QueryPerformance.js";
 export { ReplyDraft } from "./ReplyDraft.js";

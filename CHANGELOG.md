@@ -20,7 +20,7 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
-## @signalscout/ui — Unreleased
+## @signalscout/ui — 0.2.0 — 2026-09-23
 
 **License.** From this version the package is fair source, under the
 Functional Source License (FSL-1.1-ALv2), not Apache-2.0 (US-379). You may use
@@ -146,7 +146,7 @@ the two products differ the words take an argument:
 takes a `size` and carries its one rule in the stylesheet, so a consumer
 sets no rule for the mark (US-283).
 
-## Unreleased
+## 0.15.0 — 2026-09-23
 
 **License.** From this version the package is fair source, under the
 Functional Source License (FSL-1.1-ALv2), not Apache-2.0 (US-379). You may use

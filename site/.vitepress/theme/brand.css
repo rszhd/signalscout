@@ -1,0 +1,53 @@
+/*
+ * The brand on VitePress's default theme. US-342.
+ *
+ * The values are `packages/ui/src/styles/tokens.css`'s, copied, because the
+ * site is a separate build that does not install the UI package. Change a
+ * colour there and change it here. The application is light only; the site
+ * keeps VitePress's dark mode for readers, with the lighter accent the mark
+ * already uses.
+ */
+:root {
+  --vp-font-family-base: "Figtree", system-ui, sans-serif;
+
+  --vp-c-brand-1: #0b57d0;
+  --vp-c-brand-2: #0842a0;
+  --vp-c-brand-3: #0b57d0;
+  --vp-c-brand-soft: #e8f0fe;
+
+  --vp-c-text-1: #202124;
+  --vp-c-text-2: #5f6368;
+  --vp-c-bg-soft: #f8f9fa;
+  --vp-c-divider: #e3e3e3;
+}
+
+.dark {
+  --vp-c-brand-1: #8ab4f8;
+  --vp-c-brand-2: #aecbfa;
+  --vp-c-brand-3: #0b57d0;
+  --vp-c-brand-soft: rgba(138, 180, 248, 0.16);
+  --vp-c-text-1: rgba(255, 255, 255, 0.87);
+  --vp-c-text-2: rgba(235, 235, 245, 0.6);
+  --vp-c-bg-soft: #202127;
+  --vp-c-divider: #2e2e32;
+}
+
+/* A screenshot is a picture of a screen, so it gets the screen's edge. */
+.vp-doc img:not(.no-frame) {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+}
+
+.vp-doc .mermaid {
+  margin: 24px 0;
+  text-align: center;
+}
+
+/*
+ * Mermaid wraps each label in a <p>, and `.vp-doc p` gives it the page's tall
+ * line height. The label was measured without it, so the bottom line is cut.
+ */
+.vp-doc .mermaid p {
+  margin: 0;
+  line-height: 1.5;
+}

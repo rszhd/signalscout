@@ -14,7 +14,8 @@
 #   docker compose -p signalscout-proxy -f docker-compose.proxy.yml up -d
 #
 # Reads ACME_EMAIL and EDGE_NETWORK from .env in this directory. Let's Encrypt
-# rate-limits issuance, so read docs/accounts.md before deleting the volume.
+# rate-limits issuance, so do not delete the `acme` volume: it is the only copy
+# of the certificates. https://docs.signalscout.run/self-hosting/https
 
 name: signalscout-proxy
 

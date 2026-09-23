@@ -3,7 +3,8 @@
 #
 # The app image is pulled, never built here. It is built in CI and published, so
 # a 1 GB server never compiles anything, and this file works on its own — a
-# `curl` of it beside a `.env` is the whole install (docs/self-hosting.md).
+# `curl` of it beside a `.env` is the whole install
+# (https://docs.signalscout.run/self-hosting/install).
 #
 # `latest` follows main. To pin a version, set SIGNALSCOUT_IMAGE in .env:
 #
@@ -191,7 +192,7 @@ services:
   # No healthcheck, unlike `app`. This process serves no port — it takes jobs
   # from pg-boss — so there is nothing to ask. Whether it is working is a
   # question about polls, and `poll_runs` answers it:
-  # docs/self-hosting.md, *When a monitor stops finding things*. US-308.
+  # site/self-hosting/troubleshooting.md, *A monitor finds nothing*. US-308.
   worker:
     profiles: ["worker"]
     image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}

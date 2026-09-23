@@ -1,5 +1,10 @@
 # Secrets at rest
 
+> **Running SignalScout rather than changing it?** The guide for keys, backups and key rotation is on
+> [docs.signalscout.run/self-hosting/keys](https://docs.signalscout.run/self-hosting/keys), written for
+> a self-hoster; its source is [`site/self-hosting/keys.md`](../site/self-hosting/keys.md). This page holds
+> the rules and reasons a contributor needs.
+
 What is encrypted, what is not, and how to change the key. The decisions are
 in the Logs of the tickets this page names; this page holds the rules.
 
@@ -28,8 +33,9 @@ sign with (US-096). That is why it is a second variable and not a second
 value of the first.
 
 **A model key follows the same rule.** The Models screen stores keys on the
-account in `ai_keys`, encrypted the same way. Each of the four jobs —
-scoring, triage, similarity, drafting — names one or names none. Every field
+account in `ai_keys`, encrypted the same way. Each of the five jobs —
+scoring, triage, similarity, drafting, the search plan — names one or names
+none. Every field
 on a job is an *override*: an account with no row behaves as if the screen
 did not exist. A key states its provider and decides the job's; the card
 shows it rather than asking. **A key belongs to nobody's job**: it is added
@@ -150,39 +156,30 @@ decrypts every `source_credentials` row at startup, in the API and the
 worker, and refuses to start if it cannot — a process that will not boot,
 naming the record, rather than a poll that fails at 02:00 naming the
 provider. **Model keys and webhook secrets are not in that check yet**
-(BUG-341): a wrong key boots, and the error arrives at their first use. The key's shape is
-checked whenever it is present, so a truncated paste does not survive to the
-first encrypt.
+(BUG-341): a wrong key boots, and the error arrives at their first use. The
+key's shape is checked whenever it is present, so a truncated paste does not
+survive to the first encrypt.
 
 ## Rotating the key
 
-Manual, on purpose: rare, not reversible without the old key, and every row
-moves at once in one transaction.
+The steps a self-hoster follows are on the site,
+[*Rotate the encryption key*](../site/self-hosting/maintenance.md#rotate-the-encryption-key).
+The rules behind them:
 
-1. **Back up the database** — [self-hosting.md](self-hosting.md), *Backing
-   up*, has the command. The old key is the only way back, so keep the `.env`
-   holding it until step 7 has passed.
-2. **Generate the new key**: `openssl rand -base64 32`.
-3. **Stop the application**, both processes. A running process holds the old
-   key and will write with it.
-4. **Re-encrypt, with the old key still in `ENCRYPTION_KEY`**:
-   `NEW_ENCRYPTION_KEY='<new>' pnpm db:rotate-key`. It prints how many rows
-   it changed. Both keys come from the environment, never arguments, so
-   neither lands in a shell history. It covers `ai_keys` and
-   `webhook_secrets` too. **The published image has no `pnpm`**, so an
-   instance run from it uses the compiled script instead:
-
-       NEW_ENCRYPTION_KEY='<new>' docker compose run --rm -e NEW_ENCRYPTION_KEY \
-         app node packages/pipeline/dist/secrets/rotate-cli.js
-5. **Put the new key in `ENCRYPTION_KEY`** everywhere it is held.
-6. **Start the application.** The boot check verifies the provider keys
-   only. For the rest, the count from step 4 must equal the rows in
-   `source_credentials`, `ai_keys` and `webhook_secrets` together.
-
-If step 6 fails, restore the backup from step 1 and try again; do not edit
-rows. **If the key is lost, the credentials are gone.** There is no escrow, by
-design. Set them again from the provider's dashboard, or move them back to
-`.env` meanwhile.
+- **Manual, and one transaction.** Rotation is rare and cannot be undone
+  without the old key, and half a rotation — some rows on each key — is the
+  worst state available. `rotateEncryptionKey` moves `source_credentials`,
+  `ai_keys` and `webhook_secrets` together, or nothing (US-079 added the
+  second table after the first rotation left it behind).
+- **Both keys come from the environment**, `ENCRYPTION_KEY` and
+  `NEW_ENCRYPTION_KEY`, never from arguments, so neither lands in a shell
+  history as an argument.
+- **Two commands, one script.** `pnpm db:rotate-key` from a checkout;
+  `node packages/pipeline/dist/secrets/rotate-cli.js` inside the image, which
+  carries no `pnpm` and no `tsx` (BUG-338). Both run `rotate-cli.ts`.
+- **The printed count is the verification** until BUG-341 widens the boot
+  check: it must equal the rows of the three tables together.
+- **A lost key loses what it sealed.** There is no escrow, by design.
 
 ## What this does not cover
 

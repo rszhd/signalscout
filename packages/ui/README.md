@@ -206,6 +206,13 @@ Each application's `Inbox` holds the state and the requests and renders them.
   the same rules. The two layers are one file, `match.css`, and no rule needs
   an `.inbox-page` ancestor, so the preview shows a part as a page does.
 
+The frame around the list followed (US-370): `InboxFilters` — the
+Inbox/Saved switch, the monitor picker, the order and the Filters panel —
+`ArrivedBanner`, `MatchListHeading` and `ShowMore`. The page holds the values
+and the requests; the bar holds only whether its panel is open. The monitor
+picker shows only when a project has more than one monitor, and
+`activeFilters` counts only what a person can see.
+
 The monitor page's parts followed (US-353): `MonitorStatus`, the status word
 every monitor screen shows; `MonitorHistory`, the polls and their stages;
 `QueryPerformance`, what each search input finds; and `LeadSources`, where the

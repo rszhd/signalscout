@@ -22,6 +22,16 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Added.** The inbox's frame around the list (US-370): `InboxFilters`,
+`ArrivedBanner`, `MatchListHeading` and `ShowMore`, with the words
+`inboxOrders`, `scoreFilters` and `activeFilters`. The monitor picker shows
+only when a project has more than one monitor. A consumer deletes its own
+`.inbox-toolbar`, `.filter`, `.inbox-extra-filters`, `.list-heading` and
+`.inbox-arrived` rules.
+
+**Changed.** A dialog no longer reserves a scrollbar's width on its right
+(`.app-dialog` drops `scrollbar-gutter: stable`).
+
 **Changed.** The package loads the font and sets the base type (US-369).
 `styles.css` now loads Figtree at 400, 500, 600 and 700 and holds the base
 rules — box sizing, the body's size, line height, letter spacing and

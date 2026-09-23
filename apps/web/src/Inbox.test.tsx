@@ -451,8 +451,10 @@ describe("the inbox", () => {
    * the inbox and names no reason for it.
    */
   it("offers only the monitors of the project being looked at", async () => {
+    // Two here: the picker shows only when there is a choice (US-370).
     await show({}, [
       { id: "m1", name: "Reddit weekly", projectId: "p1" },
+      { id: "m4", name: "X daily", projectId: "p1" },
       { id: "m2", name: "Somebody else's", projectId: "p2" },
       { id: "m3", name: "Unfiled", projectId: null },
     ]);
@@ -460,8 +462,20 @@ describe("the inbox", () => {
     const options = [...container.querySelectorAll("option")].map((option) => option.textContent);
 
     expect(options).toContain("Reddit weekly");
+    expect(options).toContain("X daily");
     expect(options).not.toContain("Somebody else's");
     expect(options).not.toContain("Unfiled");
+  });
+
+  /**
+   * A choice of one narrows nothing. US-370, the hosted rule: the picker is
+   * hidden, and a monitor that cannot be chosen never counts in the badge.
+   */
+  it("offers no monitor picker when the project has one monitor", async () => {
+    await show({}, [{ id: "m1", name: "Reddit weekly", projectId: "p1" }]);
+
+    expect(container.querySelector('select[aria-label="Monitor"]')).toBeNull();
+    expect(button("Filters").textContent).toBe("Filters");
   });
 
   /**

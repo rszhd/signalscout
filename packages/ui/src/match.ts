@@ -161,3 +161,43 @@ export function threadDepth(match: Match): string | undefined {
       return undefined;
   }
 }
+
+/**
+ * The orders the inbox offers, and what its list heading calls each. An order
+ * is not a filter: it sits beside the monitor picker, outside the Filters
+ * panel, and never counts in its badge. "Best" fits the control; the heading
+ * has room for the sentence that says what it means.
+ */
+export const inboxOrders = [
+  { value: "rank", label: "Best", heading: "Ranked by score & age" },
+  { value: "score", label: "Score", heading: "Highest score first" },
+  { value: "newest", label: "Newest", heading: "Newest first" },
+] as const;
+
+export type InboxOrder = (typeof inboxOrders)[number]["value"];
+
+export const scoreFilters = [
+  { value: 0, label: "Any score" },
+  { value: 50, label: "50 and above" },
+  { value: 70, label: "70 and above" },
+  { value: 85, label: "85 and above" },
+] as const;
+
+/** What narrows the inbox, as the filter bar shows it. */
+export interface InboxFilterState {
+  readonly monitors: readonly { readonly id: string }[];
+  readonly monitorId: string;
+  readonly minScore: number;
+  readonly showDismissed: boolean;
+}
+
+/**
+ * How many filters narrow the list: the Filters badge, and whether an empty
+ * list says "no matches with these filters". The monitor counts only when
+ * there is a choice — with one monitor the picker is hidden, and a filter a
+ * person cannot see must not be why their inbox is empty.
+ */
+export function activeFilters(state: InboxFilterState): number {
+  const byMonitor = state.monitors.length > 1 && state.monitorId !== "";
+  return Number(byMonitor) + Number(state.minScore > 0) + Number(state.showDismissed);
+}

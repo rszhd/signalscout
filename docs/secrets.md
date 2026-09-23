@@ -1,5 +1,10 @@
 # Secrets at rest
 
+> **Running SignalScout rather than changing it?** The guide for keys, backups and key rotation is on
+> [docs.signalscout.run/self-hosting/keys](https://docs.signalscout.run/self-hosting/keys), written for
+> a self-hoster; its source is [`site/self-hosting/keys.md`](../site/self-hosting/keys.md). This page holds
+> the rules and reasons a contributor needs.
+
 What is encrypted, what is not, and how to change the key. The decisions are
 in the Logs of the tickets this page names; this page holds the rules.
 

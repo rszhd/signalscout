@@ -1,5 +1,10 @@
 # What SignalScout says a monitor cost
 
+> **Running SignalScout rather than changing it?** The guide for what SignalScout costs to run is on
+> [docs.signalscout.run/self-hosting/costs](https://docs.signalscout.run/self-hosting/costs), written for
+> a self-hoster; its source is [`site/self-hosting/costs.md`](../site/self-hosting/costs.md). This page holds
+> the rules and reasons a contributor needs.
+
 SignalScout runs on your API keys, so it must answer two questions: what has
 this monitor spent, and how do I stop it spending more. This page holds the
 rules behind both answers and what the answer is not. The measurements are in

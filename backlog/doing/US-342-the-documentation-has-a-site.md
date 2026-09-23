@@ -72,6 +72,15 @@ navigation and one real page, and deploys. The pages are US-343 to US-346.
 The site is deployed as its own Vercel project with `site` as its root, as
 the landing page is with `landing`.
 
+**Do not release to `main` before `docs.signalscout.run` answers.** Since
+US-344 the README and five repository pages link to it, and `main` is what a
+visitor reads on GitHub. The domain needs the Vercel project and a CNAME at
+Namecheap, both the owner's.
+
+Creating the Vercel project through the plugin was refused on 2026-09-23: the
+session's token can read the team `hariths-projects-04177944` and not write
+to it.
+
 ## Log
 
 - 2026-09-23T10:50+08:00 — Written from the owner's decisions: audience,

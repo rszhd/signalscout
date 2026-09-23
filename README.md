@@ -86,7 +86,7 @@ it is tested with the provider before it is stored and belongs to the account
 that pasted it. The model is yours to choose too — OpenAI, Anthropic, Google,
 DeepSeek, OpenRouter or Ollama, in three lines and no code path per provider.
 
-Read [docs/self-hosting.md](docs/self-hosting.md) for which variable is which,
+Read [Providers and keys](https://docs.signalscout.run/self-hosting/keys) for which variable is which,
 and [docs/secrets.md](docs/secrets.md) for what encryption promises.
 
 ### What it costs
@@ -133,20 +133,16 @@ say it here than let you find it in an agreement you skimmed.
 
 ## Running it
 
-The five lines at the top are the whole install. The compose file pulls
-`ghcr.io/rszhd/signalscout`, which CI builds and publishes, so a 1 GB server
-never compiles anything. `.env.example.self-hosted` names every setting worth
-having and boots as it stands; the two secrets are not in it, because a
-committed file cannot carry a secret.
+The five lines at the top are the whole install: one Postgres and one Node
+process, designed for a 1 GB server, from an image CI publishes for Intel and
+ARM. On first boot the app asks you to make the first account, and refuses
+every registration after it.
 
-**Pin a version** rather than following `latest` once you have an instance
-you care about: `SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.14.0` in
-`.env`. Tags exist for the full version, for the major and minor, and for
-`latest`.
-
-On first boot the app asks you to make the first account, and refuses every
-registration after it. One Postgres and one Node process, designed for a 1 GB
-VPS.
+**[The self-hosting guide](https://docs.signalscout.run/self-hosting/)** has
+the rest, with a diagram where one helps: the two secrets, providers and
+keys, AI models, HTTPS, email and webhooks, what it costs, backups and
+upgrades, troubleshooting, and every setting. **Put it behind HTTPS before you
+give it a public address.**
 
 **To change the code**, clone it and build the image yourself:
 
@@ -156,15 +152,6 @@ cd signalscout
 pnpm setup
 docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
 ```
-
-**Put it behind TLS before you give it a public address.** It holds provider
-keys that spend money and an inbox of your own research.
-
-[docs/self-hosting.md](docs/self-hosting.md) is the whole install: the two
-secrets and why they are not in the file you copied, **upgrading**, **backing
-up and what a dump does not contain**, the proxy, the settings that decide
-whether this instance takes registrations, and the SQL for finding out why a
-monitor stopped finding things.
 
 ---
 
@@ -208,7 +195,8 @@ by hand and says less than both on purpose.
 | [docs/map.md](docs/map.md) | Ten minutes: what runs, where it lives, how one poll and one request go |
 | [PLAN.md](PLAN.md) | What we are building, and why |
 | [STACK.md](STACK.md) | What we are building it with, and why not the alternatives |
-| [docs/self-hosting.md](docs/self-hosting.md) | The whole install: secrets, TLS, settings, troubleshooting |
+| [docs.signalscout.run](https://docs.signalscout.run) | **The guides for people who run SignalScout**: getting started, self-hosting, every setting. Source in [`site/`](site/README.md) |
+| [docs/self-hosting.md](docs/self-hosting.md) | The same install, as the contributor keeps it |
 | [docs/sources.md](docs/sources.md) | Adding a platform, adding a provider, switching one off |
 | [docs/costs.md](docs/costs.md) | What our spend figure is, and what it is wrong about |
 | [docs/secrets.md](docs/secrets.md) | Where a key lives, what encryption promises, how to rotate |

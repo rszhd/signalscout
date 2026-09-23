@@ -1,5 +1,10 @@
 # Notifications
 
+> **Running SignalScout rather than changing it?** The guide for email and webhooks, including the webhook contract is on
+> [docs.signalscout.run/self-hosting/email](https://docs.signalscout.run/self-hosting/email), written for
+> a self-hoster; its source is [`site/self-hosting/email.md`](../site/self-hosting/email.md). This page holds
+> the rules and reasons a contributor needs.
+
 Open **Monitors → Notifications** for the monitor you want to configure.
 
 **A new monitor emails its owner already.** US-093. It is created with a daily

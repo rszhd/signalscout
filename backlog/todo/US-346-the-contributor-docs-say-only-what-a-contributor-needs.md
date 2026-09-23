@@ -34,6 +34,13 @@ The paths stay. 133 files name them, `docs/testing.md` alone 449 times.
 `node scripts/context-cost.mjs` says what a session reads before it writes;
 run it before and after.
 
+Five pages now repeat the site: `docs/self-hosting.md`, `notifications.md`,
+`accounts.md`, `secrets.md` and `costs.md`. Before cutting their user half,
+move the references that send a *user* there to the site: the comments in
+`docker-compose*.yml`, `.env.example` and `.env.example.self-hosted`,
+`SECURITY.md`, and `live-webhook.ts`, whose receiver is written from the
+webhook contract, which now lives in `site/self-hosting/webhooks.md`.
+
 ## Log
 
 - 2026-09-23T10:50+08:00 — Written as part of the site split, US-342.

@@ -1,5 +1,10 @@
 # Accounts, and the port they listen on
 
+> **Running SignalScout rather than changing it?** The guide for accounts, sign-up and HTTPS is on
+> [docs.signalscout.run/self-hosting/accounts](https://docs.signalscout.run/self-hosting/accounts), written for
+> a self-hoster; its source is [`site/self-hosting/accounts.md`](../site/self-hosting/accounts.md). This page holds
+> the rules and reasons a contributor needs.
+
 SignalScout has one account by default, and a setting that opens registration
 for a deployment that wants many. This document says how the first one is
 made, what the login protects, and the one thing you must do before the

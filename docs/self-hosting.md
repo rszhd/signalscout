@@ -1,5 +1,10 @@
 # Running your own instance
 
+> **Running SignalScout rather than changing it?** The guide for the whole self-hosting guide is on
+> [docs.signalscout.run/self-hosting/](https://docs.signalscout.run/self-hosting/), written for
+> a self-hoster; its source is [`site/self-hosting/index.md`](../site/self-hosting/index.md). This page holds
+> the rules and reasons a contributor needs.
+
 SignalScout is one Postgres and one Node process. It is designed for a 1 GB
 VPS, and the container is the whole application — the open-source build is not
 cut down to make a hosted version worth paying for.

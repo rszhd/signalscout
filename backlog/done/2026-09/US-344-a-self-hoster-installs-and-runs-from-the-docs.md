@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-23T10:50+08:00
 parent: US-342
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -27,9 +27,9 @@ table is the drift BUG-339 spent a morning finding.
       email, webhooks, backups, upgrading, key rotation, troubleshooting.
 - [x] A configuration reference built from `.env.example` at build time.
 - [x] The webhook contract is one page a receiver can be written from.
-- [ ] Each repository page that lost its self-hoster half opens with one line
+- [x] Each repository page that lost its self-hoster half opens with one line
       pointing at the site, and keeps what a contributor needs.
-- [ ] The README's install section links to the site rather than repeating
+- [x] The README's install section links to the site rather than repeating
       it.
 
 ## Notes
@@ -46,3 +46,8 @@ The rotation command for the image was proved under BUG-339.
   polls on the `.env` keys, which US-081 ended, and
   `.env.example.self-hosted` listed ScrapeCreators for Reddit only and
   SocialCrawl for LinkedIn, which is switched off.
+- 2026-09-23T11:18+08:00 — Five repository pages open with a pointer to their page on the site,
+  and keep their text: code and config name them, and `live-webhook.ts` says
+  its receiver is written from `docs/notifications.md`. Removing what the site
+  now repeats, and pointing those references at the site, is US-346's. The
+  README's *Running it* is a pointer to the guide.

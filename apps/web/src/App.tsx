@@ -1,4 +1,12 @@
-import { BrandLogo, Dialog, ReplyVoices, requestJson } from "@signalscout/ui";
+import {
+  AccountIdentity,
+  BrandLogo,
+  Dialog,
+  NavItem,
+  ReplyVoices,
+  requestJson,
+  SignOut,
+} from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -409,43 +417,6 @@ function NotificationsRoute() {
   );
 }
 
-type NavIconName =
-  | "projects"
-  | "inbox"
-  | "monitors"
-  | "add"
-  | "providers"
-  | "voices"
-  | "models"
-  | "account";
-
-const navIconPaths: Record<NavIconName, string> = {
-  projects: "M4 6.5h6l2 2h8v10H4z",
-  inbox: "M4 5h16v14H4z M4 13h4l2 2h4l2-2h4",
-  monitors: "M12 20a8 8 0 1 0-8-8 M12 16a4 4 0 1 0-4-4 M12 12h.01",
-  add: "M12 5v14 M5 12h14",
-  providers: "M8 4v5 M16 4v5 M6 9h12v2a6 6 0 0 1-6 6v3",
-  voices: "M5 19l4-.8L18 9.2a2.1 2.1 0 0 0-3-3L5.8 15z M13.8 7.4l2.8 2.8",
-  models: "M12 3l1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4z M18.5 15v5 M16 17.5h5",
-  account: "M12 11.2a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8 M5.4 19.6a6.6 6.6 0 0 1 13.2 0",
-};
-
-function NavIcon({ name }: { readonly name: NavIconName }) {
-  return (
-    <span className="nav-icon" aria-hidden="true">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
-        <path d={navIconPaths[name]} strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
-  );
-}
-
 /** The sidebar, the banner, and whichever screen the address named. */
 function Shell({ status }: { readonly status: AuthStatus }) {
   const projectId = useProjectId();
@@ -470,47 +441,18 @@ function Shell({ status }: { readonly status: AuthStatus }) {
 
   const accountLinks = (
     <>
-      <Link
-        aria-current={comparing ? "page" : undefined}
-        className={comparing ? "nav-item current" : "nav-item"}
-        to={paths.providers}
-      >
-        <NavIcon name="providers" />
-        <span>Providers</span>
-      </Link>
-      <Link
-        aria-current={voicing ? "page" : undefined}
-        className={voicing ? "nav-item current" : "nav-item"}
-        to={paths.replyVoices}
-      >
-        <NavIcon name="voices" />
-        <span>Voices</span>
-      </Link>
+      <NavItem icon="providers" label="Providers" to={paths.providers} current={comparing} />
+      <NavItem icon="voices" label="Voices" to={paths.replyVoices} current={voicing} />
       {/*
         Beside Providers rather than inside a project: a model key is one
         account's, for every project it runs. US-068.
       */}
-      <Link
-        aria-current={modelling ? "page" : undefined}
-        className={modelling ? "nav-item current" : "nav-item"}
-        to={paths.models}
-      >
-        <NavIcon name="models" />
-        <span>Models</span>
-      </Link>
+      <NavItem icon="models" label="Models" to={paths.models} current={modelling} />
     </>
   );
 
   const signedInAs = status.account && (
-    <div className="signed-in-as">
-      <span className="account-avatar" aria-hidden="true">
-        {status.account.name.slice(0, 1).toUpperCase()}
-      </span>
-      <span className="account-identity">
-        <strong>{status.account.name}</strong>
-        <span>{status.account.email}</span>
-      </span>
-    </div>
+    <AccountIdentity name={status.account.name} email={status.account.email} />
   );
 
   return (
@@ -522,14 +464,7 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         </Link>
 
         <nav className="site-nav" aria-label="Screens">
-          <Link
-            aria-current={projecting ? "page" : undefined}
-            className={projecting ? "nav-item current" : "nav-item"}
-            to={paths.projects}
-          >
-            <NavIcon name="projects" />
-            <span>Projects</span>
-          </Link>
+          <NavItem icon="projects" label="Projects" to={paths.projects} current={projecting} />
 
           {/*
             Only when a project is in the address.
@@ -539,22 +474,13 @@ function Shell({ status }: { readonly status: AuthStatus }) {
           */}
           {projectId !== null && (
             <>
-              <Link
-                aria-current={reading ? "page" : undefined}
-                className={reading ? "nav-item current" : "nav-item"}
-                to={paths.inbox(projectId)}
-              >
-                <NavIcon name="inbox" />
-                <span>Inbox</span>
-              </Link>
-              <Link
-                aria-current={monitoring ? "page" : undefined}
-                className={monitoring ? "nav-item current" : "nav-item"}
+              <NavItem icon="inbox" label="Inbox" to={paths.inbox(projectId)} current={reading} />
+              <NavItem
+                icon="monitors"
+                label="Monitors"
                 to={paths.monitors(projectId)}
-              >
-                <NavIcon name="monitors" />
-                <span>Monitors</span>
-              </Link>
+                current={monitoring}
+              />
             </>
           )}
           {/*
@@ -563,23 +489,21 @@ function Shell({ status }: { readonly status: AuthStatus }) {
             make an unfiled monitor, the state migration 0038 emptied out.
           */}
           {projectId !== null && (
-            <Link className="nav-item new-monitor-nav" to={paths.newMonitor(projectId)}>
-              <NavIcon name="add" />
-              <span>New monitor</span>
-            </Link>
+            <NavItem
+              className="new-monitor-nav"
+              icon="add"
+              label="New monitor"
+              to={paths.newMonitor(projectId)}
+            />
           )}
 
-          <button
-            aria-current={accounting ? "page" : undefined}
-            className={
-              accounting ? "nav-item account-sheet-button current" : "nav-item account-sheet-button"
-            }
-            type="button"
+          <NavItem
+            className="account-sheet-button"
+            icon="account"
+            label="Account"
+            current={accounting}
             onClick={() => accountSheet.current?.showModal()}
-          >
-            <NavIcon name="account" />
-            <span>Account</span>
-          </button>
+          />
         </nav>
 
         <div className="sidebar-bottom">
@@ -634,35 +558,5 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         <Outlet />
       </main>
     </div>
-  );
-}
-
-/**
- * Signing out.
- *
- * A `POST`, because it changes something on the server: the row in `sessions`
- * is deleted, so the cookie the browser keeps stops meaning anything even if
- * somebody copied it. A link that only cleared the cookie would leave a
- * working session behind on a machine somebody has walked away from.
- */
-function SignOut() {
-  const [busy, setBusy] = useState(false);
-
-  async function signOut(): Promise<void> {
-    setBusy(true);
-
-    try {
-      await requestJson("/api/auth/sign-out", { method: "POST" });
-    } finally {
-      // Reload either way. A sign-out the server refused still has to put the
-      // person somewhere honest, and the reload asks it who they are again.
-      globalThis.location.reload();
-    }
-  }
-
-  return (
-    <button className="sign-out" disabled={busy} type="button" onClick={signOut}>
-      Sign out
-    </button>
   );
 }

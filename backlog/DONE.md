@@ -2,7 +2,7 @@
 
 # Done
 
-229 finished.
+230 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -37,6 +37,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-355 | [The sidebar is built from shared parts](done/2026-09/US-355-the-sidebar-is-built-from-shared-parts.md) | chore | shipped | 2026-09 |
 | US-354 | [The login frame, the notification settings and the document draft are shared](done/2026-09/US-354-the-login-frame-notifications-and-document-draft-are-shared.md) | chore | shipped | 2026-09 |
 | US-353 | [The monitor screens share their parts](done/2026-09/US-353-the-monitor-screens-share-their-parts.md) | chore | shipped | 2026-09 |
 | US-352 | [The inbox is built from shared components](done/2026-09/US-352-the-inbox-is-built-from-shared-components.md) | chore | shipped | 2026-09 |

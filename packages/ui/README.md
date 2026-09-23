@@ -13,8 +13,12 @@ secondary information available on demand.
 **Two applications wear this, and their screens differ.** The open-source
 application and the hosted one are forks of one app (US-151, US-239) and are
 meant to look like one product. So the brand lives here and the screens do
-not: a layout, a page stylesheet, a route table and a navigation shell belong
-to each application.
+not: a layout, a page stylesheet and a route table belong to each
+application. **A navigation's parts and look are shared; its structure is
+not** (US-355): the items, their icons, the signed-in person, signing out, the
+sidebar, the phone's bottom bar and the account sheet are here, and which
+items a navigation shows, in which order and under which heading is each
+application's shell.
 
 **The rule that keeps it one brand: a control here uses a token name and
 never a raw colour or a raw spacing value.** `pnpm lint:css` says it to CI.
@@ -219,6 +223,12 @@ account signed with the instance's own secret. `LoginFrame` is the page
 around a sign-in form; the form is the child and stays each application's.
 `DraftFromDocument` drafts a project's four answers from a page or a file;
 where it sits, and the space around it, is the page's.
+
+The navigation's parts came last (US-355): `NavItem` (a link, or a button
+that opens something), `NavIcon`, `AccountIdentity` and `SignOut`, with
+`sidebar.css` for the sidebar, the bottom bar and the account sheet. The
+shell that places them stays each application's, because the two navigations
+hold different things; an item only one of them has keeps its rules there.
 
 ## The words
 

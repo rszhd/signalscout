@@ -42,7 +42,7 @@ interface SourceOption {
   id: string;
   displayName: string;
   /** How a query has to be written here. US-027; the API reads it from the platform. */
-  search: { maxQueryWords: number; note: string };
+  search: { maxQueryWords: number; hint: string };
   /** Empty when the platform can be collected. */
   missingCredentials: CredentialOption[];
   ready: boolean;
@@ -1001,7 +1001,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                     </summary>
                     <p className="platform-plan-hint">
                       Plain phrases, without AND, OR or quote syntax. Use 2 to {limit} words each.
-                      {source.search.note ? ` ${source.search.note}` : ""}
+                      {source.search.hint ? ` ${source.search.hint}` : ""}
                     </p>
                     <div className="query-list">
                       {list.map((query, index) => {

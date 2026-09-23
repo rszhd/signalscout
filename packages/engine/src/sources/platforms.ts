@@ -27,6 +27,10 @@ export const redditPlatform: PlatformDescriptor = {
      * r/islam because the provider matched `test` and `end` as ordinary words.
      */
     maxQueryWords: 8,
+    hint:
+      "Reddit posts are long, so a full phrase can match. Use the words a " +
+      "person with the problem would type, not the name of your product " +
+      "category.",
     note:
       "A Reddit post has a title and paragraphs, so a longer phrase can appear " +
       "in one. Prefer the words a person in trouble types over the words of " +
@@ -51,6 +55,9 @@ export const xPlatform: PlatformDescriptor = {
      * ceiling and not a target: two words is a good X query.
      */
     maxQueryWords: 4,
+    hint:
+      "X posts are short, so a long phrase finds nothing. Use the words a " +
+      "person would put in a complaint.",
     note:
       "An X post is a few sentences, so a long phrase matches nothing at all. " +
       "Two to four words. Write the words that would appear inside somebody's " +
@@ -82,6 +89,10 @@ export const linkedInPlatform: PlatformDescriptor = {
      * model pay for it.
      */
     maxQueryWords: 8,
+    hint:
+      "LinkedIn posts are long, so a full phrase can match. Use the words " +
+      "people use to describe the problem to colleagues. A vague query still " +
+      "costs money and brings unrelated posts.",
     note:
       "A LinkedIn post is long-form, so a whole phrase can appear in one. " +
       "Write the words a person uses when they describe the problem to " +
@@ -116,6 +127,10 @@ export const youTubePlatform: PlatformDescriptor = {
      * videos. Same as LinkedIn, opposite of X.
      */
     maxQueryWords: 6,
+    hint:
+      "YouTube returns videos, and the leads are in the comments. Turn on " +
+      "“Include replies and comments”, or this platform finds little. Search " +
+      "for the topic a person looks up when they are stuck.",
     note:
       "A YouTube search returns videos people published, not people with a " +
       "problem — every result for a topic is a tutorial about it. The lead is " +
@@ -146,6 +161,11 @@ export const tikTokPlatform: PlatformDescriptor = {
      * and short enough to stop a sentence.
      */
     maxQueryWords: 5,
+    hint:
+      "TikTok returns videos, and the leads are in the comments. Turn on " +
+      "“Include replies and comments”, or this platform finds little. It works " +
+      "best when people describe their situation in the comments. Use everyday " +
+      "words, not trade terms.",
     note:
       "A TikTok search returns creators, not people with problems, and the " +
       "lead is in the comments — so this platform needs replies switched on to " +
@@ -195,6 +215,11 @@ export const instagramPlatform: PlatformDescriptor = {
      * in seven carries words at all, and that seventh is where every lead is.
      */
     maxQueryWords: 5,
+    hint:
+      "Instagram ranks results by relevance, not by date, so search for a topic " +
+      "that people keep discussing. The leads are in the comments. Most " +
+      "comments are only emoji, and reading comments costs more here than on " +
+      "other platforms.",
     note:
       "An Instagram search returns creators, not people with problems, and it " +
       "is ranked by relevance rather than by date — so it suits a topic that " +

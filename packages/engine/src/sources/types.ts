@@ -392,10 +392,17 @@ export interface PlatformDescriptor {
  * `maxQueryWords` is the number that was measured. `note` is the sentence the
  * model is given, and it says *why*, because a limit with no reason is a limit
  * a model talks itself out of.
+ *
+ * `hint` is what a person reads under the platform's queries. It is separate
+ * because the two readers need different text: the note gives the model
+ * orders and our own costs, and a person editing a query needs neither. The
+ * form already states the syntax and the word limit, so a hint repeats
+ * neither. Changing `note` changes the query prompt; changing `hint` does not.
  */
 export interface PlatformSearchStyle {
   readonly maxQueryWords: number;
   readonly note: string;
+  readonly hint: string;
 }
 
 /**

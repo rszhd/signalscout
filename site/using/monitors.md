@@ -61,6 +61,10 @@ write finds better conversations than a broad one, and costs less. Use plain
 phrases of at least two words; `AND` and `OR` are not supported. On Reddit
 you can also name subreddits to watch.
 
+Each platform's list has a short hint under it about what works there. On
+YouTube, TikTok and Instagram the leads are in the comments, so turn on
+**Include replies and comments** for them.
+
 ### Schedule and budget
 
 | Setting | Choices |

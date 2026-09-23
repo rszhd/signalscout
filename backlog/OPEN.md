@@ -2,7 +2,7 @@
 
 # Open tickets
 
-66 open — 5 doing, 52 todo, 9 parked (5 p1, 43 p2, 18 p3).
+67 open — 6 doing, 52 todo, 9 parked (5 p1, 44 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,6 +13,7 @@
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
+| p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |

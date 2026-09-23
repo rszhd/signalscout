@@ -10,7 +10,7 @@ WORKDIR /app
 # --- dependencies -----------------------------------------------------------
 # Only the manifests are copied, so a source change does not reinstall.
 FROM base AS deps
-COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .pnpmfile.cjs ./
 COPY packages/engine/package.json packages/engine/
 COPY packages/pipeline/package.json packages/pipeline/
 COPY packages/ui/package.json packages/ui/
@@ -27,7 +27,7 @@ RUN pnpm build
 FROM base AS runtime
 ENV NODE_ENV=production
 
-COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .pnpmfile.cjs ./
 COPY packages/engine/package.json packages/engine/
 COPY packages/pipeline/package.json packages/pipeline/
 COPY packages/ui/package.json packages/ui/

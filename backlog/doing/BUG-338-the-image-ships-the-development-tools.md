@@ -32,14 +32,14 @@ the "production" tree: both came in by this door. The migrator does not need
 
 ## Acceptance
 
-- [ ] The runtime stage of the image holds none of `vitest`, `vite`,
+- [x] The runtime stage of the image holds none of `vitest`, `vite`,
       `jsdom`, `lightningcss`, `drizzle-kit`, `esbuild` or `mongodb`,
       and the Log lists the `node_modules` size before and after.
 - [ ] An image built from the change boots: the migrator runs, `/api/health`
       answers, and one sign-in works. The Log says how it was run.
-- [ ] `pnpm licenses list --prod` and `pnpm audit --prod` no longer report
+- [x] `pnpm licenses list --prod` and `pnpm audit --prod` no longer report
       `lightningcss` or `esbuild`.
-- [ ] Development and `pnpm test` are unchanged.
+- [x] Development and `pnpm test` are unchanged.
 
 ## Notes
 
@@ -55,3 +55,32 @@ the "production" tree: both came in by this door. The migrator does not need
 
 - 2026-09-23T07:58+08:00 — Found while doing US-332, by listing `node_modules/.pnpm` in the
   published image.
+- 2026-09-23T08:40+08:00 — **Fixed by a `.pnpmfile.cjs` hook; the image build is still owed.**
+  The hook removes seventeen optional peers from `better-auth` and its
+  `@better-auth/*` packages — every framework, database and tool this
+  project does not use. It is a deny list, because those packages also
+  declare peers the login needs (`kysely`, `drizzle-orm`, `pg`). The code
+  imports only `better-auth`, `better-auth/adapters/drizzle` and
+  `better-auth/api`; nothing uses the React client. The lockfile lost 79
+  lines and gained the hook's checksum, so both install stages of the
+  `Dockerfile` copy the hook.
+
+  `--no-optional` was measured and refused: it drops 154 of 293 packages,
+  among them `@opentelemetry/api`, `ws` and `tslib`, far more than the leak.
+
+  **Proved**, on a copy of the runtime stage made the way the `Dockerfile`
+  makes it (manifests, lockfile, hook, `pnpm install --frozen-lockfile
+  --prod`, then the built `dist` folders): 308 packages and 251 MB of
+  `node_modules` before, 162 and 104 MB after, with none of the seven
+  tools. It booted in production mode against a fresh Postgres: the migrator
+  applied every migration, `/api/health` answered with the worker in
+  process, a sign-up, a sign-in and a signed-in read each answered 200, and
+  the page loaded. `pnpm check:licenses` passes without `lightningcss` and
+  `pnpm audit --prod` finds nothing. Full suite: 133 files, 2,331 tests.
+
+  **Not proved:** an image built from the `Dockerfile`. Two local builds
+  could not download the development tree — this machine reached the npm
+  registry at about 14 KB/s and the build's downloads timed out — though pnpm
+  inside the build accepted the hook and the lockfile ("Lockfile is up to
+  date"). CI builds the image on a pull request and on `main`; that run
+  closes the second box.

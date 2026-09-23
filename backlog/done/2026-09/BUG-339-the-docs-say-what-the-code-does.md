@@ -61,7 +61,7 @@ owner's call.
   the eight that drifted. Ran the rotation script inside
   `ghcr.io/rszhd/signalscout:latest`: one credential re-encrypted, and the new
   key read it back.
-- 2026-09-23T10:40+08:00 — Found three more. The boot check decrypts provider
+- 2026-09-23T10:05+08:00 — Found three more. The boot check decrypts provider
   keys only, so `docs/secrets.md` no longer says it verifies a rotation;
   BUG-341 is the code. The recovery SQL in `docs/accounts.md` moved the
   webhook secret, which does not open under a new id, missed `stage_runs`, and

@@ -3,7 +3,7 @@ id: BUG-341
 title: The boot check opens every stored secret
 type: bug
 priority: p2
-created: 2026-09-23T10:40+08:00
+created: 2026-09-23T10:05+08:00
 parent:
 area: secrets
 resolution:
@@ -51,5 +51,5 @@ way or it will accept a row copied between accounts.
 
 ## Log
 
-- 2026-09-23T10:40+08:00 — Found while checking docs/secrets.md against the
+- 2026-09-23T10:05+08:00 — Found while checking docs/secrets.md against the
   code for BUG-339.

@@ -22,6 +22,15 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Fixed.** `Field` carries its own layout: the label, the hint and the control
+on three lines, the input's border, padding and focus ring (BUG-356). Those
+rules lived in each application's `index.css`, so the component looked right
+only inside one that held them. `--focus-ring` joins the tokens. A consumer
+deletes its own copy of the `.field` rules. **Check one thing when you do**:
+the package's stylesheet loads after a consumer's base stylesheet, so a rule
+there with the same specificity that styles an input inside a `Field` now
+loses to the package's. Raise its specificity.
+
 ## @signalscout/ui — 0.1.0 — 2026-09-20
 
 **Added.** The package itself: SignalScout's brand for both applications

@@ -54,6 +54,8 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+## 0.14.0 — 2026-09-23
+
 **Changed.** A provider's `Retry-After` is read one way for every connector
 (US-334): seconds or an HTTP date, rounded up, and never more than an hour
 (`maximumRetryAfterSeconds`). A wait of zero, a time already past or a value

@@ -22,6 +22,18 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Added.** The monitor page's parts (US-353): `MonitorStatus`, the status
+pill; `MonitorHistory`, the polls and their stages, with optional paging;
+`QueryPerformance`, with an optional note per row; and `LeadSources`, which
+offers platforms, channels and intent unless the page names its groups. None
+of them fetches; the page passes the rows. The words move with them:
+`searchInputs`, `inputKey`, `leadGroupName`, `leadDimensionWords`,
+`defaultLeadDimensions` and the row types. `@signalscout/ui/testing` adds
+`pollEntry` and `stageEntry`. `.monitor-origin` and `.budget-error` join the
+theme. A consumer deletes its own `.monitor-status`, `.poll-history`,
+`.activity-*`, query and lead table rules. **Changed:** `MonitoringBar` renders
+`MonitorStatus`, so a stopped monitor's pill is the danger colour there too.
+
 **Added.** The inbox's parts (US-352): `MatchCard`, one row of the list;
 `MatchDetail`, the reading pane, with a slot for a product's own action beside
 the conversation link; and `MonitoringBar`, the line above both, which takes

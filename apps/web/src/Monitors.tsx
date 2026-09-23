@@ -26,6 +26,7 @@ import {
   anyWorking,
   BrandIcon,
   type Monitor,
+  MonitorStatus,
   messageFor,
   needsAttention,
   nextPollLabel,
@@ -420,11 +421,7 @@ function MonitorTable({
                   </span>
                 </th>
                 <td role="cell" data-label="Status">
-                  <span
-                    className={`monitor-status ${running.tone}${running.attention ? " quiet" : ""}`}
-                  >
-                    {running.label}
-                  </span>
+                  <MonitorStatus {...running} />
                   {/* The stage in flight, under the status word. US-265. The
                       word says whether the monitor is running; this says what
                       the worker is doing for it at this moment. */}

@@ -14,6 +14,8 @@
  * `react-dom` and a document, so it is imported only where a `jsdom`
  * environment is on.
  */
+
+export { pollEntry, stageEntry } from "./activity.js";
 export {
   button,
   field,

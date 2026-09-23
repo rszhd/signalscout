@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { ageLabel } from "./labels.js";
+import { MonitorStatus } from "./MonitorStatus.js";
 import type { Monitoring } from "./monitor.js";
 
 /**
@@ -18,9 +19,7 @@ export interface MonitoringBarProps {
 export function MonitoringBar({ state, monitorHref }: MonitoringBarProps) {
   return (
     <section className="inbox-monitoring" aria-label="Monitoring">
-      <span className={`monitor-status ${state.tone}${state.attention ? " quiet" : ""}`}>
-        {state.label}
-      </span>
+      <MonitorStatus label={state.label} tone={state.tone} attention={state.attention} />
       <p
         className="inbox-monitoring-now"
         title={state.nowAt ? new Date(state.nowAt).toLocaleString() : undefined}

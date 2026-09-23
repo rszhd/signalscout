@@ -214,6 +214,50 @@
   background: var(--accent-soft);
 }
 
+/*
+ * `Field`: the label, the hint and the control, one per line. BUG-356.
+ * Every application's `index.css` held these, so the component looked right
+ * only inside one.
+ */
+.field > span {
+  display: block;
+  color: var(--muted-strong);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.field > small {
+  display: block;
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  outline: none;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: var(--text-body);
+}
+
+.field textarea {
+  min-height: 68px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--muted);
+  box-shadow: var(--focus-ring);
+}
+
 .disclosure summary {
   cursor: pointer;
   color: var(--muted);

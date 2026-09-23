@@ -36,6 +36,8 @@
   --sidebar-active: #c2e7ff;
   --shadow-soft: 0 1px 2px rgb(60 64 67 / 10%), 0 1px 3px rgb(60 64 67 / 8%);
   --shadow: 0 8px 24px rgb(60 64 67 / 20%);
+  /* Around a focused text field, beside its border. */
+  --focus-ring: 0 0 0 3px rgb(25 28 26 / 6%);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 24px;

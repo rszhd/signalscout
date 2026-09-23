@@ -43,7 +43,7 @@
   },
   "scripts": {
     "build": "tsc --build && node scripts/copy-static.mjs",
-    "storybook": "storybook dev -p 6006 --host localhost --no-open",
+    "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open",
     "storybook:build": "storybook build -o storybook-static",
     "typecheck": "tsc --build && tsc -p tsconfig.stories.json"
   },

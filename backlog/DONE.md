@@ -2,10 +2,11 @@
 
 # Done
 
-225 finished.
+226 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-356 | [The Field component's rules live in the applications](done/2026-09/BUG-356-the-field-component-s-rules-live-in-the-applications.md) | bug | shipped | 2026-09 |
 | BUG-339 | [The docs say what the code does](done/2026-09/BUG-339-the-docs-say-what-the-code-does.md) | bug | shipped | 2026-09 |
 | BUG-338 | [The image ships the development tools](done/2026-09/BUG-338-the-image-ships-the-development-tools.md) | bug | shipped | 2026-09 |
 | BUG-330 | [A cost test and a draft read only their own account](done/2026-09/BUG-330-a-cost-test-and-a-draft-read-only-their-account.md) | bug | shipped | 2026-09 |

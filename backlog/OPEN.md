@@ -2,11 +2,10 @@
 
 # Open tickets
 
-53 open — 6 doing, 38 todo, 9 parked (4 p1, 33 p2, 16 p3).
+52 open — 5 doing, 38 todo, 9 parked (3 p1, 33 p2, 16 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
-| p1 | US-342 | [The documentation has a site, at docs.signalscout.run](doing/US-342-the-documentation-has-a-site.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |

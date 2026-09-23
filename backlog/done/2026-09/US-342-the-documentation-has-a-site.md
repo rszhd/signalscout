@@ -7,7 +7,7 @@ priority: p1
 created: 2026-09-23T10:50+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -56,17 +56,17 @@ navigation and one real page, and deploys. The pages are US-343 to US-346.
 
 ## Acceptance
 
-- [ ] `site/` builds with `npm ci && npm run build` and writes `llms.txt`
+- [x] `site/` builds with `npm ci && npm run build` and writes `llms.txt`
       and `llms-full.txt`.
-- [ ] The site wears the brand's colours and mark, from `packages/ui`.
-- [ ] A ` ```mermaid ` block renders as a diagram in the brand's colours and
+- [x] The site wears the brand's colours and mark, from `packages/ui`.
+- [x] A ` ```mermaid ` block renders as a diagram in the brand's colours and
       font, with no label cut off.
-- [ ] A page is plain Markdown; `site/README.md` says the rules for writing
+- [x] A page is plain Markdown; `site/README.md` says the rules for writing
       one.
-- [ ] Every internal link in the built site resolves (VitePress fails the
+- [x] Every internal link in the built site resolves (VitePress fails the
       build on a dead link).
-- [ ] The root image build and `pnpm install` are unchanged.
-- [ ] The site is served at `docs.signalscout.run`.
+- [x] The root image build and `pnpm install` are unchanged.
+- [x] The site is served at `docs.signalscout.run`.
 
 ## Notes
 
@@ -110,3 +110,8 @@ to it.
   with "repository couldn't be found": Vercel's GitHub app does not reach
   `rszhd/signalscout`. `site/README.md`, *Deploy*, has the manual steps until
   it does.
+- 2026-09-23T12:49+08:00 — Live. The owner added the CNAME; Vercel reports
+  `docs.signalscout.run` configured correctly, and `/` and `/llms.txt` answer
+  200 over a valid certificate. No file the image or the workspace install
+  reads changed. Still by hand: deploys, until Vercel's GitHub app can see
+  this repository (`site/README.md`, *Deploy*).

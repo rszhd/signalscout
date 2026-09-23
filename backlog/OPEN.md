@@ -2,7 +2,7 @@
 
 # Open tickets
 
-62 open — 4 doing, 49 todo, 9 parked (4 p1, 39 p2, 19 p3).
+61 open — 4 doing, 48 todo, 9 parked (4 p1, 39 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -55,7 +55,6 @@
 | p3 | US-326 | [The npm packages ship no paid-run or debugging scripts](todo/US-326-the-npm-packages-ship-no-paid-run-scripts.md) | chore | todo | 2026-09-23T06:27+08:00 |
 | p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
-| p3 | US-355 | [The sidebar is built from shared parts](todo/US-355-the-sidebar-is-built-from-shared-parts.md) | chore | todo | 2026-09-23T13:51+08:00 |
 | p3 | US-360 | [A pull request builds the image beside the checks](todo/US-360-a-pull-request-builds-the-image-beside-the-checks.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p3 | US-362 | [The worktree script finds what it left behind](todo/US-362-the-worktree-script-finds-what-it-left-behind.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

@@ -22,6 +22,14 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Added.** The navigation's parts (US-355): `NavItem`, `NavIcon` with its
+icon names, `AccountIdentity` and `SignOut`, and the sidebar's look — the
+sidebar, the phone's bottom bar and the account sheet — in the one
+stylesheet. A consumer keeps its own shell and deletes its `.sidebar`,
+`.nav-item`, `.signed-in-as`, `.sign-out` and `.account-sheet` rules. A rule
+for an item only its navigation has must load after the package's.
+`SignOut` no longer leaves an unhandled rejection when the server refuses.
+
 **Added.** `Notifications`, the notification settings screen, with the
 monitor's address and a `signingNotice` slot as props (US-354);
 `LoginFrame`, the page around a sign-in form, with `storyNote` and `footer`;

@@ -34,6 +34,7 @@
     "build": "tsc --build",
     "typecheck": "tsc --build",
     "generate": "drizzle-kit generate",
+    "generate:email-mark": "tsx src/notifications/email-mark-generate.ts",
     "rotate-key": "tsx --env-file-if-exists=../../.env src/secrets/rotate-cli.ts",
     "live:provider-switch": "tsx --env-file-if-exists=../../.env src/sources/live-provider-switch.ts",
     "live:linkedin-poll": "tsx --env-file-if-exists=../../.env src/sources/live-poll.ts --platform=linkedin",

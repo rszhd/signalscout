@@ -2,7 +2,7 @@
 
 # Open tickets
 
-67 open — 6 doing, 52 todo, 9 parked (5 p1, 44 p2, 18 p3).
+66 open — 6 doing, 51 todo, 9 parked (5 p1, 44 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -56,7 +56,6 @@
 | p2 | BUG-341 | [The boot check opens every stored secret](todo/BUG-341-the-boot-check-opens-every-stored-secret.md) | bug | todo | 2026-09-23T10:05+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
-| p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | US-326 | [The npm packages ship no paid-run or debugging scripts](todo/US-326-the-npm-packages-ship-no-paid-run-scripts.md) | chore | todo | 2026-09-23T06:27+08:00 |
 | p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |

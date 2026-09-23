@@ -56,7 +56,9 @@ describe("a stranger's words never become markup", () => {
     // `&lt;img src=x onerror=&quot;…&gt;`, which is exactly what escaping is
     // supposed to leave behind.
     expect(nasty.html).not.toContain("<script>");
-    expect(nasty.html).not.toContain("<img");
+    // One image, and it is the attached mark: the author's never became a tag.
+    expect(nasty.html.match(/<img /g)).toHaveLength(1);
+    expect(nasty.html).toContain('<img src="cid:');
     expect(nasty.html).toContain("&lt;script&gt;");
     expect(nasty.html).toContain("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;");
     expect(nasty.html).toContain("&lt;b&gt;&quot;buy&quot;&lt;/b&gt;");
@@ -157,8 +159,11 @@ describe("what a mail client can actually render", () => {
     expect(html).not.toContain("<link");
   });
 
-  it("loads nothing from anywhere: no image, no font, no tracking pixel", () => {
-    expect(html).not.toContain("<img");
+  it("loads nothing from anywhere: no remote image, no font, no tracking pixel", () => {
+    // Every image is attached to the message (US-095), so nothing is fetched.
+    for (const [, src] of html.matchAll(/<img src="([^"]*)"/g)) {
+      expect(src).toMatch(/^cid:/);
+    }
     expect(html).not.toContain("@font-face");
     expect(html).not.toContain("fonts.googleapis");
     // Figtree is the site font and no mail client will fetch it, so naming it

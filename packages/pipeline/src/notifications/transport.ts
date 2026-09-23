@@ -4,6 +4,7 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 import type { NotificationEnv } from "../config/env.js";
 import { assertPublicHost, type ResolveHost, resolveHost } from "./address-guard.js";
 import type { NotificationTransport } from "./deliver.js";
+import { emailMarkAttachment, emailMarkCid } from "./email-theme.js";
 
 /**
  * What this deployment cannot do yet, as the list of variables to set.
@@ -82,6 +83,12 @@ export function createNotificationTransport(
               // better with a spam filter than an HTML-only one.
               text,
               ...(html === undefined ? {} : { html }),
+              // The mark the shell's header names, carried inside the message
+              // (US-095). Only when the HTML refers to it: an attachment no
+              // part names is shown to the reader as a file.
+              ...(html?.includes(`cid:${emailMarkCid}`)
+                ? { attachments: [emailMarkAttachment()] }
+                : {}),
               messageId: `<${id}@signalscout.local>`,
             });
             if (!result.accepted?.length || result.rejected?.length)

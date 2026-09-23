@@ -309,6 +309,8 @@ export {
 export {
   type EmailShell,
   emailFont,
+  emailMarkAttachment,
+  emailMarkCid,
   emailPalette,
   escapeHtml,
   renderButton,

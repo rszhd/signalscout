@@ -1,5 +1,6 @@
 ---
 id: BUG-348
+issue: 93
 title: The issue sync says an issue is missing when it could not look
 type: bug
 priority: p3

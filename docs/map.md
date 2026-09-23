@@ -9,8 +9,7 @@ denser, and organised around what changes the next edit. Read this one first.
 **This page and everything in `docs/` is for people who change the code.**
 How to install, run and use SignalScout is on
 [docs.signalscout.run](https://docs.signalscout.run), whose source is
-[`site/`](../site/README.md). A change that alters what a user sees or sets
-changes that page in the same commit.
+[`site/`](../site/README.md). Change what a user sees, change that page.
 
 ---
 
@@ -110,9 +109,8 @@ The code says what it does. It does not say why, on purpose.
   connectors, [costs.md](costs.md) for money, [secrets.md](secrets.md) for
   credentials, [testing.md](testing.md) for tests, [design.md](design.md) for
   screens.
-- **The site** holds what a user is told. `site/self-hosting/configuration.md`
-  is generated from `.env.example`, so a setting's comment there is the text a
-  self-hoster reads.
+- **The site** holds what a user is told. Its configuration reference is
+  generated from `.env.example`.
 - **[PLAN.md](../PLAN.md)** is the product and **[STACK.md](../STACK.md)** is
   why each tool beat the alternative.
 

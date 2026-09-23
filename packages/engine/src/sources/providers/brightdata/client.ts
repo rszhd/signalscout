@@ -12,6 +12,7 @@
  * the documented snapshot id prefix were all wrong.
  */
 import type { SourceRuntime } from "../../types.js";
+import { type ProviderAnswer, ProviderError, readAnswer } from "../core.js";
 
 const apiBase = "https://api.brightdata.com/datasets/v3";
 
@@ -111,16 +112,9 @@ export type SnapshotState = SnapshotPending | SnapshotReady;
  * have nowhere left to go. In a bring-your-own-keys product this sentence is
  * the whole support channel.
  */
-export class BrightDataError extends Error {
-  constructor(
-    readonly kind: "credentials" | "account" | "input" | "provider",
-    message: string,
-    readonly httpStatus: number,
-  ) {
-    super(message);
-    this.name = "BrightDataError";
-  }
-}
+export class BrightDataError extends ProviderError<
+  "credentials" | "account" | "input" | "provider"
+> {}
 
 /** How long to wait before the first poll, when the provider gives no hint. */
 const defaultRetrySeconds = 30;
@@ -132,10 +126,7 @@ function retrySecondsFrom(message: unknown): number {
   return match ? Number(match[1]) : defaultRetrySeconds;
 }
 
-interface Answer {
-  readonly httpStatus: number;
-  readonly body: unknown;
-}
+type Answer = ProviderAnswer;
 
 export interface BrightDataClientOptions {
   readonly runtime: SourceRuntime;
@@ -165,19 +156,7 @@ export class BrightDataClient {
       ...(init.signal ? { signal: init.signal } : {}),
     });
 
-    const text = await response.text();
-
-    // A refusal is not always JSON. An invalid key answers with the bare
-    // string "Invalid credentials", so parsing strictly would turn the one
-    // error a user can fix into an unreadable parse failure.
-    let body: unknown;
-    try {
-      body = JSON.parse(text);
-    } catch {
-      body = text;
-    }
-
-    return { httpStatus: response.status, body };
+    return readAnswer(response);
   }
 
   /**

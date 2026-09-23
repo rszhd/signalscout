@@ -11,10 +11,12 @@
  *
  * Every shape below was captured, not read from the documentation, and the
  * endpoints disagree with each other on cursors, on whether an empty search
- * is free and on whether one exists at all. docs/history.md, *Sources: what
- * was measured*, lists what each capture settled.
+ * is free and on whether one exists at all. Each capture's findings are in
+ * the Log of the ticket that added the platform; US-028's lists the four
+ * where LinkedIn contradicted X.
  */
 import type { SourceRuntime } from "../../types.js";
+import { type ProviderAnswer, ProviderError, readAnswer, retryAfterDate } from "../core.js";
 
 const apiBase = "https://www.socialcrawl.dev/v1";
 
@@ -335,18 +337,9 @@ export const sortNewest = "latest";
  * have nowhere left to go. In a bring-your-own-keys product this sentence is
  * the whole support channel.
  */
-export class SocialCrawlError extends Error {
-  constructor(
-    readonly kind: "credentials" | "input" | "rateLimit" | "provider",
-    message: string,
-    readonly httpStatus: number,
-    /** Set only on `rateLimit`, and only when the provider named a time. */
-    readonly retryAfter?: Date,
-  ) {
-    super(message);
-    this.name = "SocialCrawlError";
-  }
-}
+export class SocialCrawlError extends ProviderError<
+  "credentials" | "input" | "rateLimit" | "provider"
+> {}
 
 /** One page of posts, and what the provider says it charged for them. */
 export interface Page {
@@ -380,11 +373,7 @@ export interface Page {
 /** How long to wait when the provider rate-limits us and names no time. */
 const defaultRetrySeconds = 60;
 
-interface Answer {
-  readonly httpStatus: number;
-  readonly body: unknown;
-  readonly retryAfterHeader: string | null;
-}
+type Answer = ProviderAnswer;
 
 export interface SocialCrawlClientOptions {
   readonly runtime: SourceRuntime;
@@ -417,23 +406,7 @@ export class SocialCrawlClient {
       ...(signal ? { signal } : {}),
     });
 
-    const text = await response.text();
-
-    // A refusal is not guaranteed to be JSON. Bright Data's invalid key
-    // answers with a bare string, and parsing strictly would turn the one
-    // error a user can fix into an unreadable parse failure.
-    let body: unknown;
-    try {
-      body = JSON.parse(text);
-    } catch {
-      body = text;
-    }
-
-    return {
-      httpStatus: response.status,
-      body,
-      retryAfterHeader: response.headers.get("retry-after"),
-    };
+    return readAnswer(response);
   }
 
   /**
@@ -490,9 +463,7 @@ export class SocialCrawlClient {
   }
 
   private retryAt(header: string | null): Date {
-    const seconds = Number(header);
-    const wait = Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : defaultRetrySeconds;
-    return new Date(this.runtime.now().getTime() + wait * 1000);
+    return retryAfterDate(header, this.runtime.now(), defaultRetrySeconds);
   }
 
   /**

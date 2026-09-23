@@ -45,13 +45,13 @@ ticket must not be closed by making the number bigger.
 
 ## Acceptance
 
-- [ ] The cause is named. Either this file waits on something that genuinely
+- [x] The cause is named. Either this file waits on something that genuinely
       takes longer than it should, or the run is too wide for the runner —
       `--reporter=json` gives the per-file timings that tell the two apart.
 - [ ] Twenty consecutive CI runs of the suite on an unchanged commit pass.
-- [ ] `until`'s default timeout is unchanged, or the change is argued in
+- [x] `until`'s default timeout is unchanged, or the change is argued in
       `docs/testing.md` beside the paragraph that argues against it.
-- [ ] Whatever is learned goes into `docs/testing.md`, beside the six-worker
+- [x] Whatever is learned goes into `docs/testing.md`, beside the six-worker
       measurement it continues.
 
 ## Notes
@@ -72,3 +72,44 @@ ticket must not be closed by making the number bigger.
 
 - 2026-09-19T02:01+08:00 — Written after the second sighting, on the 0.9.0
   release pull request. Both sightings re-ran green on the same commit.
+- 2026-09-23T06:17+08:00 — **The cause is a dropped job, not load.** `notify` is a `stately`
+  queue, and pg-boss builds its unique index on
+  `(name, state, COALESCE(singleton_key, ''))`. The classifier sent notify
+  with no key, so every monitor's notify shared one queued slot. While one
+  waited, `send` returned null for the next, with no error, and
+  `classifyAndWait` waited for a notify that did not exist. The scheduled
+  sweep already keyed its notify by monitor.
+
+  Nine CI runs failed in the last hundred. Four were this file: three in
+  *is not sent to the model a second time when it scored below the
+  threshold* (runs 35177984036, 35327243495, 34930983897) and one in *drops
+  a post that has already failed too many times* (35696019453). The likely
+  source of the waiting notify is a retry: `fastRetries` has
+  `retryDelay: 0`, and a failing classify job sends its notify before it
+  throws, so retries of *a model that fails* overlap the tests after it.
+  That source is inferred from the code, not observed.
+
+  Production had it too. An immediate email or webhook could wait up to one
+  minute, for the sweep. The poll lost its notify row in the stage history,
+  because the sweep's pass carries no poll.
+
+  **Fix.** `sendNotify` in `worker/notify.ts` keys every notify by its
+  monitor, and all four senders use it. A second job for the same monitor
+  may still be dropped, and that loses nothing: the step delivers the
+  monitor's outbox and never reads `matchIds`. `until` is unchanged.
+
+  **Proved.** `worker/notify.test.ts` runs the production queue settings
+  with no worker, so a job stays queued. Its first case fails every time
+  without the key. A case in `classify.test.ts` reads the notify row's
+  `singleton_key` after a real classify job, and fails without the key.
+  With the fix, the full suite passes: 132 files and 2,323 tests at four
+  workers, and four runs of four at six workers.
+
+  **Not proved.** The old timeout did not reproduce on this machine, even
+  at six workers, so the six-worker measurement in `docs/testing.md` is not
+  explained by this and the four-worker limit stays. Twenty CI runs are
+  still owed.
+
+  Separate, not this cause: run 35308792846 failed in `stage-runs.test.ts`
+  (*the notifier writes what it planned*). That test calls the step
+  directly and never uses the queue.

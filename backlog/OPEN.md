@@ -2,12 +2,14 @@
 
 # Open tickets
 
-30 open — 1 doing, 21 todo, 8 parked (1 p1, 17 p2, 12 p3).
+48 open — 2 doing, 37 todo, 9 parked (2 p1, 31 p2, 15 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
-| p2 | US-306 | [The image runs on ARM](doing/US-306-the-image-runs-on-arm.md) | feature | doing | 2026-09-22T18:56+08:00 |
+| p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
+| p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
+| p2 | BUG-338 | [The image ships the development tools](doing/BUG-338-the-image-ships-the-development-tools.md) | bug | doing | 2026-09-23T07:58+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -23,10 +25,26 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
-| p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
+| p2 | US-313 | [A first patch takes thirty minutes](todo/US-313-a-first-patch-takes-thirty-minutes.md) | chore | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-314 | [Ten issues are open to a newcomer](todo/US-314-ten-issues-are-open-to-a-newcomer.md) | chore | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-315 | [Does a good first issue refuse a generated patch?](todo/US-315-does-a-good-first-issue-refuse-a-generated-patch.md) | spike | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-316 | [A cloud agent runs the suite from an empty machine](todo/US-316-a-cloud-agent-runs-the-suite-from-an-empty-machine.md) | chore | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-317 | [A browser test sees a match reach the inbox](todo/US-317-a-browser-test-sees-a-match-reach-the-inbox.md) | chore | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-318 | [Dependencies are updated by a bot](todo/US-318-dependencies-are-updated-by-a-bot.md) | chore | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-319 | [A self-hoster can check where the image came from](todo/US-319-a-self-hoster-can-check-where-the-image-came-from.md) | chore | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-320 | [The app deploys in one click](todo/US-320-the-app-deploys-in-one-click.md) | feature | todo | 2026-09-23T05:44+08:00 |
+| p2 | US-331 | [A post that asks for a high score does not get one](todo/US-331-a-post-that-asks-for-a-high-score-does-not-get-one.md) | feature | todo | 2026-09-23T06:41+08:00 |
+| p2 | US-336 | [Every read the API calls takes its account](todo/US-336-every-read-the-api-calls-takes-its-account.md) | chore | todo | 2026-09-23T06:46+08:00 |
+| p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
+| p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
+| p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
+| p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
+| p3 | US-326 | [The npm packages ship no paid-run or debugging scripts](todo/US-326-the-npm-packages-ship-no-paid-run-scripts.md) | chore | todo | 2026-09-23T06:27+08:00 |
+| p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |
+| p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 | p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |

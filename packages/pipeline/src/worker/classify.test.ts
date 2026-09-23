@@ -15,7 +15,7 @@
 import { type AiConfig, createClassifier, createLogger, fakePosts } from "@signalscout/engine";
 import { APICallError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { classifiedPostCounts } from "../ai/record.js";
 import { createDatabase, type Database } from "../db/client.js";
@@ -749,5 +749,26 @@ describe("continuing a thread after its batch has been judged", () => {
     await until("the notification", () => notified[0]);
 
     expect(continued).toEqual([]);
+  }, 30_000);
+});
+
+/**
+ * BUG-021. The notify job is keyed by its monitor. `notify` is a `stately`
+ * queue, so a job sent without a key shares one queued slot with every other
+ * monitor's, and pg-boss drops the second without an error. `notify.test.ts`
+ * shows the drop; this shows the classifier sends through the keyed path.
+ */
+describe("the notify job the classifier sends", () => {
+  it("carries the monitor as its singleton key", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(strongPost, "keyed-notify-1");
+
+    await classifyAndWait(monitorId, [postId]);
+
+    const keys = await db.execute<{ singleton_key: string | null }>(
+      sql`select singleton_key from pgboss.job where name = 'notify' and data->>'monitorId' = ${monitorId}`,
+    );
+
+    expect(keys.rows.map((row) => row.singleton_key)).toEqual([monitorId]);
   }, 30_000);
 });

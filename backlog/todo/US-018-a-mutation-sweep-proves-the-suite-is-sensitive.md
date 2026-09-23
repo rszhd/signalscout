@@ -88,3 +88,9 @@ at face value.
 - 2026-09-04T22:54+08:00 — Written while adopting docs/testing.md. Deferred deliberately:
   the traps above are worth nothing until there is a suite to sweep, and they
   will still be true then.
+- 2026-09-23T05:30+08:00 — Carried from docs/history.md when US-312 retired it. **Deliberate mutations, counted across the project.**
+  About seventy-five were applied across eight tickets by 2026-09-05. The
+  three surfaces written test-first — credential encryption, the budget guard,
+  cursor and deduplication — took twenty-three, and every one was caught the
+  first time. Every gap came from a surface written alongside the code:
+  US-007, US-008, US-011, US-012 and US-014, each named in its own Log.

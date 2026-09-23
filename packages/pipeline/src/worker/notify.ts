@@ -78,8 +78,22 @@ export function createNotifyStep(
   };
 }
 
+/**
+ * Queue one notification pass for a monitor. Every sender goes through here.
+ *
+ * `notify` is a `stately` queue, which holds one queued job per singleton key,
+ * and pg-boss files a job sent without a key under the empty string. So a
+ * notify sent without the monitor as its key competes with every other
+ * monitor's, and pg-boss drops the loser without an error (BUG-021). A second
+ * job for the same monitor may still be dropped, and that loses nothing: a
+ * pass delivers the monitor's whole outbox, not the matches in its payload.
+ */
+export function sendNotify(boss: StepContext["boss"], payload: NotifyPayload) {
+  return boss.send(notifyQueue, payload, { singletonKey: payload.monitorId });
+}
+
 export async function enqueueNotifications(db: Database, boss: StepContext["boss"]) {
   for (const { monitorId } of await notificationMonitorIds(db)) {
-    await boss.send(notifyQueue, { monitorId, matchIds: [] }, { singletonKey: monitorId });
+    await sendNotify(boss, { monitorId, matchIds: [] });
   }
 }

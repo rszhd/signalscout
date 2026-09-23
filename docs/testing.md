@@ -2,9 +2,9 @@
 
 The rules the tests follow, what we deliberately do not test, and the one
 thing that changes when the code is written by an AI assistant rather than a
-second person. Most rules here were paid for in another repository; the
-incidents behind them, and this project's own measurements, are in
-[history.md](history.md) under *Testing*.
+second person. Most rules here were paid for in another repository, and
+US-312's Log keeps the incidents recorded from it. This project's own count
+of deliberate mutations is in US-018's Log.
 
 ---
 
@@ -243,6 +243,15 @@ before reading a red run as a regression. `vitest.config.ts` holds it off with
 `DATABASE_POOL_SIZE` at three per pool and `maxWorkers` at four. Pass
 `--maxWorkers` by hand only to go lower: six workers were tried, and
 `classify.test.ts` failed two runs in four under load.
+
+**A timeout on a queue can be a job that was never queued.** `send` returns
+null when a queue's policy refuses a job, and nothing throws. A test that
+waits on that job's effect then fails as a timeout, more often on a slower
+machine, and reads as load. `notify` is a `stately` queue, and its jobs were
+sent without a key, so every monitor shared one queued slot. That was
+BUG-021, the classify timeouts on CI. Before calling a timeout load, check
+whether the job exists. A test that needs a job to stay queued runs with no
+worker on that queue, as `worker/notify.test.ts` does.
 
 **A worker test that costs seconds a test is a polling interval.**
 `WORKER_POLLING_INTERVAL_SECONDS` is set to pg-boss's floor of 0.5 for the

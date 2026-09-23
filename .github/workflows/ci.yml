@@ -90,6 +90,15 @@ jobs:
             exit 1
           fi
 
+      # Both read the production tree. A license nobody here has read fails the
+      # first, and a high or critical hole in a production dependency fails the
+      # second; a moderate one is written down in its ticket instead. US-332.
+      - name: Every dependency's license is one we have read
+        run: pnpm check:licenses
+
+      - name: No high or critical hole in a production dependency
+        run: pnpm audit --prod --audit-level high
+
       - run: pnpm lint
       # Biome has no rule for a raw colour or a raw spacing value, and those
       # are what keep two applications on one brand. US-270.

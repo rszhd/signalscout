@@ -15,9 +15,9 @@
  * `sources/platforms.ts` and the provider in `./provider.ts`.
  *
  * **It is the fresh connector, not the cheap one** — it is chosen for the
- * posts under two hours old that the others do not reach. docs/history.md,
- * *Sources*, holds what US-056 measured across the three providers, and
- * docs/costs.md holds the price.
+ * posts under two hours old that the others do not reach. US-056's Log holds
+ * what it measured across the three providers, and docs/costs.md holds the
+ * price.
  *
  * Four measured facts shape what is below.
  *

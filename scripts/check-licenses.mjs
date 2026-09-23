@@ -43,6 +43,11 @@ const allowed = new Map([
   ["Python-2.0", "permissive, attribution"],
   ["(AFL-2.1 OR BSD-3-Clause)", "either arm is permissive"],
   ["(MIT OR CC0-1.0)", "either arm is permissive"],
+  // US-332. File-level copyleft, which is not the kind this guards against:
+  // a change to an MPL-licensed file must be shared under MPL, and using the
+  // file unchanged asks nothing of the code around it. The one package is
+  // `lightningcss`, a CSS build tool that arrives through Vite.
+  ["MPL-2.0", "file-level copyleft; asks nothing of code that uses it unchanged"],
 ]);
 
 const report = JSON.parse(

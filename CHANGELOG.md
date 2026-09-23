@@ -11,8 +11,8 @@ number and its own tag (`ui-vX.Y.Z`) and moves with neither of them.
 **An entry says what a consumer must know**, not what the diff shows. A renamed
 export, a changed option, a table that moved: those belong here. A refactor
 nobody outside this repository can see does not.
-[docs/history.md](docs/history.md) is the other record — every ticket, in the
-order it happened, including the ones that changed nothing a consumer imports.
+[backlog/DONE.md](backlog/DONE.md) is the other record — every finished
+ticket, including the ones that changed nothing a consumer imports.
 
 **What the number means, and how it is chosen, is in
 [docs/releasing.md](docs/releasing.md)** under *What the number means*: one
@@ -53,6 +53,14 @@ takes a `size` and carries its one rule in the stylesheet, so a consumer
 sets no rule for the mark (US-283).
 
 ## Unreleased
+
+**Changed.** A provider's `Retry-After` is read one way for every connector
+(US-334): seconds or an HTTP date, rounded up, and never more than an hour
+(`maximumRetryAfterSeconds`). A wait of zero, a time already past or a value
+that is not a wait takes the connector's own fallback, where three connectors
+used to retry at once. A connector's `waitUntil` can therefore be earlier than
+before for a long wait, and later for a zero one. No export changed, so the
+version is a patch.
 
 ## 0.13.1 — 2026-09-22
 

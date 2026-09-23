@@ -30,7 +30,7 @@ import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
 import { monitors, posts, type Signal } from "../db/schema.js";
 import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
-import { monitorQueries } from "../monitors/monitors.js";
+import { type Monitor, monitorQueries } from "../monitors/monitors.js";
 import { recordStageRun } from "../monitors/stage-runs.js";
 import type { FilterPayload } from "./queues.js";
 import { classifyQueue, repliesQueue } from "./queues.js";
@@ -82,6 +82,472 @@ function vectorLiteral(embedding: readonly number[]): string {
   return `[${embedding.join(",")}]`;
 }
 
+/** What every phase of one run needs, so a phase takes one argument for it. */
+interface FilterRun {
+  readonly db: StepContext["db"];
+  readonly boss: StepContext["boss"];
+  readonly logger: StepContext["logger"];
+  readonly monitor: Monitor;
+  readonly monitorId: string;
+  readonly walkId: FilterPayload["walkId"];
+  readonly pollRunId: FilterPayload["pollRunId"];
+  readonly startedAt: Date;
+  readonly itemsIn: number;
+}
+
+/**
+ * What this run of the stage did, for the history. US-201.
+ *
+ * Written here because `deliver` is where every exit of this step arrives,
+ * which is the same argument the header makes about triage: five exits and
+ * one place they all pass through leaves no caller to forget it.
+ *
+ * A failure to write the row is swallowed. The filter's work is done by
+ * this point and the posts are on their way to the classifier; failing the
+ * job over a history row would retry a stage that had already succeeded.
+ */
+async function writeStageRun(
+  run: FilterRun,
+  survivors: readonly Candidate[],
+  drops: readonly FilterDrop[],
+): Promise<void> {
+  const { db, logger, monitor, monitorId, walkId, pollRunId, startedAt, itemsIn } = run;
+  const dropped = (stage: FilterDrop["stage"]) =>
+    drops.filter((drop) => drop.stage === stage).length;
+
+  try {
+    await recordStageRun(db, {
+      monitorId,
+      userId: monitor.userId,
+      stage: "filter",
+      walkId: walkId ?? null,
+      pollRunId: pollRunId ?? null,
+      startedAt,
+      finishedAt: new Date(),
+      outcome: "done",
+      itemsIn,
+      itemsOut: survivors.length,
+      detail: {
+        stage: "filter",
+        keyword: dropped("keyword"),
+        embedding: dropped("embedding"),
+        triage: dropped("triage"),
+      },
+    });
+  } catch (cause) {
+    logger.warn({ monitorId, err: cause }, "the pre-filter's own history row was not written");
+  }
+}
+
+/** Everything that is still going to the model, and why the rest is not. */
+async function deliver(
+  run: FilterRun,
+  survivors: readonly Candidate[],
+  drops: readonly FilterDrop[],
+): Promise<void> {
+  const { db, boss, monitor, monitorId, walkId, pollRunId } = run;
+
+  await recordFilterDrops(db, monitorId, drops);
+  await writeStageRun(run, survivors, drops);
+  await boss.send(classifyQueue, {
+    monitorId,
+    postIds: survivors.map((candidate) => candidate.id),
+    walkId,
+    pollRunId,
+  });
+
+  if (!monitor.includeReplies) return;
+
+  /**
+   * The threads worth opening, which is only the posts.
+   *
+   * A reply has no thread of its own, and sending one here would open a
+   * second bill for the same words. The step checks `kind` again in SQL,
+   * because a queue payload is not a place to keep an invariant.
+   *
+   * This runs after the classify job is booked, not instead of it: the
+   * posts are leads in their own right and must not wait on a provider
+   * call to reach the inbox.
+   */
+  const threads = survivors.filter((candidate) => candidate.kind !== "reply");
+  if (threads.length === 0) return;
+
+  await boss.send(repliesQueue, {
+    monitorId,
+    postIds: threads.map((candidate) => candidate.id),
+    walkId,
+    pollRunId,
+  });
+}
+
+/**
+ * Triage, then deliver. Every exit below goes through here.
+ *
+ * **Only an explicit `no` drops.** `ai/triage.ts` decides that and this
+ * loop never second-guesses it: a timeout, a refusal, a rate limit or an
+ * unreachable provider all come back as `kept`, and the item goes on. The
+ * asymmetry is the same one the embedding stage above is built on, and it
+ * is sharper here because there is no threshold to inspect afterwards —
+ * a refused item leaves one `filter_drops` row and nothing else.
+ *
+ * The call is per item, because one item is one question and a batch would
+ * make one model answer decide several. That is the expensive shape and
+ * the honest one.
+ */
+async function pass(
+  run: FilterRun,
+  triager: Triager | undefined,
+  survivors: readonly Candidate[],
+  drops: FilterDrop[],
+): Promise<void> {
+  const { db, logger, monitor, monitorId } = run;
+
+  if (!triager || survivors.length === 0) {
+    if (!triager) {
+      logger.debug({ monitorId }, "the triage stage is not running: no triager was given");
+    }
+    await deliver(run, survivors, drops);
+    return;
+  }
+
+  const profile: MonitorProfile = {
+    product: monitor.product,
+    idealCustomer: monitor.idealCustomer,
+    problem: monitor.problem,
+    signals: monitor.signals as readonly Signal[],
+  };
+
+  const survived: string[] = [];
+  let triageSpentMicros = 0;
+  let unanswered = 0;
+  let unasked = 0;
+
+  /**
+   * BUG-004. Triage is a model call and is billed like one.
+   *
+   * When the money runs out this stage stops *calling*, and keeps every
+   * item it has not asked about. Running out of budget is not a `no`, and
+   * the rule this stage is built on is that only an explicit `no` drops.
+   * The classify step refuses the actual spend; letting these through
+   * costs nothing here and loses nothing there.
+   */
+  const meter = await createSpendMeter(db, monitorId);
+
+  for (const candidate of survivors) {
+    if (await meter.exhausted()) {
+      unasked += 1;
+      survived.push(candidate.id);
+      continue;
+    }
+
+    const outcome = await triager.triage({ monitor: profile, post: candidate });
+
+    triageSpentMicros += outcome.call.estimatedCostMicros ?? 0;
+    meter.spent(outcome.call.estimatedCostMicros);
+    if (outcome.verdict === null) unanswered += 1;
+
+    await recordModelCall(db, {
+      purpose: "triage",
+      outcome: outcome.status,
+      call: outcome.call,
+      userId: monitor.userId,
+      monitorId,
+      postId: candidate.id,
+      error: outcome.error ?? null,
+    });
+
+    if (outcome.kept) survived.push(candidate.id);
+    else drops.push({ postId: candidate.id, stage: "triage", similarity: null });
+  }
+
+  logger.info(
+    {
+      monitorId,
+      posts: survivors.length,
+      kept: survived.length,
+      droppedByTriage: survivors.length - survived.length,
+      unanswered,
+      // Items the cap stopped us asking about. They went on unfiltered,
+      // which is the expensive direction and the safe one.
+      unasked,
+      spentMicros: triageSpentMicros,
+      model: triager.model,
+    },
+    "triage finished",
+  );
+
+  await deliver(
+    run,
+    survivors.filter((candidate) => survived.includes(candidate.id)),
+    drops,
+  );
+}
+
+/** The rows this job was handed, as both stages read them. */
+async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Promise<Candidate[]> {
+  return db
+    .select({
+      id: posts.id,
+      source: posts.source,
+      channel: posts.channel,
+      title: posts.title,
+      excerpt: posts.excerpt,
+      kind: posts.kind,
+      // The vector itself is never selected. It is a thousand numbers per
+      // row that this step never reads: pgvector does the comparing.
+      embedded: sql<boolean>`${posts.embedding} is not null`,
+    })
+    .from(posts)
+    .where(inArray(posts.id, [...ids]));
+}
+
+/** The free stage: each post against the words that could have found it. */
+function keywordStage(
+  monitor: Monitor,
+  candidates: readonly Candidate[],
+): { kept: Candidate[]; drops: FilterDrop[] } {
+  /**
+   * One rule per platform, built once and reused for every post from it.
+   *
+   * US-027. A post is checked against the queries that could have found it,
+   * and never against another platform's. Checking an X post against a
+   * Reddit phrase would drop it for missing words nobody asked X for, and
+   * checking a Reddit post against a two-word X query would keep almost
+   * everything and send the bill to the model.
+   */
+  const rules = new Map<string, ReturnType<typeof keywordRuleFor>>();
+
+  const ruleFor = (source: string) => {
+    const found = rules.get(source);
+    if (found) return found;
+
+    const rule = keywordRuleFor({
+      queries: monitorQueries(monitor.generatedQueries, source),
+      subreddits: monitor.generatedSubreddits,
+    });
+    rules.set(source, rule);
+    return rule;
+  };
+
+  const kept: Candidate[] = [];
+  const drops: FilterDrop[] = [];
+
+  for (const candidate of candidates) {
+    // A reply is not checked against the monitor's words. It answers a post
+    // that already matched them, and the words are rarely repeated: "same
+    // here, what did you end up using?" shares nothing with the query that
+    // found the thread.
+    if (candidate.kind === "reply" || keepsPost(ruleFor(candidate.source), candidate)) {
+      kept.push(candidate);
+    } else {
+      drops.push({ postId: candidate.id, stage: "keyword", similarity: null });
+    }
+  }
+
+  return { kept, drops };
+}
+
+/**
+ * The embedding stage: what is left after it, to go on to triage.
+ *
+ * Every failure here returns what the keyword stage kept, unfiltered, and
+ * only a similarity under the threshold adds a drop.
+ */
+async function embeddingStage(
+  run: FilterRun,
+  embedder: Embedder,
+  candidates: readonly Candidate[],
+  kept: readonly Candidate[],
+  drops: FilterDrop[],
+): Promise<readonly Candidate[]> {
+  const { db, logger, monitor, monitorId } = run;
+
+  let spentMicros = 0;
+
+  /** Record one embedding call, whatever it returned. It was billed either way. */
+  const record = async (
+    outcome: "scored" | "failed",
+    call: Parameters<typeof recordModelCall>[1]["call"],
+    error?: string,
+  ) => {
+    spentMicros += call.estimatedCostMicros ?? 0;
+    await recordModelCall(db, {
+      purpose: "embedding",
+      outcome,
+      call,
+      userId: monitor.userId,
+      monitorId,
+      // One call covers many posts, so it belongs to none of them. The row
+      // is on the monitor's bill, which is where the cap reads it.
+      postId: null,
+      error: error ?? null,
+    });
+  };
+
+  /**
+   * The monitor's description, embedded once and kept until it is edited.
+   *
+   * `description_embedding_source` holds the text that produced the stored
+   * vector, so an edit is found by comparing strings rather than by a writer
+   * elsewhere remembering to clear a column.
+   */
+  const descriptionText = monitorDescriptionText(monitor);
+  let monitorVector: readonly number[] | undefined;
+
+  if (monitor.descriptionEmbedding && monitor.descriptionEmbeddingSource === descriptionText) {
+    monitorVector = monitor.descriptionEmbedding;
+  } else {
+    const outcome = await embedder.embed([descriptionText]);
+    await record(
+      outcome.status === "embedded" ? "scored" : "failed",
+      outcome.call,
+      outcome.status === "embedded" ? undefined : outcome.error,
+    );
+
+    if (outcome.status === "embedded" && outcome.embeddings[0]) {
+      monitorVector = outcome.embeddings[0];
+      await db
+        .update(monitors)
+        .set({
+          descriptionEmbedding: [...monitorVector],
+          descriptionEmbeddingSource: descriptionText,
+        })
+        .where(eq(monitors.id, monitorId));
+    } else {
+      logger.error(
+        { monitorId, err: outcome.status === "failed" ? outcome.error : "no embedding returned" },
+        "the monitor could not be embedded: every post goes to the model",
+      );
+    }
+  }
+
+  if (!monitorVector) {
+    logger.info(
+      { monitorId, posts: candidates.length, kept: kept.length, droppedByKeyword: drops.length },
+      "pre-filter finished without its embedding stage",
+    );
+    return kept;
+  }
+
+  /**
+   * Replies never reach the embedding stage, so they are separated here
+   * rather than filtered out of each step below.
+   *
+   * US-029 measured both settings on two real threads. Embedded alone, a
+   * reply's similarity is about its own few words and the shipped threshold
+   * drops people who are asking. Embedded under the parent's title, all 46
+   * comments landed inside 0.2 of the title's own score and no threshold
+   * separated anything. Neither setting is worth an embedding call.
+   */
+  const embeddable = kept.filter((candidate) => candidate.kind !== "reply");
+  const skippedReplies = kept.filter((candidate) => candidate.kind === "reply");
+
+  // Only what is not embedded yet. A post another monitor already embedded
+  // costs nothing here, which is the reason the vector lives on the post and
+  // not on the pair.
+  const toEmbed = embeddable.filter((candidate) => !candidate.embedded);
+
+  if (toEmbed.length > 0) {
+    const outcome = await embedder.embed(toEmbed.map((candidate) => postEmbeddingText(candidate)));
+    await record(
+      outcome.status === "embedded" ? "scored" : "failed",
+      outcome.call,
+      outcome.status === "embedded" ? undefined : outcome.error,
+    );
+
+    if (outcome.status === "failed") {
+      logger.error(
+        { monitorId, posts: toEmbed.length, err: outcome.error },
+        "posts could not be embedded: they go to the model unfiltered",
+      );
+      logger.info(
+        {
+          monitorId,
+          posts: candidates.length,
+          kept: kept.length,
+          droppedByKeyword: drops.length,
+          spentMicros,
+        },
+        "pre-filter finished without its embedding stage",
+      );
+      return kept;
+    }
+
+    for (const [index, candidate] of toEmbed.entries()) {
+      const embedding = outcome.embeddings[index];
+      if (!embedding) continue;
+
+      await db
+        .update(posts)
+        .set({ embedding: [...embedding] })
+        .where(eq(posts.id, candidate.id));
+    }
+  }
+
+  /**
+   * The comparison itself, in Postgres, because pgvector owns the distance.
+   *
+   * `<=>` is cosine distance, so one minus it is cosine similarity, which is
+   * the number the threshold and `filter_drops` both speak in.
+   */
+  const scored = await db
+    .select({
+      id: posts.id,
+      similarity: sql<number>`1 - (${posts.embedding} <=> ${vectorLiteral(monitorVector)}::vector)`,
+    })
+    .from(posts)
+    .where(
+      and(
+        inArray(
+          posts.id,
+          embeddable.map((candidate) => candidate.id),
+        ),
+        isNotNull(posts.embedding),
+      ),
+    );
+
+  const similarities = new Map(scored.map((row) => [row.id, Number(row.similarity)]));
+  // A reply arrives already past this stage. It was never embedded and was
+  // never going to be, so it is not "unmeasured" — it is not measured here.
+  const survivors: Candidate[] = [...skippedReplies];
+  let unmeasured = 0;
+
+  for (const candidate of embeddable) {
+    const similarity = similarities.get(candidate.id);
+
+    // No similarity means the post has no vector: its embedding failed and
+    // was skipped above. It goes to the model, like every other failure.
+    if (similarity === undefined) {
+      unmeasured += 1;
+      survivors.push(candidate);
+      continue;
+    }
+
+    if (similarity >= monitor.similarityThreshold) survivors.push(candidate);
+    else drops.push({ postId: candidate.id, stage: "embedding", similarity });
+  }
+
+  const droppedByEmbedding = drops.length - (candidates.length - kept.length);
+
+  logger.info(
+    {
+      monitorId,
+      posts: candidates.length,
+      kept: survivors.length,
+      droppedByKeyword: candidates.length - kept.length,
+      droppedByEmbedding,
+      unmeasured,
+      threshold: monitor.similarityThreshold,
+      embedded: toEmbed.length,
+      spentMicros,
+      model: embedder.model,
+    },
+    "pre-filter finished",
+  );
+
+  return survivors;
+}
+
 export function createFilterStep({
   embedderFor,
   triagerFor,
@@ -119,173 +585,16 @@ export function createFilterStep({
     const embedder = await embedderFor?.(monitor.userId);
     const triager = await triagerFor?.(monitor.userId);
 
-    /**
-     * What this run of the stage did, for the history. US-201.
-     *
-     * Written here because `deliver` is where every exit of this step arrives,
-     * which is the same argument the header makes about triage: five exits and
-     * one place they all pass through leaves no caller to forget it.
-     *
-     * A failure to write the row is swallowed. The filter's work is done by
-     * this point and the posts are on their way to the classifier; failing the
-     * job over a history row would retry a stage that had already succeeded.
-     */
-    const writeStageRun = async (survivors: readonly Candidate[], drops: readonly FilterDrop[]) => {
-      const dropped = (stage: FilterDrop["stage"]) =>
-        drops.filter((drop) => drop.stage === stage).length;
-
-      try {
-        await recordStageRun(db, {
-          monitorId,
-          userId: monitor.userId,
-          stage: "filter",
-          walkId: walkId ?? null,
-          pollRunId: pollRunId ?? null,
-          startedAt,
-          finishedAt: new Date(),
-          outcome: "done",
-          itemsIn: ids.length,
-          itemsOut: survivors.length,
-          detail: {
-            stage: "filter",
-            keyword: dropped("keyword"),
-            embedding: dropped("embedding"),
-            triage: dropped("triage"),
-          },
-        });
-      } catch (cause) {
-        logger.warn({ monitorId, err: cause }, "the pre-filter's own history row was not written");
-      }
-    };
-
-    /** Everything that is still going to the model, and why the rest is not. */
-    const deliver = async (survivors: readonly Candidate[], drops: readonly FilterDrop[]) => {
-      await recordFilterDrops(db, monitorId, drops);
-      await writeStageRun(survivors, drops);
-      await boss.send(classifyQueue, {
-        monitorId,
-        postIds: survivors.map((candidate) => candidate.id),
-        walkId,
-        pollRunId,
-      });
-
-      if (!monitor.includeReplies) return;
-
-      /**
-       * The threads worth opening, which is only the posts.
-       *
-       * A reply has no thread of its own, and sending one here would open a
-       * second bill for the same words. The step checks `kind` again in SQL,
-       * because a queue payload is not a place to keep an invariant.
-       *
-       * This runs after the classify job is booked, not instead of it: the
-       * posts are leads in their own right and must not wait on a provider
-       * call to reach the inbox.
-       */
-      const threads = survivors.filter((candidate) => candidate.kind !== "reply");
-      if (threads.length === 0) return;
-
-      await boss.send(repliesQueue, {
-        monitorId,
-        postIds: threads.map((candidate) => candidate.id),
-        walkId,
-        pollRunId,
-      });
-    };
-
-    /**
-     * Triage, then deliver. Every exit below goes through here.
-     *
-     * **Only an explicit `no` drops.** `ai/triage.ts` decides that and this
-     * loop never second-guesses it: a timeout, a refusal, a rate limit or an
-     * unreachable provider all come back as `kept`, and the item goes on. The
-     * asymmetry is the same one the embedding stage above is built on, and it
-     * is sharper here because there is no threshold to inspect afterwards —
-     * a refused item leaves one `filter_drops` row and nothing else.
-     *
-     * The call is per item, because one item is one question and a batch would
-     * make one model answer decide several. That is the expensive shape and
-     * the honest one.
-     */
-    const pass = async (survivors: readonly Candidate[], drops: FilterDrop[]) => {
-      if (!triager || survivors.length === 0) {
-        if (!triager) {
-          logger.debug({ monitorId }, "the triage stage is not running: no triager was given");
-        }
-        await deliver(survivors, drops);
-        return;
-      }
-
-      const profile: MonitorProfile = {
-        product: monitor.product,
-        idealCustomer: monitor.idealCustomer,
-        problem: monitor.problem,
-        signals: monitor.signals as readonly Signal[],
-      };
-
-      const survived: string[] = [];
-      let triageSpentMicros = 0;
-      let unanswered = 0;
-      let unasked = 0;
-
-      /**
-       * BUG-004. Triage is a model call and is billed like one.
-       *
-       * When the money runs out this stage stops *calling*, and keeps every
-       * item it has not asked about. Running out of budget is not a `no`, and
-       * the rule this stage is built on is that only an explicit `no` drops.
-       * The classify step refuses the actual spend; letting these through
-       * costs nothing here and loses nothing there.
-       */
-      const meter = await createSpendMeter(db, monitorId);
-
-      for (const candidate of survivors) {
-        if (await meter.exhausted()) {
-          unasked += 1;
-          survived.push(candidate.id);
-          continue;
-        }
-
-        const outcome = await triager.triage({ monitor: profile, post: candidate });
-
-        triageSpentMicros += outcome.call.estimatedCostMicros ?? 0;
-        meter.spent(outcome.call.estimatedCostMicros);
-        if (outcome.verdict === null) unanswered += 1;
-
-        await recordModelCall(db, {
-          purpose: "triage",
-          outcome: outcome.status,
-          call: outcome.call,
-          userId: monitor.userId,
-          monitorId,
-          postId: candidate.id,
-          error: outcome.error ?? null,
-        });
-
-        if (outcome.kept) survived.push(candidate.id);
-        else drops.push({ postId: candidate.id, stage: "triage", similarity: null });
-      }
-
-      logger.info(
-        {
-          monitorId,
-          posts: survivors.length,
-          kept: survived.length,
-          droppedByTriage: survivors.length - survived.length,
-          unanswered,
-          // Items the cap stopped us asking about. They went on unfiltered,
-          // which is the expensive direction and the safe one.
-          unasked,
-          spentMicros: triageSpentMicros,
-          model: triager.model,
-        },
-        "triage finished",
-      );
-
-      await deliver(
-        survivors.filter((candidate) => survived.includes(candidate.id)),
-        drops,
-      );
+    const run: FilterRun = {
+      db,
+      boss,
+      logger,
+      monitor,
+      monitorId,
+      walkId,
+      pollRunId,
+      startedAt,
+      itemsIn: ids.length,
     };
 
     if (!monitor.preFilterEnabled) {
@@ -296,75 +605,12 @@ export function createFilterStep({
 
       // The rows are read even with the filter off, because `deliver` needs to
       // know which of them are posts before it books a thread for one.
-      const all: Candidate[] = await db
-        .select({
-          id: posts.id,
-          source: posts.source,
-          channel: posts.channel,
-          title: posts.title,
-          excerpt: posts.excerpt,
-          kind: posts.kind,
-          embedded: sql<boolean>`${posts.embedding} is not null`,
-        })
-        .from(posts)
-        .where(inArray(posts.id, ids));
-
-      await deliver(all, []);
+      await deliver(run, await readCandidates(db, ids), []);
       return;
     }
 
-    const candidates: Candidate[] = await db
-      .select({
-        id: posts.id,
-        source: posts.source,
-        channel: posts.channel,
-        title: posts.title,
-        excerpt: posts.excerpt,
-        kind: posts.kind,
-        // The vector itself is never selected. It is a thousand numbers per
-        // row that this step never reads: pgvector does the comparing.
-        embedded: sql<boolean>`${posts.embedding} is not null`,
-      })
-      .from(posts)
-      .where(inArray(posts.id, ids));
-
-    /**
-     * One rule per platform, built once and reused for every post from it.
-     *
-     * US-027. A post is checked against the queries that could have found it,
-     * and never against another platform's. Checking an X post against a
-     * Reddit phrase would drop it for missing words nobody asked X for, and
-     * checking a Reddit post against a two-word X query would keep almost
-     * everything and send the bill to the model.
-     */
-    const rules = new Map<string, ReturnType<typeof keywordRuleFor>>();
-
-    const ruleFor = (source: string) => {
-      const found = rules.get(source);
-      if (found) return found;
-
-      const rule = keywordRuleFor({
-        queries: monitorQueries(monitor.generatedQueries, source),
-        subreddits: monitor.generatedSubreddits,
-      });
-      rules.set(source, rule);
-      return rule;
-    };
-
-    const kept: Candidate[] = [];
-    const drops: FilterDrop[] = [];
-
-    for (const candidate of candidates) {
-      // A reply is not checked against the monitor's words. It answers a post
-      // that already matched them, and the words are rarely repeated: "same
-      // here, what did you end up using?" shares nothing with the query that
-      // found the thread.
-      if (candidate.kind === "reply" || keepsPost(ruleFor(candidate.source), candidate)) {
-        kept.push(candidate);
-      } else {
-        drops.push({ postId: candidate.id, stage: "keyword", similarity: null });
-      }
-    }
+    const candidates = await readCandidates(db, ids);
+    const { kept, drops } = keywordStage(monitor, candidates);
 
     if (!embedder || kept.length === 0) {
       if (!embedder) {
@@ -378,197 +624,10 @@ export function createFilterStep({
         { monitorId, posts: candidates.length, kept: kept.length, droppedByKeyword: drops.length },
         "pre-filter finished",
       );
-      await pass(kept, drops);
+      await pass(run, triager, kept, drops);
       return;
     }
 
-    let spentMicros = 0;
-
-    /** Record one embedding call, whatever it returned. It was billed either way. */
-    const record = async (
-      outcome: "scored" | "failed",
-      call: Parameters<typeof recordModelCall>[1]["call"],
-      error?: string,
-    ) => {
-      spentMicros += call.estimatedCostMicros ?? 0;
-      await recordModelCall(db, {
-        purpose: "embedding",
-        outcome,
-        call,
-        userId: monitor.userId,
-        monitorId,
-        // One call covers many posts, so it belongs to none of them. The row
-        // is on the monitor's bill, which is where the cap reads it.
-        postId: null,
-        error: error ?? null,
-      });
-    };
-
-    /**
-     * The monitor's description, embedded once and kept until it is edited.
-     *
-     * `description_embedding_source` holds the text that produced the stored
-     * vector, so an edit is found by comparing strings rather than by a writer
-     * elsewhere remembering to clear a column.
-     */
-    const descriptionText = monitorDescriptionText(monitor);
-    let monitorVector: readonly number[] | undefined;
-
-    if (monitor.descriptionEmbedding && monitor.descriptionEmbeddingSource === descriptionText) {
-      monitorVector = monitor.descriptionEmbedding;
-    } else {
-      const outcome = await embedder.embed([descriptionText]);
-      await record(
-        outcome.status === "embedded" ? "scored" : "failed",
-        outcome.call,
-        outcome.status === "embedded" ? undefined : outcome.error,
-      );
-
-      if (outcome.status === "embedded" && outcome.embeddings[0]) {
-        monitorVector = outcome.embeddings[0];
-        await db
-          .update(monitors)
-          .set({
-            descriptionEmbedding: [...monitorVector],
-            descriptionEmbeddingSource: descriptionText,
-          })
-          .where(eq(monitors.id, monitorId));
-      } else {
-        logger.error(
-          { monitorId, err: outcome.status === "failed" ? outcome.error : "no embedding returned" },
-          "the monitor could not be embedded: every post goes to the model",
-        );
-      }
-    }
-
-    if (!monitorVector) {
-      logger.info(
-        { monitorId, posts: candidates.length, kept: kept.length, droppedByKeyword: drops.length },
-        "pre-filter finished without its embedding stage",
-      );
-      await pass(kept, drops);
-      return;
-    }
-
-    /**
-     * Replies never reach the embedding stage, so they are separated here
-     * rather than filtered out of each step below.
-     *
-     * US-029 measured both settings on two real threads. Embedded alone, a
-     * reply's similarity is about its own few words and the shipped threshold
-     * drops people who are asking. Embedded under the parent's title, all 46
-     * comments landed inside 0.2 of the title's own score and no threshold
-     * separated anything. Neither setting is worth an embedding call.
-     */
-    const embeddable = kept.filter((candidate) => candidate.kind !== "reply");
-    const skippedReplies = kept.filter((candidate) => candidate.kind === "reply");
-
-    // Only what is not embedded yet. A post another monitor already embedded
-    // costs nothing here, which is the reason the vector lives on the post and
-    // not on the pair.
-    const toEmbed = embeddable.filter((candidate) => !candidate.embedded);
-
-    if (toEmbed.length > 0) {
-      const outcome = await embedder.embed(
-        toEmbed.map((candidate) => postEmbeddingText(candidate)),
-      );
-      await record(
-        outcome.status === "embedded" ? "scored" : "failed",
-        outcome.call,
-        outcome.status === "embedded" ? undefined : outcome.error,
-      );
-
-      if (outcome.status === "failed") {
-        logger.error(
-          { monitorId, posts: toEmbed.length, err: outcome.error },
-          "posts could not be embedded: they go to the model unfiltered",
-        );
-        logger.info(
-          {
-            monitorId,
-            posts: candidates.length,
-            kept: kept.length,
-            droppedByKeyword: drops.length,
-            spentMicros,
-          },
-          "pre-filter finished without its embedding stage",
-        );
-        await pass(kept, drops);
-        return;
-      }
-
-      for (const [index, candidate] of toEmbed.entries()) {
-        const embedding = outcome.embeddings[index];
-        if (!embedding) continue;
-
-        await db
-          .update(posts)
-          .set({ embedding: [...embedding] })
-          .where(eq(posts.id, candidate.id));
-      }
-    }
-
-    /**
-     * The comparison itself, in Postgres, because pgvector owns the distance.
-     *
-     * `<=>` is cosine distance, so one minus it is cosine similarity, which is
-     * the number the threshold and `filter_drops` both speak in.
-     */
-    const scored = await db
-      .select({
-        id: posts.id,
-        similarity: sql<number>`1 - (${posts.embedding} <=> ${vectorLiteral(monitorVector)}::vector)`,
-      })
-      .from(posts)
-      .where(
-        and(
-          inArray(
-            posts.id,
-            embeddable.map((candidate) => candidate.id),
-          ),
-          isNotNull(posts.embedding),
-        ),
-      );
-
-    const similarities = new Map(scored.map((row) => [row.id, Number(row.similarity)]));
-    // A reply arrives already past this stage. It was never embedded and was
-    // never going to be, so it is not "unmeasured" — it is not measured here.
-    const survivors: Candidate[] = [...skippedReplies];
-    let unmeasured = 0;
-
-    for (const candidate of embeddable) {
-      const similarity = similarities.get(candidate.id);
-
-      // No similarity means the post has no vector: its embedding failed and
-      // was skipped above. It goes to the model, like every other failure.
-      if (similarity === undefined) {
-        unmeasured += 1;
-        survivors.push(candidate);
-        continue;
-      }
-
-      if (similarity >= monitor.similarityThreshold) survivors.push(candidate);
-      else drops.push({ postId: candidate.id, stage: "embedding", similarity });
-    }
-
-    const droppedByEmbedding = drops.length - (candidates.length - kept.length);
-
-    logger.info(
-      {
-        monitorId,
-        posts: candidates.length,
-        kept: survivors.length,
-        droppedByKeyword: candidates.length - kept.length,
-        droppedByEmbedding,
-        unmeasured,
-        threshold: monitor.similarityThreshold,
-        embedded: toEmbed.length,
-        spentMicros,
-        model: embedder.model,
-      },
-      "pre-filter finished",
-    );
-
-    await pass(survivors, drops);
+    await pass(run, triager, await embeddingStage(run, embedder, candidates, kept, drops), drops);
   };
 }

@@ -45,8 +45,8 @@ exists in the place a reader would look first.
 
 - [ ] `pinnedTriageModel` is `jev-latest`, and `pnpm test` passes on the
       fixtures already captured
-- [x] `docs/history.md` carries US-229's five readings and the date, so the
-      number behind the choice outlives this ticket
+- [x] US-229's Log carries its five readings and the date, so the number
+      behind the choice outlives this ticket
 - [ ] AGENTS.md's *Where the product stands* says triage runs on an evaluation
       model, in one sentence, and deletes nothing it replaces
 - [x] `.env.example` and `.env.example.self-hosted` name the pair a new
@@ -105,3 +105,4 @@ exists in the place a reader would look first.
   The boxes left are the promotion itself: `pinned.ts`, AGENTS.md, the note in
   `triage-prompt.ts` that two prompts ask two questions, `recommended.ts`, and
   a release. None should move until the live trial has run longer.
+- 2026-09-23T05:30+08:00 — US-312 retired docs/history.md. The box about US-229's five readings now points at US-229's Log, which holds them; the 2026-09-19 entry above names the file as it was then.

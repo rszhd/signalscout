@@ -1,5 +1,6 @@
 ---
 id: US-342
+issue: 90
 title: The documentation has a site, at docs.signalscout.run
 type: feature
 priority: p1

@@ -1,5 +1,6 @@
 ---
 id: US-345
+issue: 92
 title: A cloud customer finds what differs from the self-hosted build
 type: feature
 priority: p2

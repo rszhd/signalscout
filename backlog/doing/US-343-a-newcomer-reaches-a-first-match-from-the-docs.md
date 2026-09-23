@@ -1,5 +1,6 @@
 ---
 id: US-343
+issue: 91
 title: A newcomer reaches a first match from the docs
 type: feature
 priority: p1

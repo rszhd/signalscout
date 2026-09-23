@@ -224,32 +224,6 @@ other.
 | [AI_POLICY.md](AI_POLICY.md) | How AI may be used here, by the owner and by a contributor |
 | [SECURITY.md](SECURITY.md) | Reporting a hole privately, and what is in scope |
 
----|---|
-| [docs/map.md](docs/map.md) | Ten minutes: what runs, where it lives, how one poll and one request go |
-| [PLAN.md](PLAN.md) | What we are building, and why |
-| [STACK.md](STACK.md) | What we are building it with, and why not the alternatives |
-| [docs.signalscout.run](https://docs.signalscout.run) | **The guides for people who run SignalScout**: getting started, self-hosting, every setting. Source in [`site/`](site/README.md) |
-| [docs/self-hosting.md](docs/self-hosting.md) | The same install, as the contributor keeps it |
-| [docs/sources.md](docs/sources.md) | Adding a platform, adding a provider, switching one off |
-| [docs/costs.md](docs/costs.md) | What our spend figure is, and what it is wrong about |
-| [docs/secrets.md](docs/secrets.md) | Where a key lives, what encryption promises, how to rotate |
-| [docs/accounts.md](docs/accounts.md) | Accounts, TLS, verifying an address by hand, getting back in |
-| [docs/notifications.md](docs/notifications.md) | SMTP setup and the webhook contract |
-| [docs/deletions.md](docs/deletions.md) | How a removed post stops being shown |
-| [docs/pipeline.md](docs/pipeline.md) | The worker's run in order, the caps that stop it, and what each step writes |
-| [docs/design.md](docs/design.md) | This application's screens and layouts |
-| [packages/ui/](packages/ui/README.md) | The brand both applications wear: tokens, the spacing scale, shared controls |
-| [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
-| [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
-| [docs/releasing.md](docs/releasing.md) | Cutting a version of the packages and the image |
-| [CHANGELOG.md](CHANGELOG.md) | What each published package version changed for a consumer |
-| [packages/engine/](packages/engine/README.md) | The stateless half, on npm: connectors, model calls, the cipher |
-| [packages/pipeline/](packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |
-| [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
-| [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
-| [AI_POLICY.md](AI_POLICY.md) | How AI may be used here, by the owner and by a contributor |
-| [SECURITY.md](SECURITY.md) | Reporting a hole privately, and what is in scope |
-
 ---
 
 ## Contributing

@@ -214,6 +214,25 @@
   background: var(--accent-soft);
 }
 
+/*
+ * A quiet line of supporting text, and an inline refusal. The monitor screens
+ * named them first; the shared parts and several pages use both (US-353).
+ */
+.monitor-origin {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.budget-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
 /* Named for a screen reader, silent on the page. */
 .visually-hidden {
   position: absolute;

@@ -202,6 +202,15 @@ Each application's `Inbox` holds the state and the requests and renders them.
   the same rules. The two layers are one file, `match.css`, and no rule needs
   an `.inbox-page` ancestor, so the preview shows a part as a page does.
 
+The monitor page's parts followed (US-353): `MonitorStatus`, the status word
+every monitor screen shows; `MonitorHistory`, the polls and their stages;
+`QueryPerformance`, what each search input finds; and `LeadSources`, where the
+matches come from. **They fetch nothing.** The two APIs answer these reads in
+different shapes — the self-hosted one pages the history and sends a score
+floor — so each application keeps the request and hands the rows in, and what
+only one API sends is an optional prop: `more` and `onShowOlder`, a query row's
+`note`, the lead groups to offer. Their rules are in `monitor-parts.css`.
+
 ## The words
 
 `monitor.ts` holds what both products *say* about a monitor, a poll, a stage

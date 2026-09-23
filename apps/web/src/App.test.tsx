@@ -279,7 +279,7 @@ describe("the application screens", () => {
     // The sidebar's copy. US-123 added a second one inside the account sheet,
     // which is how a phone reaches these screens.
     const accountLinks = [
-      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+      ...screen.container.querySelectorAll('.sidebar-bottom nav[aria-label="Account"] a'),
     ].map((link) => link.getAttribute("href"));
 
     // Pricing joins the account section here, and for the same reason: both
@@ -478,7 +478,7 @@ describe("the application screens", () => {
       link.getAttribute("href"),
     );
     const accountLinks = [
-      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+      ...screen.container.querySelectorAll('.sidebar-bottom nav[aria-label="Account"] a'),
     ].map((link) => link.getAttribute("href"));
     // Connections is gone from the menu and the account screens sit together.
     // Settings is still a mockup route and must stay off the nav: a link that
@@ -505,12 +505,22 @@ describe("the application screens", () => {
 
     expect(screen.container.querySelector(".site-nav .account-sheet-button")).not.toBeNull();
 
-    const sheetLinks = [...screen.container.querySelectorAll(".account-sheet a")].map((link) =>
-      link.getAttribute("href"),
-    );
+    const sheetLinks = [
+      ...screen.container.querySelectorAll('.account-sheet nav[aria-label="Account screens"] a'),
+    ].map((link) => link.getAttribute("href"));
 
     expect(sheetLinks).toEqual(["/providers", "/reply-voices", "/models"]);
     expect(screen.container.querySelector(".account-sheet .sign-out")).not.toBeNull();
+  });
+
+  it("links to the docs from the sidebar and from the phone's sheet, in a new tab", async () => {
+    screen = await mount(<App />, inbox);
+
+    for (const place of [".sidebar-bottom", ".account-sheet"]) {
+      const docs = screen.container.querySelector(`${place} nav[aria-label="Help"] a`);
+      expect(docs?.getAttribute("href"), place).toBe("https://docs.signalscout.run/");
+      expect(docs?.getAttribute("target"), place).toBe("_blank");
+    }
   });
 
   /**

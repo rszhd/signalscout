@@ -417,6 +417,9 @@ function NotificationsRoute() {
   );
 }
 
+/** The public docs. Not a path in `route.ts`: it is another site. */
+const docsUrl = "https://docs.signalscout.run/";
+
 /** The sidebar, the banner, and whichever screen the address named. */
 function Shell({ status }: { readonly status: AuthStatus }) {
   const projectId = useProjectId();
@@ -449,6 +452,14 @@ function Shell({ status }: { readonly status: AuthStatus }) {
       */}
       <NavItem icon="models" label="Models" to={paths.models} current={modelling} />
     </>
+  );
+
+  // Outside the account list: the docs are nobody's account screen. Shown in
+  // the sidebar and in the phone's sheet, because the bottom bar has no room.
+  const docsLink = (
+    <nav className="account-nav" aria-label="Help">
+      <NavItem icon="docs" label="Docs" href={docsUrl} />
+    </nav>
   );
 
   const signedInAs = status.account && (
@@ -507,6 +518,8 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         </nav>
 
         <div className="sidebar-bottom">
+          {docsLink}
+
           {/*
             Account-level navigation now sits beside the account, not beside
             the project flow. US-021 kept the project screens here; these four
@@ -548,6 +561,7 @@ function Shell({ status }: { readonly status: AuthStatus }) {
             <nav className="account-nav" aria-label="Account screens">
               {accountLinks}
             </nav>
+            {docsLink}
             {signedInAs}
             <SignOut />
           </div>

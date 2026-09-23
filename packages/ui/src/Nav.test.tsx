@@ -46,6 +46,18 @@ describe("a navigation item", () => {
     button("Account").click();
     expect(onClick).toHaveBeenCalledOnce();
   });
+
+  it("opens another site in a new tab and is never the current page", async () => {
+    screen = await mount(
+      <NavItem icon="docs" label="Docs" href="https://docs.signalscout.run/" current />,
+    );
+    const docs = screen.container.querySelector("a");
+
+    expect(docs?.getAttribute("href")).toBe("https://docs.signalscout.run/");
+    expect(docs?.getAttribute("target")).toBe("_blank");
+    expect(docs?.getAttribute("rel")).toBe("noreferrer");
+    expect(docs?.getAttribute("aria-current")).toBeNull();
+  });
 });
 
 describe("the signed-in person", () => {

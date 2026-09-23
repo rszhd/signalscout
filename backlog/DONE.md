@@ -2,11 +2,12 @@
 
 # Done
 
-223 finished.
+224 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
 | BUG-339 | [The docs say what the code does](done/2026-09/BUG-339-the-docs-say-what-the-code-does.md) | bug | shipped | 2026-09 |
+| BUG-338 | [The image ships the development tools](done/2026-09/BUG-338-the-image-ships-the-development-tools.md) | bug | shipped | 2026-09 |
 | BUG-330 | [A cost test and a draft read only their own account](done/2026-09/BUG-330-a-cost-test-and-a-draft-read-only-their-account.md) | bug | shipped | 2026-09 |
 | BUG-329 | [The session gate reads the route, not the URL](done/2026-09/BUG-329-the-session-gate-reads-the-route-not-the-url.md) | bug | shipped | 2026-09 |
 | BUG-328 | [The webhook guard reads every spelling of an address](done/2026-09/BUG-328-the-webhook-guard-reads-every-spelling-of-an-address.md) | bug | shipped | 2026-09 |

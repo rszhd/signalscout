@@ -251,17 +251,6 @@
   letter-spacing: -0.01em;
 }
 
-.monitor-stopped {
-  margin: 0;
-  padding: 10px 12px;
-  border-left: 3px solid #b2553d;
-  border-radius: 7px;
-  color: #733826;
-  background: #fbeee9;
-  font-size: var(--text-sm);
-  line-height: 1.5;
-}
-
 .monitor-spend {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -312,11 +301,6 @@
   margin: -4px 0 0;
 }
 
-.monitor-controls {
-  display: grid;
-  gap: 14px;
-}
-
 .budget-form {
   display: flex;
   flex-wrap: wrap;
@@ -345,15 +329,13 @@
   max-width: 240px;
 }
 
-.budget-actions,
-.monitor-card-actions {
+.budget-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.budget-form .secondary-button,
-.monitor-card-actions .secondary-button {
+.budget-form .secondary-button {
   min-height: 36px;
 }
 
@@ -365,20 +347,6 @@
   font-size: var(--text-sm);
   font-weight: 700;
   text-decoration: none;
-}
-
-.monitor-filter-counts {
-  flex-basis: 100%;
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--text-sm);
-  line-height: 1.5;
-}
-
-.monitor-card-actions {
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
 }
 
 /* Connections */
@@ -1219,27 +1187,7 @@
   it. A person only needs it when they wonder why there is one lead here and
   not five.
 */
-/*
-  A project's monitors, under its name. US-045.
 
-  The heading sits at the list's own width rather than the page's, so a group
-  title lines up with the cards under it. A monitor in no project has no
-  heading at all — see `groupsOf`.
-*/
-.monitor-group-heading {
-  width: min(1280px, calc(100% - 76px));
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 8px auto 14px;
-  font-size: var(--text-md);
-}
-.monitor-group-count {
-  color: var(--muted);
-  font-size: var(--text-xs);
-  font-weight: 400;
-}
 .draft-missing {
   margin: 12px 0;
   color: var(--muted);

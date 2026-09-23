@@ -47,7 +47,7 @@ which monitor is due.
 3. **Filter, cheaply, three times.** A keyword match
    (`engine/src/filter/keywords.ts`), then an embedding threshold
    (`engine/src/ai/embed.ts`), then a one-word question to a cheap model
-   (`engine/src/ai/probe.ts`). `worker/filter.ts` runs them in that order.
+   (`engine/src/ai/triage.ts`). `worker/filter.ts` runs them in that order.
 4. **Classify.** `worker/classify.ts` calls the good model through
    `engine/src/ai/classify.ts` and gets relevance, problem fit, ICP fit,
    intent and urgency back.

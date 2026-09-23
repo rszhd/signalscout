@@ -167,7 +167,11 @@ moves at once in one transaction.
    `NEW_ENCRYPTION_KEY='<new>' pnpm db:rotate-key`. It prints how many rows
    it changed. Both keys come from the environment, never arguments, so
    neither lands in a shell history. It covers `ai_keys` and
-   `webhook_secrets` too.
+   `webhook_secrets` too. **The published image has no `pnpm`**, so an
+   instance run from it uses the compiled script instead:
+
+       NEW_ENCRYPTION_KEY='<new>' docker compose run --rm -e NEW_ENCRYPTION_KEY \
+         app node packages/pipeline/dist/secrets/rotate-cli.js
 5. **Put the new key in `ENCRYPTION_KEY`** everywhere it is held.
 6. **Start the application.** The boot check is the verification.
 

@@ -24,4 +24,4 @@ measured before it ships*.
 6. Promotion is the last step: change the pair in `ai/fixtures/pinned.ts`
    only when the matching capture exists.
 7. The ticket's Log gets both halves: kept and dropped counts, and what the
-   drops scored. Then the history paragraph, if a number moved.
+   drops scored. If a number moved, the Log is where the new one lives.

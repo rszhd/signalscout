@@ -75,8 +75,8 @@ SignalScout ships the integrations. You own the accounts. Nothing is proxied
 through us, and no data leaves your instance.
 
 Six platforms arrive through four data providers — ScrapeCreators and
-SocialCrawl for Reddit, SocialCrawl and SocialData for X, Apify for LinkedIn,
-and SocialCrawl for YouTube, TikTok and Instagram. You bring a key for the
+SocialCrawl for Reddit, YouTube and TikTok, SocialCrawl and SocialData for X,
+Apify for LinkedIn, and SocialCrawl for Instagram. You bring a key for the
 providers you actually use, and one Reddit key plus one model key is already a
 useful product. ScrapeCreators and SocialCrawl both have a free tier that needs
 no card.
@@ -215,9 +215,12 @@ by hand and says less than both on purpose.
 | [docs/accounts.md](docs/accounts.md) | Accounts, TLS, verifying an address by hand, getting back in |
 | [docs/notifications.md](docs/notifications.md) | SMTP setup and the webhook contract |
 | [docs/deletions.md](docs/deletions.md) | How a removed post stops being shown |
-| [docs/design.md](docs/design.md) | The shared theme, tokens, the spacing scale and controls |
+| [docs/pipeline.md](docs/pipeline.md) | The worker's run in order, the caps that stop it, and what each step writes |
+| [docs/design.md](docs/design.md) | This application's screens and layouts |
+| [packages/ui/](packages/ui/README.md) | The brand both applications wear: tokens, the spacing scale, shared controls |
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
 | [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
+| [docs/releasing.md](docs/releasing.md) | Cutting a version of the packages and the image |
 | [CHANGELOG.md](CHANGELOG.md) | What each published package version changed for a consumer |
 | [packages/engine/](packages/engine/README.md) | The stateless half, on npm: connectors, model calls, the cipher |
 | [packages/pipeline/](packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |

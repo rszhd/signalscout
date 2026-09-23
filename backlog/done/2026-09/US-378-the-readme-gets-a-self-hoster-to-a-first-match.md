@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-23T16:57+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -50,3 +50,4 @@ The cloud promise keeps its words, because US-321 quotes them.
   the app asks for both keys after the first account (`Onboarding.tsx`), so
   step 2 says so. The repository table moved to `docs/map.md`. Every local
   link resolves.
+- 2026-09-23T18:18+08:00 — The owner read the README and accepted it.

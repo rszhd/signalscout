@@ -31,7 +31,7 @@ the README can be the short path into them.
       database password and HTTPS.
 - [x] Provider agreements, connector prices, the roadmap and the license
       argument are one line and a link each, or gone.
-- [x] The repository table lives in `docs/map.md`, not in the README.
+- [x] The repository table lives in CONTRIBUTING.md, not in the README.
 - [x] The seventh-network rule is left to PLAN.md, not said three times.
 - [x] `#running-it` and *What this is not* still exist: the site and the
       feature form link to them.
@@ -51,3 +51,6 @@ The cloud promise keeps its words, because US-321 quotes them.
   step 2 says so. The repository table moved to `docs/map.md`. Every local
   link resolves.
 - 2026-09-23T18:18+08:00 — The owner read the README and accepted it.
+- 2026-09-23T20:12+08:00 — The table moved again, to CONTRIBUTING.md: in `docs/map.md` it
+  broke the 800-word limit `docs-map.test.ts` holds, which the release pull
+  request (#95) caught.

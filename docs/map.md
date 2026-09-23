@@ -116,30 +116,3 @@ The code says what it does. It does not say why, on purpose.
 
 Go looking when a change touches money, a credential, a connector or a
 migration. Otherwise the ticket is enough.
-
-## Every document
-
-| | |
-|---|---|
-| [PLAN.md](../PLAN.md) | What we are building, and why |
-| [STACK.md](../STACK.md) | What we are building it with, and why not the alternatives |
-| [docs/pipeline.md](pipeline.md) | The worker's run in order, the caps that stop it, and what each step writes |
-| [docs/sources.md](sources.md) | Adding a platform, adding a provider, switching one off |
-| [docs/costs.md](costs.md) | What our spend figure is, and what it is wrong about |
-| [docs/secrets.md](secrets.md) | Where a key lives, what encryption promises, what rotation does |
-| [docs/accounts.md](accounts.md) | Who may register, whose keys pay, what the login protects |
-| [docs/notifications.md](notifications.md) | The outbox, what an email is, the signing secret, where a webhook may point |
-| [docs/deletions.md](deletions.md) | How a removed post stops being shown |
-| [docs/self-hosting.md](self-hosting.md) | Adding a setting, the image, and what the install guide promises |
-| [docs/design.md](design.md) | This application's screens and layouts |
-| [packages/ui/](../packages/ui/README.md) | The brand both applications wear: tokens, the spacing scale, shared controls |
-| [docs/testing.md](testing.md) | How the tests are written, and what a green suite cannot say |
-| [docs/instruments.md](instruments.md) | Every command that spends money, what it asks and what it costs |
-| [docs/releasing.md](releasing.md) | Cutting a version of the packages and the image |
-| [CHANGELOG.md](../CHANGELOG.md) | What each published package version changed for a consumer |
-| [packages/engine/](../packages/engine/README.md) | The stateless half, on npm: connectors, model calls, the cipher |
-| [packages/pipeline/](../packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |
-| [backlog/](../backlog/README.md) | One ticket per file; the folder is the status |
-| [AGENTS.md](../AGENTS.md) | Instructions for AI coding agents working in this repo |
-| [AI_POLICY.md](../AI_POLICY.md) | How AI may be used here, by the owner and by a contributor |
-| [SECURITY.md](../SECURITY.md) | Reporting a hole privately, and what is in scope |

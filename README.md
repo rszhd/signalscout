@@ -140,7 +140,7 @@ having and boots as it stands; the two secrets are not in it, because a
 committed file cannot carry a secret.
 
 **Pin a version** rather than following `latest` once you have an instance
-you care about: `SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1` in
+you care about: `SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.14.0` in
 `.env`. Tags exist for the full version, for the major and minor, and for
 `latest`.
 

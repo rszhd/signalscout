@@ -30,7 +30,7 @@ The app is then on <http://localhost:3000>. The compose file pulls
 moves when `main` does:
 
 ```bash
-echo "SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1" >> .env
+echo "SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.14.0" >> .env
 ```
 
 Tags are published for the full version (`0.13.1`), the major and minor
@@ -125,7 +125,7 @@ serving none. Read its log first: a migration that refused says which. To go
 back, restore the dump and pin the version you were on:
 
 ```bash
-echo "SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1" >> .env
+echo "SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.14.0" >> .env
 docker compose up -d
 ```
 

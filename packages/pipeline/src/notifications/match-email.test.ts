@@ -11,8 +11,9 @@
  * The rest of the file is about what a mail client can render: a `<style>`
  * block Gmail strips, a flex row Outlook flattens, a font nobody has.
  */
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { escapeHtml, safeUrl } from "./email-theme.js";
+import { emailPalette, escapeHtml, safeUrl } from "./email-theme.js";
 import { type MatchRow, matchEmail } from "./match-email.js";
 
 const postedAt = new Date("2026-09-09T12:00:00.000Z");
@@ -183,11 +184,44 @@ describe("what a mail client can actually render", () => {
 
   it("paints its own background, so a dark-mode client does not invert it", () => {
     expect(html).toContain("color-scheme:light");
-    expect(html).toContain("background:#f7f8fa");
+    expect(html).toContain("background:#f8fafd");
   });
 
   it("uses the site's own accent, copied from the tokens", () => {
-    expect(html).toContain("#36578f");
-    expect(html).toContain("#48679f");
+    expect(html).toContain("#0b57d0");
+  });
+});
+
+/**
+ * The copy stays a copy. An email cannot read `tokens.css`, so the palette is
+ * written out by hand, and this is what notices when the brand moves and the
+ * emails do not. The test reads the stylesheet as text; the package does not
+ * import the UI package, which the boundary forbids.
+ */
+describe("the email palette", () => {
+  const tokens = readFileSync(
+    new URL("../../../ui/src/styles/tokens.css", import.meta.url),
+    "utf8",
+  );
+  const token = (name: string) =>
+    tokens.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{3,6})\\s*;`))?.[1]?.toLowerCase();
+  // `#fff` in the stylesheet is `#ffffff` here: a mail client gets the long form.
+  const long = (hex: string | undefined) =>
+    hex?.length === 4 ? `#${[...hex.slice(1)].map((c) => c + c).join("")}` : hex;
+
+  it.each([
+    ["ink", "ink"],
+    ["muted", "muted"],
+    ["mutedStrong", "muted-strong"],
+    ["background", "background"],
+    ["surface", "surface"],
+    ["surfaceSoft", "surface-soft"],
+    ["line", "line"],
+    ["accent", "accent"],
+    ["accentSoft", "accent-soft"],
+    ["accentText", "accent-text"],
+    ["onAccent", "text-on-accent"],
+  ] as const)("%s matches --%s", (key, name) => {
+    expect(emailPalette[key]).toBe(long(token(name)));
   });
 });

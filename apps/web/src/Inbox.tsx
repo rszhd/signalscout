@@ -1,14 +1,21 @@
 import {
+  ArrivedBanner,
+  activeFilters,
   FormError,
+  InboxFilters,
+  type InboxOrder,
+  inboxOrders,
   type Match,
   MatchCard,
   MatchDetail,
+  MatchListHeading,
   type Monitor,
   MonitoringBar,
   messageFor,
   monitoringState,
   PageState,
   requestJson,
+  ShowMore,
   useMonitorRefresh,
   type Verdict,
 } from "@signalscout/ui";
@@ -84,36 +91,6 @@ export function thresholdSentence(monitors: readonly MonitorSummary[]): string |
 
 type LoadState = "loading" | "more" | "ready" | "error";
 
-const scoreFilters = [
-  { value: 0, label: "Any score" },
-  { value: 50, label: "50 and above" },
-  { value: 70, label: "70 and above" },
-  { value: 85, label: "85 and above" },
-];
-
-const dismissedFilters = [
-  { value: "hide", label: "Hidden" },
-  { value: "show", label: "Shown" },
-];
-
-/**
- * The orders the list offers, and what the heading calls each one. US-114.
- *
- * An order is not a filter, so it sits beside the monitor picker rather than
- * inside the Filters panel and never adds to that panel's count. A filter says
- * what is on the list; this says where to start reading.
- */
-const orders = [
-  // "Best" on the control and the rule in the heading below it. The picker has
-  // room for one word and the heading has room for the sentence that says what
-  // the word means, so neither has to do the other's job.
-  { value: "rank", label: "Best", heading: "Ranked by score & age" },
-  { value: "score", label: "Score", heading: "Highest score first" },
-  { value: "newest", label: "Newest", heading: "Newest first" },
-] as const;
-
-type Order = (typeof orders)[number]["value"];
-
 /**
  * The inbox of one project. US-045, US-076.
  *
@@ -141,8 +118,7 @@ export function Inbox({
   const [error, setError] = useState<string | null>(null);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
-  const [order, setOrder] = useState<Order>("rank");
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [order, setOrder] = useState<InboxOrder>("rank");
   const [showDismissed, setShowDismissed] = useState(false);
   /**
    * The saved list. US-043.
@@ -416,9 +392,9 @@ export function Inbox({
     );
   }
 
-  const filtered = monitorId !== "" || minScore > 0 || showDismissed;
+  const filtered = activeFilters({ monitors, monitorId, minScore, showDismissed }) > 0;
   const orderHeading =
-    orders.find((option) => option.value === order)?.heading ?? orders[0].heading;
+    inboxOrders.find((option) => option.value === order)?.heading ?? inboxOrders[0].heading;
   /**
    * The item the address names, when the loaded page does not hold it. US-268.
    *
@@ -512,115 +488,26 @@ export function Inbox({
         />
       )}
 
-      <div className="inbox-toolbar">
-        <fieldset className="view-switch inbox-views" aria-label="Which matches">
-          <button type="button" aria-pressed={!showSaved} onClick={() => setShowSaved(false)}>
-            Inbox
-          </button>
-          <button type="button" aria-pressed={showSaved} onClick={() => setShowSaved(true)}>
-            Saved
-          </button>
-        </fieldset>
-        <div className="inbox-filters">
-          <label className="filter">
-            <span>Monitor</span>
-            <select
-              aria-label="Monitor"
-              value={monitorId}
-              onChange={(event) => setMonitorId(event.target.value)}
-            >
-              <option value="">All monitors</option>
-              {monitors.map((monitor) => (
-                <option key={monitor.id} value={monitor.id}>
-                  {monitor.name}
-                </option>
-              ))}
-            </select>
-          </label>
+      <InboxFilters
+        saved={showSaved}
+        onSaved={setShowSaved}
+        monitors={monitors}
+        monitorId={monitorId}
+        onMonitor={setMonitorId}
+        order={order}
+        onOrder={setOrder}
+        minScore={minScore}
+        onMinScore={setMinScore}
+        showDismissed={showDismissed}
+        onShowDismissed={setShowDismissed}
+        onClear={clearFilters}
+      />
 
-          {!showSaved && (
-            <label className="filter">
-              <span>Order</span>
-              <select
-                aria-label="Order"
-                value={order}
-                onChange={(event) => setOrder(event.target.value as Order)}
-              >
-                {orders.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-
-          <button
-            className={`compact-button filter-toggle ${filtered ? "active" : ""}`}
-            type="button"
-            aria-expanded={filtersOpen}
-            aria-controls="inbox-extra-filters"
-            onClick={() => setFiltersOpen(!filtersOpen)}
-          >
-            Filters
-            {filtered
-              ? ` · ${Number(minScore > 0) + Number(showDismissed) + Number(monitorId !== "")}`
-              : ""}
-          </button>
-        </div>
-      </div>
-      <div className="inbox-extra-filters" id="inbox-extra-filters" hidden={!filtersOpen}>
-        <label className="filter">
-          <span>Minimum score</span>
-          <select
-            aria-label="Minimum score"
-            value={String(minScore)}
-            onChange={(event) => setMinScore(Number(event.target.value))}
-          >
-            {scoreFilters.map((filter) => (
-              <option key={filter.value} value={filter.value}>
-                {filter.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="filter">
-          <span>Not relevant</span>
-          <select
-            aria-label="Not relevant"
-            value={showDismissed ? "show" : "hide"}
-            onChange={(event) => setShowDismissed(event.target.value === "show")}
-          >
-            {dismissedFilters.map((filter) => (
-              <option key={filter.value} value={filter.value}>
-                {filter.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {filtered && (
-          <button className="read-more-button" type="button" onClick={clearFilters}>
-            Clear filters
-          </button>
-        )}
-      </div>
-
-      {/*
-        The banner, and the only thing that reloads the list. US-125.
-
-        A live region that is present and empty rather than one that appears
-        with its message: a region added to the document at the same moment as
-        its content is announced by nothing.
-      */}
-      <div className="inbox-arrived-slot" role="status" aria-live="polite">
-        {arrived > 0 && state !== "loading" && (
-          <button className="inbox-arrived" type="button" onClick={() => void loadFirstPage()}>
-            {arrived === 1 ? "Show 1 new match" : `Show ${arrived} new matches`}
-          </button>
-        )}
-      </div>
+      {/* The only thing that reloads the list. US-125. */}
+      <ArrivedBanner
+        arrived={state === "loading" ? 0 : arrived}
+        onShow={() => void loadFirstPage()}
+      />
 
       {state === "loading" && (
         <PageState kind="loading" heading="Loading the inbox">
@@ -718,23 +605,12 @@ export function Inbox({
       {state !== "loading" && state !== "error" && selectedMatch && (
         <div className="inbox-layout">
           <div className="match-list-column">
-            <div className="list-heading">
-              <span>
-                {matches.length}
-                {page?.nextCursor ? "+" : ""} conversations
-              </span>
-              <span>{showSaved ? "Recently saved" : orderHeading}</span>
-              {/*
-                Beside the count, because the count is what it exports. US-064.
-                A plain link rather than a fetch: the browser downloads it, so
-                nothing here has to hold a file in memory or invent a filename
-                — the server sets both. "CSV" is on the label because somebody
-                asking for Excel will otherwise go looking for a second button.
-              */}
-              <a className="inbox-export" href={`/api/matches/export?${filterQuery()}`} download>
-                Export CSV
-              </a>
-            </div>
+            <MatchListHeading
+              count={matches.length}
+              more={page?.nextCursor != null}
+              heading={showSaved ? "Recently saved" : orderHeading}
+              exportHref={`/api/matches/export?${filterQuery()}`}
+            />
             <div className="inbox-scroll-region">
               <ol className="match-list" aria-label="Matches">
                 {matches.map((match) => (
@@ -757,16 +633,7 @@ export function Inbox({
               </ol>
 
               {page?.nextCursor && (
-                <div className="inbox-more">
-                  <button
-                    className="secondary-button"
-                    disabled={state === "more"}
-                    type="button"
-                    onClick={() => void loadMore()}
-                  >
-                    {state === "more" ? "Loading…" : "Show more"}
-                  </button>
-                </div>
+                <ShowMore loading={state === "more"} onClick={() => void loadMore()} />
               )}
             </div>
           </div>

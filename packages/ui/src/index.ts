@@ -26,6 +26,13 @@ export {
   DraftFromDocument,
   type DraftFromDocumentProps,
 } from "./DraftFromDocument.js";
+export {
+  ArrivedBanner,
+  InboxFilters,
+  type InboxFiltersProps,
+  MatchListHeading,
+  ShowMore,
+} from "./InboxFilters.js";
 export { LeadSources, type LeadSourcesProps } from "./LeadSources.js";
 export { LoginFrame, type LoginFrameProps } from "./LoginFrame.js";
 export { ageLabel, platformName, providerName, untilLabel } from "./labels.js";
@@ -35,12 +42,17 @@ export { MonitorHistory, type MonitorHistoryProps } from "./MonitorHistory.js";
 export { MonitoringBar, type MonitoringBarProps } from "./MonitoringBar.js";
 export { MonitorStatus, type MonitorStatusProps } from "./MonitorStatus.js";
 export {
+  activeFilters,
+  type InboxFilterState,
+  type InboxOrder,
+  inboxOrders,
   limitWords,
   type Match,
   opensThreadOnly,
   type PlatformLabel,
   platformLabel,
   postPreviewWordLimit,
+  scoreFilters,
   threadDepth,
   type Verdict,
   whereItCameFrom,

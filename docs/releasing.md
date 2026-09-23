@@ -175,11 +175,20 @@ against the Postgres `pnpm db:up` starts. It packs, installs into
 
 ## Secrets
 
-None. Each package on npm lists `rszhd/signalscout` and `release.yml` as a
-trusted publisher, so the release job authenticates with the OIDC token
-GitHub mints for it, and no npm token exists anywhere. US-154 published the
-first version with a granular access token because a package has to exist
-before npm will trust a workflow to publish it; US-156 replaced the token.
+None. Each package on npm lists `rszhd/signalscout` and its release workflow
+as a trusted publisher — `release.yml` for the engine and the pipeline,
+`release-ui.yml` for the UI package — so the release job authenticates with
+the OIDC token GitHub mints for it, and no npm token exists anywhere. US-154
+published the first version with a granular access token because a package
+has to exist before npm will trust a workflow to publish it; US-156 replaced
+the token. The UI package's trust was set only for 0.2.0, which is why the
+workflow run for 0.1.0 failed with a 404 on publish.
+
+A trusted publisher names one workflow file and cannot be changed afterwards;
+renaming a release workflow means deleting the publisher on npm and adding
+it again. Each one allows a direct `npm publish`; npm recommends staged
+publishing instead, which would need the workflows to run `npm stage publish`
+and the owner to approve each version on npmjs.com.
 
 ## Versions
 

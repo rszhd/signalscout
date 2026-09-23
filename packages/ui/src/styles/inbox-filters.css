@@ -68,7 +68,7 @@
   border-radius: 999px;
   outline: none;
   color: var(--muted-strong);
-  background: var(--surface);
+  background-color: var(--surface);
   font-size: var(--text-sm);
   transition:
     border-color 140ms ease,

@@ -212,9 +212,6 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
                 : "Manage your schedules, spending and search quality in one place."}
             </p>
           </div>
-          <a className="secondary-button" href="/api/feedback/export">
-            Export feedback as JSON
-          </a>
         </div>
         <div className="monitors-filter-panel">
           <div className="monitors-toolbar">

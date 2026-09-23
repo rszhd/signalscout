@@ -112,11 +112,6 @@
   line-height: 1.6;
 }
 
-.monitors-overview > a {
-  flex-shrink: 0;
-  font-weight: 500;
-}
-
 .monitors-filter-panel {
   margin-bottom: var(--space-6);
   padding: 0;
@@ -232,10 +227,14 @@
   min-height: var(--control-height);
   border: 1px solid var(--line-dark);
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  background-color: var(--surface);
   padding: var(--space-2);
   color: var(--ink);
   font-size: var(--text-sm);
+}
+
+.monitor-controls select {
+  padding-right: var(--space-8);
 }
 
 .collection-settings-section .monitor-origin {

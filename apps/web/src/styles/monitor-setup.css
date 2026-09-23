@@ -123,8 +123,12 @@
   border: 1px solid var(--line-dark);
   border-radius: var(--radius-sm);
   padding: var(--space-3);
-  background: var(--surface);
+  background-color: var(--surface);
   font: inherit;
+}
+
+.setup-content .field select {
+  padding-right: var(--space-8);
 }
 .setup-content .field textarea {
   min-height: 96px;

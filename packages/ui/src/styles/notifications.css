@@ -109,8 +109,12 @@
   border: 1px solid var(--line-dark);
   border-radius: var(--radius-sm);
   color: var(--ink);
-  background: var(--surface);
+  background-color: var(--surface);
   font: inherit;
+}
+
+.notification-panel select {
+  padding-right: var(--space-8);
 }
 
 .notification-panel input:not([type="checkbox"]):hover,

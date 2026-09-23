@@ -2,7 +2,7 @@
 
 # Open tickets
 
-48 open — 2 doing, 37 todo, 9 parked (2 p1, 31 p2, 15 p3).
+49 open — 2 doing, 38 todo, 9 parked (2 p1, 32 p2, 15 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -38,6 +38,7 @@
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
+| p2 | BUG-341 | [The boot check opens every stored secret](todo/BUG-341-the-boot-check-opens-every-stored-secret.md) | bug | todo | 2026-09-23T10:40+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |

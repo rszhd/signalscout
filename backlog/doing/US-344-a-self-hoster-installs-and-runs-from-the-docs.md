@@ -23,10 +23,10 @@ table is the drift BUG-339 spent a morning finding.
 
 ## Acceptance
 
-- [ ] *Self-hosting*: install, TLS and the proxy, providers and keys, models,
+- [x] *Self-hosting*: install, TLS and the proxy, providers and keys, models,
       email, webhooks, backups, upgrading, key rotation, troubleshooting.
-- [ ] A configuration reference built from `.env.example` at build time.
-- [ ] The webhook contract is one page a receiver can be written from.
+- [x] A configuration reference built from `.env.example` at build time.
+- [x] The webhook contract is one page a receiver can be written from.
 - [ ] Each repository page that lost its self-hoster half opens with one line
       pointing at the site, and keeps what a contributor needs.
 - [ ] The README's install section links to the site rather than repeating
@@ -39,3 +39,10 @@ The rotation command for the image was proved under BUG-339.
 ## Log
 
 - 2026-09-23T10:50+08:00 — Written as part of the site split, US-342.
+- 2026-09-23T11:15+08:00 — Twelve pages, each with a diagram or a table. Every fact was
+  checked against the code: button labels, defaults, the `>=` on the
+  immediate-email score, the signature header. Two comments that users read
+  were wrong and are fixed: `.env.example` said a stranger on an open instance
+  polls on the `.env` keys, which US-081 ended, and
+  `.env.example.self-hosted` listed ScrapeCreators for Reddit only and
+  SocialCrawl for LinkedIn, which is switched off.

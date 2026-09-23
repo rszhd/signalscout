@@ -31,6 +31,9 @@ export default withMermaid(
     lastUpdated: true,
     // The README is for people writing pages, not a page.
     srcExclude: ["README.md"],
+    // A link to localhost is an instruction to the reader, not a page on this
+    // site. Every other dead link still fails the build.
+    ignoreDeadLinks: "localhostLinks",
 
     head: [
       ["link", { rel: "icon", type: "image/svg+xml", href: "/brand/mark-small.svg" }],
@@ -43,6 +46,7 @@ export default withMermaid(
 
       nav: [
         { text: "Getting started", link: "/getting-started/" },
+        { text: "Self-hosting", link: "/self-hosting/" },
         { text: "Cloud", link: "https://www.signalscout.run" },
         { text: "GitHub", link: repository },
       ],
@@ -51,6 +55,23 @@ export default withMermaid(
         {
           text: "Getting started",
           items: [{ text: "What SignalScout does", link: "/getting-started/" }],
+        },
+        {
+          text: "Self-hosting",
+          items: [
+            { text: "Overview", link: "/self-hosting/" },
+            { text: "Install", link: "/self-hosting/install" },
+            { text: "Providers and keys", link: "/self-hosting/keys" },
+            { text: "AI models", link: "/self-hosting/models" },
+            { text: "Accounts and sign-up", link: "/self-hosting/accounts" },
+            { text: "HTTPS and the proxy", link: "/self-hosting/https" },
+            { text: "Email", link: "/self-hosting/email" },
+            { text: "Webhooks", link: "/self-hosting/webhooks" },
+            { text: "What it costs you", link: "/self-hosting/costs" },
+            { text: "Back up and upgrade", link: "/self-hosting/maintenance" },
+            { text: "Troubleshooting", link: "/self-hosting/troubleshooting" },
+            { text: "Configuration reference", link: "/self-hosting/configuration" },
+          ],
         },
       ],
 

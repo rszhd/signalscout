@@ -6,7 +6,9 @@
     "node": ">=24"
   },
   "scripts": {
+    "predev": "node scripts/configuration.mjs",
     "dev": "vitepress dev",
+    "prebuild": "node scripts/configuration.mjs",
     "build": "vitepress build",
     "preview": "vitepress preview"
   },

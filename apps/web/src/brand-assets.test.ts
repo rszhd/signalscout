@@ -13,7 +13,7 @@ describe("the application brand assets", () => {
 
     expect(html).toContain('<meta name="theme-color" content="#f8fafd" />');
     expect(html).toContain('href="/favicon.ico"');
-    expect(html).toContain('href="/brand/mark.svg"');
+    expect(html).toContain('href="/brand/mark-small.svg"');
     expect(html).toContain('href="/brand/apple-touch-icon.png"');
     expect(html).toContain('href="/site.webmanifest"');
     expect(html).not.toContain("favicon.svg");
@@ -54,8 +54,8 @@ describe("the application brand assets", () => {
       icon512Maskable: sha256("brand/icon-512-maskable.png"),
       legacyRasterEntry: sha256("logo.png"),
     }).toEqual({
-      favicon: "d3ebdb211465f84d53192b37dbe1bbf0ff0d200e7cd4d6d961debf933d268056",
-      appleTouch: "08809af3bb764932fd51768ccf5791664cd006a86a0c75875767f6ff90dce18f",
+      favicon: "768fd81e4318ba1d0afa1fce25fd3a9342ef9db04b04dd6998986d8010671dfc",
+      appleTouch: "c1d6d813a97bd075241f89f8f147c0d0a339422c36a2df15b51254401d35c7a3",
       icon192: "3a1e5a41e8b659364a3ddcb15aa61332afc704855c0f1b97192976af5326d1ac",
       icon512: "9a8ddc47b0a1125fdad14c7bfaf6d10b6716dd55ec7bc9d69c03c84f9a76122b",
       icon512Maskable: "40dac1ce0f483192d6460a4a9529d2bf0bc2ec251002943dd8da7bc05845bd45",

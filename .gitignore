@@ -71,3 +71,5 @@ site/.vitepress/*.timestamp-*.mjs
 
 # The UI package's static component preview, from `storybook:build` (US-351).
 storybook-static/
+# What Storybook writes beside the package when it fails to start.
+debug-storybook.log

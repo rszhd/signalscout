@@ -45,3 +45,6 @@ A screenshot is stored beside its page. `site/README.md` holds the rules.
 ## Log
 
 - 2026-09-23T10:50+08:00 — Written as part of the site split, US-342.
+- 2026-09-23T11:17+08:00 — Screenshots wait for the owner: the UI is being polished first, and a
+  screenshot of the screen before the polish is one to take twice. No seed
+  data and no screenshot script yet.

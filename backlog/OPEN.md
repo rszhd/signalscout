@@ -2,7 +2,7 @@
 
 # Open tickets
 
-52 open — 6 doing, 37 todo, 9 parked (4 p1, 33 p2, 15 p3).
+53 open — 6 doing, 38 todo, 9 parked (4 p1, 33 p2, 16 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -50,6 +50,7 @@
 | p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
+| p3 | BUG-348 | [The issue sync says an issue is missing when it could not look](todo/BUG-348-sync-says-an-issue-is-missing-when-it-could-not-look.md) | bug | todo | 2026-09-23T12:28+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 | p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |
 | p3 | US-242 | [Do saved and a good verdict ever disagree?](parked/US-242-do-saved-and-a-good-verdict-ever-disagree.md) | spike | parked | 2026-09-20T00:56+08:00 |

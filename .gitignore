@@ -63,3 +63,6 @@ evals/*/dataset.json
 # The documentation site's build and cache (US-342).
 site/.vitepress/cache/
 site/.vitepress/dist/
+# Vite's bundled copy of the config, written while it loads and left behind
+# when a server is stopped mid-load.
+site/.vitepress/*.timestamp-*.mjs

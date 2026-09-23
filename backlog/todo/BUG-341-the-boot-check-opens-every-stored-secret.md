@@ -1,5 +1,6 @@
 ---
 id: BUG-341
+issue: 89
 title: The boot check opens every stored secret
 type: bug
 priority: p2

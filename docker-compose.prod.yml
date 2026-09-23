@@ -12,7 +12,7 @@
 #
 # The proxy is a separate compose project. Start docker-compose.proxy.yml first,
 # or point EDGE_NETWORK at the network a proxy you already run is on. Full
-# instructions: docs/accounts.md.
+# instructions: https://docs.signalscout.run/self-hosting/https
 
 services:
   app:

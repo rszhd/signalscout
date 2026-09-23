@@ -100,7 +100,7 @@ them.
 
 The principle is unchanged: the user owns the account and pays for their own
 usage. STACK.md, *A source is not a provider*, holds the reasoning and the rule
-it produced, and docs/self-hosting.md lists every variable.
+it produced, and the site's configuration reference lists every variable.
 
 Several AI providers are supported:
 

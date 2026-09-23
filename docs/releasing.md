@@ -145,7 +145,7 @@ say they can be mixed.
 6. A job re-tags the published image with `0.2.0` and `0.2`, from CI's
    cache. `latest` is not among them: that one follows `main`, and a tag can
    point at a commit `main` has moved past. A self-hoster pins a version with
-   `SIGNALSCOUT_IMAGE` (docs/self-hosting.md).
+   `SIGNALSCOUT_IMAGE` (site/self-hosting/install.md).
 7. The last job makes the GitHub Release, titled with the tag and holding
    the tag's section of CHANGELOG.md. It runs after npm has the packages,
    so a refused publish leaves no Release naming a version nobody can

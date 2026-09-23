@@ -2,7 +2,7 @@
 
 # Open tickets
 
-53 open — 6 doing, 38 todo, 9 parked (4 p1, 34 p2, 15 p3).
+52 open — 6 doing, 37 todo, 9 parked (4 p1, 33 p2, 15 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -38,7 +38,6 @@
 | p2 | US-319 | [A self-hoster can check where the image came from](todo/US-319-a-self-hoster-can-check-where-the-image-came-from.md) | chore | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-320 | [The app deploys in one click](todo/US-320-the-app-deploys-in-one-click.md) | feature | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-331 | [A post that asks for a high score does not get one](todo/US-331-a-post-that-asks-for-a-high-score-does-not-get-one.md) | feature | todo | 2026-09-23T06:41+08:00 |
-| p2 | US-346 | [The contributor docs say only what a contributor needs](todo/US-346-the-contributor-docs-say-only-what-a-contributor-needs.md) | chore | todo | 2026-09-23T10:50+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |

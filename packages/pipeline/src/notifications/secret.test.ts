@@ -47,7 +47,7 @@ beforeEach(async () => {
 
 describe("generating a secret", () => {
   it("is 32 bytes of hex, which is what the documented command produces", () => {
-    // docs/notifications.md tells a self-hoster `openssl rand -hex 32`, so the
+    // site/self-hosting/webhooks.md tells a self-hoster `openssl rand -hex 32`, so the
     // two halves of one instance cannot disagree about what a secret looks
     // like, and WEBHOOK_SIGNING_SECRET's own 32-character minimum is cleared.
     const secret = generateWebhookSecret();

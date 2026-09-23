@@ -199,13 +199,15 @@ Encrypts credentials stored in the database. Base64 of 32 bytes:
 openssl rand -base64 32
 ```
 
-Leave it empty while your keys live in this file. An environment variable
-needs no encryption — it is already outside the database and outside git —
-and nothing in the application writes an encrypted credential yet.
+It encrypts the keys pasted on the Connections and Models screens, and each
+account's webhook signing secret. A key in this file needs no encryption: it
+is already outside the database and outside git. So an instance whose keys all
+live here may leave it empty, and the screens then say they cannot store one.
 
-Once one is stored, this stops being optional: the API and the worker decrypt
-every stored credential at boot and refuse to start if they cannot. Losing
-this value loses those credentials. docs/secrets.md has the rotation steps.
+Once a provider key is stored, this stops being optional: the API and the
+worker decrypt every stored provider key at boot and refuse to start if they
+cannot. Losing this value loses what it encrypted. The rotation steps are at
+https://docs.signalscout.run/self-hosting/maintenance
 
 ## Sources
 
@@ -213,14 +215,10 @@ this value loses those credentials. docs/secrets.md has the rotation steps.
 
 Default: *empty*
 
-Reddit arrives through Bright Data, not through Reddit's own API: Reddit
-closed self-serve app registration in November 2025 and now approves
-developers by hand. A Bright Data account is self-serve and its free tier
-needs no card — 5,000 records a month, then $1.50 per 1,000.
-Bright Data. **This key buys nothing here now.** US-158 switched the Reddit
-connector that spends it off on 2026-09-17: it bills a record per post, about
-five times what ScrapeCreators or SocialCrawl charge for the same subreddit
-page. The variable stays because the connector still ships and this file
+Bright Data, for Reddit. **This key buys nothing here now.** US-158 switched
+the Reddit connector that spends it off on 2026-09-17: it bills a record per
+post, about five times what ScrapeCreators or SocialCrawl charge for the same
+subreddit page. The variable stays because the connector still ships and this file
 lists one variable per credential field the build registers. Setting it does
 nothing until somebody deletes `notOffered` from
 `packages/engine/src/sources/providers/brightdata/reddit.ts`.
@@ -578,7 +576,8 @@ SMTP is optional, unless AUTH_EMAIL_VERIFICATION is required — then
 SMTP_HOST and SMTP_FROM are what carry the confirmation link, and the process
 refuses to start without them. Resend: smtp.resend.com, port 465, secure true,
 user resend, password your Resend API key. SMTP_FROM is an address on your
-verified domain. See docs/notifications.md for the setup and webhook contract.
+verified domain. See https://docs.signalscout.run/self-hosting/email, and
+/self-hosting/webhooks for the webhook contract.
 
 ### `WEBHOOK_SIGNING_SECRET`
 

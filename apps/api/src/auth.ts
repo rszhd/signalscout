@@ -22,7 +22,7 @@
 import { type Database, getMonitor, type Logger, type Monitor } from "@signalscout/pipeline";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { type Auth, accountExists } from "./auth/auth.js";
+import { type Auth, accountExists, clientAddressHeader } from "./auth/auth.js";
 import { hasCompletedOnboarding } from "./auth/onboarding.js";
 import type { SignupMode } from "./auth/user.js";
 import type { ApiServer } from "./server.js";
@@ -157,6 +157,10 @@ function headersOf(request: FastifyRequest): Headers {
     }
   }
 
+  // Set, never passed through: `request.ip` is Fastify's answer under
+  // `TRUST_PROXY`, and a copy the client sent is replaced by it.
+  headers.set(clientAddressHeader, request.ip);
+
   return headers;
 }
 
@@ -227,7 +231,11 @@ export async function registerAuthRoutes(
     });
 
   app.addHook("onRequest", async (request, reply) => {
-    const path = request.url.split("?")[0] ?? "";
+    // The route that matched, not the URL as it arrived. The router decodes a
+    // path before it matches, so `/%61pi/matches` reaches `/api/matches` while
+    // its raw spelling does not start with `/api/` (BUG-329). With no match no
+    // handler runs, and the raw path decides only between a 401 and the page.
+    const path = request.routeOptions.url ?? request.url.split("?")[0] ?? "";
 
     if (isOpenPath(path)) return;
 

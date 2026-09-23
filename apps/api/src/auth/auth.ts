@@ -117,6 +117,11 @@ export interface CreateAuthOptions {
    * this, and it is where the refusal to boot lives.
    */
   readonly sendEmail?: SendEmail;
+  /**
+   * The sign-in rate limit. On unless a test that is about something else
+   * turns it off; no setting reaches this, so a deployment cannot (BUG-327).
+   */
+  readonly rateLimit?: boolean;
 }
 
 /**
@@ -180,6 +185,16 @@ export async function claimUnownedRows(db: Database, userId: string): Promise<vo
  * Two rules live in the hooks below rather than in configuration, and both are
  * things a static setting cannot say.
  */
+/**
+ * The header the API writes the client's address into, for Better Auth.
+ *
+ * The API decides who the client is, from the connection and `TRUST_PROXY`,
+ * and hands Better Auth that one answer. Left to itself Better Auth reads
+ * `X-Forwarded-For`, which the client writes (BUG-327). Any copy a client
+ * sends is removed before this is set.
+ */
+export const clientAddressHeader = "x-signalscout-client-ip";
+
 export function createAuth({
   db,
   secret,
@@ -188,6 +203,7 @@ export function createAuth({
   trustedOrigins = [],
   signup = "closed",
   sendEmail,
+  rateLimit = true,
 }: CreateAuthOptions) {
   return betterAuth({
     secret,
@@ -321,6 +337,13 @@ export function createAuth({
       updateAge: sessionRefreshAfterSeconds,
     },
 
+    /**
+     * On, and on because we said so, for the origin check's reason below:
+     * Better Auth's default is on only when `NODE_ENV` is production, so a
+     * deployment started any other way lost it silently (BUG-327).
+     */
+    rateLimit: { enabled: rateLimit },
+
     advanced: {
       /**
        * The cross-site check is on, and it is on because we said so.
@@ -335,6 +358,9 @@ export function createAuth({
        * `auth.test.ts` able to prove it.
        */
       disableOriginCheck: false,
+
+      // The one address the API decided on. `clientAddressHeader`.
+      ipAddress: { ipAddressHeaders: [clientAddressHeader] },
     },
 
     databaseHooks: {

@@ -23,7 +23,7 @@ import {
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner, createTestDatabase, type TestDatabase } from "./testing.js";
+import { asOwner, asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -289,5 +289,49 @@ describe("the cost test routes", () => {
 
       expect(response.statusCode).toBe(400);
     });
+  });
+
+  /**
+   * BUG-330. A cost test holds the queries a person is about to pay for, which
+   * say what they sell. It is theirs, so another account gets the same answer
+   * as for an id that does not exist.
+   */
+  it("reads a cost test only for the account that started it", async () => {
+    const { jobs } = stubJobs();
+
+    const id = await withServer(jobs, async (app) => {
+      const started = await app.inject({
+        method: "POST",
+        url: "/api/monitors/estimates",
+        payload: plan,
+      });
+      expect(started.statusCode).toBe(202);
+
+      const own = await app.inject({
+        method: "GET",
+        url: `/api/monitors/estimates/${started.json().id}`,
+      });
+      expect(own.statusCode).toBe(200);
+
+      return started.json().id as string;
+    });
+
+    const stranger = await buildServer({
+      session: asUser("a-stranger"),
+      env: loadEnv({ DATABASE_URL: database.url }),
+      logger,
+      db,
+      queryGenerator: null,
+      jobs,
+    });
+
+    try {
+      const theirs = await stranger.inject({ method: "GET", url: `/api/monitors/estimates/${id}` });
+
+      expect(theirs.statusCode).toBe(404);
+      expect(theirs.body).not.toContain("flaky end to end tests");
+    } finally {
+      await stranger.close();
+    }
   });
 });

@@ -10,7 +10,7 @@
  * them — a saved instruction belongs to the account and is chosen at the
  * moment of drafting, so the route reads it by id rather than joining to it.
  */
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import type { Signal } from "../db/schema.js";
 import { matches, monitors, posts } from "../db/schema.js";
@@ -33,9 +33,14 @@ export interface DraftContext {
   readonly postedAt: Date;
 }
 
-/** Read one match, or nothing when no match has that id. */
+/**
+ * Read one match of this account's, or nothing when it has no match with that
+ * id. The prompt carries the monitor's brief, so a match somebody else owns
+ * answers as an unknown one (BUG-330).
+ */
 export async function draftContext(
   db: Database,
+  userId: string,
   matchId: string,
 ): Promise<DraftContext | undefined> {
   const [row] = await db
@@ -58,7 +63,7 @@ export async function draftContext(
     .from(matches)
     .innerJoin(monitors, eq(matches.monitorId, monitors.id))
     .innerJoin(posts, eq(matches.postId, posts.id))
-    .where(eq(matches.id, matchId))
+    .where(and(eq(matches.id, matchId), eq(monitors.userId, userId)))
     .limit(1);
 
   if (!row) return undefined;

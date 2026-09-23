@@ -16,6 +16,7 @@ export {
   matchOwner,
   maximumPageSize,
   noMatchCounts,
+  ownsMatch,
   rankDecayPointsPerDay,
   readMatch,
   setMatchSaved,

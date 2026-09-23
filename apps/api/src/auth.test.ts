@@ -23,6 +23,8 @@ import {
   posts,
   projects,
   readProviderChoices,
+  recordSourceUsage,
+  recordVerdict,
   replyPrompts,
   replyVoicePresets,
   sourceProviders,
@@ -1133,21 +1135,10 @@ describe("the session gate", () => {
     }
 
     /**
-     * Every route that names a record, asked by a stranger with the owner's own
-     * ids. US-336, after BUG-330: two routes read by id alone and no test
-     * noticed, because the cross-account cases were written per route. This one
-     * walks what the build registered, so the next route is in it on the day it
-     * is added.
-     *
-     * A write gets a valid body where the route has one, so the answer comes
-     * from the handler and not from validation. Whatever the answer, nothing of
-     * the owner's may be read or changed.
+     * One of everything a route can name, owned by `owner`, each carrying
+     * `secret` where a person would read it.
      */
-    it("answers every route that names a record as if the owner's did not exist", async () => {
-      await clear();
-      const owner = "second-account";
-      const secret = "OWNER-ONLY-TEXT";
-
+    async function ownerRecords(owner: string, secret: string) {
       const monitorId = await monitorFor(owner, secret);
       const project = await createProject(db, owner, {
         name: secret,
@@ -1189,6 +1180,27 @@ describe("the session gate", () => {
         pollDays: [0, 1, 2, 3, 4, 5, 6],
         probes: [{ source: "reddit", kind: "query", term: secret } as never],
       });
+
+      return { monitorId, project, prompt, match, estimateId };
+    }
+
+    /**
+     * Every route that names a record, asked by a stranger with the owner's own
+     * ids. US-336, after BUG-330: two routes read by id alone and no test
+     * noticed, because the cross-account cases were written per route. This one
+     * walks what the build registered, so the next route is in it on the day it
+     * is added.
+     *
+     * A write gets a valid body where the route has one, so the answer comes
+     * from the handler and not from validation. Whatever the answer, nothing of
+     * the owner's may be read or changed.
+     */
+    it("answers every route that names a record as if the owner's did not exist", async () => {
+      await clear();
+      const owner = "second-account";
+      const secret = "OWNER-ONLY-TEXT";
+
+      const { monitorId, project, prompt, match, estimateId } = await ownerRecords(owner, secret);
 
       /** Which of the owner's ids a route's `:id` names, by where the route lives. */
       const idFor = (url: string): string | undefined => {
@@ -1256,6 +1268,70 @@ describe("the session gate", () => {
         expect(savedMatch?.savedAt ?? null).toBeNull();
       } finally {
         await app.close();
+      }
+    });
+
+    /**
+     * Every GET route that names no record, asked by a stranger while the
+     * owner has one of everything. The sweep above covers routes with an id.
+     * A list, a count or an export answers for "all of mine", and BUG-009 was
+     * a total that added up everybody's. US-336.
+     */
+    it("shows a stranger none of the owner's rows on a route that names none", async () => {
+      await clear();
+      const owner = "second-account";
+      const secret = "OWNER-ONLY-TEXT";
+      const { monitorId, match } = await ownerRecords(owner, secret);
+      await recordVerdict(db, { userId: owner, matchId: match.id, verdict: "good" });
+      // A cost nothing else adds up to, so a total that counted it shows.
+      await recordSourceUsage(db, {
+        userId: owner,
+        monitorId,
+        source: "reddit",
+        provider: "scrapecreators",
+        units: 1,
+        pricePerUnitMicros: 987_654,
+      });
+      const ownersSpend = /987654|0\.9877/;
+
+      /** A route's other parameters name a setting of the asker's, not a record. */
+      const values: Record<string, string> = {
+        platform: "reddit",
+        provider: "scrapecreators",
+        field: "apiKey",
+        task: "classify",
+      };
+
+      const stranger = await serverAs("first-account");
+      const itself = await serverAs(owner);
+      let shownToOwner = 0;
+
+      try {
+        const routes = stranger.registeredRoutes.filter(
+          (route) =>
+            route.method === "GET" && route.url.startsWith("/api/") && !route.url.includes(":id"),
+        );
+        expect(routes.length).toBeGreaterThan(10);
+
+        for (const route of routes) {
+          const key = `GET ${route.url}`;
+          const url = route.url.replace(/:(\w+)/g, (_, name: string) => values[name] ?? name);
+          const response = await stranger.inject({ method: "GET", url });
+
+          expect(response.statusCode, `${key} answered ${response.statusCode}`).toBeLessThan(500);
+          expect(response.body, `${key} showed the owner's text`).not.toContain(secret);
+          expect(response.body, `${key} counted the owner's spend`).not.toMatch(ownersSpend);
+
+          const own = await itself.inject({ method: "GET", url });
+          if (own.body.includes(secret) || ownersSpend.test(own.body)) shownToOwner += 1;
+        }
+
+        // The same routes show the owner their own rows, so an absence above
+        // is a refusal and not a route that never shows this text.
+        expect(shownToOwner).toBeGreaterThanOrEqual(5);
+      } finally {
+        await stranger.close();
+        await itself.close();
       }
     });
 

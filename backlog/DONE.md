@@ -2,7 +2,7 @@
 
 # Done
 
-230 finished.
+231 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -47,6 +47,7 @@
 | US-344 | [A self-hoster installs and runs SignalScout from the docs](done/2026-09/US-344-a-self-hoster-installs-and-runs-from-the-docs.md) | feature | shipped | 2026-09 |
 | US-342 | [The documentation has a site, at docs.signalscout.run](done/2026-09/US-342-the-documentation-has-a-site.md) | feature | shipped | 2026-09 |
 | US-337 | [A pipeline step reads as its phases](done/2026-09/US-337-a-pipeline-step-reads-as-its-phases.md) | chore | shipped | 2026-09 |
+| US-336 | [Every read the API calls takes its account](done/2026-09/US-336-every-read-the-api-calls-takes-its-account.md) | chore | shipped | 2026-09 |
 | US-334 | [The provider clients share one core](done/2026-09/US-334-the-provider-clients-share-one-core.md) | chore | shipped | 2026-09 |
 | US-332 | [The licence check and the audit run in CI and pass](done/2026-09/US-332-the-licence-check-and-the-audit-run-in-ci.md) | chore | shipped | 2026-09 |
 | US-312 | [history.md is retired into the tickets that hold its evidence](done/2026-09/US-312-history-md-is-retired-into-the-tickets.md) | chore | shipped | 2026-09 |

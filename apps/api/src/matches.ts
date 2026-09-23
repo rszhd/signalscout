@@ -27,8 +27,8 @@ import {
   listMatches,
   matchesToCsv,
   matchOrders,
-  matchOwner,
   maximumPageSize,
+  ownsMatch,
   readMatch,
   recordVerdict,
   setMatchSaved,
@@ -374,7 +374,7 @@ export async function registerMatchRoutes(
        * somebody else's monitor gets the same 404 an unknown id gets, because
        * telling the two apart would confirm the id.
        */
-      if ((await matchOwner(db, request.params.id)) !== sessionUserId(request)) {
+      if (!(await ownsMatch(db, sessionUserId(request), request.params.id))) {
         return reply.code(404).send({ message: "No match has that id." });
       }
 

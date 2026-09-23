@@ -20,7 +20,7 @@ import {
   offeredConnectors,
   type ProviderChoices,
 } from "@signalscout/engine";
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, projects, type Signal, type Source } from "../db/schema.js";
 import {
@@ -28,6 +28,7 @@ import {
   saveNotificationSettings,
 } from "../notifications/settings.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
+import { ownsMonitor } from "./owner.js";
 
 /** A monitor row, as Drizzle selects it. */
 export type Monitor = typeof monitors.$inferSelect;
@@ -392,6 +393,23 @@ export async function getMonitor(db: Database, id: string): Promise<Monitor | un
   return monitor;
 }
 
+/**
+ * The monitor with this id, if this account owns it. What a route calls;
+ * `getMonitor` is the worker's, which polls every account. US-336.
+ */
+export async function getOwnedMonitor(
+  db: Database,
+  userId: string,
+  id: string,
+): Promise<Monitor | undefined> {
+  const [monitor] = await db
+    .select()
+    .from(monitors)
+    .where(and(eq(monitors.id, id), eq(monitors.userId, userId)))
+    .limit(1);
+  return monitor;
+}
+
 export async function createMonitor(
   db: Database,
   input: CreateMonitorInput,
@@ -607,6 +625,53 @@ export async function deleteMonitor(db: Database, id: string): Promise<boolean> 
   const deleted = await db.delete(monitors).where(eq(monitors.id, id)).returning({
     id: monitors.id,
   });
+
+  return deleted.length > 0;
+}
+
+/*
+ * The same four changes, made only by the account that owns the monitor.
+ * US-336. Each answers a stranger as its twin above answers an unknown id.
+ */
+
+export async function updateOwnedMonitor(
+  db: Database,
+  userId: string,
+  id: string,
+  input: UpdateMonitorInput,
+): Promise<Monitor | undefined> {
+  if (!(await ownsMonitor(db, userId, id))) return undefined;
+  return updateMonitor(db, id, input);
+}
+
+export async function pauseOwnedMonitor(
+  db: Database,
+  userId: string,
+  id: string,
+): Promise<Monitor | undefined> {
+  if (!(await ownsMonitor(db, userId, id))) return undefined;
+  return pauseMonitor(db, id);
+}
+
+export async function resumeOwnedMonitor(
+  db: Database,
+  userId: string,
+  id: string,
+  runtime: MonitorEnvironment,
+): Promise<ResumeResult | undefined> {
+  if (!(await ownsMonitor(db, userId, id))) return undefined;
+  return resumeMonitor(db, id, runtime);
+}
+
+export async function deleteOwnedMonitor(
+  db: Database,
+  userId: string,
+  id: string,
+): Promise<boolean> {
+  const deleted = await db
+    .delete(monitors)
+    .where(and(eq(monitors.id, id), eq(monitors.userId, userId)))
+    .returning({ id: monitors.id });
 
   return deleted.length > 0;
 }

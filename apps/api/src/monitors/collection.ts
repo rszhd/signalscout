@@ -7,7 +7,7 @@
  */
 import {
   budgetStates,
-  checkBudget,
+  checkOwnedBudget,
   classifiedPostCounts,
   createMonitor,
   filterDropCounts,
@@ -19,7 +19,7 @@ import {
   noMatchCounts,
   notificationIssues,
   noVerdicts,
-  setBudget,
+  setOwnedBudget,
   verdictCounts,
 } from "@signalscout/pipeline";
 import { z } from "zod";
@@ -84,7 +84,8 @@ export function registerCollectionRoutes(app: ApiServer, context: MonitorContext
           // about. A missing drop count is different — it means this monitor
           // has dropped nothing, which is what zero says.
           toResponse(monitor, runtime, {
-            state: states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
+            state:
+              states.get(monitor.id) ?? (await checkOwnedBudget(db, monitor.userId, monitor.id)),
             dropped: drops.get(monitor.id) ?? noFilterDrops,
             read: read.get(monitor.id) ?? 0,
             verdicts: verdicts.get(monitor.id) ?? noVerdicts,
@@ -134,7 +135,7 @@ export function registerCollectionRoutes(app: ApiServer, context: MonitorContext
         },
       );
 
-      if (request.body.budget) await setBudget(db, monitor.id, request.body.budget);
+      if (request.body.budget) await setOwnedBudget(db, person.id, monitor.id, request.body.budget);
 
       if (missing.length > 0) {
         // Created, and paused, because four answers somebody just typed are

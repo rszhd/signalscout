@@ -194,22 +194,27 @@ UPDATE source_credentials SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE source_providers   SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE ai_settings        SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE ai_keys            SET user_id = '<new>' WHERE user_id = '<old>';
-UPDATE webhook_secrets    SET user_id = '<new>' WHERE user_id = '<old>';
 
 -- History, so the spend and poll screens keep answering:
 UPDATE api_usage          SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE model_calls        SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE poll_runs          SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE stage_runs         SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE query_estimates    SET user_id = '<new>' WHERE user_id = '<old>';
 ```
 
 **Check the list is still complete before trusting it**:
-`grep -n user_id packages/pipeline/src/db/schema.ts`. It has grown three
+`grep -rn user_id packages/pipeline/src/db/schema/`. It has grown four
 times. Two rows are silent when missed: a `source_providers` row left behind
 makes a box with two Reddit keys refuse every Reddit collection with nothing
 on any screen saying why, and an `ai_keys` row left behind sends every model
 call to the instance's key or to failure.
 
-Deleting a user cascades to its sessions and nothing else. A stored key moved
+Deleting a user cascades to its sessions and its `accounts` row, which holds
+the password hash, and nothing else. A stored provider or model key moved
 this way keeps working: the ciphertext is authenticated with the record
 written into the row, so it decrypts and normalises on its next rewrite.
+
+**The webhook signing secret is not moved.** Its record is derived from the
+account on each read, so a row moved to another id does not open. Generate a
+new secret on the Notifications screen and put it in the receiver.

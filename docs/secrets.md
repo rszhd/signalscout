@@ -145,10 +145,12 @@ history and every proxy.
 ## The key is checked at boot
 
 `ENCRYPTION_KEY` is optional: an instance that stores nothing needs none, and
-`pnpm dev` works on a clean checkout. An instance that stores a credential
-decrypts every row at startup, in the API and the worker, and refuses to
-start if it cannot — a process that will not boot, naming the record, rather
-than a poll that fails at 02:00 naming the provider. The key's shape is
+`pnpm dev` works on a clean checkout. An instance that stores a provider key
+decrypts every `source_credentials` row at startup, in the API and the
+worker, and refuses to start if it cannot — a process that will not boot,
+naming the record, rather than a poll that fails at 02:00 naming the
+provider. **Model keys and webhook secrets are not in that check yet**
+(BUG-341): a wrong key boots, and the error arrives at their first use. The key's shape is
 checked whenever it is present, so a truncated paste does not survive to the
 first encrypt.
 
@@ -173,7 +175,9 @@ moves at once in one transaction.
        NEW_ENCRYPTION_KEY='<new>' docker compose run --rm -e NEW_ENCRYPTION_KEY \
          app node packages/pipeline/dist/secrets/rotate-cli.js
 5. **Put the new key in `ENCRYPTION_KEY`** everywhere it is held.
-6. **Start the application.** The boot check is the verification.
+6. **Start the application.** The boot check verifies the provider keys
+   only. For the rest, the count from step 4 must equal the rows in
+   `source_credentials`, `ai_keys` and `webhook_secrets` together.
 
 If step 6 fails, restore the backup from step 1 and try again; do not edit
 rows. **If the key is lost, the credentials are gone.** There is no escrow, by

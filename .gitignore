@@ -66,3 +66,5 @@ site/.vitepress/dist/
 # Vite's bundled copy of the config, written while it loads and left behind
 # when a server is stopped mid-load.
 site/.vitepress/*.timestamp-*.mjs
+# The Vercel CLI's link to the docs project: an id, and the build output.
+.vercel/

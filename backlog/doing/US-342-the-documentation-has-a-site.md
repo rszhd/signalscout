@@ -100,3 +100,13 @@ to it.
   that way on the site's models and costs pages, in both example env files
   (so the configuration reference shows it), in `docs/costs.md`, which also
   names the triage loop that proves a candidate reliable, and in the README.
+- 2026-09-23T12:45+08:00 — The owner asked for the project to be created. The Vercel plugin's
+  token still cannot write to the team; the Vercel CLI's login can. The
+  project `signalscout-docs` (`prj_lpdrMMliq8UuTyTfQDgBHBbJuqcs`) exists, a
+  prebuilt deploy from `dev` serves at signalscout-docs.vercel.app (every page
+  checked answers 200, `llms.txt` included), and `docs.signalscout.run` is
+  added and waits on a CNAME at Namecheap:
+  `docs` → `1f00b56cedfe77fe.vercel-dns-017.com.`. Connecting Git was refused
+  with "repository couldn't be found": Vercel's GitHub app does not reach
+  `rszhd/signalscout`. `site/README.md`, *Deploy*, has the manual steps until
+  it does.

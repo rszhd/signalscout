@@ -14,6 +14,25 @@ npm run build     # fails on a dead internal link
 This folder is outside the pnpm workspace on purpose. The image installs the
 workspace, and a documentation generator has no place in it.
 
+## Deploy
+
+The site is the Vercel project `signalscout-docs`, and
+`docs.signalscout.run` points at it. It is **not connected to Git yet**:
+Vercel's GitHub app has no access to this repository, and granting it is
+the owner's. Until then a deploy is by hand, from a checkout of `main`:
+
+```bash
+cd site
+npx vercel link --project signalscout-docs      # once per machine
+npx vercel build --prod
+npx vercel deploy --prebuilt --prod
+```
+
+`vercel build` runs the configuration generator here, where
+`../.env.example` exists, and uploads only the built output. Once the
+repository is connected, set the project's root directory to `site` and
+its production branch to `main`, and a merge to `main` deploys by itself.
+
 ## A page is one Markdown file
 
 Its path is its address: `site/self-hosting/email.md` is

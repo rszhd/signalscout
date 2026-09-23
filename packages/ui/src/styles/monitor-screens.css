@@ -609,6 +609,17 @@
   font-size: var(--text-xs);
 }
 
+/* The grid has two columns. A third figure, which this application's page
+   has and the hosted one does not, wraps to a second row, where it needs
+   the line that divides the rows and the row's full width. US-376. */
+.monitor-key-metric:nth-child(n + 3) {
+  border-top: 1px solid var(--line);
+}
+
+.monitor-key-metric:nth-child(odd):last-child:not(:first-child) {
+  grid-column: 1 / -1;
+}
+
 .monitor-detail-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.8fr);
@@ -750,7 +761,7 @@
     grid-template-columns: 1fr;
   }
 
-  .monitor-key-metric:first-child {
+  .monitor-key-metric:nth-child(odd) {
     border-left: 0;
   }
 
@@ -795,7 +806,7 @@
     border-top: 1px solid var(--line);
   }
 
-  .monitor-key-metric:first-child {
+  .monitor-key-metric:nth-child(odd) {
     border-left: 0;
   }
 

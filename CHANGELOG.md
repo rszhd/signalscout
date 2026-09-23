@@ -22,6 +22,9 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Fixed.** A monitor page with three key figures draws the third on a
+second row with a full-width line above it (US-376).
+
 **Changed.** `LeadSources` draws its breakdown switch as the theme's
 `.view-switch`, the underline tabs the inbox uses, not a bar of pill
 buttons (US-375).

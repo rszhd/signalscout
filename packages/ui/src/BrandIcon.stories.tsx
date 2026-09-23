@@ -3,7 +3,7 @@ import { BrandIcon } from "./BrandIcon.js";
 
 const platforms = ["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"];
 const providers = ["brightdata", "scrapecreators", "socialcrawl", "apify", "socialdata"];
-const models = ["anthropic", "openai", "google", "deepseek", "openrouter", "ollama"];
+const models = ["anthropic", "openai", "google", "deepseek", "openrouter", "ollama", "typesafe"];
 
 const meta = {
   title: "Brand/BrandIcon",

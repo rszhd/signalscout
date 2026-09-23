@@ -19,6 +19,7 @@ const icons: Record<string, string> = {
   google: "google.ico",
   openrouter: "openrouter.ico",
   ollama: "ollama.png",
+  typesafe: "typesafe.png",
 };
 
 /** Decorative: callers keep the provider/platform name alongside the icon. */

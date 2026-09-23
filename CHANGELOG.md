@@ -22,6 +22,10 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
+**Changed.** `LeadSources` draws its breakdown switch as the theme's
+`.view-switch`, the underline tabs the inbox uses, not a bar of pill
+buttons (US-375).
+
 **Added.** The look of the monitor list and the monitor page (US-371), in
 the one stylesheet: the overview, the toolbar and filters, the table, the
 group headings, and the page's header, tabs, sections, key figures and

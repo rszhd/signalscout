@@ -60,7 +60,7 @@ export function LeadSources({
         </div>
       ) : (
         <>
-          <fieldset className="lead-breakdown-switch">
+          <fieldset className="view-switch lead-breakdown-switch">
             <legend className="visually-hidden">Lead breakdown</legend>
             {dimensions.map((item) => (
               <button

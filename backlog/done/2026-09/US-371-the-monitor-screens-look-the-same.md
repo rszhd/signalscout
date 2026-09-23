@@ -45,7 +45,7 @@ a feature only one product has stays with that product.
 ## Log
 
 - 2026-09-23T16:35+08:00 — Written after the owner's rule and the count, with US-371 to US-374.
-- 2026-09-23T16:47+08:00 — Done. `monitor-screens.css` holds the hosted
+- 2026-09-23T16:45+08:00 — Done. `monitor-screens.css` holds the hosted
   rules for every class both screens use, folded to one set with no page
   ancestor, on tokens and the scale. This application's `monitors.css` lost
   137 rules and `index.css` 8; what stays is layout and this product's

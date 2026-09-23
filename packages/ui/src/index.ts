@@ -22,6 +22,20 @@ export { Field } from "./components/Field.js";
 export { FormError, type FormErrorProps } from "./components/FormError.js";
 export { PageState, type PageStateProps } from "./components/PageState.js";
 export { ageLabel, platformName, providerName, untilLabel } from "./labels.js";
+export { MatchCard, type MatchCardProps } from "./MatchCard.js";
+export { MatchDetail, type MatchDetailProps } from "./MatchDetail.js";
+export { MonitoringBar, type MonitoringBarProps } from "./MonitoringBar.js";
+export {
+  limitWords,
+  type Match,
+  opensThreadOnly,
+  type PlatformLabel,
+  platformLabel,
+  postPreviewWordLimit,
+  threadDepth,
+  type Verdict,
+  whereItCameFrom,
+} from "./match.js";
 export {
   type ActivityEntry,
   type ActivityGroup,

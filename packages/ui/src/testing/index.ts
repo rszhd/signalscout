@@ -25,4 +25,5 @@ export {
   settle,
   setValue,
 } from "./harness.js";
+export { match } from "./matches.js";
 export { monitor, poll, testMonitorId, testProjectId } from "./monitors.js";

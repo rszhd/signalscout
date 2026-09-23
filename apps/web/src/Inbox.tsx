@@ -1,66 +1,20 @@
 import {
-  ageLabel,
-  BrandIcon,
-  band,
   FormError,
+  type Match,
+  MatchCard,
+  MatchDetail,
   type Monitor,
-  type Monitoring,
+  MonitoringBar,
   messageFor,
   monitoringState,
   PageState,
-  ReplyDraft,
   requestJson,
   useMonitorRefresh,
+  type Verdict,
 } from "@signalscout/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { paths } from "./route.js";
-
-/**
- * What the monitoring is doing, above the matches. US-265.
- *
- * The inbox is the screen a person keeps open, and it was the one screen that
- * said nothing about collection: an empty list read equally as "nobody is
- * talking" and as "this was paused a week ago". The bar answers three
- * questions and stops — what is happening, when the next poll is if the answer
- * is "waiting", and what the last poll did.
- *
- * The latest only. A history belongs on the monitor page, one click away.
- * Every word comes from `monitor.tsx`, so this screen and the monitor screens
- * cannot end up saying two different things about one monitor.
- */
-function MonitoringBar({
-  state,
-  projectId,
-}: {
-  readonly state: Monitoring;
-  readonly projectId: string;
-}) {
-  return (
-    <section className="inbox-monitoring" aria-label="Monitoring">
-      <span className={`monitor-status ${state.tone}${state.attention ? " quiet" : ""}`}>
-        {state.label}
-      </span>
-      <p
-        className="inbox-monitoring-now"
-        title={state.nowAt ? new Date(state.nowAt).toLocaleString() : undefined}
-      >
-        {state.now}
-      </p>
-      {state.last && state.lastAt && (
-        <p className="inbox-monitoring-last">
-          <time dateTime={state.lastAt} title={new Date(state.lastAt).toLocaleString()}>
-            {ageLabel(state.lastAt)}
-          </time>
-          {` · ${state.last}`}
-        </p>
-      )}
-      <Link className="inbox-monitor-link" to={paths.monitor(projectId, state.monitor.id)}>
-        View monitor
-      </Link>
-    </section>
-  );
-}
 
 /**
  * The inbox.
@@ -85,49 +39,6 @@ function MonitoringBar({
  * that is quietly out of date.
  */
 const arrivalCheckMs = 60_000;
-
-type Verdict = "good" | "not_relevant";
-
-interface Match {
-  id: string;
-  monitorId: string;
-  monitorName: string;
-  score: number;
-  problemFit: number;
-  icpFit: number;
-  intent: number;
-  intentLabel: string;
-  reasons: string[];
-  /** Null when this person has not judged the match yet. */
-  verdict: Verdict | null;
-  source: string;
-  channel: string | null;
-  author: string | null;
-  title: string | null;
-  excerpt: string;
-  /** "post" or "reply". US-020. */
-  kind: string;
-  /** The thread above a reply. Null on a post, and on an orphaned reply. */
-  parentTitle: string | null;
-  parentExcerpt: string | null;
-  parentUrl: string | null;
-  /**
-   * How deep the thread above a reply was read, and why it stopped. US-048.
-   *
-   * Optional rather than nullable, and that is the honest type rather than a
-   * hedge: a browser holding this build can be talking to an API that predates
-   * it, and then these keys are simply absent. Marking them optional makes the
-   * compiler ask about that at every use site, which is what would have caught
-   * the crash this shape caused.
-   */
-  parentRepliesRead?: number | null;
-  parentReplyCount?: number | null;
-  parentRepliesStopped?: string | null;
-  /** Kept for later. US-043. Not a verdict; a person's intention. */
-  saved: boolean;
-  url: string;
-  postedAt: string;
-}
 
 interface MatchPage {
   matches: Match[];
@@ -203,159 +114,6 @@ const orders = [
 
 type Order = (typeof orders)[number]["value"];
 
-const postPreviewWordLimit = 80;
-
-function limitWords(body: string): { text: string; truncated: boolean } {
-  const words = body.trim().split(/\s+/).filter(Boolean);
-  if (words.length <= postPreviewWordLimit) return { text: body, truncated: false };
-
-  return {
-    text: `${words.slice(0, postPreviewWordLimit).join(" ")}…`,
-    truncated: true,
-  };
-}
-
-/**
- * How each platform names itself, and how it names the place a post came from.
- *
- * A table rather than a branch, because a branch answers "not X, so Reddit"
- * and that is wrong the moment a third platform exists. US-028 added LinkedIn
- * and found exactly that: every LinkedIn match would have been labelled
- * Reddit. A platform missing from here falls back to its own id, which is
- * plain rather than wrong.
- *
- * BrandIcon supplies the decorative platform image; the adjacent text names it.
- */
-const platformLabels: Record<
-  string,
-  {
-    name: string;
-    where: (match: Match) => string | undefined;
-    /**
-     * Whether this platform's own link opens the comment, or only the thread.
-     *
-     * A per-platform fact rather than a per-match one, and it decides what the
-     * button may promise. Every platform here currently reaches the comment,
-     * and each does it with a format that platform produces itself — YouTube's
-     * `&lc=` from its Share button, TikTok's `?cid=` from its comment
-     * notification.
-     *
-     * The field exists because that was not always true and may not stay true.
-     * TikTok's connector invented `?comment_id=`, which looked like a deep link
-     * and opened the video; for one afternoon this read "thread" and the screen
-     * told a person to scroll. An unknown platform defaults to "thread" for the
-     * same reason: a button that over-promises sends somebody looking for
-     * something that was never there.
-     */
-    commentLink: "comment" | "thread";
-  }
-> = {
-  reddit: {
-    name: "Reddit",
-    where: (match) => (match.channel ? `r/${match.channel}` : undefined),
-    commentLink: "comment",
-  },
-  x: {
-    name: "X",
-    where: (match) => (match.author ? `@${match.author}` : undefined),
-    commentLink: "comment",
-  },
-  linkedin: {
-    name: "LinkedIn",
-    // On LinkedIn the author is the context, as on X. The stored author is the
-    // profile slug out of the post URL, which is what identifies the account.
-    where: (match) => (match.author ? `@${match.author}` : undefined),
-    commentLink: "comment",
-  },
-  youtube: {
-    name: "YouTube",
-    where: (match) => (match.channel ? match.channel : undefined),
-    commentLink: "comment",
-  },
-  tiktok: {
-    name: "TikTok",
-    // The creator, which is what a TikTok URL is keyed by and the only context
-    // a video carries: there is no title and no description, only a caption.
-    where: (match) => (match.author ? `@${match.author}` : undefined),
-    // `?cid=`, which is the link TikTok puts in a comment notification. It read
-    // "thread" for one afternoon on 2026-09-06, while the only known link was
-    // one this product had invented and the owner had found it did nothing.
-    commentLink: "comment",
-  },
-};
-
-/**
- * How much of a thread was read, in a sentence, or nothing.
- *
- * US-048. A comment reaches the inbox as a sample of a conversation: threads
- * are read fifty comments at a time and abandoned when a batch holds no
- * lead. How big that sample was, against how big the thread is,
- * changes what it means — and a person cannot guess any of it.
- *
- * The reason for stopping is the half nobody could infer. "We read 100 of
- * 1,713 and stopped because two batches held nothing" and "we read 100 of
- * 1,713 and ran out of budget" look identical on the screen otherwise, and
- * they call for different actions: one is a judgement about the thread, the
- * other is a bill.
- *
- * Nothing is said while a thread is still being read, because a number that
- * moves on its own invites a person to read meaning into it.
- */
-function threadDepth(match: Match): string | undefined {
-  if (match.kind !== "reply") return undefined;
-
-  /**
-   * `== null`, not `=== null`, and the difference crashed the screen.
-   *
-   * The type says `number | null` and the runtime can still hand back
-   * `undefined`: a browser holding this build against an API that predates it
-   * receives a row with the field absent, `undefined` slips past a `=== null`
-   * check, and `.toLocaleString()` throws — taking the whole inbox down rather
-   * than one line of it. A field this component did not exist to show
-   * yesterday must be treated as optional whatever the type says.
-   */
-  const read = match.parentRepliesRead;
-  if (read == null || read === 0) return undefined;
-
-  const total = match.parentReplyCount;
-  const of = total != null && total > read ? ` of ${total.toLocaleString()}` : "";
-  const counted = `${read.toLocaleString()}${of} comment${read === 1 ? "" : "s"} read`;
-
-  switch (match.parentRepliesStopped) {
-    case "threshold":
-      return `${counted}. Stopped: the last batch held no lead.`;
-    case "ceiling":
-      return `${counted}. Stopped: this is as deep as one thread is read.`;
-    case "budget":
-      return `${counted}. Stopped: the monitor reached its budget.`;
-    case "end":
-      return `${counted} — the whole thread.`;
-    default:
-      // Still being read. A count that moves is worse than no count.
-      return undefined;
-  }
-}
-
-function platformLabel(source: string) {
-  return (
-    platformLabels[source] ?? {
-      name: source,
-      where: () => undefined,
-      // An unknown platform promises nothing, which is the safe direction: a
-      // button that over-promises sends a person scrolling for something that
-      // was never there.
-      commentLink: "thread" as const,
-    }
-  );
-}
-
-function whereItCameFrom(match: Match): string {
-  const platform = platformLabel(match.source);
-  const channel = platform.where(match);
-
-  return channel ? `${platform.name} · ${channel}` : platform.name;
-}
-
 /**
  * The inbox of one project. US-045, US-076.
  *
@@ -383,7 +141,6 @@ export function Inbox({
   const [error, setError] = useState<string | null>(null);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
-  const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
   const [order, setOrder] = useState<Order>("rank");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showDismissed, setShowDismissed] = useState(false);
@@ -497,7 +254,6 @@ export function Inbox({
       setMatches(answer.matches);
       setSelectedMatchId(answer.matches[0]?.id ?? null);
       setMobileDetailOpen(false);
-      setExpandedMatchId(null);
       setPage({ nextCursor: answer.nextCursor, asOf: answer.asOf });
       setState("ready");
     } catch (cause) {
@@ -652,7 +408,6 @@ export function Inbox({
         setSelectedMatchId(remaining[index]?.id ?? remaining.at(-1)?.id ?? null);
         return remaining;
       });
-      setExpandedMatchId(null);
       return;
     }
 
@@ -737,15 +492,6 @@ export function Inbox({
 
   const selectedMatch =
     matches.find((match) => match.id === selectedMatchId) ?? addressedMatch ?? matches[0] ?? null;
-  const scoreRows: Array<[string, number]> = selectedMatch
-    ? [
-        ["Problem fit", selectedMatch.problemFit],
-        ["ICP fit", selectedMatch.icpFit],
-        ["Intent", selectedMatch.intent],
-      ]
-    : [];
-  const limitedPost = selectedMatch ? limitWords(selectedMatch.excerpt) : null;
-  const postIsExpanded = selectedMatch?.id === expandedMatchId;
 
   function clearFilters(): void {
     setMonitorId("");
@@ -759,7 +505,12 @@ export function Inbox({
           says what it is doing. The heading stays for a screen reader. US-281. */}
       <h1 className="visually-hidden">Inbox</h1>
 
-      {monitoring && <MonitoringBar state={monitoring} projectId={projectId} />}
+      {monitoring && (
+        <MonitoringBar
+          state={monitoring}
+          monitorHref={paths.monitor(projectId, monitoring.monitor.id)}
+        />
+      )}
 
       <div className="inbox-toolbar">
         <fieldset className="view-switch inbox-views" aria-label="Which matches">
@@ -986,58 +737,23 @@ export function Inbox({
             </div>
             <div className="inbox-scroll-region">
               <ol className="match-list" aria-label="Matches">
-                {matches.map((match) => {
-                  const tone = band(match.score);
-                  return (
-                    <li key={match.id}>
-                      <button
-                        className={`match-card ${selectedMatch.id === match.id ? "selected" : ""}`}
-                        aria-current={selectedMatch.id === match.id ? "true" : undefined}
-                        type="button"
-                        onClick={() => {
-                          setSelectedMatchId(match.id);
-                          setMobileDetailOpen(true);
-                          setExpandedMatchId(null);
-                          // The address follows the reading, so what is on
-                          // screen is what a copied link opens. Replace, so
-                          // Back leaves the inbox rather than walking every
-                          // item that was clicked in it. US-268.
-                          navigate(paths.inboxMatch(projectId, match.id), { replace: true });
-                        }}
-                      >
-                        <span className="match-top">
-                          <span className={`source-badge source-${match.source}`}>
-                            <BrandIcon brand={match.source} />
-                            {whereItCameFrom(match)}
-                          </span>
-                          <span className="match-origin">{ageLabel(match.postedAt)}</span>
-                        </span>
-                        <strong className="match-title">
-                          {match.kind === "reply" && (
-                            <span className="match-kind">
-                              <span className="visually-hidden">A reply: </span>
-                              <span aria-hidden="true">↳ </span>
-                            </span>
-                          )}
-                          {match.title ?? match.parentTitle ?? match.excerpt}
-                        </strong>
-                        {(match.title ?? match.parentTitle) && (
-                          <span className="match-excerpt">{match.excerpt}</span>
-                        )}
-                        <span className="match-bottom">
-                          <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
-                          <span className="match-list-status">
-                            {match.saved ? "Saved" : match.verdict === "good" ? "Good lead" : ""}
-                          </span>
-                          <span className="match-score">
-                            <strong>{match.score}</strong>
-                            <span>/ 100</span>
-                          </span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
+                {matches.map((match) => (
+                  <li key={match.id}>
+                    <MatchCard
+                      match={match}
+                      selected={selectedMatch.id === match.id}
+                      onSelect={() => {
+                        setSelectedMatchId(match.id);
+                        setMobileDetailOpen(true);
+                        // The address follows the reading, so what is on
+                        // screen is what a copied link opens. Replace, so
+                        // Back leaves the inbox rather than walking every
+                        // item that was clicked in it. US-268.
+                        navigate(paths.inboxMatch(projectId, match.id), { replace: true });
+                      }}
+                    />
+                  </li>
+                ))}
               </ol>
 
               {page?.nextCursor && (
@@ -1057,134 +773,15 @@ export function Inbox({
 
           <aside className={`match-detail ${mobileDetailOpen ? "mobile-open" : ""}`}>
             <div className="inbox-scroll-region">
-              <div className="detail-inner" key={selectedMatch.id}>
-                <button
-                  className="mobile-detail-back"
-                  type="button"
-                  onClick={() => setMobileDetailOpen(false)}
-                >
-                  ← Back to inbox
-                </button>
-
-                <div className="detail-top">
-                  <span className={`source-badge source-${selectedMatch.source}`}>
-                    <BrandIcon brand={selectedMatch.source} />
-                    {whereItCameFrom(selectedMatch)}
-                  </span>
-                  <span className="match-origin">{ageLabel(selectedMatch.postedAt)}</span>
-                </div>
-
-                <h2 className="detail-title">
-                  {selectedMatch.title ??
-                    selectedMatch.parentTitle ??
-                    "A conversation worth reading"}
-                </h2>
-                <p className="detail-author">
-                  {selectedMatch.author ?? "Unknown author"} · matched by{" "}
-                  {selectedMatch.monitorName}
-                </p>
-
-                {/*
-                  The thread above a reply, shown before it.
-
-                  A person judging a reply must see what the classifier saw:
-                  "we hit this too, what did you end up using?" is a good lead
-                  or noise depending entirely on the post above it, and an
-                  inbox that hid the post would be asking the wrong question.
-                */}
-                {selectedMatch.kind === "reply" && selectedMatch.parentExcerpt && (
-                  <div className="post-body">
-                    <p className="section-label">Replying to</p>
-                    <blockquote className="post-box thread-post">
-                      {selectedMatch.parentTitle && (
-                        <strong className="thread-post-title">{selectedMatch.parentTitle}</strong>
-                      )}
-                      {limitWords(selectedMatch.parentExcerpt).text}
-                    </blockquote>
-                    {threadDepth(selectedMatch) && (
-                      <p className="thread-depth">{threadDepth(selectedMatch)}</p>
-                    )}
-                  </div>
-                )}
-
-                <div className="post-body">
-                  {selectedMatch.kind === "reply" && <p className="section-label">The reply</p>}
-                  <blockquote className="post-box">
-                    {postIsExpanded ? selectedMatch.excerpt : limitedPost?.text}
-                  </blockquote>
-                  {limitedPost?.truncated && (
-                    <button
-                      className="read-more-button"
-                      type="button"
-                      onClick={() => setExpandedMatchId(postIsExpanded ? null : selectedMatch.id)}
-                    >
-                      {postIsExpanded ? "Show less" : "Read more"}
-                    </button>
-                  )}
-                </div>
-
-                {/*
-                  The three sub-scores sit under the post, open.
-
-                  They explain the number the list was ordered by, so they are
-                  read while the post is still in view. Behind a disclosure they
-                  were a click nobody made.
-                */}
-                <section className="score-section">
-                  <div className="score-heading">
-                    <h3>Score breakdown</h3>
-                    <span>{selectedMatch.score} / 100</span>
-                  </div>
-
-                  <dl className="match-scores">
-                    {scoreRows.map(([label, score]) => (
-                      <div key={label}>
-                        <dt>{label}</dt>
-                        <dd>{score}</dd>
-                        <span className="score-bar" aria-hidden="true">
-                          <i style={{ width: `${score}%` }} />
-                        </span>
-                      </div>
-                    ))}
-                  </dl>
-                </section>
-
-                {/*
-                  What the link can and cannot do, said before it is pressed.
-
-                  On TikTok the comment has no address. The provider returns
-                  none, the platform publishes none, and the `?comment_id=` we
-                  invented was opened on 2026-09-06 and ignored — the video
-                  opens with the comment section closed. Nothing in this
-                  product can fix that, so the honest thing is to say it here
-                  and hand over the one thing that makes the scrolling shorter:
-                  the handle to look for. The text above is the other half,
-                  which is why it is shown in full rather than summarised.
-                */}
-                {selectedMatch.kind === "reply" &&
-                  platformLabel(selectedMatch.source).commentLink === "thread" && (
-                    <p className="link-caveat">
-                      {platformLabel(selectedMatch.source).name} has no link to a single comment.
-                      This opens the post — open the comments and look for{" "}
-                      <strong>
-                        {selectedMatch.author ? `@${selectedMatch.author}` : "the author"}
-                      </strong>
-                      .
-                    </p>
-                  )}
-
-                <div className="match-actions">
-                  <a
-                    className="primary-button"
-                    href={selectedMatch.url}
-                    rel="noreferrer noopener"
-                    target="_blank"
-                  >
-                    {selectedMatch.kind === "reply" &&
-                    platformLabel(selectedMatch.source).commentLink === "thread"
-                      ? "Open the post ↗"
-                      : "Open conversation ↗"}
-                  </a>
+              <MatchDetail
+                key={selectedMatch.id}
+                match={selectedMatch}
+                saving={saving}
+                judging={judging}
+                onSave={(saved) => void keep(selectedMatch, saved)}
+                onJudge={(verdict) => void judge(selectedMatch, verdict)}
+                onBack={() => setMobileDetailOpen(false)}
+                actions={
                   <button
                     className="secondary-button"
                     type="button"
@@ -1192,63 +789,8 @@ export function Inbox({
                   >
                     {copied ? "Link copied" : "Copy link"}
                   </button>
-                  <button
-                    aria-pressed={selectedMatch.saved}
-                    className={`secondary-button ${selectedMatch.saved ? "chosen" : ""}`}
-                    disabled={saving}
-                    type="button"
-                    onClick={() => void keep(selectedMatch, !selectedMatch.saved)}
-                  >
-                    {selectedMatch.saved ? "Saved" : "Save for later"}
-                  </button>
-                  <span className="match-meta">{selectedMatch.intentLabel}</span>
-                </div>
-
-                <div className="match-why">
-                  <p className="section-label">What the model saw</p>
-                  <ul>
-                    {selectedMatch.reasons.map((reason) => (
-                      <li key={reason}>
-                        <span aria-hidden="true">•</span>
-                        {reason}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <ReplyDraft key={selectedMatch.id} matchId={selectedMatch.id} />
-
-                <div className="verdict-actions">
-                  <p className="section-label">Was this a good lead?</p>
-                  <div className="verdict-buttons">
-                    <button
-                      aria-pressed={selectedMatch.verdict === "good"}
-                      className={`verdict-button ${
-                        selectedMatch.verdict === "good" ? "chosen" : ""
-                      }`}
-                      disabled={judging}
-                      type="button"
-                      onClick={() => void judge(selectedMatch, "good")}
-                    >
-                      Good lead
-                    </button>
-                    <button
-                      aria-pressed={selectedMatch.verdict === "not_relevant"}
-                      className={`verdict-button ${
-                        selectedMatch.verdict === "not_relevant" ? "chosen" : ""
-                      }`}
-                      disabled={judging}
-                      type="button"
-                      onClick={() => void judge(selectedMatch, "not_relevant")}
-                    >
-                      Not relevant
-                    </button>
-                  </div>
-                  <p className="verdict-note">
-                    Dismissed a conversation? Bring it back with Filters → Not relevant → Shown.
-                  </p>
-                </div>
-              </div>
+                }
+              />
             </div>
           </aside>
         </div>

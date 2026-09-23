@@ -214,6 +214,16 @@
   background: var(--accent-soft);
 }
 
+/* Named for a screen reader, silent on the page. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /*
  * `Field`: the label, the hint and the control, one per line. BUG-356.
  * Every application's `index.css` held these, so the component looked right

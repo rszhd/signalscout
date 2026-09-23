@@ -183,6 +183,25 @@ the navigation. `ReplyDraft` is the second (US-278): the composer a match opens,
 which followed the hosted layout before it moved, so the package holds the
 newer one.
 
+## The parts of a screen
+
+The inbox is not one screen in the package: its filters, its paging and its
+address carry the product. Its parts are (US-352). `MatchCard` is a row of the
+list, `MatchDetail` the reading pane, and `MonitoringBar` the line above both.
+Each application's `Inbox` holds the state and the requests and renders them.
+
+- **The page decides; the part shows.** `MatchDetail` calls back with a
+  verdict or a save and changes nothing itself, so a refused request leaves
+  the pane as it was. `saving` and `judging` are the page's answer to "is one
+  in flight".
+- **A product's own action is a slot.** `MatchDetail`'s `actions` sits beside
+  the conversation link: self-hosted it holds *Copy link*.
+- **An address is a prop.** `MonitoringBar` takes `monitorHref`, because the
+  hosted product opens its one monitor's list and this one opens the monitor.
+- **The look is the hosted one**, whose `inbox.css` refined an older layer of
+  the same rules. The two layers are one file, `match.css`, and no rule needs
+  an `.inbox-page` ancestor, so the preview shows a part as a page does.
+
 ## The words
 
 `monitor.ts` holds what both products *say* about a monitor, a poll, a stage
@@ -193,6 +212,12 @@ polls a month" — and not the control that lets a person choose one, which the
 hosted product no longer offers (US-173 there). They are here for the reason the tokens are —
 a sentence written twice becomes two sentences, and "Found nothing" beside
 "Running" about one monitor is the failure US-104 exists to prevent.
+
+`match.ts` holds the words about one match: where it came from
+("Reddit · r/devops"), how much of a reply's thread was read and why it
+stopped, whether the link can open the reply or only the post, and how much of
+a post the pane shows before *Read more*. `band`, the two words for a score,
+stays in `monitor.ts`.
 
 Where the products differ, the difference is an argument and never a fork:
 

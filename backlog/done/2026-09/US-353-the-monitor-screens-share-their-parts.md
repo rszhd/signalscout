@@ -78,3 +78,7 @@ screens (US-277): one shows dollars, the other a share of an allowance.
   `dev` and on this branch — history, search performance, lead sources — the
   query table in a 390px frame, and the list's status pill. The 22 new
   stories render. The monitor tests pass unchanged; 12 new; 2,375 pass.
+- 2026-09-23T15:56+08:00 — The owner answered the open question: this application keeps
+  "Posts vs. comments" among its lead groups. It stays a `dimensions` prop
+  here and out of the hosted default.
+

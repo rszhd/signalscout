@@ -1,29 +1,39 @@
 # Project Plan
 
+The product rules: what SignalScout is for, what it will not become, and how
+we will know it works. What it does today is in the [README](README.md) and
+on [docs.signalscout.run](https://docs.signalscout.run); why each tool was
+chosen is in [STACK.md](STACK.md). Read this before proposing anything
+structural.
+
 ## What we’re building
 
-An **open-source AI intent monitoring tool** that watches social platforms and surfaces conversations from people who may actually need what you sell.
+An **open-source AI intent monitoring tool** that watches social platforms and
+surfaces conversations from people who may actually need what you sell.
 
-Instead of traditional social listening focused on brand mentions, sentiment, dashboards, and analytics, this project focuses on one question:
+Traditional social listening answers *who mentioned my brand*. This product
+answers one question:
 
 > Who is publicly talking about a problem my product can solve?
 
-The first version focused on **Reddit and X/Twitter**. Six platforms are
-monitored now — see *Sources* below, and *Important rule* for how that
-happened.
+**Open source first.** The self-hosted build is the whole application, and it
+is not cut down to make a hosted version worth paying for. Self-hosted, the
+user brings the keys: a data provider's for each platform, and a model's. They
+own the accounts and pay for their own usage.
 
 ---
 
 ## Core idea
 
-Users describe:
+A person describes, once per business (a *project*):
 
 * What their product does
 * Who their ideal customer is
 * What problems they solve
-* What kinds of buying signals they care about
 
-The system continuously searches connected social platforms, collects candidate posts, and uses AI to evaluate each conversation.
+and, per monitor, the buying signals they care about. The system searches the
+platforms on a schedule, collects candidate posts, and uses AI to evaluate
+each conversation.
 
 Example:
 
@@ -54,150 +64,44 @@ And score it:
 * Buyer intent: 88
 * Urgency: 82
 
-Instead of alerting on every keyword match, AI filters the noise and surfaces the conversations that actually matter.
+Instead of alerting on every keyword match, AI filters the noise and surfaces
+the conversations that actually matter.
 
 ---
 
-# Philosophy
-
-## Open source first
-
-The complete application should be self-hostable.
-
-Users should be able to:
-
-```bash
-git clone ...
-docker compose up
-```
-
-and run the entire system themselves.
-
-The open-source version should not be artificially crippled to force people onto the paid version.
-
----
-
-## Bring Your Own Keys
-
-Users provide their own credentials for external services.
-
-For example:
-
-```env
-BRIGHTDATA_API_KEY=      # Bright Data — Reddit
-SOCIALCRAWL_API_KEY=     # SocialCrawl — Reddit, X, YouTube, TikTok, Instagram
-APIFY_API_TOKEN=         # Apify — LinkedIn
-
-AI_API_KEY=
-```
-
-**No platform is reached through its own API, and that is not what was
-planned.** Reddit closed self-serve registration in November 2025 and X sells
-pay-per-use with no free tier, so every platform arrives through a data
-provider and the key a person brings is that provider's. A variable is named
-after the provider rather than the platform, because one key can serve five of
-them.
-
-The principle is unchanged: the user owns the account and pays for their own
-usage. STACK.md, *A source is not a provider*, holds the reasoning and the rule
-it produced, and the site's configuration reference lists every variable.
-
-Several AI providers are supported:
-
-* OpenAI
-* Anthropic
-* Gemini
-* DeepSeek
-* OpenRouter
-* Ollama
-* OpenAI-compatible local models
-
-The same philosophy applies to social networks.
-
-We provide the integration.
-
-The user controls the account, API access, usage, and associated API costs.
-
----
-
-# Sources
-
-Six platforms are monitored, through ten connectors — of which nine are
-offered, because a connector can ship and not be offered. Reddit and X came
-first, and the signals they carry are written out below. STACK.md holds what
-the economics of a source do to the build, docs/sources.md holds what each
-connector can and cannot do, and each connector's ticket records what it has
-been measured doing.
-
-## Reddit
-
-Monitor relevant posts and comments.
-
-Useful signals include:
-
-* Asking for recommendations
-* Looking for alternatives
-* Complaining about an existing tool
-* Describing a recurring problem
-* Comparing solutions
-* Asking how other companies solve something
-* Looking to hire someone to solve the problem
-
-## X / Twitter
-
-Monitor real-time conversations around similar signals.
-
-Especially useful for:
-
-* Founder complaints
-* Product recommendations
-* Tool-switching conversations
-* Requests for help
-* Competitor frustration
-* New problems being discussed in real time
-
----
-
-# Monitoring flow
+## Monitoring flow
 
 This is the shape. [docs/pipeline.md](docs/pipeline.md) is how it runs: the
 caps, the cursors, and which row each step leaves behind.
 
 ```text
-Reddit ─────┐
-            │
-X ──────────┤
-            │
-            ▼
-      Candidate posts
-            │
-            ▼
-      Cheap pre-filter
-            │
-            ▼
-      AI intent engine
-            │
-       ┌────┼────┐
-       │    │    │
-       ▼    ▼    ▼
- Relevance ICP  Intent
-       │    │    │
-       └────┼────┘
-            │
-            ▼
-       Lead score
-            │
-            ▼
-         Matches
-            │
-     ┌──────┼──────┐
-     ▼      ▼      ▼
- Dashboard Email Webhook
+Reddit · X · LinkedIn · YouTube · TikTok · Instagram
+                    │   (through data providers)
+                    ▼
+             Candidate posts
+                    │
+                    ▼
+    Cheap stages: keyword → similarity → triage
+                    │
+                    ▼
+            AI intent engine
+          relevance · ICP · intent
+                    │
+                    ▼
+       Lead score, at or above the
+        monitor's minimum = a match
+                    │
+     ┌──────┬───────┼───────┬──────────┐
+     ▼      ▼       ▼       ▼          ▼
+   Inbox  Email  Webhook   CSV    Reply draft
 ```
+
+Money is spent at fetch time, before any filter sees a post, so every monitor
+has a monthly cap and every search plan can be priced before it runs.
 
 ---
 
-# Intent classification
+## Intent classification
 
 The AI should not merely decide whether a post is related to a keyword.
 
@@ -229,7 +133,11 @@ Intent: 90/100
 
 Intent: 96/100
 
-Possible classification fields:
+These four are the classifier's labelled set: `ai/fixtures/examples.ts`
+copies them, and [docs/testing.md](docs/testing.md) says how they are used.
+Change one here and change it there.
+
+Classification fields:
 
 ```json
 {
@@ -243,7 +151,7 @@ Possible classification fields:
 }
 ```
 
-Possible intent types:
+Intent types:
 
 ```text
 none
@@ -258,27 +166,10 @@ hiring
 
 ---
 
-# Product UX
+## The intent inbox
 
-Avoid building a traditional social-listening analytics dashboard.
-
-Read [docs/design.md](docs/design.md) before changing a screen. New screens
-should feel like the same product through their navigation, typography,
-spacing, colour and responsive behaviour. Real product behaviour and ticket
-acceptance stay authoritative, and a control does not appear in the
-application until the behaviour behind it exists.
-
-No need initially for:
-
-* Sentiment charts
-* Share of voice
-* Word clouds
-* Competitor analytics
-* Complex reports
-
-The core product should be an **intent inbox**.
-
-Example:
+The core product is an **intent inbox**, not a social-listening analytics
+dashboard.
 
 ```text
 🔥 94 HIGH INTENT
@@ -300,21 +191,16 @@ Problem fit       98
 ICP fit           91
 Intent            94
 
-[Open conversation]
-[Draft reply]
-[Not relevant]
+[Open conversation]  [Save for later]
+[Draft reply]        [Good lead]  [Not relevant]
 ```
 
-The heading was "Why it matched", with a tick on every claim. That is right
-for the 94 above and wrong for a 31. The classifier is asked for claims about
-the post, not for support for its own score, so on a weak post it writes what
-it saw and some of it is negative: "the post does not ask for a tool" is one
-of the most useful lines on the card, and a green tick beside it is a lie
-about what the model said.
-
-So the claims are neutral, and the score above them says how it went. A
-heading that only reads correctly on a good match hides exactly the matches a
-person most needs to dismiss quickly.
+**The claims are neutral, and the score above them says how it went.** The
+classifier is asked for claims about the post, not for support for its own
+score, so on a weak post some of what it saw is negative: "the post does not
+ask for a tool" is one of the most useful lines on the card. A heading that
+only reads correctly on a good match hides exactly the matches a person most
+needs to dismiss quickly.
 
 The experience should feel like:
 
@@ -326,235 +212,69 @@ Not:
 
 ---
 
-# Monitor creation
+## Monitor creation
 
-Creating a monitor should be simple.
+Creating a monitor should be simple. The first three answers belong to the
+project and are copied into each monitor made from it:
 
-## Product
+* **Product** — What do you sell?
+* **Ideal customer** — Who is most likely to buy it?
+* **Problem** — What problem does it solve?
 
-What do you sell?
+Then the monitor's own choices:
 
-## Ideal customer
+* **Signals** — what the system should look for:
 
-Who is most likely to buy it?
+  ```text
+  ☑ Asking for recommendations
+  ☑ Looking for alternatives
+  ☑ Complaining about their current solution
+  ☑ Describing the problem
+  ☑ Comparing products
+  ☑ Ready to buy
+  ☑ Looking to hire someone
+  ```
 
-## Problem
-
-What problem does it solve?
-
-## Signals
-
-What should the system look for?
-
-```text
-☑ Asking for recommendations
-☑ Looking for alternatives
-☑ Complaining about current solution
-☑ Describing the problem
-☑ Comparing products
-☑ Looking to purchase
-☑ Looking to hire someone
-```
-
-The system can generate underlying search queries automatically.
-
-Users should not need to become Boolean-search experts.
+  `packages/engine/src/signals.ts` holds these labels; they are the checkbox
+  text and the query generator's vocabulary at once.
+* **Sources** — which platforms to watch.
+* **Search plan** — the system writes the searches; the person edits them.
+  Nobody should need to become a Boolean-search expert.
+* **Schedule & budget** — how often, and the most it may spend in a month.
 
 ---
 
-# Feedback loop
+## Feedback loop
 
-Every result should allow:
+Every match offers a verdict:
 
 ```text
-👍 Good match
+👍 Good lead
 👎 Not relevant
 ```
 
-Over time these examples can improve intent classification for each user.
+Different businesses consider different things valuable. **The goal** is for
+the system to learn what this particular user considers a good lead.
 
-Different businesses consider different things valuable.
-
-The long-term goal is for the system to learn:
-
-> What does this particular user consider a good lead?
-
----
-
-# Architecture
-
-Keep integrations modular. The shape the repository actually took is in
-STACK.md, *Repository shape*; what matters here is the seam.
-
-Social networks should implement a common connector interface.
-
-The sketch this plan started from was three members: an id,
-`validateCredentials` and `search`. US-003 settled the real one, and it is
-wider, because three facts about billing and throttling were missing here and
-each one, left out, ends up copied into the worker: a page carries a cost as
-well as a cursor, back-off belongs to the connector, and a source declares its
-own price. `packages/engine/src/sources/types.ts` is the interface, and its
-comments say why each member exists.
-
-This makes additional integrations easy for both us and community contributors.
-See [docs/sources.md](docs/sources.md) for the steps.
+**Nothing implements that yet.** A verdict is stored, hides a match marked
+not relevant, and can be exported; the classifier does not read it. The path
+there is measured first: thirty verdicts to say whether the score is right
+(US-033), then a harness to compare a rule (US-231).
 
 ---
 
-# Future integrations
-
-Do not build these until the existing sources are working well. YouTube,
-TikTok and Instagram have since been built, each as a recorded decision — see
-*Important rule*.
-
-Potential sources:
-
-* Hacker News
-* Bluesky
-* Mastodon
-* Threads — parked in US-038, and the only one of that ticket's three still parked
-* RSS
-* GitHub
-* Stack Overflow
-* Discourse
-* Facebook
-* Other forums and communities
-
-Community pull requests should be encouraged for new connectors.
-
----
-
-# Cloud version
-
-The open-source project remains free and self-hostable.
-
-**It is live, and since 2026-09-16 it is a separate private repository.**
-SignalScout Cloud has run at app.signalscout.run since 2026-09-10. It is built
-on the two packages this repository publishes, and its price, its plans and
-its Stripe integration live there and not here — STACK.md, *Hosted version*.
-
-The hosted product is not charging users for social data or AI usage.
-
-Users continue to bring their own API keys.
-
-We charge for convenience.
-
-## Open Source
-
-**$0**
-
-* Self-hosted
-* Full application
-* BYO social API keys
-* BYO AI provider
-* Scheduler
-* Docker Compose
-* Webhooks
-* Full source code
-
-## Hosted
-
-**$20/month**, after seven free days
-
-* No server setup
-* Runs 24/7
-* Managed scheduler
-* Hosted database
-* Automatic updates
-* Backups
-* Email alerts
-* Webhooks
-* BYO social API keys
-* BYO AI key
-
-The positioning should be:
-
-> Don't want to host it yourself? We'll run it for you.
-
-Not:
-
-> Hosted version for people who don't know how to use servers.
-
-Developers may also happily pay simply because they do not want another service to maintain.
-
----
-
-# Potential future pricing
-
-Keep the entry tier cheap.
-
-```text
-Open Source
-$0
-
-Hosted
-$20/month          the tier that exists
-```
-
-This section planned $5-9 for the hosted tier and a Pro tier above it. The
-hosted tier shipped at $20 and there is no Pro tier. The reason to keep the
-paragraph is the rule under it, which has not changed: keep the entry tier
-cheap, and do not design a second tier until people are using the first.
-
-Possible Pro features later:
-
-* More monitors
-* Higher polling frequency
-* Longer history
-* Slack/Discord
-* Teams
-* API access
-* CRM integrations
-* Advanced feedback/training
-* Shared monitors
-
-Do not worry about this until people are actually using the product.
-
----
-
-# Positioning
-
-Avoid positioning it as another generic social-listening platform.
-
-Possible positioning:
-
-> **Open-source AI intent monitoring.**
-
-> **Find people talking about the problem your product solves.**
-
-> **Turn Reddit and X conversations into an intent inbox.**
-
-> **Social listening for buyer intent, not vanity metrics.**
-
-> **Your accounts. Your API keys. Your data.**
-
-The differentiation is not having more integrations or more analytics than established social-listening companies.
-
-The differentiation is:
-
-* Open source
-* Self-hostable
-* BYO APIs
-* BYO AI
-* Cheap hosted option
-* Intent-first
-* Built around finding useful conversations rather than producing marketing analytics
-
----
-
-# What we are NOT building
+## What we are NOT building
 
 At least initially:
 
 * A Brandwatch competitor
 * Enterprise social-media analytics
-* Social publishing
-* Social-media scheduling
+* Sentiment charts, share of voice, word clouds, competitor reports
+* Social publishing or scheduling — a reply draft ends at the clipboard
 * Influencer management
-* Sentiment analytics
-* CRM platform
-* Lead enrichment database
-* Full sales automation system
+* A CRM platform
+* A lead enrichment database
+* A full sales automation system
 
 Keep the scope narrow:
 
@@ -562,33 +282,7 @@ Keep the scope narrow:
 
 ---
 
-# Success criteria
-
-Do not measure the first launch primarily by:
-
-* GitHub stars
-* Product Hunt votes
-* Website traffic
-* Signups
-
-The first meaningful question is:
-
-> Are people receiving matches that they genuinely find valuable?
-
-Early milestones:
-
-1. Get the product working for ourselves.
-2. Get 10–20 people self-hosting it.
-3. See whether they continue running monitors.
-4. Measure whether matches are genuinely useful.
-5. Get the first users saying they would rather pay than maintain the server.
-6. Launch the hosted version.
-7. Get the first 5–10 paying users.
-8. Only then expand integrations and features.
-
----
-
-# Important rule
+## Important rule
 
 **Do not add another social network until Reddit + X reliably produce useful matches.**
 
@@ -608,30 +302,36 @@ A product with two sources that surfaces five genuinely valuable conversations p
 
 ---
 
-# Initial product thesis
+## Success criteria
 
-People already pay for social listening and keyword monitoring.
+Do not measure the product primarily by GitHub stars, Product Hunt votes,
+website traffic or signups.
 
-We are not trying to beat established companies at their own game.
+The first meaningful question is:
 
-Instead, we are building a smaller open-source tool for people who want:
+> Are people receiving matches that they genuinely find valuable?
 
-```text
-social conversations
-        +
-AI understanding
-        +
-buyer/problem intent
-        =
-useful opportunities
-```
+Early milestones:
 
-The open-source project creates distribution and trust.
+1. Get the product working for ourselves.
+2. Get 10–20 people self-hosting it.
+3. See whether they continue running monitors.
+4. Measure whether matches are genuinely useful.
+5. Launch the hosted version — **done**: SignalScout Cloud has run at
+   app.signalscout.run since 2026-09-10.
+6. Get the first 5–10 paying users.
+7. Only then expand integrations and features.
 
-BYOK keeps costs and platform dependency low.
-
-The cheap hosted version monetizes convenience.
-
-And the product succeeds if users regularly look at a match and think:
+The product succeeds if users regularly look at a match and think:
 
 > “This is exactly the kind of person I wanted to find.”
+
+---
+
+## Cloud version
+
+SignalScout Cloud is a separate, private product built on the two packages
+this repository publishes (US-151, US-155). It includes the data and model
+usage, so a cloud customer brings no keys, and it charges; its plans and
+prices live there and on the pricing page, not here. This repository charges
+nobody, and nothing in it knows a subscription.

@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-23T13:51+08:00
 parent: US-270
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -34,21 +34,21 @@ Vitest 5. A preview only, until the addon takes Vitest 5.
 
 ## Acceptance
 
-- [ ] `pnpm --filter @signalscout/ui storybook` opens a preview of every
+- [x] `pnpm --filter @signalscout/ui storybook` opens a preview of every
       exported component, and `storybook:build` builds a static one.
-- [ ] The preview wears the package's own stylesheet and Figtree, so what it
+- [x] The preview wears the package's own stylesheet and Figtree, so what it
       shows is what an application shows.
-- [ ] Every component exported today has a story per state a screen puts it
+- [x] Every component exported today has a story per state a screen puts it
       in: `Button`, `Dialog`, `Field`, `FormError`, `PageState`, `BrandIcon`,
       `BrandLogo`, `ProjectCard`, `ReplyDraft`, `ReplyVoices`.
-- [ ] A component that fetches is shown without a server.
-- [ ] Nothing Storybook installs reaches the published tarball:
+- [x] A component that fetches is shown without a server.
+- [x] Nothing Storybook installs reaches the published tarball:
       `pnpm release:verify:ui` passes and the tarball lists no story.
-- [ ] `pnpm check:licenses`, `pnpm lint`, `pnpm typecheck` and `pnpm test`
+- [x] `pnpm check:licenses`, `pnpm lint`, `pnpm typecheck` and `pnpm test`
       pass.
-- [ ] The package README says how to run the preview and that a new
+- [x] The package README says how to run the preview and that a new
       component comes with its stories.
-- [ ] The preview was opened in a browser; the Log says what was seen.
+- [x] The preview was opened in a browser; the Log says what was seen.
 
 ## Notes
 
@@ -59,3 +59,16 @@ Vitest 5. A preview only, until the addon takes Vitest 5.
 
 - 2026-09-23T13:51+08:00 — Written after a survey of the two applications,
   with US-352 to US-355. The owner chose Storybook from the table above.
+- 2026-09-23T14:05+08:00 — Shipped. Storybook 10.6 with the a11y addon,
+  telemetry off, the dev server on 127.0.0.1 only. 39 stories over the ten
+  components; `ReplyDraft` and `ReplyVoices` run against `parameters.api`,
+  and the Drafted, Writing and Refused stories press the button themselves.
+  A browser opened ProjectCard, ReplyVoices, ReplyDraft, Button, Field,
+  PageState, BrandIcon (all 17 icons load) and Dialog. **The preview found a
+  real fault on its first run**: `Field`'s layout rules are in each
+  application's `index.css`, so the label and its hint run together without
+  one — BUG-356. The Dialog story pads its own body, because `.app-dialog`
+  has no padding and every screen pads its own. The browser used for the
+  check runs Dark Reader, which repaints the preview dark; the token values
+  underneath are the light theme. 2,344 tests pass, the tarball holds 83
+  files and no story, and every license check passes.

@@ -32,7 +32,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verdicts": "node --env-file=.env scripts/verdicts.mjs",
-    "typecheck": "tsc --build && pnpm --filter @signalscout/web typecheck"
+    "typecheck": "tsc --build && pnpm --filter @signalscout/ui typecheck && pnpm --filter @signalscout/web typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.12",

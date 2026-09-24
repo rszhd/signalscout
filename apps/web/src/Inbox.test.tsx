@@ -1121,18 +1121,10 @@ describe("the inbox", () => {
       expect(listReads()).toBe(before);
     });
 
-    it("copies the item's address", async () => {
-      const writeText = vi.fn(async () => undefined);
-      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    it("offers no copy button: the address bar already holds the link", async () => {
       await show();
 
-      await act(async () => button("Copy link").click());
-      await settle();
-
-      expect(writeText).toHaveBeenCalledWith(
-        `${window.location.origin}/projects/${projectId}/matches/match-1`,
-      );
-      expect(container.textContent).toContain("Link copied");
+      expect(() => button("Copy link")).toThrow();
     });
   });
 

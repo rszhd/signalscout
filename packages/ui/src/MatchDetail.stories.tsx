@@ -36,12 +36,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Post: Story = {};
 
-/** Self-hosted: *Copy link* in the product's slot beside the conversation link. */
-export const WithCopyLink: Story = {
+/** A product's own button, in the slot beside the conversation link. */
+export const WithProductAction: Story = {
   args: {
     actions: (
       <button className="secondary-button" type="button">
-        Copy link
+        A product action
       </button>
     ),
   },

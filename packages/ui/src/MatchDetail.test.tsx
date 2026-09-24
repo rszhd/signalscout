@@ -109,7 +109,7 @@ describe("the reading pane", () => {
     const container = await show({
       actions: (
         <button className="secondary-button" type="button">
-          Copy link
+          A product action
         </button>
       ),
     });
@@ -117,7 +117,7 @@ describe("the reading pane", () => {
     const actions = [...(container.querySelector(".match-actions")?.children ?? [])];
     expect(actions.map((node) => node.textContent)).toEqual([
       "Open conversation ↗",
-      "Copy link",
+      "A product action",
       "Save for later",
       "Describing the problem",
     ]);

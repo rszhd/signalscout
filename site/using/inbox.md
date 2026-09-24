@@ -32,7 +32,6 @@ flowchart TD
 | Button | What it does |
 |---|---|
 | **Open conversation ↗** | Opens the post on its platform, in a new tab. |
-| **Copy link** | Copies a link to this match inside SignalScout, to send to a colleague. |
 | **Save for later** | Keeps the match under **Saved**. |
 | **Draft reply** | Writes a reply for you to edit and post yourself. See [reply drafts](./replies). |
 | **Mark as replied** | Records that you answered this conversation. The match stays in the inbox, and its card says **Replied**. Press it again to take the mark back. |

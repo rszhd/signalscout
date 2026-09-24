@@ -494,21 +494,6 @@ export function Inbox({
     };
   }, [addressed, matches, state]);
 
-  /** Whether the address was copied a moment ago, for the button's own word. */
-  const [copied, setCopied] = useState(false);
-
-  async function copyLink(match: Match): Promise<void> {
-    const address = `${window.location.origin}${paths.inboxMatch(projectId, match.id)}`;
-    try {
-      await navigator.clipboard.writeText(address);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // No clipboard: the address is already in the bar, and the person can
-      // copy it from there. Nothing to report.
-    }
-  }
-
   const selectedMatch =
     matches.find((match) => match.id === selectedMatchId) ?? addressedMatch ?? matches[0] ?? null;
 
@@ -696,15 +681,6 @@ export function Inbox({
                 marking={marking}
                 onReplied={(replied) => void markReplied(selectedMatch, replied)}
                 onBack={() => setMobileDetailOpen(false)}
-                actions={
-                  <button
-                    className="secondary-button"
-                    type="button"
-                    onClick={() => void copyLink(selectedMatch)}
-                  >
-                    {copied ? "Link copied" : "Copy link"}
-                  </button>
-                }
               />
             </div>
           </aside>

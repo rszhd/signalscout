@@ -23,7 +23,7 @@ import { ReplyDraft } from "./ReplyDraft.js";
  * to another match folds it again.
  *
  * `actions` is where a product adds its own buttons beside the conversation
- * link: self-hosted it is *Copy link*.
+ * link. Neither application fills it today (US-398).
  */
 export interface MatchDetailProps {
   readonly match: Match;

@@ -2,10 +2,11 @@
 
 # Done
 
-241 finished.
+242 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-393 | [LinkedIn fixtures published two names and an email address](done/2026-09/BUG-393-linkedin-fixtures-published-two-names-and-an-email.md) | bug | shipped | 2026-09 |
 | BUG-356 | [The Field component's rules live in the applications](done/2026-09/BUG-356-the-field-component-s-rules-live-in-the-applications.md) | bug | shipped | 2026-09 |
 | BUG-339 | [The docs say what the code does](done/2026-09/BUG-339-the-docs-say-what-the-code-does.md) | bug | shipped | 2026-09 |
 | BUG-338 | [The image ships the development tools](done/2026-09/BUG-338-the-image-ships-the-development-tools.md) | bug | shipped | 2026-09 |

@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-24T12:53+08:00
 parent:
 area: sources
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -43,7 +43,7 @@ does**: the files are on `origin/main` and `origin/dev` since `b913fba`.
 - [x] The three fixtures repaired by `repair-linkedin-fixtures.mjs`, and no
       name, member number or personal address left in any LinkedIn fixture
 - [x] Every LinkedIn connector's tests pass unchanged
-- [ ] The owner decides whether to rewrite the public history
+- [x] The owner decides whether to rewrite the public history
 
 ## Notes
 
@@ -67,3 +67,5 @@ does**: the files are on `origin/main` and `origin/dev` since `b913fba`.
   the import) and failed lint on formatting. The follow-up fixes both, and a
   check on a mention after styled Unicode letters replaced the name, the
   address and the member number and kept the letters.
+- 2026-09-24T12:55+08:00 — **Closed.** The owner decided on 2026-09-24 that removing the data
+  from the current files is enough, and the public history is not rewritten.

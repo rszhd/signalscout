@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-24T11:18+08:00
 parent:
 area: sources
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -83,3 +83,5 @@ are the typos that would make spending invisible.
   Those four are proven by construction, not each by its own poll.
 
   Suite: 149 files, 2,475 tests pass.
+- 2026-09-24T13:41+08:00 — Released in 0.16.0 and pinned by the hosted product, which is on
+  staging with it.

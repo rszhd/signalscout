@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-24T07:53+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -140,3 +140,5 @@ not measured, and the capture decides it.
   against this working copy: HarvestAPI for LinkedIn, a LinkedIn poll counted
   as one credit, and Apify as a manual fallback. This ticket stays in doing
   until the release.
+- 2026-09-24T13:41+08:00 — Released in 0.16.0 and pinned by the hosted product, which is on
+  staging with it.

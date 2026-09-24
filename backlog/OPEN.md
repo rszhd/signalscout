@@ -2,17 +2,17 @@
 
 # Open tickets
 
-68 open — 7 doing, 52 todo, 9 parked (7 p1, 44 p2, 17 p3).
+68 open — 8 doing, 51 todo, 9 parked (7 p1, 44 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-386 | [LinkedIn is fetched through HarvestAPI directly](doing/US-386-linkedin-is-fetched-through-harvestapi-directly.md) | feature | doing | 2026-09-24T07:53+08:00 |
+| p1 | US-389 | [An instance names the price it pays a provider](doing/US-389-an-instance-names-the-price-it-pays-a-provider.md) | feature | doing | 2026-09-24T11:18+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
-| p1 | US-389 | [An instance names the price it pays a provider](todo/US-389-an-instance-names-the-price-it-pays-a-provider.md) | feature | todo | 2026-09-24T11:18+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |

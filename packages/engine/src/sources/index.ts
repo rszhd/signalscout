@@ -30,6 +30,7 @@ export {
   youTubePlatform,
   youTubePlatformId,
 } from "./platforms.js";
+export { type ProviderPrices, withInstancePrices } from "./prices.js";
 export {
   ApifyLinkedInSource,
   apifyLinkedIn,

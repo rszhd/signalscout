@@ -39,8 +39,15 @@ export const brightDataProvider: ProviderDescriptor = {
   id: "brightdata",
   displayName: "Bright Data",
   credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
+  unitPriceMicros: 1500,
 };
 ```
+
+`unitPriceMicros` is the list price of one of the provider's own units, the
+price its connectors' prices are built from. It is what `withInstancePrices`
+scales from when an instance pays less (US-389). Leave it out only when a
+connector turns a dollar bill into units at its own price, as Apify's does;
+then no instance price can be applied to it, and one given is refused.
 
 **3. Export one `ConnectorDefinition` per platform it fetches.** The pair,
 what that pair bills, and a `create` that takes a `SourceRuntime` and returns

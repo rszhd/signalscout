@@ -24,4 +24,6 @@ export const harvestApiProvider: ProviderDescriptor = {
   displayName: "HarvestAPI",
   websiteUrl: "https://harvestapi.io/",
   credentialFields,
+  /** A request, at the $20 top-up. */
+  unitPriceMicros: 4000,
 };

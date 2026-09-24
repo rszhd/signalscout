@@ -43,15 +43,15 @@ are the typos that would make spending invisible.
 
 ## Acceptance
 
-- [ ] `createSourceRegistry` takes an optional price per provider id, in
-      micro-dollars per provider unit, and each connector built from it
-      reports scaled `pricePerUnitMicros` and `replyPricePerUnitMicros`
-- [ ] The scaled prices reach every reader: the budget guard, `api_usage`,
+- [x] `withInstancePrices` takes a price per provider id, in micro-dollars
+      per provider unit, and returns definitions whose connectors report
+      scaled `pricePerUnitMicros` and `replyPricePerUnitMicros`
+- [x] The scaled prices reach every reader: the budget guard, `api_usage`,
       the cost test, a resumed collection and deletion verification
-- [ ] A registry built without the option prices exactly as today
-- [ ] A zero, negative or non-numeric price refuses at boot, naming the
+- [x] With no prices, every definition is returned as it was
+- [x] A zero, negative or non-numeric price refuses at boot, naming the
       provider
-- [ ] `docs/costs.md` and `docs/sources.md` say where an instance's price
+- [x] `docs/costs.md` and `docs/sources.md` say where an instance's price
       comes from
 
 ## Notes
@@ -59,9 +59,27 @@ are the typos that would make spending invisible.
 - The consumer is the hosted product: US-390 there.
 - Open question for the owner: should a self-hoster get the same setting
   through `.env`? Not in this ticket's scope unless asked.
-- `SourceRegistry` is the one place every consumer builds connectors from,
-  which is why the option belongs there and not on a connector.
+- The prices are applied to the definitions, not inside the registry: the
+  cost test reads definitions and never the registry, so a price applied only
+  in the registry would reach every reader but that one.
 
 ## Log
 
 - 2026-09-24T11:18+08:00 — Written at the owner's request, before building.
+- 2026-09-24T12:30+08:00 — Built. `withInstancePrices(definitions, prices)`
+  returns copies of the named provider's definitions with both prices scaled
+  by paid over list, and each copy builds a connector that reports the same
+  prices; everything else on it is the original's. A provider carries its
+  list unit price as `ProviderDescriptor.unitPriceMicros`, set on five of the
+  six. Apify has none, because its connector turns its dollar bill into
+  units at the list price, so a price given for it is refused.
+
+  **Which readers were proven, and how.** A poll through a priced connector
+  recorded 3 units at the paid price in `api_usage`, which the budget guard
+  sums, and in `poll_runs` (`worker/instance-prices.test.ts`). The replies
+  step, a resumed collection and deletion verification read the connector
+  the registry builds, and the engine test proves that connector carries the
+  paid prices. The cost test reads the definitions, which carry them too.
+  Those four are proven by construction, not each by its own poll.
+
+  Suite: 149 files, 2,475 tests pass.

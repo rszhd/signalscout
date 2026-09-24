@@ -420,6 +420,18 @@ export interface ProviderDescriptor {
   /** The provider's own website, where a person can sign up or buy more. */
   readonly websiteUrl?: string;
   readonly credentialFields: readonly CredentialField[];
+  /**
+   * The list price of one of the provider's own units — a credit, a request, a
+   * record — in micro-dollars: the price its connectors' prices are built
+   * from. US-389.
+   *
+   * It is what lets an instance that pays less say so: `withInstancePrices`
+   * scales every connector of the provider by the instance's price over this
+   * one. Absent means the provider cannot be scaled, and a price given for it
+   * is refused — Apify is absent because its connector reads the settled bill
+   * in dollars and turns it into units at the list price.
+   */
+  readonly unitPriceMicros?: number;
 }
 
 /**

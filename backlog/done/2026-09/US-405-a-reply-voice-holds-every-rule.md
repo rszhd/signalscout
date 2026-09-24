@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-25T00:03+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -62,3 +62,5 @@ words under the old name; an edited or renamed voice is the person's.
   migration 0072 rewrote all 70 untouched shipped voices across 14 accounts
   and left the one voice a person wrote. No draft was generated against a
   real model, so how drafts read with the new voices is not yet measured.
+- 2026-09-25T01:34+08:00 — Released in 0.17.0 (tag v0.17.0). Migration 0072 rewrote all 165 saved
+  shipped voices on the hosted production database.

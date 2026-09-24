@@ -7,7 +7,7 @@ priority: p1
 created: 2026-09-24T22:04+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -101,3 +101,5 @@ only records it.
   stubbed, so no model call was made: the button, the badge, the question
   after *Copy*, the filter, and the phone layout all show as intended. Not
   proven: a real draft followed by a real post on a platform.
+- 2026-09-25T01:34+08:00 — Released in 0.17.0 (tag v0.17.0) and deployed with the hosted application's
+  production release.

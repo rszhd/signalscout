@@ -2,7 +2,7 @@
 
 # Done
 
-244 finished.
+250 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -38,6 +38,12 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-407 | [A monitor is edited from its page](done/2026-09/US-407-a-monitor-is-edited-from-its-page.md) | feature | shipped | 2026-09 |
+| US-405 | [A reply voice holds every rule](done/2026-09/US-405-a-reply-voice-holds-every-rule.md) | feature | shipped | 2026-09 |
+| US-400 | [A post written twice is one card](done/2026-09/US-400-a-post-written-twice-is-one-card.md) | feature | shipped | 2026-09 |
+| US-399 | [A person sees the matches they replied to](done/2026-09/US-399-a-person-sees-the-matches-they-replied-to.md) | feature | shipped | 2026-09 |
+| US-398 | [The inbox has no Copy link button](done/2026-09/US-398-the-inbox-has-no-copy-link-button.md) | chore | shipped | 2026-09 |
+| US-396 | [A match records that the person replied](done/2026-09/US-396-a-match-records-that-the-person-replied.md) | feature | shipped | 2026-09 |
 | US-389 | [An instance names the price it pays a provider](done/2026-09/US-389-an-instance-names-the-price-it-pays-a-provider.md) | feature | shipped | 2026-09 |
 | US-386 | [LinkedIn is fetched through HarvestAPI directly](done/2026-09/US-386-linkedin-is-fetched-through-harvestapi-directly.md) | feature | shipped | 2026-09 |
 | US-381 | [The README opens with a banner](done/2026-09/US-381-the-readme-opens-with-a-banner.md) | chore | shipped | 2026-09 |

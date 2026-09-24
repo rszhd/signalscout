@@ -60,7 +60,7 @@ const options = {
       displayName: "Reddit",
       // US-027: the form asks for one list per platform and shows each
       // platform's own limit, so the options carry it.
-      search: { maxQueryWords: 8, note: "A Reddit post has a title and paragraphs." },
+      search: { maxQueryWords: 8, hint: "Reddit posts are long, so a full phrase can match." },
       missingCredentials: [],
       ready: true,
       // US-020: whether the connector that runs here reads replies.
@@ -499,7 +499,7 @@ describe("the monitor form", () => {
     const x = {
       id: "x",
       displayName: "X",
-      search: { maxQueryWords: 4, note: "Four words on X." },
+      search: { maxQueryWords: 4, hint: "X posts are short, so a long phrase finds nothing." },
       missingCredentials: [
         {
           providerId: "socialcrawl",

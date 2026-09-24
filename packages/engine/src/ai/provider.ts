@@ -173,8 +173,8 @@ export function createModel(config: AiConfig): LanguageModel {
  * would look exactly like a real one on the bill page US-014 builds.
  *
  * Anthropic list prices, read 2026-09-05 and again 2026-09-09 off
- * platform.claude.com/docs/en/about-claude/pricing; OpenAI's, read 2026-09-06
- * and again 2026-09-09 off developers.openai.com/api/docs/pricing; Google's,
+ * platform.claude.com/docs/en/about-claude/pricing; OpenAI's, read 2026-09-06,
+ * 2026-09-09 and 2026-09-23 off developers.openai.com/api/docs/pricing; Google's,
  * read 2026-09-09 off ai.google.dev/gemini-api/docs/pricing. One US dollar is
  * 1,000,000 micros, so $1.00 per million tokens is 1_000_000 here.
  *
@@ -214,8 +214,10 @@ export const modelPrices: Readonly<
   "claude-sonnet-5": { input: 2_000_000, output: 10_000_000, provider: "anthropic" },
   "claude-opus-5": { input: 5_000_000, output: 25_000_000, provider: "anthropic" },
   "claude-fable-5-1": { input: 10_000_000, output: 50_000_000, provider: "anthropic" },
+  "gpt-6-luna": { input: 100_000, output: 500_000, provider: "openai" },
   "gpt-5.6-luna": { input: 200_000, output: 1_200_000, provider: "openai" },
   "gpt-5.6-terra": { input: 2_000_000, output: 12_000_000, provider: "openai" },
+  "gpt-6-sol": { input: 2_000_000, output: 10_000_000, provider: "openai" },
   "gpt-5.6-sol": { input: 4_000_000, output: 20_000_000, provider: "openai" },
   "gpt-6-astra": { input: 10_000_000, output: 50_000_000, provider: "openai" },
   "gemini-3.5-flash-lite": { input: 300_000, output: 2_500_000, provider: "google" },

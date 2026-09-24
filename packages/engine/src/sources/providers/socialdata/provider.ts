@@ -38,4 +38,6 @@ export const socialDataProvider: ProviderDescriptor = {
   displayName: "SocialData",
   websiteUrl: "https://socialdata.tools/",
   credentialFields,
+  /** A tweet. */
+  unitPriceMicros: 200,
 };

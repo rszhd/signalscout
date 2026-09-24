@@ -10,7 +10,7 @@ You bring a key for each provider you want to use.
 |---|---|---|
 | Reddit | ScrapeCreators, SocialCrawl | ScrapeCreators has a free tier with no card. |
 | X | SocialCrawl, SocialData | SocialData is prepaid. |
-| LinkedIn | Apify | The only one that finds a post an hour old. |
+| LinkedIn | HarvestAPI, Apify | Both return the same posts, minutes old. HarvestAPI costs about a twelfth as much. |
 | YouTube | ScrapeCreators, SocialCrawl | |
 | TikTok | ScrapeCreators, SocialCrawl | |
 | Instagram | SocialCrawl | Comments cost more than posts. See [costs](./costs). |
@@ -40,6 +40,7 @@ flowchart TD
 SCRAPECREATORS_API_KEY=   # Reddit, YouTube, TikTok
 SOCIALCRAWL_API_KEY=      # Reddit, X, YouTube, TikTok, Instagram
 SOCIALDATA_API_KEY=''     # X. Keep the quotes: the key can contain a "|"
+HARVESTAPI_API_KEY=       # LinkedIn
 APIFY_API_TOKEN=          # LinkedIn
 ```
 

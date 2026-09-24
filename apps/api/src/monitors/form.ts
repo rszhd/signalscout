@@ -55,7 +55,7 @@ export function registerFormRoutes(app: ApiServer, context: MonitorContext): voi
                * form asks for one list per platform and holds each to its own
                * rule, so it has to be able to say what the rule is.
                */
-              search: z.object({ maxQueryWords: z.number(), note: z.string() }),
+              search: z.object({ maxQueryWords: z.number(), hint: z.string() }),
               /** Empty when the platform can be collected. */
               missingCredentials: z.array(missingCredentialSchema),
               ready: z.boolean(),
@@ -104,7 +104,7 @@ export function registerFormRoutes(app: ApiServer, context: MonitorContext): voi
             displayName: platform.displayName,
             search: {
               maxQueryWords: platform.search?.maxQueryWords ?? defaultQueryWords,
-              note: platform.search?.note ?? "",
+              hint: platform.search?.hint ?? "",
             },
             // What is still to be set, from whichever providers are blocked.
             // Each entry names its provider, so a platform two providers fetch
@@ -201,6 +201,12 @@ export function registerFormRoutes(app: ApiServer, context: MonitorContext): voi
         return reply.code(502).send({
           message: `${generator.model} could not be reached: ${outcome.error}`,
         });
+      }
+
+      // BUG-383: a line that broke a rule is left out rather than refusing the
+      // plan. The log is where somebody finds out the model keeps doing it.
+      if (outcome.dropped.length > 0) {
+        request.log.info({ dropped: outcome.dropped }, "the model wrote queries the plan left out");
       }
 
       return {

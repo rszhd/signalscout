@@ -1,0 +1,94 @@
+{
+  "note": "Which request produced each file. Captured from the live API; see docs/testing.md on why these are captured and never written.",
+  "provider": "harvestapi",
+  "platform": "linkedin",
+  "files": [
+    {
+      "file": "search-by-date.json",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "flaky tests",
+          "sortBy": "date"
+        }
+      },
+      "httpStatus": 200,
+      "capturedAt": "2026-09-23T23:59:00.228Z",
+      "identitiesReplaced": 264
+    },
+    {
+      "file": "search-past-24h.json",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "flaky tests",
+          "sortBy": "date",
+          "postedLimit": "24h"
+        }
+      },
+      "httpStatus": 200,
+      "capturedAt": "2026-09-23T23:59:00.251Z",
+      "identitiesReplaced": 264
+    },
+    {
+      "file": "search-page-2.json",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "flaky tests",
+          "sortBy": "date",
+          "page": "2"
+        }
+      },
+      "httpStatus": 200,
+      "capturedAt": "2026-09-23T23:59:00.273Z",
+      "identitiesReplaced": 243
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "kumquat velocipede telemetry brunch",
+          "sortBy": "date"
+        }
+      },
+      "httpStatus": 200,
+      "capturedAt": "2026-09-23T23:59:00.274Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "comments.json",
+      "request": {
+        "path": "/linkedin/post-comments",
+        "params": {
+          "post": "https://www.linkedin.com/posts/li-user-1_amazon-qasdet-20l-target-here-are-activity-7508514943374266368-9ngF",
+          "sortBy": "date"
+        }
+      },
+      "httpStatus": 200,
+      "capturedAt": "2026-09-23T23:59:00.275Z",
+      "identitiesReplaced": 12
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "path": "/linkedin/post-search",
+        "key": "invalid"
+      },
+      "httpStatus": 401,
+      "capturedAt": "2026-09-24T00:01:06.343Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "probe-rejected.json",
+      "request": {
+        "path": "/users/my-api-user",
+        "key": "invalid"
+      },
+      "httpStatus": 401,
+      "capturedAt": "2026-09-24T00:01:06.925Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

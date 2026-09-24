@@ -53,6 +53,9 @@ export type Source = (typeof sources)[number];
  * naming — `assertSourcesCanBeStored` checks platforms and nothing checks
  * providers, so a connector can be registered, tested and unable to store a
  * single row. The live poll is what found it.
+ *
+ * US-386 added `harvestapi`: the company behind the Apify actor, sold
+ * directly and billed per page rather than per post.
  */
 export const providers = [
   "brightdata",
@@ -60,6 +63,7 @@ export const providers = [
   "socialcrawl",
   "apify",
   "socialdata",
+  "harvestapi",
 ] as const;
 export type Provider = (typeof providers)[number];
 

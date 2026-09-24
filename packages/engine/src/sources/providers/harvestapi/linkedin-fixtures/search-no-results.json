@@ -1,0 +1,35 @@
+{
+  "pagination": {
+    "totalElements": 0,
+    "totalPages": 0,
+    "pageNumber": 1,
+    "previousElements": 0,
+    "pageSize": 50,
+    "totalResultCount": 0
+  },
+  "elements": [],
+  "query": {
+    "search": "kumquat%20velocipede%20telemetry%20brunch",
+    "sortBy": "date_posted",
+    "companyIds": [],
+    "profileIds": [],
+    "authorsCompanyIds": []
+  },
+  "status": 200,
+  "retries": 0,
+  "payments": [
+    "linkedinPostSearch"
+  ],
+  "originalQuery": {
+    "search": "kumquat velocipede telemetry brunch",
+    "sortBy": "date"
+  },
+  "cost": 0.004,
+  "user": {
+    "membershipTier": "free",
+    "planName": "free",
+    "requestsConcurrency": 1
+  },
+  "entityId": null,
+  "requestId": "ebb88434-ca3d-423d-b0cc-c12d79fba692"
+}

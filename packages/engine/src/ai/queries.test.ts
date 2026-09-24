@@ -183,8 +183,8 @@ describe("a query is written for one platform", () => {
 
   it("holds each platform to its own ceiling and not to the other's", () => {
     // Eight words is Reddit's limit and four is X's, so a plan that is legal
-    // on one side and not the other must fail as a whole rather than be
-    // trimmed to fit.
+    // on one side and not the other fails the schema as a whole. The
+    // generator drops such a line before the schema sees the plan (BUG-383).
     expect(redditPlatform.search?.maxQueryWords).toBe(8);
     expect(xPlatform.search?.maxQueryWords).toBe(4);
     expect(
@@ -278,6 +278,58 @@ describe("a model that answers", () => {
   });
 });
 
+/** One bad line costs that line, not the plan. BUG-383. */
+describe("a model that breaks a rule on one line", () => {
+  it("keeps the good queries and drops the one over the word limit", async () => {
+    const tooLong = "how do you find people asking for your product";
+    const generator = createQueryGenerator({
+      config: config(),
+      model: modelReturning(withQueries(...goodPlan.queries.reddit, tooLong)),
+    });
+
+    const outcome = await generator.generate(monitor, bothPlatforms);
+
+    expect(outcome.status).toBe("generated");
+    if (outcome.status !== "generated") return;
+    expect(outcome.plan.queries.reddit).toEqual(goodPlan.queries.reddit);
+    expect(outcome.dropped).toEqual([
+      { list: "reddit", value: tooLong, reason: expect.stringContaining("at most 8 words") },
+    ]);
+  });
+
+  it("drops a repeat and everything past the limit", async () => {
+    const nine = Array.from({ length: 9 }, (_, index) => `testing question number ${index}`);
+    const generator = createQueryGenerator({
+      config: config(),
+      model: modelReturning(withQueries(nine[0] as string, ...nine)),
+    });
+
+    const outcome = await generator.generate(monitor, bothPlatforms);
+
+    expect(outcome.status).toBe("generated");
+    if (outcome.status !== "generated") return;
+    expect(outcome.plan.queries.reddit).toEqual(nine.slice(0, 8));
+    expect(outcome.dropped.map((line) => line.reason)).toEqual([
+      "the same as an earlier line",
+      "past the limit of 8",
+    ]);
+  });
+
+  it("drops a subreddit that is not a name, and keeps the plan", async () => {
+    const generator = createQueryGenerator({
+      config: config(),
+      model: modelReturning({ ...goodPlan, subreddits: ["r/webdev", "small SaaS teams"] }),
+    });
+
+    const outcome = await generator.generate(monitor, bothPlatforms);
+
+    expect(outcome.status).toBe("generated");
+    if (outcome.status !== "generated") return;
+    expect(outcome.plan.subreddits).toEqual(["webdev"]);
+    expect(outcome.dropped.map((line) => line.list)).toEqual(["subreddits"]);
+  });
+});
+
 describe("a model that answers badly", () => {
   it("rejects a plan the schema refuses rather than storing it", async () => {
     const generator = createQueryGenerator({
@@ -289,6 +341,36 @@ describe("a model that answers badly", () => {
 
     expect(outcome.status).toBe("rejected");
     expect(outcome).not.toHaveProperty("plan");
+  });
+
+  it("names what it dropped when too few queries are left", async () => {
+    const generator = createQueryGenerator({
+      config: config(),
+      model: modelReturning(withQueries("qa", "testing", "software")),
+    });
+
+    const outcome = await generator.generate(monitor, bothPlatforms);
+
+    expect(outcome.status).toBe("rejected");
+    if (outcome.status !== "rejected") return;
+    expect(outcome.error).toContain("Reddit kept 0 of 3");
+    expect(outcome.error).toContain('reddit "qa": a query is at least two words');
+  });
+
+  it("names the rule an answer of the wrong shape broke, not the answer", async () => {
+    // BUG-383: the reason used to follow the model's whole reply, and the
+    // length limit cut it off.
+    const generator = createQueryGenerator({
+      config: config(),
+      model: modelReturning({ subreddits: ["webdev"] }),
+    });
+
+    const outcome = await generator.generate(monitor, bothPlatforms);
+
+    expect(outcome.status).toBe("rejected");
+    if (outcome.status !== "rejected") return;
+    expect(outcome.error).toMatch(/: queries: /);
+    expect(outcome.error).not.toContain("webdev");
   });
 
   it("rejects prose that is not JSON at all", async () => {

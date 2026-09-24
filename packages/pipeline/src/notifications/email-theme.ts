@@ -1,11 +1,10 @@
 /**
  * The look of every email this product sends. US-094.
  *
- * **Why the palette is copied.** `docs/design.md` says `apps/web/src/styles/
- * tokens.css` is the source of truth, and it stays the source of truth for the
- * application. An email cannot read it. There is no external stylesheet in a
- * mail client, no CSS custom property in Outlook's Word renderer, no flexbox
- * and no grid — so the values are copied here, each one named for the token it
+ * **Why the palette is copied.** `packages/ui/src/styles/tokens.css` is the
+ * source of truth for both applications. An email cannot read it. There is no
+ * external stylesheet in a mail client, no CSS custom property in Outlook's
+ * Word renderer, no flexbox and no grid — so the values are copied here, each one named for the token it
  * came from, and they are copied exactly **once**. A palette copied into each
  * template is a palette that drifts in three places until two emails disagree
  * about the blue.
@@ -22,9 +21,12 @@
  *   forwarded mail and by several others outright.
  * * **No web font.** Figtree will not load. The fallback stack in `tokens.css`
  *   is what everybody sees, so it is what is written here.
- * * **No image and no tracking pixel.** A logo needs a hosted URL, is blocked
- *   by default in most clients, and a remote image in a notification is a read
- *   receipt nobody asked for. The wordmark is text.
+ * * **No remote image and no tracking pixel.** A hosted image is blocked by
+ *   default in most clients, and one in a notification is a read receipt
+ *   nobody asked for. The mark travels inside the message instead, attached
+ *   by content id (US-095): nothing is fetched when the mail is read. A data
+ *   URI and an inline `<svg>` are both stripped by Gmail. The wordmark stays
+ *   text beside it, so a client with images off still says who wrote.
  * * **Light only**, because the site theme is. A message with no background of
  *   its own is inverted by a dark-mode client into grey on near-black, so the
  *   shell paints its own and declares `color-scheme: light`.
@@ -37,8 +39,10 @@
  * text is data and must never be able to become instructions.
  */
 
+import { emailMarkPng } from "./email-mark.js";
+
 /**
- * The palette, copied from `apps/web/src/styles/tokens.css`.
+ * The palette, copied from `packages/ui/src/styles/tokens.css`.
  *
  * The token name is beside each value so a person changing one can find the
  * other. Nothing here is a new colour: adding one would make this a second
@@ -46,25 +50,25 @@
  */
 export const emailPalette = {
   /** --ink */
-  ink: "#151a22",
+  ink: "#202124",
   /** --muted */
-  muted: "#626b78",
+  muted: "#5f6368",
   /** --muted-strong */
-  mutedStrong: "#414b59",
+  mutedStrong: "#3c4043",
   /** --background */
-  background: "#f7f8fa",
+  background: "#f8fafd",
   /** --surface */
   surface: "#ffffff",
   /** --surface-soft */
-  surfaceSoft: "#f5f7fa",
+  surfaceSoft: "#f8f9fa",
   /** --line */
-  line: "#e5e8ed",
+  line: "#e3e3e3",
   /** --accent */
-  accent: "#48679f",
+  accent: "#0b57d0",
   /** --accent-soft */
-  accentSoft: "#edf2fa",
+  accentSoft: "#e8f0fe",
   /** --accent-text */
-  accentText: "#36578f",
+  accentText: "#0b57d0",
   /** --text-on-accent */
   onAccent: "#ffffff",
 } as const;
@@ -124,6 +128,26 @@ export function safeUrl(value: string): string | null {
   }
 }
 
+/** The content id the shell's header names, and the attachment answers. */
+export const emailMarkCid = "signalscout-mark@signalscout";
+
+/**
+ * The mark as an inline attachment, for any message whose HTML names it.
+ *
+ * `transport.ts` adds it only when the HTML carries `cid:` + `emailMarkCid`,
+ * because an attachment no part refers to is shown to the reader as a file.
+ * It costs about a kilobyte a message: `email-mark.ts` holds the PNG.
+ */
+export function emailMarkAttachment() {
+  return {
+    filename: "signalscout.png",
+    content: Buffer.from(emailMarkPng, "base64"),
+    contentType: "image/png",
+    contentDisposition: "inline" as const,
+    cid: emailMarkCid,
+  };
+}
+
 export interface EmailShell {
   /** The line under the wordmark. One short sentence, already plain text. */
   readonly preheading: string;
@@ -152,9 +176,16 @@ export function renderShell({ preheading, body, footer }: EmailShell): string {
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"`,
     ` style="max-width:600px;width:100%;font-family:${emailFont};">`,
 
-    // The wordmark. Text, not an image: see the header comment.
-    `<tr><td style="padding:0 4px 12px;font-size:15px;font-weight:600;color:${p.accentText};`,
-    ` letter-spacing:0.01em;">SignalScout</td></tr>`,
+    // The mark and the wordmark, set as the application's sidebar sets them.
+    // The alt is empty because the name is already beside it.
+    '<tr><td style="padding:0 4px 12px;">',
+    '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>',
+    `<td style="padding-right:10px;vertical-align:middle;">`,
+    `<img src="cid:${emailMarkCid}" width="32" height="32" alt=""`,
+    ' style="display:block;border:0;width:32px;height:32px;" /></td>',
+    `<td style="vertical-align:middle;font-size:17px;font-weight:600;color:${p.ink};`,
+    ` letter-spacing:-0.015em;">SignalScout</td>`,
+    "</tr></table></td></tr>",
 
     `<tr><td style="background:${p.surface};border:1px solid ${p.line};border-radius:${radius};`,
     ` padding:24px;">`,
@@ -171,10 +202,11 @@ export function renderShell({ preheading, body, footer }: EmailShell): string {
 }
 
 /**
- * The blue action button.
+ * The blue action button, a pill like the application's primary button.
  *
  * A table rather than a padded anchor, because Outlook ignores padding on an
- * inline element and the button collapses to its text.
+ * inline element and the button collapses to its text. Outlook on Windows
+ * also ignores the radius and draws a square button, which still reads.
  */
 export function renderButton(url: string, label: string): string {
   const p = emailPalette;
@@ -183,9 +215,9 @@ export function renderButton(url: string, label: string): string {
 
   return [
     `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0;">`,
-    `<tr><td style="background:${p.accent};border-radius:8px;">`,
+    `<tr><td style="background:${p.accent};border-radius:999px;">`,
     `<a href="${escapeHtml(href)}"`,
-    ` style="display:inline-block;padding:11px 18px;font-family:${emailFont};font-size:15px;`,
+    ` style="display:inline-block;padding:11px 22px;font-family:${emailFont};font-size:15px;`,
     ` font-weight:600;color:${p.onAccent};text-decoration:none;">${escapeHtml(label)}</a>`,
     "</td></tr></table>",
   ].join("");

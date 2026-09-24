@@ -32,6 +32,18 @@ textarea {
   font: inherit;
 }
 
+/*
+  Selects draw their own arrow. The browser's arrow ignores right padding and
+  sits against the border, so no rule could give it room.
+*/
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%235f6368' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right var(--space-3) center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
 button {
   cursor: pointer;
 }

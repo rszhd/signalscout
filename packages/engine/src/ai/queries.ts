@@ -191,6 +191,137 @@ export interface QueryPlan {
 }
 
 /**
+ * The shape the model is asked for: the plan without its per-query rules.
+ *
+ * With the rules inside the schema, one query over a platform's word limit
+ * refused the whole plan, and every good query went with it. The rules are
+ * applied after the answer instead, a line at a time, by `usablePlanFrom`
+ * (BUG-383).
+ */
+function queryPlanDraftSchemaFor(platforms: readonly PlatformDescriptor[]) {
+  return z.object({
+    queries: z.object(
+      Object.fromEntries(
+        platforms.map((platform) => [
+          platform.id,
+          z
+            .array(z.string())
+            .describe(
+              `Search phrases a person with this problem would type on ${platform.displayName}`,
+            ),
+        ]),
+      ),
+    ),
+    subreddits: z
+      .array(z.string())
+      .describe("Subreddits where the ideal customer already posts. Bare names."),
+  });
+}
+
+/** One line the model wrote and the plan left out, and the rule it broke. */
+export interface DroppedQuery {
+  /** A platform id, or `subreddits`. */
+  readonly list: string;
+  readonly value: string;
+  readonly reason: string;
+}
+
+type Usable =
+  | {
+      readonly status: "usable";
+      readonly plan: QueryPlan;
+      readonly dropped: readonly DroppedQuery[];
+    }
+  | { readonly status: "unusable"; readonly error: string };
+
+/**
+ * The lines of one list that pass its rule, in order, each once, up to `limit`.
+ *
+ * A repeat is compared after the schema's own trimming, so `r/SaaS` and `SaaS`
+ * are one subreddit, as `allDifferent` would have judged them.
+ */
+function keepUsable(
+  list: string,
+  values: readonly string[],
+  schema: z.ZodType<string, unknown>,
+  limit: number,
+): { kept: string[]; dropped: DroppedQuery[] } {
+  const kept: string[] = [];
+  const dropped: DroppedQuery[] = [];
+  const seen = new Set<string>();
+
+  for (const value of values) {
+    const parsed = schema.safeParse(value);
+    if (!parsed.success) {
+      dropped.push({ list, value, reason: parsed.error.issues[0]?.message ?? "not usable" });
+    } else if (seen.has(parsed.data.toLowerCase())) {
+      dropped.push({ list, value, reason: "the same as an earlier line" });
+    } else if (kept.length === limit) {
+      dropped.push({ list, value, reason: `past the limit of ${limit}` });
+    } else {
+      seen.add(parsed.data.toLowerCase());
+      kept.push(parsed.data);
+    }
+  }
+
+  return { kept, dropped };
+}
+
+/**
+ * The plan that is left once every line that breaks a rule is dropped.
+ *
+ * Unusable only when a platform keeps fewer than `minimumQueries`, because
+ * that is a monitor with too few ways in, and the error names what was dropped
+ * and why. A bad subreddit never makes a plan unusable: none is a valid answer.
+ */
+export function usablePlanFrom(
+  draft: {
+    readonly queries: Readonly<Record<string, readonly string[]>>;
+    readonly subreddits: readonly string[];
+  },
+  platforms: readonly PlatformDescriptor[],
+): Usable {
+  const queries: Record<string, string[]> = {};
+  const dropped: DroppedQuery[] = [];
+  const short: string[] = [];
+
+  for (const platform of platforms) {
+    const written = draft.queries[platform.id] ?? [];
+    const list = keepUsable(
+      platform.id,
+      written,
+      searchQuerySchemaFor(platform.search),
+      maximumQueries,
+    );
+
+    queries[platform.id] = list.kept;
+    dropped.push(...list.dropped);
+    if (list.kept.length < minimumQueries) {
+      short.push(`${platform.displayName} kept ${list.kept.length} of ${written.length}`);
+    }
+  }
+
+  const subreddits = keepUsable("subreddits", draft.subreddits, subredditSchema, maximumSubreddits);
+  dropped.push(...subreddits.dropped);
+
+  if (short.length > 0) {
+    const reasons = dropped.map((line) => `${line.list} "${line.value}": ${line.reason}`);
+    return {
+      status: "unusable",
+      error:
+        `Fewer than ${minimumQueries} usable queries (${short.join("; ")}). ` +
+        `Dropped: ${reasons.join("; ")}`,
+    };
+  }
+
+  // The full schema, once more, over what is left. Every line already passed
+  // its own rule, so a refusal here is a bug in this function and throws.
+  const plan = queryPlanSchemaFor(platforms).parse({ queries, subreddits: subreddits.kept });
+
+  return { status: "usable", plan: plan as QueryPlan, dropped };
+}
+
+/**
  * The instructions, which do not change between monitors, so a provider can
  * cache this half. The monitor's own answers are the user prompt.
  */
@@ -276,7 +407,13 @@ export function buildQueryUserPrompt(monitor: MonitorProfile): string {
  * users to look in the wrong place.
  */
 export type QueryPlanOutcome =
-  | { readonly status: "generated"; readonly plan: QueryPlan; readonly call: ModelCall }
+  | {
+      readonly status: "generated";
+      readonly plan: QueryPlan;
+      /** Lines the model wrote that broke a rule and were left out. */
+      readonly dropped: readonly DroppedQuery[];
+      readonly call: ModelCall;
+    }
   | { readonly status: "rejected"; readonly error: string; readonly call: ModelCall }
   | { readonly status: "failed"; readonly error: string; readonly call: ModelCall };
 
@@ -331,7 +468,7 @@ export function createQueryGenerator({
       const result = await generateStructured({
         model: languageModel,
         config,
-        schema: queryPlanSchemaFor(platforms),
+        schema: queryPlanDraftSchemaFor(platforms),
         schemaName: "monitor_queries",
         schemaDescription: "The search phrases and subreddits this monitor will use",
         system: buildQuerySystemPrompt(platforms),
@@ -341,7 +478,17 @@ export function createQueryGenerator({
 
       if (result.status !== "ok") return result;
 
-      return { status: "generated", plan: result.object as QueryPlan, call: result.call };
+      const usable = usablePlanFrom(result.object, platforms);
+      if (usable.status === "unusable") {
+        return { status: "rejected", error: usable.error, call: result.call };
+      }
+
+      return {
+        status: "generated",
+        plan: usable.plan,
+        dropped: usable.dropped,
+        call: result.call,
+      };
     },
   };
 }

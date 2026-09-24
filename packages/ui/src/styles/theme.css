@@ -390,7 +390,7 @@
   border: 1px solid var(--line-dark);
   border-radius: 4px;
   color: var(--ink);
-  background: var(--surface);
+  background-color: var(--surface);
   font: inherit;
   font-size: var(--text-body);
   line-height: 1.5;
@@ -398,6 +398,10 @@
   transition:
     border-color 140ms ease,
     box-shadow 140ms ease;
+}
+
+.field select.form-control {
+  padding-right: var(--space-8);
 }
 
 .field .form-control:hover {

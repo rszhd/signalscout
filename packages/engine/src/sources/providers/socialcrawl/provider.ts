@@ -31,4 +31,6 @@ export const socialCrawlProvider: ProviderDescriptor = {
   displayName: "SocialCrawl",
   websiteUrl: "https://www.socialcrawl.dev/",
   credentialFields,
+  /** A credit, at the £15 Starter pack. */
+  unitPriceMicros: 8118,
 };

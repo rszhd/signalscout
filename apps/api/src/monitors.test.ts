@@ -259,13 +259,14 @@ describe("the monitor routes", () => {
         // the second platform that has to collapse, and the first one where the
         // two providers agree about neither the price nor the billable unit:
         // SocialCrawl bills five credits for ten posts and Apify bills every
-        // post it returns.
+        // post it returns. Three since US-386, which added HarvestAPI directly:
+        // Apify's upstream, billed per page of fifty.
         expect(builtInSources.filter((source) => source.platform.id === "linkedin")).toHaveLength(
-          2,
+          3,
         );
 
-        // Three providers for Reddit, two each for LinkedIn and X, and one
-        // each for the rest: ten connectors make six rows. US-006 added the second platform, US-028
+        // Three providers each for Reddit and LinkedIn, two for X, and one
+        // each for the rest: eleven connectors make six rows. US-006 added the second platform, US-028
         // the third, US-034 the fourth, US-044 the fifth and US-049 the sixth,
         // which is why this list grew; a platform appearing twice is the
         // failure it guards. SocialCrawl fetching five of the six is exactly
@@ -305,7 +306,7 @@ describe("the monitor routes", () => {
   describe("writing the queries", () => {
     it("returns them and records what the call cost", async () => {
       await withServer(
-        { queryGenerator: stubGenerator({ status: "generated", plan, call }) },
+        { queryGenerator: stubGenerator({ status: "generated", plan, dropped: [], call }) },
         async (app) => {
           const response = await app.inject({
             method: "POST",
@@ -408,7 +409,7 @@ describe("the monitor routes", () => {
 
     it("refuses answers too short to write a query from", async () => {
       await withServer(
-        { queryGenerator: stubGenerator({ status: "generated", plan, call }) },
+        { queryGenerator: stubGenerator({ status: "generated", plan, dropped: [], call }) },
         async (app) => {
           const response = await app.inject({
             method: "POST",
@@ -1294,7 +1295,7 @@ describe("the monitor routes", () => {
         timeoutMs: 30_000,
         generate: async (_answers, wanted) => {
           asked = wanted;
-          return { status: "generated", plan, call };
+          return { status: "generated", plan, dropped: [], call };
         },
       };
 

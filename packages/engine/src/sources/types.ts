@@ -392,10 +392,17 @@ export interface PlatformDescriptor {
  * `maxQueryWords` is the number that was measured. `note` is the sentence the
  * model is given, and it says *why*, because a limit with no reason is a limit
  * a model talks itself out of.
+ *
+ * `hint` is what a person reads under the platform's queries. It is separate
+ * because the two readers need different text: the note gives the model
+ * orders and our own costs, and a person editing a query needs neither. The
+ * form already states the syntax and the word limit, so a hint repeats
+ * neither. Changing `note` changes the query prompt; changing `hint` does not.
  */
 export interface PlatformSearchStyle {
   readonly maxQueryWords: number;
   readonly note: string;
+  readonly hint: string;
 }
 
 /**
@@ -413,6 +420,18 @@ export interface ProviderDescriptor {
   /** The provider's own website, where a person can sign up or buy more. */
   readonly websiteUrl?: string;
   readonly credentialFields: readonly CredentialField[];
+  /**
+   * The list price of one of the provider's own units — a credit, a request, a
+   * record — in micro-dollars: the price its connectors' prices are built
+   * from. US-389.
+   *
+   * It is what lets an instance that pays less say so: `withInstancePrices`
+   * scales every connector of the provider by the instance's price over this
+   * one. Absent means the provider cannot be scaled, and a price given for it
+   * is refused — Apify is absent because its connector reads the settled bill
+   * in dollars and turns it into units at the list price.
+   */
+  readonly unitPriceMicros?: number;
 }
 
 /**

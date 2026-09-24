@@ -2,13 +2,17 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "./BrandLogo.js";
 
 /**
- * The page around a sign-in form: the brand, the story beside the form, and
- * a footer. US-354.
+ * The page around a sign-in form, in the shape of Google's own sign-in: one
+ * wide card with the mark at its top, the screen's heading on the left and
+ * its form on the right. US-354. On a phone the card is the page, in one
+ * column.
  *
- * The form is the child, and it is each application's: first run and open
- * sign-up self-hosted, a password reset hosted. What the two products say
- * about themselves is a prop — `storyNote` under the story's points, and the
- * `footer` line.
+ * The screen is the child, and it is each application's: first run and open
+ * sign-up self-hosted, a password reset hosted. Each screen is a
+ * `.login-card` holding a `.login-head` and a `.login-body`, and ends its
+ * form with a `.login-actions` row. What a product says about itself —
+ * `storyNote`, `footer` — sits in a small row under the card, and only when
+ * it passes one.
  */
 export interface LoginFrameProps {
   readonly children: ReactNode;
@@ -16,62 +20,21 @@ export interface LoginFrameProps {
   readonly footer?: ReactNode;
 }
 
-export function LoginFrame({
-  children,
-  storyNote,
-  footer = "AI intent monitoring.",
-}: LoginFrameProps) {
+export function LoginFrame({ children, storyNote, footer }: LoginFrameProps) {
   return (
     <main className="login-page">
-      <header className="login-header">
-        <div className="login-brand">
+      <div className="login-column">
+        <div className="login-shell">
           <BrandLogo />
-          <span>SignalScout</span>
+          {children}
         </div>
-        <span className="login-header-note">Conversations worth finding.</span>
-      </header>
-
-      <div className="login-layout">
-        <aside className="login-story" aria-labelledby="login-story-title">
-          <p className="login-eyebrow">A little less searching. A lot more signal.</p>
-          <h2 id="login-story-title">
-            Your next customer
-            <br />
-            is already talking.
-          </h2>
-          <p className="login-story-copy">
-            Find people describing the problem your product solves, and join the conversation when
-            it matters.
-          </p>
-          <ul className="login-story-points">
-            <li>
-              <span aria-hidden="true">01</span>
-              <p>
-                <strong>Find real demand</strong>
-                <span>Watch public conversations where customers already ask for help.</span>
-              </p>
-            </li>
-            <li>
-              <span aria-hidden="true">02</span>
-              <p>
-                <strong>Read for intent</strong>
-                <span>Bring the conversations most relevant to your product into one inbox.</span>
-              </p>
-            </li>
-            <li>
-              <span aria-hidden="true">03</span>
-              <p>
-                <strong>Stay in control</strong>
-                <span>You choose when to reply. SignalScout never posts for you.</span>
-              </p>
-            </li>
-          </ul>
-          {storyNote && <p className="login-story-footer">{storyNote}</p>}
-        </aside>
-
-        {children}
+        {(storyNote || footer) && (
+          <footer className="login-footer">
+            {storyNote && <span className="login-story-footer">{storyNote}</span>}
+            {footer}
+          </footer>
+        )}
       </div>
-      <footer className="login-footer">{footer}</footer>
     </main>
   );
 }

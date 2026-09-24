@@ -4,6 +4,7 @@ import type { SendMailOptions } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 import { expect, it, vi } from "vitest";
 import { loadNotificationEnv } from "../config/env.js";
+import { emailMarkCid, renderShell } from "./email-theme.js";
 import { createNotificationTransport, notificationReadiness } from "./transport.js";
 
 it("reports missing SMTP settings while leaving webhooks independent", () => {
@@ -129,6 +130,38 @@ it("configures implicit TLS for Resend and sends a stable message id", async () 
     messageId: "<delivery-1@signalscout.local>",
     text: "Message body",
   });
+});
+
+/**
+ * The mark travels inside the message, and only with a message that shows it.
+ * US-095: an attachment no part names is listed to the reader as a file.
+ */
+it("attaches the mark by content id when the HTML names it, and not otherwise", async () => {
+  const sendMail = vi.fn(async (_message: SendMailOptions) => ({
+    accepted: ["owner@example.com"],
+    rejected: [],
+  }));
+  const transport = createNotificationTransport(
+    loadNotificationEnv({ SMTP_HOST: "smtp.example.com", SMTP_FROM: "alerts@example.com" }),
+    { mailer: () => ({ sendMail }) },
+  );
+  assert(transport.email);
+  const html = renderShell({ preheading: "A match.", body: "", footer: "Footer." });
+
+  await transport.email("owner@example.com", "A match", "Body", "delivery-1", html);
+  await transport.email("owner@example.com", "A match", "Body", "delivery-2", "<p>Plain</p>");
+  await transport.email("owner@example.com", "A match", "Body", "delivery-3");
+
+  const [shell, plain, text] = sendMail.mock.calls.map(([message]) => message);
+  expect(shell?.attachments).toEqual([
+    expect.objectContaining({
+      cid: emailMarkCid,
+      contentType: "image/png",
+      contentDisposition: "inline",
+    }),
+  ]);
+  expect(plain?.attachments).toBeUndefined();
+  expect(text?.attachments).toBeUndefined();
 });
 
 it("refuses a receiver that resolves inside our own network, before the request", async () => {

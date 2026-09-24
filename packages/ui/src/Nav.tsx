@@ -24,7 +24,8 @@ export type NavIconName =
   | "voices"
   | "models"
   | "billing"
-  | "account";
+  | "account"
+  | "docs";
 
 const navIconPaths: Record<NavIconName, string> = {
   projects: "M4 6.5h6l2 2h8v10H4z",
@@ -36,6 +37,7 @@ const navIconPaths: Record<NavIconName, string> = {
   models: "M12 3l1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4z M18.5 15v5 M16 17.5h5",
   billing: "M4 6h16v12H4z M4 10h16 M7 15h4",
   account: "M12 11.2a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8 M5.4 19.6a6.6 6.6 0 0 1 13.2 0",
+  docs: "M12 6.5C10.5 5.3 8 5 4 5v13c4 0 6.5.3 8 1.5 1.5-1.2 4-1.5 8-1.5V5c-4 0-6.5.3-8 1.5z M12 6.5v13",
 };
 
 export function NavIcon({ name }: { readonly name: NavIconName }) {
@@ -63,12 +65,14 @@ interface NavItemBase {
 }
 
 /**
- * One item: a link to a screen, or — for the account sheet on a phone — a
- * button that opens something. Only one item in a navigation is current.
+ * One item: a link to a screen, a link to another site such as the docs, or —
+ * for the account sheet on a phone — a button that opens something. Only one
+ * item in a navigation is current, and an item on another site never is.
  */
 export type NavItemProps =
-  | (NavItemBase & { readonly to: string; readonly onClick?: never })
-  | (NavItemBase & { readonly onClick: () => void; readonly to?: never });
+  | (NavItemBase & { readonly to: string; readonly href?: never; readonly onClick?: never })
+  | (NavItemBase & { readonly href: string; readonly to?: never; readonly onClick?: never })
+  | (NavItemBase & { readonly onClick: () => void; readonly to?: never; readonly href?: never });
 
 export function NavItem(props: NavItemProps) {
   const { icon, label, current = false, className } = props;
@@ -79,6 +83,16 @@ export function NavItem(props: NavItemProps) {
       <span>{label}</span>
     </>
   );
+
+  // A new tab, so a person reading the docs does not lose the screen they
+  // were on.
+  if (props.href !== undefined) {
+    return (
+      <a className={classes} href={props.href} target="_blank" rel="noreferrer">
+        {content}
+      </a>
+    );
+  }
 
   if (props.to !== undefined) {
     return (

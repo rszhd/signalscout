@@ -34,7 +34,7 @@ describe("the verification email is dressed like the rest of the product", () =>
 
     expect(html).toContain("SignalScout");
     expect(html).toContain("color-scheme:light");
-    expect(html).toContain("#36578f");
+    expect(html).toContain("#0b57d0");
     expect(html).toContain("Hello, confirm this address");
   });
 

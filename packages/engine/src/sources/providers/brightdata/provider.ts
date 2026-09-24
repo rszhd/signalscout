@@ -29,4 +29,6 @@ export const brightDataProvider: ProviderDescriptor = {
   displayName: "Bright Data",
   websiteUrl: "https://brightdata.com/",
   credentialFields,
+  /** A record, at the pay-as-you-go rate. */
+  unitPriceMicros: 1500,
 };

@@ -29,4 +29,6 @@ export const scrapeCreatorsProvider: ProviderDescriptor = {
   displayName: "ScrapeCreators",
   websiteUrl: "https://scrapecreators.com/",
   credentialFields,
+  /** A credit, at the entry pack. */
+  unitPriceMicros: 1880,
 };

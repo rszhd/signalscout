@@ -8,7 +8,7 @@ priority: p3
 created: 2026-09-10T00:36+08:00
 parent: US-094
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -45,16 +45,16 @@ an empty box says nothing about who sent the message.
 
 ## Acceptance
 
-- [ ] The mark is attached to the message by content id, not linked, not a
+- [x] The mark is attached to the message by content id, not linked, not a
       data URI and not inline SVG
-- [ ] The asset comes from `packages/ui`, so the worker container has it
+- [x] The asset comes from `packages/ui`, so the worker container has it
       without the web app
-- [ ] It is resized for a mail header rather than shipped at 512×512, and the
+- [x] It is resized for a mail header rather than shipped at 512×512, and the
       per-message byte cost is written down
-- [ ] A client with images off still shows who sent the message
-- [ ] The digest, the immediate alert and the verification email all get it,
+- [x] A client with images off still shows who sent the message
+- [x] The digest, the immediate alert and the verification email all get it,
       because they share one shell
-- [ ] A live send, read in a real client with images on and with images off
+- [x] A live send, read in a real client with images on and with images off
 
 ## Notes
 
@@ -74,3 +74,24 @@ an empty box says nothing about who sent the message.
   so this is the record rather than the work.
 - 2026-09-20T15:06+08:00 — Updated the source path after US-270 moved the
   canonical mark into `packages/ui` and US-272 removed the old radar favicon.
+- 2026-09-24T07:18+08:00 — Built with the owner's request to bring the emails
+  to the current brand. `email-mark-generate.ts` draws the nine-dot
+  `mark.svg` from its circles with Node's own `zlib`, no new dependency, into
+  a committed `email-mark.ts`: a 64-pixel PNG of 743 bytes, shown at 32
+  pixels as the sidebar shows it. `email-mark.test.ts` fails when the
+  committed file no longer matches the SVG. The transport attaches it only
+  when the HTML names `cid:signalscout-mark@signalscout`. A message built
+  with nodemailer and not sent was `multipart/related` with the PNG `inline`
+  under that content id, and weighed 3,269 bytes against 1,715 without the
+  mark: about 1.5 KB a message. Headless screenshots with the image and
+  without it looked right; no real client has shown it yet.
+- 2026-09-24T07:18+08:00 — The hosted repository sends through the same
+  transport and gets the mark with the next pipeline release. Its
+  `verification-email.test.ts` checks the old accent `#36578f`, which becomes
+  `#0b57d0` in the same release.
+- 2026-09-24T07:19+08:00 — Sent one verification message through Resend to
+  the owner's address, with a "[Test]" subject and the docs site in place of
+  a token link. Resend accepted it. Waiting for the owner to read it with
+  images on and off.
+- 2026-09-24T07:20+08:00 — The owner received the test message and replied that it
+  looks good, after being asked to read it with images on and off.

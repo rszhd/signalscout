@@ -409,15 +409,6 @@ describe("the monitor list", () => {
 
     expect(container.textContent).toContain("No monitors yet");
   });
-
-  it("offers the feedback as a file, so it survives a reinstall", async () => {
-    await show([monitor()]);
-
-    const link = [...container.querySelectorAll("a")].find((anchor) =>
-      anchor.textContent?.includes("Export feedback"),
-    );
-    expect(link?.getAttribute("href")).toBe("/api/feedback/export");
-  });
 });
 
 /**

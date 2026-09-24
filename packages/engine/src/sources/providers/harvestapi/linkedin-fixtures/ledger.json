@@ -1,0 +1,92 @@
+{
+  "note": "What each request moved on the account, read from /users/my-api-user before and after it. Empty means nothing the account reports moved.",
+  "runs": [
+    {
+      "run": "search-by-date",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "flaky tests",
+          "sortBy": "date"
+        }
+      },
+      "httpStatus": 200,
+      "elapsedMs": 2774,
+      "accountFieldsMoved": {
+        "usage.balance": -0.004
+      }
+    },
+    {
+      "run": "search-past-24h",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "flaky tests",
+          "sortBy": "date",
+          "postedLimit": "24h"
+        }
+      },
+      "httpStatus": 200,
+      "elapsedMs": 3359,
+      "accountFieldsMoved": {
+        "usage.balance": -0.004
+      }
+    },
+    {
+      "run": "search-page-2",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "flaky tests",
+          "sortBy": "date",
+          "page": "2"
+        }
+      },
+      "httpStatus": 200,
+      "elapsedMs": 3072,
+      "accountFieldsMoved": {
+        "usage.balance": -0.004
+      }
+    },
+    {
+      "run": "search-no-results",
+      "request": {
+        "path": "/linkedin/post-search",
+        "params": {
+          "search": "kumquat velocipede telemetry brunch",
+          "sortBy": "date"
+        }
+      },
+      "httpStatus": 200,
+      "elapsedMs": 1640,
+      "accountFieldsMoved": {
+        "usage.balance": -0.004
+      }
+    },
+    {
+      "run": "comments",
+      "request": {
+        "path": "/linkedin/post-comments",
+        "params": {
+          "post": "https://www.linkedin.com/posts/li-user-1_amazon-qasdet-20l-target-here-are-activity-7508514943374266368-9ngF",
+          "sortBy": "date"
+        }
+      },
+      "httpStatus": 200,
+      "elapsedMs": 1537,
+      "accountFieldsMoved": {
+        "usage.balance": -0.004
+      }
+    },
+    {
+      "run": "credentials-rejected",
+      "httpStatus": 401,
+      "note": "sent with a deliberately invalid key"
+    },
+    {
+      "run": "probe-rejected",
+      "httpStatus": 401,
+      "note": "sent with a deliberately invalid key"
+    }
+  ]
+}

@@ -20,6 +20,43 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.16.0 — 2026-09-24
+
+**Migration.** `0069_add_harvestapi_provider` adds `harvestapi` to the
+provider check on seven tables. Run the pipeline's migrations before this
+version polls, or recording a HarvestAPI call fails after it is paid for.
+
+**Added.** LinkedIn through HarvestAPI directly (US-386): `harvestApiLinkedIn`,
+`HarvestApiLinkedInSource`, `harvestApiProvider` and `harvestApiProviderId`,
+with the key in `HARVESTAPI_API_KEY`. It is the company behind the Apify
+actor, billed $0.004 a page of fifty posts. It is in `builtInSources` beside
+Apify, so an account holding both keys must choose one for LinkedIn, or its
+polls skip the platform with `no_provider_choice`. An account with one key
+needs nothing.
+
+**Added.** `withInstancePrices(definitions, prices)` and `ProviderPrices`
+(US-389): a consumer that pays a provider less than its list price names the
+price paid per provider unit, and every connector of that provider counts at
+it. `ProviderDescriptor.unitPriceMicros` is the list price it scales from;
+Apify has none, and a price given for it is refused.
+
+**Changed.** `PlatformDescriptor.search` has a required `hint`, plain advice
+for a person, beside `note`, which is part of the query prompt (US-385). A
+consumer that describes its own platform adds one.
+
+**Changed.** A generated query plan keeps the queries that pass their
+platform's rules and drops the rest, where one bad line used to refuse the
+whole plan (BUG-383). The `generated` outcome carries
+`dropped: readonly DroppedQuery[]`; a consumer that builds one, in a test
+stub for example, sets it.
+
+**Added.** Prices for `gpt-6-sol` and `gpt-6-luna` (US-384). A model with no
+price records no cost, so name either only from this version.
+
+**Changed.** The notification emails wear the current brand and carry the
+mark inside the message, attached by content id (US-095). `emailMarkAttachment`
+and `emailMarkCid` are exported for a consumer that sends the shell itself.
+
 ## @signalscout/ui — 0.2.0 — 2026-09-23
 
 **License.** From this version the package is fair source, under the

@@ -273,6 +273,23 @@ on GOLD and above. The connector counts the dearest, so a person on a better
 plan is told they spent more than they did rather than less. Get a token in
 the Apify console under Settings, Integrations.
 
+### `HARVESTAPI_API_KEY`
+
+Default: *empty*
+
+HarvestAPI, for LinkedIn. US-386.
+
+The company behind the Apify actor above, sold directly. It returns the same
+posts, and it bills a request rather than a post: one request is one page of
+fifty posts, for $0.004 on the $20 top-up and down to $0.002 on larger ones.
+A LinkedIn poll costs about $0.004 here against $0.05 through Apify. A search
+that finds nothing is billed the same as a full one.
+
+It is not a second source of LinkedIn data: an outage at HarvestAPI stops
+Apify's actor too. With both keys set, choose one on the Connections screen.
+Pay-as-you-go, and a top-up expires after a year. Get a key at
+https://harvestapi.io/admin/api-keys; it needs no LinkedIn account.
+
 ### `SOCIALDATA_API_KEY`
 
 Default: *empty* · **in the short file**

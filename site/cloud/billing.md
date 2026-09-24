@@ -8,8 +8,8 @@ numbers for each plan.
 ## Search credits
 
 A plan gives you **search credits** each day. One credit runs one search, on
-one platform, once. A LinkedIn search uses five credits, because LinkedIn
-costs more to search.
+one platform, once. Every platform uses one credit a search, LinkedIn
+included.
 
 Your credits are shared across all your projects, and SignalScout sets the
 schedule from them:

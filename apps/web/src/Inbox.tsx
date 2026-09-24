@@ -120,6 +120,8 @@ export function Inbox({
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [order, setOrder] = useState<InboxOrder>("rank");
   const [showDismissed, setShowDismissed] = useState(false);
+  /** Leave out the matches the person said they replied to. US-396. */
+  const [hideReplied, setHideReplied] = useState(false);
   /**
    * The saved list. US-043.
    *
@@ -137,6 +139,7 @@ export function Inbox({
   const [arrived, setArrived] = useState(0);
   const [judging, setJudging] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [marking, setMarking] = useState(false);
 
   /**
    * What the monitoring is doing, derived on every render. US-265.
@@ -209,12 +212,13 @@ export function Inbox({
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
+    if (hideReplied) query.set("hideReplied", "true");
     if (showSaved) query.set("saved", "true");
     // Not on the saved list, which has an order of its own. Sending it would
     // ask the server for something it is right to ignore. US-114.
     if (!showSaved && order !== "rank") query.set("order", order);
     return query;
-  }, [projectId, monitorId, minScore, showDismissed, showSaved, order]);
+  }, [projectId, monitorId, minScore, showDismissed, hideReplied, showSaved, order]);
 
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");
@@ -358,6 +362,45 @@ export function Inbox({
     setMatches((current) => current.map((row) => (row.id === match.id ? { ...row, saved } : row)));
   }
 
+  /**
+   * Say the person replied to a match, or take it back. US-396.
+   *
+   * The row stays, like a saved one, unless the person is hiding replied
+   * matches — then it leaves the way a dismissed one does, and the next match
+   * down is selected.
+   */
+  async function markReplied(match: Match, replied: boolean): Promise<void> {
+    setMarking(true);
+    setError(null);
+
+    try {
+      await requestJson(`/api/matches/${match.id}/replied`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ replied }),
+      });
+    } catch (cause) {
+      setError(messageFor(cause, "The reply could not be recorded."));
+      return;
+    } finally {
+      setMarking(false);
+    }
+
+    if (replied && hideReplied) {
+      setMatches((current) => {
+        const index = current.findIndex((row) => row.id === match.id);
+        const remaining = current.filter((row) => row.id !== match.id);
+        setSelectedMatchId(remaining[index]?.id ?? remaining.at(-1)?.id ?? null);
+        return remaining;
+      });
+      return;
+    }
+
+    setMatches((current) =>
+      current.map((row) => (row.id === match.id ? { ...row, replied } : row)),
+    );
+  }
+
   async function judge(match: Match, verdict: Verdict): Promise<void> {
     setJudging(true);
     setError(null);
@@ -392,7 +435,7 @@ export function Inbox({
     );
   }
 
-  const filtered = activeFilters({ monitors, monitorId, minScore, showDismissed }) > 0;
+  const filtered = activeFilters({ monitors, monitorId, minScore, showDismissed, hideReplied }) > 0;
   const orderHeading =
     inboxOrders.find((option) => option.value === order)?.heading ?? inboxOrders[0].heading;
   /**
@@ -473,6 +516,7 @@ export function Inbox({
     setMonitorId("");
     setMinScore(0);
     setShowDismissed(false);
+    setHideReplied(false);
   }
 
   return (
@@ -500,6 +544,8 @@ export function Inbox({
         onMinScore={setMinScore}
         showDismissed={showDismissed}
         onShowDismissed={setShowDismissed}
+        hideReplied={hideReplied}
+        onHideReplied={setHideReplied}
         onClear={clearFilters}
       />
 
@@ -563,7 +609,7 @@ export function Inbox({
               </button>
             }
           >
-            There may be matches the monitor or the minimum score is hiding.
+            There may be matches these filters are hiding.
           </PageState>
         ) : showSaved ? (
           <PageState
@@ -647,6 +693,8 @@ export function Inbox({
                 judging={judging}
                 onSave={(saved) => void keep(selectedMatch, saved)}
                 onJudge={(verdict) => void judge(selectedMatch, verdict)}
+                marking={marking}
+                onReplied={(replied) => void markReplied(selectedMatch, replied)}
                 onBack={() => setMobileDetailOpen(false)}
                 actions={
                   <button

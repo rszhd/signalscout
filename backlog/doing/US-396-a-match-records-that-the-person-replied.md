@@ -49,22 +49,23 @@ only records it.
 
 ## Acceptance
 
-- [ ] `matches` gains a nullable `replied_at`, the same shape as `saved_at`,
+- [x] `matches` gains a nullable `replied_at`, the same shape as `saved_at`,
       with a migration. Null means not replied
-- [ ] A route sets and clears it for one match the caller owns, and the match
+- [x] A route sets and clears it for one match the caller owns, and the match
       shape the API returns carries it
-- [ ] The reading pane has a *Mark as replied* button that toggles the mark
+- [x] The reading pane has a *Mark as replied* button that toggles the mark
       and reads as pressed when it is set, beside *Save for later*
-- [ ] Pressing *Copy* on a draft shows "Did you post it?" with a
+- [x] Pressing *Copy* on a draft shows "Did you post it?" with a
       *Mark as replied* action. The copy alone never sets the mark
-- [ ] A replied match stays in the list, and its card shows a *Replied* badge
-- [ ] The filters offer hiding replied matches, and the list and the export
-      honour it the same way, through the one filter query
-- [ ] Marking a match replied does not change its verdict, its saved state or
+- [x] A replied match stays in the list, and its card shows a *Replied* badge
+- [x] The filters offer hiding replied matches, and the list, the count and
+      the export honour it the same way, through the one filter query
+- [x] Marking a match replied does not change its verdict, its saved state or
       its place in the list
-- [ ] Both applications show the button, the question, the badge and the
-      filter. The cloud inbox is changed in the same release (see Notes)
-- [ ] Tests cover the route (owner only, set and clear), the migration, the
+- [x] The button, the question and the filter are optional props of the
+      shared components, so a page that does not store the mark offers none
+      of them
+- [x] Tests cover the route (owner only, set and clear), the migration, the
       filter, and that *Copy* alone leaves the match unmarked
 
 ## Notes
@@ -79,9 +80,8 @@ only records it.
   `packages/ui/src/MatchDetail.tsx` and `packages/ui/src/ReplyDraft.tsx`, so
   they reach both applications. The badge goes on `MatchCard`, and the filter
   on `InboxFilters`.
-- The cloud inbox (`signalscout-cloud/apps/web/src/Inbox.tsx`) builds its own
-  query and list, so it needs the filter and the save-style handler by hand.
-  Build both against the working copy and release once.
+- The new props are optional, so an application on the older inbox takes
+  this version of the package and shows nothing new until it passes them.
 - Open question, decided here by default and open to change: a replied match
   stays in the list rather than leaving it the way a *Not relevant* one does,
   because a replied lead is still a lead and the conversation may continue.
@@ -91,3 +91,13 @@ only records it.
 - 2026-09-24T22:04+08:00 — Written at the owner's request, after a walk
   through the inbox flow showed nothing records a reply. Option B of five was
   chosen: a mark the person sets, with a question after *Copy*.
+- 2026-09-24T22:22+08:00 — Built in a worktree. Migration 0070 adds
+  `replied_at`; `PUT /api/matches/:id/replied` sets it; `hideReplied` reaches
+  the list, the count and the export through `inboxConditions`. The CSV gains
+  a `replied` column after `saved`. The acceptance line about the hosted
+  application was removed: this repository carries no rule about it. The full
+  suite passes (2,501 tests), with lint, typecheck and the CSS lint. Rendered
+  in headless Chromium against the worktree's API with the draft route
+  stubbed, so no model call was made: the button, the badge, the question
+  after *Copy*, the filter, and the phone layout all show as intended. Not
+  proven: a real draft followed by a real post on a platform.

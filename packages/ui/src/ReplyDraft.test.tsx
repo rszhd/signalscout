@@ -198,6 +198,61 @@ describe("the draft itself", () => {
   });
 });
 
+/**
+ * The question after a copy. US-396. A copy is not a post, so the copy sets
+ * nothing; the person answers, and a page without the mark asks nothing.
+ */
+describe("whether the reply was posted", () => {
+  function clipboard(): void {
+    Object.defineProperty(globalThis.navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+  }
+
+  it("asks after a copy, and marks nothing until the person answers", async () => {
+    clipboard();
+    server({});
+    const onReplied = vi.fn();
+    screen = await mount(<ReplyDraft matchId={matchId} onReplied={onReplied} />);
+
+    await press("Draft reply");
+    expect(text()).not.toContain("Did you post it?");
+
+    await press("Copy draft");
+
+    expect(text()).toContain("Did you post it?");
+    expect(onReplied).not.toHaveBeenCalled();
+
+    await press("Yes, mark as replied");
+
+    expect(onReplied).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it("says the match is marked once it is", async () => {
+    clipboard();
+    server({});
+    screen = await mount(<ReplyDraft matchId={matchId} replied onReplied={() => undefined} />);
+
+    await press("Draft reply");
+    await press("Copy draft");
+
+    expect(text()).toContain("Marked as replied.");
+    expect(text()).not.toContain("Did you post it?");
+  });
+
+  it("asks nothing on a page that does not store the mark", async () => {
+    clipboard();
+    server({});
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    await press("Draft reply");
+    await press("Copy draft");
+
+    expect(text()).not.toContain("Did you post it?");
+  });
+});
+
 describe("the saved prompts", () => {
   it("edits prompts in a dialog and returns focus when it closes", async () => {
     server({ prompts: { prompts: [] } });

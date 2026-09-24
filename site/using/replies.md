@@ -10,6 +10,7 @@ flowchart TD
   draft --> edit["You edit it"]
   edit -->|Copy draft| clip["Your clipboard"]
   clip --> post["You post it<br/>on the platform"]
+  post -->|Mark as replied| marked["The match says Replied"]
 ```
 
 ## Draft a reply
@@ -24,7 +25,9 @@ an editable box.
   voice** from your saved voices, and **Customize**, where you add guidance,
   for example: *Answer the pricing question first, and keep it to three
   sentences.* The guidance applies to this draft only.
-- **Copy draft** puts the text on your clipboard.
+- **Copy draft** puts the text on your clipboard. SignalScout then asks
+  **Did you post it?** Press **Yes, mark as replied** after you post, so the
+  inbox shows that you answered. Copying alone marks nothing.
 
 Read the draft before you post it. It carries your name into somebody else's
 conversation.

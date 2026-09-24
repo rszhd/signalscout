@@ -24,6 +24,7 @@ import {
   matchCounts,
   rankDecayPointsPerDay,
   readMatch,
+  setMatchReplied,
   setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";
@@ -470,6 +471,105 @@ describe("the inbox list", () => {
     it("answers nothing for a match that does not exist", async () => {
       expect(
         await setMatchSaved(db, owner, "00000000-0000-0000-0000-000000000000", true),
+      ).toBeUndefined();
+    });
+  });
+
+  /**
+   * The person said they replied. US-396.
+   *
+   * The cases that matter are what the mark must not do: move the match, take
+   * it off the inbox, or touch the verdict and the saved state beside it.
+   */
+  describe("a match the person replied to", () => {
+    it("says so on the card, and stays on the inbox in its place", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      const strong = await seed({ monitorId, score: 90, postedAt: minutesAgo(1) });
+
+      const before = await listMatches(db, { userId: owner, asOf: now });
+      await setMatchReplied(db, owner, answered, true);
+      const after = await listMatches(db, { userId: owner, asOf: now });
+
+      expect(after.matches.map((match) => match.id)).toEqual([strong, answered]);
+      expect(after.matches.map((match) => match.id)).toEqual(
+        before.matches.map((match) => match.id),
+      );
+      expect(after.matches.find((match) => match.id === answered)?.replied).toBe(true);
+      expect(after.matches.find((match) => match.id === strong)?.replied).toBe(false);
+    });
+
+    it("leaves the verdict and the saved state as they were", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await recordVerdict(db, { matchId: answered, userId: owner, verdict: "good" });
+      await setMatchReplied(db, owner, answered, true);
+
+      const match = await readMatch(db, owner, answered);
+
+      expect(match?.verdict).toBe("good");
+      expect(match?.saved).toBe(false);
+      expect(match?.replied).toBe(true);
+    });
+
+    it("can be taken back", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchReplied(db, owner, answered, true);
+      const cleared = await setMatchReplied(db, owner, answered, false);
+
+      expect(cleared?.repliedAt).toBeNull();
+      expect((await readMatch(db, owner, answered))?.replied).toBe(false);
+    });
+
+    it("keeps the first time when it is marked twice", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      const first = new Date("2026-09-01T00:00:00.000Z");
+
+      await setMatchReplied(db, owner, answered, true, first);
+      const again = await setMatchReplied(
+        db,
+        owner,
+        answered,
+        true,
+        new Date("2026-09-03T00:00:00.000Z"),
+      );
+
+      expect(again?.repliedAt?.toISOString()).toBe(first.toISOString());
+    });
+
+    it("is left out when the person hides replied matches, and counted the same way", async () => {
+      const answered = await seed({
+        monitorId,
+        score: 70,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+      const open = await seed({
+        monitorId,
+        score: 60,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      await setMatchReplied(db, owner, answered, true);
+
+      const filters = { userId: owner, hideReplied: true };
+      const page = await listMatches(db, filters);
+
+      expect(page.matches.map((match) => match.id)).toEqual([open]);
+      expect(await countNewMatches(db, { ...filters, since: minutesAgo(15) })).toBe(1);
+    });
+
+    it("does not mark another account's match", async () => {
+      const theirs = await seed({ monitorId: strangerMonitorId, score: 70, postedAt: now });
+
+      expect(await setMatchReplied(db, owner, theirs, true)).toBeUndefined();
+      expect((await readMatch(db, "stranger", theirs))?.replied).toBe(false);
+    });
+
+    it("answers nothing for a match that does not exist", async () => {
+      expect(
+        await setMatchReplied(db, owner, "00000000-0000-0000-0000-000000000000", true),
       ).toBeUndefined();
     });
   });

@@ -241,6 +241,7 @@ export {
   ownsMatch,
   rankDecayPointsPerDay,
   readMatch,
+  setMatchReplied,
   setMatchSaved,
   UnusableCursorError,
   utf8ByteOrderMark,

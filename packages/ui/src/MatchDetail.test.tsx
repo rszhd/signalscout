@@ -72,6 +72,32 @@ describe("the reading pane", () => {
     expect(onSave).toHaveBeenLastCalledWith(false);
   });
 
+  it("asks to mark a match replied, and to take a mark back", async () => {
+    const onReplied = vi.fn();
+    await show({ onReplied });
+    expect(button("Mark as replied").getAttribute("aria-pressed")).toBe("false");
+    button("Mark as replied").click();
+    expect(onReplied).toHaveBeenLastCalledWith(true);
+    await screen.unmount();
+
+    await show({ onReplied, match: match({ replied: true }) });
+    expect(button("Replied").getAttribute("aria-pressed")).toBe("true");
+    button("Replied").click();
+    expect(onReplied).toHaveBeenLastCalledWith(false);
+  });
+
+  it("offers no replied button to a page that does not store the mark", async () => {
+    await show();
+
+    expect(() => button("Mark as replied")).toThrow();
+  });
+
+  it("disables the replied button while its request is in flight", async () => {
+    await show({ onReplied: () => undefined, marking: true });
+
+    expect(button("Mark as replied").disabled).toBe(true);
+  });
+
   it("disables the buttons while the page says a request is in flight", async () => {
     await show({ saving: true, judging: true });
 

@@ -34,6 +34,15 @@ export interface MatchDetailProps {
   /** Closes the pane on a phone, where it covers the list. */
   readonly onBack: () => void;
   readonly actions?: ReactNode;
+  /**
+   * Mark the match replied, or take the mark back. US-396.
+   *
+   * Optional, and the button and the question after *Copy* show only when it
+   * is given: a page that does not store the mark must not offer it.
+   */
+  readonly onReplied?: (replied: boolean) => void;
+  /** A replied request is in flight. */
+  readonly marking?: boolean;
 }
 
 export function MatchDetail({
@@ -44,7 +53,10 @@ export function MatchDetail({
   onJudge,
   onBack,
   actions,
+  onReplied,
+  marking = false,
 }: MatchDetailProps) {
+  const replied = match.replied === true;
   const [expanded, setExpanded] = useState(false);
   const post = limitWords(match.excerpt);
   const depth = threadDepth(match);
@@ -147,6 +159,17 @@ export function MatchDetail({
         >
           {match.saved ? "Saved" : "Save for later"}
         </button>
+        {onReplied && (
+          <button
+            aria-pressed={replied}
+            className={replied ? "secondary-button chosen" : "secondary-button"}
+            disabled={marking}
+            type="button"
+            onClick={() => onReplied(!replied)}
+          >
+            {replied ? "Replied" : "Mark as replied"}
+          </button>
+        )}
         <span className="match-meta">{match.intentLabel}</span>
       </div>
 
@@ -162,7 +185,13 @@ export function MatchDetail({
         </ul>
       </div>
 
-      <ReplyDraft key={match.id} matchId={match.id} />
+      <ReplyDraft
+        key={match.id}
+        matchId={match.id}
+        replied={replied}
+        marking={marking}
+        onReplied={onReplied}
+      />
 
       <div className="verdict-actions">
         <p className="section-label">Was this a good lead?</p>

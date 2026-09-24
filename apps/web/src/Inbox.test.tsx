@@ -111,6 +111,7 @@ describe("the inbox", () => {
       // Checked before the list, because a verdict's URL starts with the
       // list's. The body is what the assertions below read.
       if (url.endsWith("/verdict")) return json({ verdict: "good", changed: false });
+      if (url.endsWith("/replied")) return json({ matchId: "match-1", replied: true });
       if (url.endsWith("/saved")) {
         return json({ matchId: "match-1", saved: true, savedAt: "2026-09-06T12:00:00.000Z" });
       }
@@ -818,6 +819,87 @@ describe("the inbox", () => {
 
       const asked = fetchMock.mock.calls.map(([url]) => String(url));
       expect(asked.some((url) => url.includes("includeNotRelevant"))).toBe(false);
+    });
+  });
+
+  /**
+   * The person says they replied. US-396.
+   *
+   * The row stays, like a saved one, because a replied lead is still a lead —
+   * unless the person asked to hide replied matches, and then it leaves the
+   * way a dismissed one does.
+   */
+  describe("marking a match replied", () => {
+    const twoMatches = {
+      matches: [
+        match(),
+        match({
+          id: "match-2",
+          title: "A second conversation",
+          url: "https://reddit.com/r/SaaS/comments/def",
+        }),
+      ],
+      nextCursor: null,
+      asOf: "2026-09-05T12:00:00.000Z",
+    };
+
+    function repliedCalls(): unknown[] {
+      return fetchMock.mock.calls
+        .filter(([url]) => String(url).endsWith("/replied"))
+        .map(([, init]) => JSON.parse(String((init as RequestInit).body)));
+    }
+
+    it("sends the mark, keeps the row, and says so on the card and the button", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      await act(async () => button("Mark as replied").click());
+      await settle();
+
+      expect(repliedCalls()).toEqual([{ replied: true }]);
+      expect(container.querySelectorAll(".match-card")).toHaveLength(2);
+      expect(container.querySelector(".match-card .match-list-status")?.textContent).toBe(
+        "Replied",
+      );
+      expect(button("Replied").getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("asks the server to leave replied matches out when the filter says so", async () => {
+      await show();
+
+      await act(async () => button("Filters").click());
+      await act(async () => setValue(select("Replied"), "hide"));
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+      expect(asked.some((url) => url.includes("hideReplied=true"))).toBe(true);
+      expect(container.querySelector(".list-heading a")?.getAttribute("href")).toContain(
+        "hideReplied=true",
+      );
+    });
+
+    it("takes the row out and reads on when replied matches are hidden", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      await act(async () => button("Filters").click());
+      await act(async () => setValue(select("Replied"), "hide"));
+      await settle();
+      await act(async () => button("Mark as replied").click());
+      await settle();
+
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+      expect(container.querySelector(".detail-title")?.textContent).toBe("A second conversation");
+    });
+
+    it("leaves the button as it was when the mark could not be stored", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      fetchMock.mockImplementation(async () => json({ message: "The database is down." }, 500));
+
+      await act(async () => button("Mark as replied").click());
+      await settle();
+
+      expect(button("Mark as replied").getAttribute("aria-pressed")).toBe("false");
+      expect(container.textContent).toContain("The database is down.");
     });
   });
 

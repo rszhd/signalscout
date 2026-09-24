@@ -18,7 +18,7 @@ import type { InboxMatch } from "./matches.js";
  * Score first because that is what the inbox is sorted by, then the words that
  * say what it is, then the link — which is the column a person actually acts
  * on. The rest is provenance: which monitor found it, what was judged, whether
- * it was kept.
+ * it was kept, whether it was answered.
  *
  * The five dimension scores come last (US-237). They are what a person sorts
  * by once the row is understood, and five numbers between the total and the
@@ -39,6 +39,7 @@ const columns = [
   "monitor",
   "verdict",
   "saved",
+  "replied",
   "relevance",
   "problem_fit",
   "icp_fit",
@@ -122,6 +123,7 @@ export function matchesToCsv(matches: readonly InboxMatch[]): string {
         match.monitorName,
         match.verdict,
         match.saved ? "yes" : "no",
+        match.replied ? "yes" : "no",
         match.relevance,
         match.problemFit,
         match.icpFit,

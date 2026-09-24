@@ -45,6 +45,11 @@ export interface Match {
   parentRepliesStopped?: string | null;
   /** Kept for later. Not a verdict; a person's intention. */
   saved: boolean;
+  /**
+   * The person said they replied. US-396. Optional for the reason the thread
+   * depth is: an API that predates it does not send it, and absent reads as no.
+   */
+  replied?: boolean;
   url: string;
   postedAt: string;
 }
@@ -189,6 +194,8 @@ export interface InboxFilterState {
   readonly monitorId: string;
   readonly minScore: number;
   readonly showDismissed: boolean;
+  /** Replied matches left out. Optional: a page without the filter has none. US-396. */
+  readonly hideReplied?: boolean;
 }
 
 /**
@@ -199,5 +206,10 @@ export interface InboxFilterState {
  */
 export function activeFilters(state: InboxFilterState): number {
   const byMonitor = state.monitors.length > 1 && state.monitorId !== "";
-  return Number(byMonitor) + Number(state.minScore > 0) + Number(state.showDismissed);
+  return (
+    Number(byMonitor) +
+    Number(state.minScore > 0) +
+    Number(state.showDismissed) +
+    Number(state.hideReplied === true)
+  );
 }

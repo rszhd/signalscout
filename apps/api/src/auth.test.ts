@@ -1216,6 +1216,7 @@ describe("the session gate", () => {
         "PATCH /api/monitors/:id": { name: "Taken over" },
         "PUT /api/monitors/:id/budget": { monthlyCapMicros: 0, onExhausted: "pause" },
         "PUT /api/matches/:id/saved": { saved: true },
+        "PUT /api/matches/:id/replied": { replied: true },
         "PUT /api/matches/:id/verdict": { verdict: "not_relevant" },
         "PATCH /api/projects/:id": { name: "Taken over" },
         "PATCH /api/reply-prompts/:id": { name: "Taken over" },
@@ -1266,6 +1267,7 @@ describe("the session gate", () => {
         expect(await db.select().from(feedback)).toEqual([]);
         const [savedMatch] = await db.select().from(matches).where(eq(matches.id, match.id));
         expect(savedMatch?.savedAt ?? null).toBeNull();
+        expect(savedMatch?.repliedAt ?? null).toBeNull();
       } finally {
         await app.close();
       }
@@ -1456,6 +1458,16 @@ describe("the session gate", () => {
         expect(kept.statusCode).toBe(404);
         const [after] = await db.select({ savedAt: matches.savedAt }).from(matches);
         expect(after?.savedAt).toBeNull();
+
+        const replied = await app.inject({
+          method: "PUT",
+          url: `/api/matches/${match}/replied`,
+          payload: { replied: true },
+        });
+
+        expect(replied.statusCode).toBe(404);
+        const [unmarked] = await db.select({ repliedAt: matches.repliedAt }).from(matches);
+        expect(unmarked?.repliedAt).toBeNull();
       } finally {
         await app.close();
       }

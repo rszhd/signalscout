@@ -19,6 +19,14 @@ export interface MatchCardProps {
 export function MatchCard({ match, selected, onSelect }: MatchCardProps) {
   const tone = band(match.score);
   const heading = match.title ?? match.parentTitle;
+  // Replied is said beside the other mark rather than instead of it: a person
+  // scanning the list is asking "have I answered this" first.
+  const status = [
+    match.replied ? "Replied" : null,
+    match.saved ? "Saved" : match.verdict === "good" ? "Good lead" : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <button
@@ -46,9 +54,7 @@ export function MatchCard({ match, selected, onSelect }: MatchCardProps) {
       {heading && <span className="match-excerpt">{match.excerpt}</span>}
       <span className="match-bottom">
         <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
-        <span className="match-list-status">
-          {match.saved ? "Saved" : match.verdict === "good" ? "Good lead" : ""}
-        </span>
+        <span className="match-list-status">{status}</span>
         <span className="match-score">
           <strong>{match.score}</strong>
           <span>/ 100</span>

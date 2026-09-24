@@ -29,6 +29,7 @@ function match(overrides: Partial<InboxMatch> = {}): InboxMatch {
     intentLabel: "Asking for recommendations",
     reasons: ["asks what others use"],
     saved: false,
+    replied: false,
     verdict: null,
     readAt: null,
     source: "reddit",
@@ -185,6 +186,7 @@ describe("the file a person opens", () => {
       "monitor",
       "verdict",
       "saved",
+      "replied",
       "relevance",
       "problem_fit",
       "icp_fit",
@@ -209,12 +211,20 @@ describe("the file a person opens", () => {
       "Flaky tests",
       "good",
       "yes",
+      "no",
       "90",
       "72",
       "84",
       "94",
       "60",
     ]);
+  });
+
+  it("says whether the person replied, beside whether they kept it", () => {
+    const [header, row] = parseCsv(matchesToCsv([match({ replied: true })]));
+
+    expect(row?.[header?.indexOf("saved") ?? -1]).toBe("no");
+    expect(row?.[header?.indexOf("replied") ?? -1]).toBe("yes");
   });
 
   it("writes an empty cell where there is nothing, not the word null", () => {

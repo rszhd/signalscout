@@ -294,6 +294,20 @@
   background: var(--success);
 }
 
+/* The question after a copy. Empty until then, so it takes no room. US-396. */
+.reply-draft-posted {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.reply-draft-posted:not(:empty) {
+  margin-top: var(--space-3);
+}
+
 .reply-draft-cost {
   order: -1;
   margin-right: auto;

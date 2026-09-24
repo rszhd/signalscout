@@ -111,6 +111,8 @@ export interface InboxMatch {
   /** Specific claims about this post. The part that is not a keyword alert. */
   readonly reasons: readonly string[];
   readonly saved: boolean;
+  /** The person said they replied. US-396. */
+  readonly replied: boolean;
   /** The verdict this user has in force, or null when they have not judged it. */
   readonly verdict: Verdict | null;
   readonly readAt: Date | null;
@@ -217,6 +219,13 @@ export interface InboxFilters {
    * `order` is ignored.
    */
   readonly savedOnly?: boolean;
+  /**
+   * Leave out the matches the person said they replied to. US-396.
+   *
+   * A filter and not a list of its own: a replied match is still a lead, and
+   * it stays in the inbox unless the person asks for it to go.
+   */
+  readonly hideReplied?: boolean;
 }
 
 export interface ListMatchesOptions extends InboxFilters {
@@ -380,6 +389,7 @@ function inboxConditions(options: InboxFilters): SQL[] {
    * and kept it anyway meant both, and hiding it would overrule them.
    */
   if (options.savedOnly) conditions.push(isNotNull(matches.savedAt));
+  if (options.hideReplied) conditions.push(isNull(matches.repliedAt));
   if (options.minScore !== undefined) conditions.push(gte(matches.score, options.minScore));
 
   return conditions;
@@ -440,6 +450,7 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
       // Derived, so a screen keeps asking one simple question while the
       // column carries the ordering the saved list needs.
       saved: sql<boolean>`${matches.savedAt} is not null`,
+      replied: sql<boolean>`${matches.repliedAt} is not null`,
       verdict: feedback.verdict,
       readAt: matches.readAt,
       source: posts.source,
@@ -654,6 +665,38 @@ export async function setMatchSaved(
     .returning({ id: matches.id, savedAt: matches.savedAt });
 
   return row ? { matchId: row.id, savedAt: row.savedAt } : undefined;
+}
+
+/**
+ * Say the person replied to a match, or take it back. US-396.
+ *
+ * The shape of `setMatchSaved`, for the same reasons: one column on the match,
+ * scoped in the statement that writes it, and nothing else touched — not the
+ * verdict, not the saved state, not the rank. Marking again keeps the first
+ * time. Undefined when no match of this account has that id.
+ */
+export async function setMatchReplied(
+  db: Database,
+  userId: string,
+  matchId: string,
+  replied: boolean,
+  now: Date = new Date(),
+): Promise<{ readonly matchId: string; readonly repliedAt: Date | null } | undefined> {
+  const [row] = await db
+    .update(matches)
+    .set({ repliedAt: replied ? sql`coalesce(${matches.repliedAt}, ${now})` : null })
+    .where(
+      and(
+        eq(matches.id, matchId),
+        inArray(
+          matches.monitorId,
+          db.select({ id: monitors.id }).from(monitors).where(eq(monitors.userId, userId)),
+        ),
+      ),
+    )
+    .returning({ id: matches.id, repliedAt: matches.repliedAt });
+
+  return row ? { matchId: row.id, repliedAt: row.repliedAt } : undefined;
 }
 
 /** How many matches one monitor holds, and how many nobody has opened. US-109. */

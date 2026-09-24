@@ -33,6 +33,7 @@ interface Seed {
 interface Card {
   id: string;
   monitorName: string;
+  replied: boolean;
   verdict: "good" | "not_relevant" | null;
   score: number;
   problemFit: number;
@@ -414,6 +415,72 @@ describe("the inbox route", () => {
       } finally {
         await app.close();
       }
+    });
+  });
+
+  /**
+   * The person says they replied. US-396. The route is the screen's call site
+   * of the rule the pipeline asserts, with the query string it sends.
+   */
+  describe("the replied mark", () => {
+    async function markReplied(matchId: string, replied: boolean) {
+      const app = await server();
+      try {
+        return await app.inject({
+          method: "PUT",
+          url: `/api/matches/${matchId}/replied`,
+          payload: { replied },
+        });
+      } finally {
+        await app.close();
+      }
+    }
+
+    it("stores the mark and puts it on the card, and takes it back", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+
+      const marked = await markReplied(matchId, true);
+
+      expect(marked.statusCode).toBe(200);
+      expect(marked.json()).toMatchObject({ matchId, replied: true });
+      expect(marked.json().repliedAt).toEqual(expect.any(String));
+      expect(inserted((await get("/api/matches")).json<Page>().matches).replied).toBe(true);
+
+      const cleared = await markReplied(matchId, false);
+
+      expect(cleared.json()).toMatchObject({ matchId, replied: false, repliedAt: null });
+      expect(inserted((await get("/api/matches")).json<Page>().matches).replied).toBe(false);
+    });
+
+    it("keeps a replied match on the inbox, and leaves it out when asked", async () => {
+      await seed({ monitorId, score: 50, minutesOld: 5 });
+      const answered = await seed({ monitorId, score: 99, minutesOld: 1 });
+
+      await markReplied(answered, true);
+
+      expect(scores((await get("/api/matches")).json<Page>())).toEqual([99, 50]);
+      expect(scores((await get("/api/matches?hideReplied=true")).json<Page>())).toEqual([50]);
+    });
+
+    it("leaves a replied match out of the count and the file when asked", async () => {
+      const since = new Date(Date.now() - 60 * 60_000).toISOString();
+      await seed({ monitorId, score: 50, minutesOld: 5 });
+      const answered = await seed({ monitorId, score: 99, minutesOld: 1 });
+
+      await markReplied(answered, true);
+
+      const count = await get(`/api/matches/count?since=${since}&hideReplied=true`);
+      const file = await get("/api/matches/export?hideReplied=true");
+
+      expect(count.json()).toEqual({ count: 1 });
+      // A header and one row.
+      expect(file.body.trim().split("\r\n")).toHaveLength(2);
+    });
+
+    it("answers 404 for a match that does not exist", async () => {
+      const response = await markReplied("00000000-0000-4000-8000-000000000000", true);
+
+      expect(response.statusCode).toBe(404);
     });
   });
 

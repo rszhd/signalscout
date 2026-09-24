@@ -70,6 +70,15 @@ export const matches = pgTable(
      * is theirs.
      */
     savedAt: timestamp("saved_at", { withTimezone: true }),
+    /**
+     * When the person said they replied to this post, or null. US-396.
+     *
+     * Set by the person, never inferred: a copied draft is not a posted one,
+     * and a mark they did not give is a mark they learn not to trust. Like
+     * `savedAt` it is an intention and not a verdict, so a re-classification
+     * leaves it alone.
+     */
+    repliedAt: timestamp("replied_at", { withTimezone: true }),
     lastVerifiedAt: timestamp("last_verified_at", { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

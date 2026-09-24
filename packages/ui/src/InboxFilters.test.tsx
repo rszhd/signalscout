@@ -99,4 +99,18 @@ describe("the inbox filter bar", () => {
     expect(onMinScore).toHaveBeenCalledWith(85);
     expect(onOrder).toHaveBeenCalledWith("newest");
   });
+
+  it("offers the replied filter only to a page that stores the mark, and counts it", async () => {
+    screen = await mount(<InboxFilters {...props()} />);
+    expect(screen.container.querySelector('select[aria-label="Replied"]')).toBeNull();
+    await screen.unmount();
+
+    const onHideReplied = vi.fn();
+    screen = await mount(<InboxFilters {...props({ hideReplied: true, onHideReplied })} />);
+
+    expect(button("Filters · 1")).toBeDefined();
+    setValue(select("Replied"), "show");
+    await settle();
+    expect(onHideReplied).toHaveBeenCalledWith(false);
+  });
 });

@@ -22,6 +22,12 @@ export interface InboxFiltersProps {
   readonly onMinScore: (minScore: number) => void;
   readonly showDismissed: boolean;
   readonly onShowDismissed: (show: boolean) => void;
+  /**
+   * Replied matches left out. US-396. Optional as a pair: a page that does not
+   * store the mark gets no filter for it.
+   */
+  readonly hideReplied?: boolean;
+  readonly onHideReplied?: (hide: boolean) => void;
   readonly onClear: () => void;
 }
 
@@ -43,10 +49,12 @@ export function InboxFilters({
   onMinScore,
   showDismissed,
   onShowDismissed,
+  hideReplied = false,
+  onHideReplied,
   onClear,
 }: InboxFiltersProps) {
   const [open, setOpen] = useState(false);
-  const count = activeFilters({ monitors, monitorId, minScore, showDismissed });
+  const count = activeFilters({ monitors, monitorId, minScore, showDismissed, hideReplied });
 
   return (
     <>
@@ -135,6 +143,20 @@ export function InboxFilters({
             <option value="show">Shown</option>
           </select>
         </label>
+
+        {onHideReplied && (
+          <label className="filter">
+            <span>Replied</span>
+            <select
+              aria-label="Replied"
+              value={hideReplied ? "hide" : "show"}
+              onChange={(event) => onHideReplied(event.target.value === "hide")}
+            >
+              <option value="show">Shown</option>
+              <option value="hide">Hidden</option>
+            </select>
+          </label>
+        )}
 
         {count > 0 && (
           <button className="read-more-button" type="button" onClick={onClear}>

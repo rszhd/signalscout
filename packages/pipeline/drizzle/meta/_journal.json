@@ -498,6 +498,13 @@
       "when": 1790259145780,
       "tag": "0070_a_match_records_that_the_person_replied",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1790264086432,
+      "tag": "0071_a_copy_of_a_post_is_not_scored_again",
+      "breakpoints": true
     }
   ]
 }

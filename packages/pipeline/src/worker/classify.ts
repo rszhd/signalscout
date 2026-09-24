@@ -30,6 +30,14 @@
  * version too: an edited monitor is a different question, and a post the model
  * could not answer three times has not been asked this one.
  *
+ * **One card for a post written twice.** US-400. A post whose author made the
+ * same post within `copyWindowDays`, and whose earlier copy already has a card
+ * on this monitor, is recorded in `post_copies` on that card and not paid for.
+ * A copy of a post that scored below the threshold is still scored — the
+ * model's score varies between identical posts, and the copy is the lead's
+ * second chance — and if it makes a card, the earlier copies are put on it.
+ * The batch is read in the order it was handed.
+ *
  * **A failure fails the job.** The posts that were scored are written and
  * their notification is sent before the throw, and the retry skips them, so
  * retrying costs only the posts that failed. Swallowing the failure instead
@@ -44,7 +52,8 @@ import {
   scoreColumns,
   type ThreadContext,
 } from "@signalscout/engine";
-import { and, count, eq, inArray, isNull, ne, notInArray } from "drizzle-orm";
+import { and, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
 import type { Database, Queryable } from "../db/client.js";
@@ -54,6 +63,7 @@ import {
   matches,
   modelCalls,
   monitors,
+  postCopies,
   posts,
   type Signal,
 } from "../db/schema.js";
@@ -74,6 +84,25 @@ import type { Step, StepContext } from "./steps.js";
  * charge that buys the same answer.
  */
 export const maxClassificationAttempts = 3;
+
+/**
+ * How far apart two posts may be and still be one post written twice. US-400.
+ *
+ * The owner's number. A person who puts one question to three subreddits does
+ * it in minutes; the same words a month later are a new moment, and the
+ * question may have a new answer.
+ */
+export const copyWindowDays = 7;
+
+/** The key one post's words are known by: platform, author and fingerprint. */
+function copyKey(post: typeof posts.$inferSelect): string | undefined {
+  if (post.kind !== "post" || !post.author || !post.textFingerprint) return undefined;
+  return `${post.source}\u0000${post.author}\u0000${post.textFingerprint}`;
+}
+
+function withinCopyWindow(a: Date, b: Date): boolean {
+  return Math.abs(a.getTime() - b.getTime()) <= copyWindowDays * 24 * 60 * 60 * 1000;
+}
 
 export interface ClassifyOptions {
   /**
@@ -108,6 +137,20 @@ interface Ledger {
   readonly alreadyScored: ReadonlySet<string | null>;
   readonly alreadyMatched: ReadonlySet<string | null>;
   readonly attemptsByPost: ReadonlyMap<string | null, number>;
+  /** Posts already recorded as copies for this monitor. US-400. */
+  readonly alreadyCopied: ReadonlySet<string>;
+  /** The other copies of each post in this batch that this monitor has met. US-400. */
+  readonly copiesOf: ReadonlyMap<string, readonly Copy[]>;
+}
+
+/** Another copy of a post, and what this monitor already made of it. US-400. */
+interface Copy {
+  readonly id: string;
+  readonly postedAt: Date;
+  /** It is a card on this monitor: the copies of it are not scored. */
+  readonly hasCard: boolean;
+  /** Scored at this version without making a card: it hangs on the next card. */
+  readonly scoredBelow: boolean;
 }
 
 async function readLedger(
@@ -139,7 +182,32 @@ async function readLedger(
     .from(filterDrops)
     .where(and(eq(filterDrops.monitorId, monitorId), eq(filterDrops.stage, "ceiling")));
 
-  const [candidates, scored, failures, matched] = await Promise.all([
+  /**
+   * The other copies of each candidate, and what this monitor made of them.
+   * US-400.
+   *
+   * Replies are left out: "same here" is the same words from many people, and
+   * short enough to be the same words from one person in two threads.
+   */
+  const copy = alias(posts, "copy");
+  const scoredCopy = db
+    .select({ one: sql`1` })
+    .from(modelCalls)
+    .where(
+      and(
+        eq(modelCalls.monitorId, monitorId),
+        eq(modelCalls.monitorVersion, monitor.version),
+        eq(modelCalls.purpose, "classification"),
+        eq(modelCalls.outcome, "scored"),
+        eq(modelCalls.postId, copy.id),
+      ),
+    );
+  const cardOfCopy = db
+    .select({ one: sql`1` })
+    .from(matches)
+    .where(and(eq(matches.monitorId, monitorId), eq(matches.postId, copy.id)));
+
+  const [candidates, scored, failures, matched, copied, others] = await Promise.all([
     db
       .select()
       .from(posts)
@@ -167,13 +235,55 @@ async function readLedger(
       .select({ postId: matches.postId })
       .from(matches)
       .where(and(eq(matches.monitorId, monitorId), inArray(matches.postId, [...ids]))),
+    db
+      .select({ postId: postCopies.postId })
+      .from(postCopies)
+      .where(and(eq(postCopies.monitorId, monitorId), inArray(postCopies.postId, [...ids]))),
+    db
+      .select({
+        postId: posts.id,
+        copyId: copy.id,
+        postedAt: copy.postedAt,
+        hasCard: sql<boolean>`exists (${cardOfCopy})`,
+        scored: sql<boolean>`exists (${scoredCopy})`,
+      })
+      .from(posts)
+      .innerJoin(
+        copy,
+        and(
+          eq(copy.source, posts.source),
+          eq(copy.author, posts.author),
+          eq(copy.textFingerprint, posts.textFingerprint),
+          ne(copy.id, posts.id),
+          eq(copy.kind, "post"),
+          isNull(copy.deletedAt),
+          sql`abs(extract(epoch from ${copy.postedAt} - ${posts.postedAt})) <= ${
+            copyWindowDays * 24 * 60 * 60
+          }`,
+        ),
+      )
+      .where(and(inArray(posts.id, [...ids]), eq(posts.kind, "post"), isNotNull(posts.author))),
   ]);
+
+  const copiesOf = new Map<string, Copy[]>();
+  for (const row of others) {
+    const list = copiesOf.get(row.postId) ?? [];
+    list.push({
+      id: row.copyId,
+      postedAt: row.postedAt,
+      hasCard: row.hasCard,
+      scoredBelow: row.scored && !row.hasCard,
+    });
+    copiesOf.set(row.postId, list);
+  }
 
   return {
     candidates,
     alreadyScored: new Set(scored.map((row) => row.postId)),
     alreadyMatched: new Set(matched.map((row) => row.postId)),
     attemptsByPost: new Map(failures.map((row) => [row.postId, Number(row.attempts)])),
+    alreadyCopied: new Set(copied.map((row) => row.postId)),
+    copiesOf,
   };
 }
 
@@ -345,12 +455,24 @@ export function createClassifyStep({
 
     const ids = [...postIds];
 
-    const { candidates, alreadyScored, alreadyMatched, attemptsByPost } = await readLedger(
-      db,
-      monitor,
-      ids,
-      newPostsPerPairPerDay,
-    );
+    const { candidates, alreadyScored, alreadyMatched, attemptsByPost, alreadyCopied, copiesOf } =
+      await readLedger(db, monitor, ids, newPostsPerPairPerDay);
+
+    // In the order the batch was handed, which the daily ceiling reads by:
+    // the read returns them in whatever order Postgres finds them. Of two
+    // copies in one batch, the first reached is the one scored. US-400.
+    const handed = new Map(ids.map((id, index) => [id, index]));
+    candidates.sort((a, b) => (handed.get(a.id) ?? 0) - (handed.get(b.id) ?? 0));
+
+    /**
+     * What this run made of each post's words, for the copies later in it.
+     * US-400. The card, once there is one, and the copies scored below the
+     * threshold before it, which it will carry.
+     */
+    const cardHere = new Map<string, { id: string; postedAt: Date }>();
+    const belowHere = new Map<string, { id: string; postedAt: Date }[]>();
+    const copies: { postId: string; cardPostId: string }[] = [];
+    let copiesSkipped = 0;
 
     /**
      * The thread above every reply in this batch, in one read.
@@ -435,6 +557,27 @@ export function createClassifyStep({
         continue;
       }
 
+      if (alreadyCopied.has(post.id)) {
+        skipped += 1;
+        continue;
+      }
+
+      const key = copyKey(post);
+      const others = copiesOf.get(post.id) ?? [];
+      const madeHere = key ? cardHere.get(key) : undefined;
+      // The oldest card, so every copy of one post lands on the same one.
+      const card =
+        others
+          .filter((other) => other.hasCard)
+          .sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime())[0] ??
+        (madeHere && withinCopyWindow(madeHere.postedAt, post.postedAt) ? madeHere : undefined);
+
+      if (card) {
+        copies.push({ postId: post.id, cardPostId: card.id });
+        copiesSkipped += 1;
+        continue;
+      }
+
       /**
        * Out of money, so stop rather than finish the batch.
        *
@@ -496,6 +639,12 @@ export function createClassifyStep({
       }
 
       if (outcome.score < monitor.minScore) {
+        if (key) {
+          belowHere.set(key, [
+            ...(belowHere.get(key) ?? []),
+            { id: post.id, postedAt: post.postedAt },
+          ]);
+        }
         await record(db, post.id, "scored", outcome.call);
         logger.debug(
           { monitorId, postId: post.id, score: outcome.score, threshold: monitor.minScore },
@@ -507,6 +656,28 @@ export function createClassifyStep({
       const row = await writeMatch(db, record, monitorId, post.id, outcome);
 
       if (row && !alreadyMatched.has(post.id)) matchIds.push(row.id);
+
+      // A new card carries the copies that were scored below the threshold
+      // before it, so the person reads the post once. US-400.
+      if (key) {
+        cardHere.set(key, { id: post.id, postedAt: post.postedAt });
+        const carried = [
+          ...others.filter((other) => other.scoredBelow),
+          ...(belowHere.get(key) ?? []).filter((other) =>
+            withinCopyWindow(other.postedAt, post.postedAt),
+          ),
+        ];
+        for (const other of carried) copies.push({ postId: other.id, cardPostId: post.id });
+      }
+    }
+
+    // Written once for the batch. A copy already recorded is left as it is:
+    // a retry or a later poll is handed the same post again. US-400.
+    if (copies.length > 0) {
+      await db
+        .insert(postCopies)
+        .values(copies.map((copy) => ({ monitorId, ...copy })))
+        .onConflictDoNothing();
     }
 
     // The posts the ceiling kept from the model, written where every other
@@ -530,6 +701,7 @@ export function createClassifyStep({
         posts: candidates.length,
         scored: scoredNow,
         skipped,
+        copies: copiesSkipped,
         matches: matchIds.length,
         dropped,
         unclassified: retryable,
@@ -568,6 +740,7 @@ export function createClassifyStep({
           stage: "classify",
           scored: scoredNow,
           skipped,
+          copies: copiesSkipped,
           matched: matchIds.length,
           unclassified: retryable,
           dropped,

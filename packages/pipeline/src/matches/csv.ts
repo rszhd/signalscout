@@ -40,6 +40,7 @@ const columns = [
   "verdict",
   "saved",
   "replied",
+  "also_posted_in",
   "relevance",
   "problem_fit",
   "icp_fit",
@@ -124,6 +125,8 @@ export function matchesToCsv(matches: readonly InboxMatch[]): string {
         match.verdict,
         match.saved ? "yes" : "no",
         match.replied ? "yes" : "no",
+        // The other places the author made the same post, by link. US-400.
+        match.copies.map((copy) => copy.url).join(" "),
         match.relevance,
         match.problemFit,
         match.icpFit,

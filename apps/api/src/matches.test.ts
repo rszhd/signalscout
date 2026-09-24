@@ -13,8 +13,10 @@ import {
   type Database,
   matches,
   monitors,
+  postCopies,
   posts,
 } from "@signalscout/pipeline";
+import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
@@ -34,6 +36,7 @@ interface Card {
   id: string;
   monitorName: string;
   replied: boolean;
+  copies: { channel: string | null; url: string; postedAt: string }[];
   verdict: "good" | "not_relevant" | null;
   score: number;
   problemFit: number;
@@ -172,6 +175,42 @@ describe("the inbox route", () => {
   afterEach(async () => {
     await db.delete(matches);
     await db.delete(posts);
+  });
+
+  it("carries the other places the author made the same post", async () => {
+    const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+    const [match] = await db
+      .select({ postId: matches.postId })
+      .from(matches)
+      .where(eq(matches.id, matchId));
+    const [copy] = await db
+      .insert(posts)
+      .values({
+        source: "reddit",
+        externalId: "t3_copy_api",
+        url: "https://reddit.com/r/SideProject/comments/copy",
+        author: "someone",
+        channel: "SideProject",
+        title: "How are small teams handling regression testing?",
+        excerpt: "We're manually checking our major flows before every release.",
+        postedAt: new Date(),
+      })
+      .returning({ id: posts.id });
+    await db
+      .insert(postCopies)
+      .values({ monitorId, postId: copy?.id as string, cardPostId: match?.postId as string });
+
+    const card = inserted((await get("/api/matches")).json<Page>().matches);
+    const one = (await get(`/api/matches/${matchId}`)).json<Card>();
+
+    expect(card.copies).toEqual([
+      {
+        channel: "SideProject",
+        url: "https://reddit.com/r/SideProject/comments/copy",
+        postedAt: expect.any(String),
+      },
+    ]);
+    expect(one.copies).toEqual(card.copies);
   });
 
   it("returns a card with its reasons, sub-scores and link", async () => {

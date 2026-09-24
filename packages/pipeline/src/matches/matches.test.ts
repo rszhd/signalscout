@@ -13,7 +13,7 @@
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { type IntentType, matches, monitors, posts } from "../db/schema.js";
+import { type IntentType, matches, monitors, postCopies, posts } from "../db/schema.js";
 import { recordVerdict } from "../feedback/feedback.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
@@ -640,6 +640,88 @@ describe("the inbox list", () => {
       expect(
         await setMatchReplied(db, owner, "00000000-0000-0000-0000-000000000000", true),
       ).toBeUndefined();
+    });
+  });
+
+  /**
+   * The other places the author made the same post. US-400. The classify step
+   * records them; this is the card that shows them.
+   */
+  describe("a match whose post was copied elsewhere", () => {
+    async function copyPost(
+      channel: string,
+      minutesLater: number,
+      deleted = false,
+    ): Promise<string> {
+      postSequence += 1;
+      const row = inserted(
+        await db
+          .insert(posts)
+          .values({
+            source: "reddit",
+            externalId: `t3_copy_${postSequence}`,
+            url: `https://reddit.com/r/${channel}/comments/${postSequence}`,
+            author: "someone",
+            channel,
+            title: "How are small teams handling regression testing?",
+            excerpt: "We're manually checking our major flows before every release.",
+            postedAt: minutesAgo(30 - minutesLater),
+            deletedAt: deleted ? now : null,
+          })
+          .returning({ id: posts.id }),
+      );
+      return row.id;
+    }
+
+    async function originalOf(matchId: string): Promise<string> {
+      const [row] = await db
+        .select({ postId: matches.postId })
+        .from(matches)
+        .where(eq(matches.id, matchId));
+      if (!row) throw new Error("No such match.");
+      return row.postId;
+    }
+
+    it("lists them on the card, oldest first, without a deleted one", async () => {
+      const matchId = await seed({ monitorId, score: 80, postedAt: minutesAgo(30) });
+      const original = await originalOf(matchId);
+      const later = await copyPost("startups", 6);
+      const sooner = await copyPost("SideProject", 2);
+      const gone = await copyPost("Entrepreneur", 4, true);
+
+      await db
+        .insert(postCopies)
+        .values(
+          [later, sooner, gone].map((postId) => ({ monitorId, postId, cardPostId: original })),
+        );
+
+      const [card] = (await listMatches(db, { userId: owner })).matches;
+
+      expect(card?.copies.map((copy) => copy.channel)).toEqual(["SideProject", "startups"]);
+      expect(card?.copies[0]?.url).toContain("/r/SideProject/");
+      expect(card?.copies[0]?.postedAt).toBeInstanceOf(Date);
+    });
+
+    it("shows another monitor's copies on that monitor's card only", async () => {
+      const mine = await seed({ monitorId, score: 80, postedAt: minutesAgo(30) });
+      const original = await originalOf(mine);
+      const copy = await copyPost("SideProject", 2);
+
+      await db
+        .insert(postCopies)
+        .values({ monitorId: otherMonitorId, postId: copy, cardPostId: original });
+
+      const [card] = (await listMatches(db, { userId: owner, monitorId })).matches;
+
+      expect(card?.copies).toEqual([]);
+    });
+
+    it("is an empty list on a card with no copies", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(30) });
+
+      const [card] = (await listMatches(db, { userId: owner })).matches;
+
+      expect(card?.copies).toEqual([]);
     });
   });
 

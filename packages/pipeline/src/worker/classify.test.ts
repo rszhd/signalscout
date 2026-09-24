@@ -25,6 +25,7 @@ import {
   matches,
   modelCalls,
   monitors,
+  postCopies,
   posts,
   sourceCoverage,
 } from "../db/schema.js";
@@ -707,6 +708,257 @@ it("does not pay the model to read a post already confirmed deleted", async () =
  * thread is read, which is why what is asserted here is only that the thread
  * is offered, never what happens to it.
  */
+/**
+ * One question put to two subreddits. US-400.
+ *
+ * The same author, the same words, on the same platform and within a week is
+ * one post written twice. The monitor that scored the first does not pay for
+ * the second; the second hangs on the first one's card.
+ */
+describe("a copy of a post this monitor already scored", () => {
+  const minute = 60_000;
+
+  /** A post in the author's words, with what differs between copies. */
+  async function insertWords(
+    externalId: string,
+    overrides: {
+      channel?: string;
+      title?: string;
+      text?: string;
+      author?: string;
+      postedAt?: Date;
+      kind?: "post" | "reply";
+      parentPostId?: string;
+    } = {},
+  ): Promise<string> {
+    const [row] = await db
+      .insert(posts)
+      .values({
+        source: "reddit",
+        externalId,
+        url: `https://reddit.com/r/${overrides.channel ?? "SaaS"}/comments/${externalId}`,
+        author: overrides.author ?? "sure_shift",
+        channel: overrides.channel ?? "SaaS",
+        title: overrides.title ?? "Launched a roommate matching app. Users, but no retention",
+        excerpt:
+          overrides.text ??
+          "Five days in, people sign up and never come back. What would you check first?",
+        postedAt: overrides.postedAt ?? new Date("2026-09-18T00:45:00.000Z"),
+        kind: overrides.kind ?? "post",
+        parentPostId: overrides.parentPostId ?? null,
+      })
+      .returning({ id: posts.id });
+
+    if (!row) throw new Error("The post was not inserted.");
+    return row.id;
+  }
+
+  async function copiesFor(monitorId: string) {
+    return db
+      .select({ postId: postCopies.postId, cardPostId: postCopies.cardPostId })
+      .from(postCopies)
+      .where(eq(postCopies.monitorId, monitorId));
+  }
+
+  async function matchedPosts(monitorId: string) {
+    const rows = await db
+      .select({ postId: matches.postId })
+      .from(matches)
+      .where(eq(matches.monitorId, monitorId));
+    return rows.map((row) => row.postId);
+  }
+
+  it("is not sent to the model, makes no card, and is recorded against the first", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-a-1");
+    // Another subreddit, three minutes later, with the case and spacing that
+    // copying between two text boxes changes.
+    const second = await insertWords("copy-a-2", {
+      channel: "SideProject",
+      title: "Launched a roommate  matching app. USERS, but no retention",
+      text: "Five days in, people sign up and never come back.\n\nWhat would you check first? ",
+      postedAt: new Date("2026-09-18T00:48:00.000Z"),
+    });
+
+    await classifyAndWait(monitorId, [first]);
+    await classifyAndWait(monitorId, [second]);
+
+    expect(calls).toHaveLength(1);
+    expect(await matchedPosts(monitorId)).toEqual([first]);
+    expect(await copiesFor(monitorId)).toEqual([{ postId: second, cardPostId: first }]);
+  }, 30_000);
+
+  it("scores the first of two copies in one batch, and puts the other on its card", async () => {
+    const monitorId = await insertMonitor(database);
+    const later = await insertWords("copy-b-2", {
+      channel: "startups",
+      postedAt: new Date("2026-09-18T00:51:00.000Z"),
+    });
+    const earlier = await insertWords("copy-b-1");
+
+    await classifyAndWait(monitorId, [later, earlier]);
+
+    expect(calls).toHaveLength(1);
+    expect(await matchedPosts(monitorId)).toEqual([later]);
+    expect(await copiesFor(monitorId)).toEqual([{ postId: earlier, cardPostId: later }]);
+  }, 30_000);
+
+  /**
+   * The model's score varies between identical posts: on the stored data one
+   * copy scored 72 where its original, the same words in the same subreddit,
+   * did not reach 30. So a copy of a post below the threshold is not skipped.
+   */
+  it("gives a copy of a post below the threshold its own chance, and carries the first", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-c-1");
+    const second = await insertWords("copy-c-2", {
+      channel: "SideProject",
+      postedAt: new Date("2026-09-18T00:47:00.000Z"),
+    });
+    answer = () => weakAnswer;
+    await classifyAndWait(monitorId, [first]);
+
+    answer = () => strongAnswer;
+    await classifyAndWait(monitorId, [second]);
+
+    expect(calls).toHaveLength(2);
+    expect(await matchedPosts(monitorId)).toEqual([second]);
+    expect(await copiesFor(monitorId)).toEqual([{ postId: first, cardPostId: second }]);
+  }, 30_000);
+
+  it("carries an earlier copy from the same batch onto the card a later one made", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-i-1");
+    const second = await insertWords("copy-i-2", {
+      channel: "startups",
+      postedAt: new Date("2026-09-18T00:47:00.000Z"),
+    });
+    const third = await insertWords("copy-i-3", {
+      channel: "SideProject",
+      postedAt: new Date("2026-09-18T00:49:00.000Z"),
+    });
+    let call = 0;
+    answer = () => (call++ === 0 ? weakAnswer : strongAnswer);
+
+    await classifyAndWait(monitorId, [third, second, first]);
+
+    // The first scored low, the second made the card, the third was not asked.
+    expect(calls).toHaveLength(2);
+    expect(await matchedPosts(monitorId)).toEqual([second]);
+    expect((await copiesFor(monitorId)).sort((a, b) => a.postId.localeCompare(b.postId))).toEqual(
+      [
+        { postId: first, cardPostId: second },
+        { postId: third, cardPostId: second },
+      ].sort((a, b) => a.postId.localeCompare(b.postId)),
+    );
+  }, 30_000);
+
+  it("makes no card and no link when every copy scores below the threshold", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-j-1");
+    const second = await insertWords("copy-j-2", {
+      channel: "SideProject",
+      postedAt: new Date("2026-09-18T00:47:00.000Z"),
+    });
+    answer = () => weakAnswer;
+
+    await classifyAndWait(monitorId, [first, second]);
+
+    expect(calls).toHaveLength(2);
+    expect(await matchedPosts(monitorId)).toEqual([]);
+    expect(await copiesFor(monitorId)).toEqual([]);
+  }, 30_000);
+
+  it("is asked nothing again when a later poll hands it back", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-d-1");
+    const second = await insertWords("copy-d-2", {
+      channel: "SideProject",
+      postedAt: new Date("2026-09-18T00:47:00.000Z"),
+    });
+
+    await classifyAndWait(monitorId, [first, second]);
+    await classifyAndWait(monitorId, [first, second]);
+
+    expect(calls).toHaveLength(1);
+    expect(await copiesFor(monitorId)).toHaveLength(1);
+  }, 30_000);
+
+  it("is scored for a monitor that never scored the first", async () => {
+    const one = await insertMonitor(database);
+    const other = await insertMonitor(database, { name: "Watches SideProject only" });
+    const first = await insertWords("copy-e-1");
+    const second = await insertWords("copy-e-2", {
+      channel: "SideProject",
+      postedAt: new Date("2026-09-18T00:47:00.000Z"),
+    });
+
+    await classifyAndWait(one, [first]);
+    await classifyAndWait(other, [second]);
+
+    expect(calls).toHaveLength(2);
+    expect(await matchedPosts(other)).toEqual([second]);
+    expect(await copiesFor(other)).toEqual([]);
+  }, 30_000);
+
+  it("is scored when the words were edited, or another author wrote them", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-f-1");
+    const edited = await insertWords("copy-f-2", {
+      channel: "SideProject",
+      text: "Five days in, people sign up and never come back. What would you check first? (edit: iOS only)",
+    });
+    const someoneElse = await insertWords("copy-f-3", {
+      channel: "startups",
+      author: "another_person",
+    });
+
+    await classifyAndWait(monitorId, [first, edited, someoneElse]);
+
+    expect(calls).toHaveLength(3);
+    expect(await copiesFor(monitorId)).toEqual([]);
+  }, 30_000);
+
+  it("is scored when more than a week separates the two", async () => {
+    const monitorId = await insertMonitor(database);
+    const first = await insertWords("copy-g-1");
+    const muchLater = await insertWords("copy-g-2", {
+      postedAt: new Date(new Date("2026-09-18T00:45:00.000Z").getTime() + 8 * 24 * 60 * minute),
+    });
+
+    await classifyAndWait(monitorId, [first, muchLater]);
+
+    expect(calls).toHaveLength(2);
+    expect(await copiesFor(monitorId)).toEqual([]);
+  }, 30_000);
+
+  it("never treats two replies as copies, however alike", async () => {
+    const monitorId = await insertMonitor(database);
+    const thread = await insertWords("copy-h-thread", {
+      author: "op",
+      title: "What do you use for QA?",
+    });
+    const one = await insertWords("copy-h-1", {
+      kind: "reply",
+      parentPostId: thread,
+      title: "",
+      text: "Same here, following",
+    });
+    const two = await insertWords("copy-h-2", {
+      kind: "reply",
+      parentPostId: thread,
+      title: "",
+      text: "Same here, following",
+      postedAt: new Date("2026-09-18T00:50:00.000Z"),
+    });
+
+    await classifyAndWait(monitorId, [one, two]);
+
+    expect(calls).toHaveLength(2);
+    expect(await copiesFor(monitorId)).toEqual([]);
+  }, 30_000);
+});
+
 describe("continuing a thread after its batch has been judged", () => {
   it("sends the parent thread back once per batch of replies", async () => {
     const monitorId = await insertMonitor(database, {});

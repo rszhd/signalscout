@@ -98,6 +98,38 @@ describe("the reading pane", () => {
     expect(button("Mark as replied").disabled).toBe(true);
   });
 
+  it("links the other places the author made the same post", async () => {
+    const container = await show({
+      match: match({
+        channel: "startups",
+        copies: [
+          { channel: "SideProject", url: "https://reddit.com/r/SideProject/a", postedAt: "" },
+          { channel: "startups", url: "https://reddit.com/r/startups/b", postedAt: "" },
+        ],
+      }),
+    });
+
+    const line = container.querySelector(".detail-copies");
+    const links = [...(line?.querySelectorAll("a") ?? [])];
+
+    expect(line?.textContent).toBe("Also posted in r/SideProject ↗, r/startups, again ↗");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "https://reddit.com/r/SideProject/a",
+      "https://reddit.com/r/startups/b",
+    ]);
+    expect(links.every((link) => link.getAttribute("target") === "_blank")).toBe(true);
+  });
+
+  it("says nothing about copies when there are none, or the API sends none", async () => {
+    const container = await show();
+    expect(container.querySelector(".detail-copies")).toBeNull();
+    await screen.unmount();
+
+    const { copies: _, ...older } = match();
+    const again = await show({ match: older });
+    expect(again.querySelector(".detail-copies")).toBeNull();
+  });
+
   it("disables the buttons while the page says a request is in flight", async () => {
     await show({ saving: true, judging: true });
 

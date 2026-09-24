@@ -198,6 +198,12 @@ export type StageRunDetail =
        * already paid to score them. BUG-003's skip, in the record of the work.
        */
       readonly skipped?: number;
+      /**
+       * Posts it did not ask about because each repeats one this monitor
+       * already scored: the same author and words. US-400. Optional: older
+       * rows have no number for it.
+       */
+      readonly copies?: number;
       /** Of those, the ones that cleared the monitor's threshold. */
       readonly matched: number;
       /** The model would not answer. They keep their place and are asked again. */

@@ -199,6 +199,18 @@
   line-height: 1.7;
 }
 
+/* The other places the author made the same post. US-400. */
+.detail-copies {
+  margin: var(--space-1) 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.detail-copies a {
+  color: var(--accent-text);
+}
+
 .section-label {
   margin: 0 0 var(--space-3);
   color: var(--accent-hover);

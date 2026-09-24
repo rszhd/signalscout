@@ -25,6 +25,7 @@ import {
   exportFeedback,
   type InboxMatch,
   listMatches,
+  type MatchCopy,
   matchesToCsv,
   matchOrders,
   maximumPageSize,
@@ -56,6 +57,10 @@ const matchSchema = z.object({
   saved: z.boolean(),
   /** The person said they replied. US-396. */
   replied: z.boolean(),
+  /** The other places the author made the same post, oldest first. US-400. */
+  copies: z.array(
+    z.object({ channel: z.string().nullable(), url: z.string(), postedAt: z.string() }),
+  ),
   /** Null when this person has not judged the match. Not a third verdict. */
   verdict: z.enum(verdicts).nullable(),
   readAt: z.string().nullable(),
@@ -88,6 +93,10 @@ const matchSchema = z.object({
   parentReplyCount: z.number().nullable(),
   parentRepliesStopped: z.string().nullable(),
 });
+
+function serialiseCopies(copies: readonly MatchCopy[]) {
+  return copies.map((copy) => ({ ...copy, postedAt: copy.postedAt.toISOString() }));
+}
 
 const query = z.object({
   monitorId: z.uuid().optional(),
@@ -226,6 +235,7 @@ export async function registerMatchRoutes(
           reasons: [...match.reasons],
           readAt: match.readAt?.toISOString() ?? null,
           postedAt: match.postedAt.toISOString(),
+          copies: serialiseCopies(match.copies),
         })),
         nextCursor: page.nextCursor,
         asOf: page.asOf.toISOString(),
@@ -264,6 +274,7 @@ export async function registerMatchRoutes(
         reasons: [...match.reasons],
         readAt: match.readAt?.toISOString() ?? null,
         postedAt: match.postedAt.toISOString(),
+        copies: serialiseCopies(match.copies),
       };
     },
   });

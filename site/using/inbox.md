@@ -26,6 +26,9 @@ flowchart TD
 - **What the model saw** — the reasons behind the score, one per line. Read
   these before you trust the number.
 - **Open conversation ↗** — the original post on its platform.
+- **Also posted in** — the same post in other places. When an author posts
+  the same words more than once in a week, for example in two subreddits,
+  the inbox shows one match, with a link to each copy.
 
 ## What you can do with a match
 

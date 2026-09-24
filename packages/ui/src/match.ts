@@ -50,6 +50,11 @@ export interface Match {
    * depth is: an API that predates it does not send it, and absent reads as no.
    */
   replied?: boolean;
+  /**
+   * The other places the author made the same post, oldest first. US-400.
+   * Optional: an API that predates it does not send it.
+   */
+  copies?: MatchCopy[];
   url: string;
   postedAt: string;
 }
@@ -118,6 +123,25 @@ const platformLabels: Record<string, PlatformLabel> = {
 
 export function platformLabel(source: string): PlatformLabel {
   return platformLabels[source] ?? { name: source, where: () => undefined, commentLink: "thread" };
+}
+
+/** Another place a match's post was made. US-400. */
+export interface MatchCopy {
+  channel: string | null;
+  url: string;
+  postedAt: string;
+}
+
+/**
+ * Where a copy was made, in the words the card uses for the original:
+ * "r/SideProject". A copy in the original's own place says so, because two
+ * links reading "r/startups" would look like one link twice.
+ */
+export function copyPlace(match: Match, copy: MatchCopy): string {
+  const platform = platformLabel(match.source);
+  const place = platform.where({ ...match, channel: copy.channel }) ?? platform.name;
+
+  return place === platform.where(match) ? `${place}, again` : place;
 }
 
 /** "Reddit · r/devops", or the platform alone when there is no place. */

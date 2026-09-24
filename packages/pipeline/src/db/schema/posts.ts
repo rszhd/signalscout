@@ -55,6 +55,20 @@ export const posts = pgTable(
     channel: text("channel"),
     title: text("title"),
     excerpt: text("excerpt").notNull(),
+    /**
+     * The words of the post, reduced to a fingerprint. US-400.
+     *
+     * Computed by Postgres, so no second implementation can disagree with it:
+     * the title and the excerpt, lower case, with every run of whitespace
+     * made one space. Two posts with the same author and the same fingerprint
+     * are one post written twice — the same question put to two subreddits —
+     * and the classify step scores only the first. An edited copy has another
+     * fingerprint, on purpose: a false merge hides a lead, and a missed one
+     * costs a card.
+     */
+    textFingerprint: text("text_fingerprint").generatedAlwaysAs(
+      sql`md5(btrim(regexp_replace(lower(coalesce(title, '') || ' ' || excerpt), '[[:space:]]+', ' ', 'g')))`,
+    ),
     /** When the author posted it, not when we read it. */
     postedAt: timestamp("posted_at", { withTimezone: true }).notNull(),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
@@ -217,6 +231,9 @@ export const posts = pgTable(
       ),
     ),
     index("posts_parent_idx").on(table.parentPostId),
+    // The question the classify step asks before it pays: has this author
+    // posted these words already. US-400.
+    index("posts_author_fingerprint_idx").on(table.source, table.author, table.textFingerprint),
   ],
 );
 

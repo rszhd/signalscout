@@ -8,6 +8,7 @@ export {
   type InboxMatch,
   type ListMatchesOptions,
   listMatches,
+  type MatchCopy,
   type MatchCounts,
   type MatchOrder,
   type MatchPage,

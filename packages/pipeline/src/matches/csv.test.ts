@@ -30,6 +30,7 @@ function match(overrides: Partial<InboxMatch> = {}): InboxMatch {
     reasons: ["asks what others use"],
     saved: false,
     replied: false,
+    copies: [],
     verdict: null,
     readAt: null,
     source: "reddit",
@@ -187,6 +188,7 @@ describe("the file a person opens", () => {
       "verdict",
       "saved",
       "replied",
+      "also_posted_in",
       "relevance",
       "problem_fit",
       "icp_fit",
@@ -212,6 +214,7 @@ describe("the file a person opens", () => {
       "good",
       "yes",
       "no",
+      "",
       "90",
       "72",
       "84",
@@ -225,6 +228,27 @@ describe("the file a person opens", () => {
 
     expect(row?.[header?.indexOf("saved") ?? -1]).toBe("no");
     expect(row?.[header?.indexOf("replied") ?? -1]).toBe("yes");
+  });
+
+  it("lists the other places the author made the same post, by link", () => {
+    const [header, row] = parseCsv(
+      matchesToCsv([
+        match({
+          copies: [
+            {
+              channel: "SideProject",
+              url: "https://reddit.com/r/SideProject/x",
+              postedAt: new Date(),
+            },
+            { channel: "startups", url: "https://reddit.com/r/startups/y", postedAt: new Date() },
+          ],
+        }),
+      ]),
+    );
+
+    expect(row?.[header?.indexOf("also_posted_in") ?? -1]).toBe(
+      "https://reddit.com/r/SideProject/x https://reddit.com/r/startups/y",
+    );
   });
 
   it("writes an empty cell where there is nothing, not the word null", () => {

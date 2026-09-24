@@ -86,6 +86,13 @@ export type MatchOrder = (typeof matchOrders)[number];
 /** The saved and replied lists' own orders, beside the ones a caller may ask for. */
 type PageOrder = MatchOrder | "saved" | "replied";
 
+/** Another place a match's post was made: the same author and words. US-400. */
+export interface MatchCopy {
+  readonly channel: string | null;
+  readonly url: string;
+  readonly postedAt: Date;
+}
+
 /** One match, with the post it is about and the monitor that found it. */
 export interface InboxMatch {
   readonly id: string;
@@ -113,6 +120,14 @@ export interface InboxMatch {
   readonly saved: boolean;
   /** The person said they replied. US-396. */
   readonly replied: boolean;
+  /**
+   * The other places the author posted these words, oldest first. US-400.
+   *
+   * Posts the classify step recorded as copies of this one for this monitor,
+   * so they are on this card rather than on cards of their own. A copy the
+   * author deleted is left out.
+   */
+  readonly copies: readonly MatchCopy[];
   /** The verdict this user has in force, or null when they have not judged it. */
   readonly verdict: Verdict | null;
   readonly readAt: Date | null;
@@ -467,6 +482,19 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
       // column carries the ordering the saved list needs.
       saved: sql<boolean>`${matches.savedAt} is not null`,
       replied: sql<boolean>`${matches.repliedAt} is not null`,
+      // One small read per card, on the index that names the original. A
+      // join would multiply the page's rows by the number of copies.
+      copies: sql<{ channel: string | null; url: string; postedAt: string }[]>`coalesce((
+        select json_agg(
+          json_build_object('channel', copy.channel, 'url', copy.url, 'postedAt', copy.posted_at)
+          order by copy.posted_at
+        )
+        from post_copies
+        join posts copy on copy.id = post_copies.post_id
+        where post_copies.monitor_id = ${matches.monitorId}
+          and post_copies.card_post_id = ${matches.postId}
+          and copy.deleted_at is null
+      ), '[]'::json)`,
       verdict: feedback.verdict,
       readAt: matches.readAt,
       source: posts.source,
@@ -512,6 +540,7 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
 
   const page = rows.slice(0, limit).map(({ sortBy: value, ...row }) => ({
     ...row,
+    copies: row.copies.map((copy) => ({ ...copy, postedAt: new Date(copy.postedAt) })),
     rank: Number(row.rank),
     intentLabel: intentTypeLabel(row.intentType),
     cursor: `${Number(value)}:${row.id}`,

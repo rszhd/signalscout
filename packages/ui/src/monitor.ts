@@ -720,6 +720,8 @@ export type StageRunDetail =
        * number for this.
        */
       skipped?: number;
+      /** Copies of a post already scored, so not asked. US-400. Optional, as above. */
+      copies?: number;
       matched: number;
       unclassified: number;
       dropped: number;
@@ -836,6 +838,9 @@ export function stageDidLabel(run: StageRun): string {
       // First, because it is what explains the two numbers above it. US-206:
       // a retry is handed the whole batch and asks about almost none of it.
       skipped > 0 ? `${skipped} already scored` : null,
+      (detail.copies ?? 0) > 0
+        ? `${count(detail.copies ?? 0, "copy", "copies")} of an earlier post`
+        : null,
       detail.unclassified > 0 ? `${detail.unclassified} left unclassified` : null,
       detail.dropped > 0 ? `${detail.dropped} given up on` : null,
       detail.leftByCap > 0 ? `${detail.leftByCap} not reached: the cap` : null,

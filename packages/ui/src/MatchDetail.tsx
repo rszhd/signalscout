@@ -2,6 +2,7 @@ import { type ReactNode, useState } from "react";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel } from "./labels.js";
 import {
+  copyPlace,
   limitWords,
   type Match,
   opensThreadOnly,
@@ -87,6 +88,20 @@ export function MatchDetail({
       <p className="detail-author">
         {match.author ?? "Unknown author"} · matched by {match.monitorName}
       </p>
+      {/* The same post in other places, so the card stands for all of them. US-400. */}
+      {(match.copies?.length ?? 0) > 0 && (
+        <p className="detail-copies">
+          Also posted in{" "}
+          {match.copies?.map((copy, index) => (
+            <span key={copy.url}>
+              {index > 0 && ", "}
+              <a href={copy.url} rel="noreferrer noopener" target="_blank">
+                {copyPlace(match, copy)} ↗
+              </a>
+            </span>
+          ))}
+        </p>
+      )}
 
       {/* The thread above a reply, first: a reply is a good lead or noise
           depending on the post it answers, and the classifier saw both. */}

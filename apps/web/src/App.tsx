@@ -322,6 +322,7 @@ export function App() {
         <Route path={routes.monitors} element={<MonitorsRoute />} />
         <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
         <Route path={routes.monitor} element={<MonitorRoute />} />
+        <Route path={routes.editMonitor} element={<EditMonitorRoute />} />
         <Route path={routes.notifications} element={<NotificationsRoute />} />
         <Route path={routes.connections} element={<Connections />} />
         <Route path={routes.providers} element={<Providers />} />
@@ -385,6 +386,16 @@ function MonitorFormRoute() {
   );
 }
 
+/** The monitor form, filled from one monitor. US-407. */
+function EditMonitorRoute() {
+  const { projectId, monitorId } = useParams();
+  return projectId && monitorId ? (
+    <MonitorForm key={monitorId} monitorId={monitorId} projectId={projectId} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
+}
+
 /**
  * One monitor's page. US-109.
  *
@@ -426,7 +437,8 @@ function Shell({ status }: { readonly status: AuthStatus }) {
   const listing = useMatch(routes.monitors) !== null;
   const readingMonitor = useMatch(routes.monitor) !== null;
   const editingNotifications = useMatch(routes.notifications) !== null;
-  const monitoring = listing || readingMonitor || editingNotifications;
+  const editingMonitor = useMatch(routes.editMonitor) !== null;
+  const monitoring = listing || readingMonitor || editingNotifications || editingMonitor;
   const readingList = useMatch(routes.inbox) !== null;
   const readingItem = useMatch(routes.inboxMatch) !== null;
   const reading = readingList || readingItem;

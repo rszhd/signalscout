@@ -610,6 +610,10 @@ export function MonitorDetail({
         </div>
         <div className="monitor-page-actions">
           <MonitorStatus {...running} />
+          {/* What it looks for and where: the answers, platforms and search plan. US-407. */}
+          <Link className="secondary-button" to={paths.editMonitor(home, monitor.id)}>
+            Edit monitor
+          </Link>
           <Button disabled={busy} onClick={() => void setPaused(!monitor.paused)}>
             {busy ? "Updating…" : monitor.paused ? "Resume" : "Pause"}
           </Button>

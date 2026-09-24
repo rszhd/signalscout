@@ -12,7 +12,7 @@ import {
   toMicros,
 } from "@signalscout/ui";
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
@@ -71,6 +71,19 @@ interface QueryPlan {
 }
 
 const emptyPlan: QueryPlan = { queries: {}, subreddits: [] };
+
+/** What the edit form reads off a saved monitor. US-407. */
+interface SavedMonitor {
+  name: string;
+  product: string;
+  idealCustomer: string;
+  problem: string;
+  signals: string[];
+  sources: string[];
+  queries: Record<string, string[]>;
+  subreddits: string[];
+  includeReplies: boolean;
+}
 
 interface CreatedMonitor {
   id: string;
@@ -228,7 +241,24 @@ function cleanList(values: readonly string[] | undefined): string[] {
  * owns the sequence, and keeps the generated plan editable before anything
  * starts. Each step owns one decision; App routes here as a dedicated page.
  */
-export function MonitorForm({ projectId }: { readonly projectId: string }) {
+export function MonitorForm({
+  projectId,
+  monitorId = null,
+}: {
+  readonly projectId: string;
+  /**
+   * The monitor to edit, or null for a new one. US-407.
+   *
+   * Editing walks the same steps and keeps the saved search plan as it is:
+   * the lists may be somebody's own words. It ends at the plan, because the
+   * schedule, the budget and the minimum score are set on the monitor's page.
+   */
+  readonly monitorId?: string | null;
+}) {
+  const editing = monitorId !== null;
+  const navigate = useNavigate();
+  /** False until the monitor being edited has been read. */
+  const [loaded, setLoaded] = useState(!editing);
   const [optionsState, setOptionsState] = useState<OptionsState>({ state: "loading" });
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [selectedSignals, setSelectedSignals] = useState<string[]>([]);
@@ -275,7 +305,9 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     [...selectedSignals].sort(),
     [...selectedSources].sort(),
   ]);
-  const currentStep = steps.findIndex((step) => step.id === stage);
+  // Editing ends at the plan: the launch step's settings live on the monitor page.
+  const visibleSteps = editing ? steps.filter((step) => step.id !== "launch") : steps;
+  const currentStep = visibleSteps.findIndex((step) => step.id === stage);
   useEffect(() => {
     // Moving between steps should put keyboard and screen-reader users at the new heading.
     if (stage !== "created") headingRef.current?.focus();
@@ -304,31 +336,62 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
      * overwrite a choice the other made: this one only writes when the project
      * has something to say.
      */
-    requestJson<{
-      name: string;
-      product: string;
-      idealCustomer: string;
-      problem: string;
-      signals: string[];
-    }>(`/api/projects/${projectId}`)
-      .then((project) => {
-        if (cancelled) return;
-        setAnswers((current) => ({
-          // The monitor's own name is left alone: a project is a business
-          // and a monitor is one search inside it, so they are not the same
-          // name and prefilling one with the other invites a list of
-          // identical rows.
-          name: current.name,
-          product: project.product,
-          idealCustomer: project.idealCustomer,
-          problem: project.problem,
-        }));
-        if (project.signals.length > 0) setSelectedSignals(project.signals);
-      })
-      .catch(() => {
-        // A project that has gone leaves an ordinary empty form, which is
-        // what a person can act on. Nothing here is worth an error banner.
-      });
+    if (monitorId) {
+      // The monitor's own answers and plan, not the project's: an edit
+      // changes this monitor, and the project may have moved on since.
+      requestJson<SavedMonitor>(`/api/monitors/${encodeURIComponent(monitorId)}`)
+        .then((monitor) => {
+          if (cancelled) return;
+          setAnswers({
+            name: monitor.name,
+            product: monitor.product,
+            idealCustomer: monitor.idealCustomer,
+            problem: monitor.problem,
+          });
+          setSelectedSignals(monitor.signals);
+          setSelectedSources(monitor.sources);
+          setIncludeReplies(monitor.includeReplies);
+          setPlan({ queries: monitor.queries, subreddits: monitor.subreddits });
+          setLoaded(true);
+        })
+        .catch((cause: unknown) => {
+          if (!cancelled) {
+            setOptionsState({
+              state: "error",
+              message: messageFor(cause, "The monitor could not be read."),
+            });
+          }
+        });
+    }
+
+    // A new monitor starts from the project's answers; an edit already has its own.
+    if (!monitorId) {
+      requestJson<{
+        name: string;
+        product: string;
+        idealCustomer: string;
+        problem: string;
+        signals: string[];
+      }>(`/api/projects/${projectId}`)
+        .then((project) => {
+          if (cancelled) return;
+          setAnswers((current) => ({
+            // The monitor's own name is left alone: a project is a business
+            // and a monitor is one search inside it, so they are not the same
+            // name and prefilling one with the other invites a list of
+            // identical rows.
+            name: current.name,
+            product: project.product,
+            idealCustomer: project.idealCustomer,
+            problem: project.problem,
+          }));
+          if (project.signals.length > 0) setSelectedSignals(project.signals);
+        })
+        .catch(() => {
+          // A project that has gone leaves an ordinary empty form, which is
+          // what a person can act on. Nothing here is worth an error banner.
+        });
+    }
 
     requestJson<MonitorOptions>("/api/monitor-options")
       .then((options) => {
@@ -344,7 +407,12 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         // Only the platforms this account can actually poll. US-085 disables
         // the others, and a disabled box that arrived ticked is a selection
         // nobody can remove.
-        setSelectedSources(options.sources.filter((source) => source.ready).map((s) => s.id));
+        // Functional, because an edit's saved platforms may have arrived first.
+        setSelectedSources((current) =>
+          current.length > 0
+            ? current
+            : options.sources.filter((source) => source.ready).map((s) => s.id),
+        );
       })
       .catch((cause: unknown) => {
         if (!cancelled) {
@@ -358,9 +426,9 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [projectId]);
+  }, [projectId, monitorId]);
 
-  const options = optionsState.state === "ready" ? optionsState.options : null;
+  const options = optionsState.state === "ready" && loaded ? optionsState.options : null;
   const selectedSourceOptions = useMemo(
     () => options?.sources.filter((source) => selectedSources.includes(source.id)) ?? [],
     [options, selectedSources],
@@ -480,6 +548,11 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
       return;
     }
 
+    if (editing) {
+      await reviewEdit();
+      return;
+    }
+
     if (generatedFor === generationSignature) {
       goTo("review");
       return;
@@ -519,6 +592,86 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     }
   }
 
+  /**
+   * The saved plan, with a list written for each platform that has none.
+   * US-407.
+   *
+   * Editing keeps every saved query and subreddit. A platform ticked in this
+   * edit has no list yet, so the model writes one for that platform alone and
+   * the rest is left as it is.
+   */
+  async function reviewEdit(): Promise<void> {
+    if (!options) return;
+    const missing = selectedSources.filter((id) => cleanList(plan.queries[id] ?? []).length === 0);
+
+    if (missing.length === 0 || !options.canGenerateQueries) {
+      setPlan((current) => ({
+        ...current,
+        queries: { ...current.queries, ...Object.fromEntries(missing.map((id) => [id, [""]])) },
+      }));
+      goTo("review");
+      return;
+    }
+
+    setWorking("generating");
+    try {
+      const generated = await requestJson<QueryPlan>("/api/monitors/queries", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          product: answers.product,
+          idealCustomer: answers.idealCustomer,
+          problem: answers.problem,
+          signals: selectedSignals,
+          sources: missing,
+        }),
+      });
+      setPlan((current) => ({
+        ...current,
+        queries: {
+          ...current.queries,
+          ...Object.fromEntries(missing.map((id) => [id, generated.queries[id] ?? [""]])),
+        },
+        // Suggested subreddits only for a Reddit that has none of its own.
+        subreddits:
+          missing.includes("reddit") && cleanList(current.subreddits).length === 0
+            ? generated.subreddits
+            : current.subreddits,
+        model: generated.model,
+        estimatedCostMicros: generated.estimatedCostMicros,
+      }));
+      setStage("review");
+    } catch (cause) {
+      setError(messageFor(cause, "The search plan could not be generated."));
+    } finally {
+      setWorking(null);
+    }
+  }
+
+  /** Save the edit, and go back to the monitor it changed. US-407. */
+  async function saveEdit(): Promise<void> {
+    if (!monitorId || working) return;
+    setWorking("creating");
+    try {
+      await requestJson(`/api/monitors/${encodeURIComponent(monitorId)}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...answers,
+          signals: selectedSignals,
+          queries,
+          subreddits,
+          sources: selectedSources,
+          includeReplies,
+        }),
+      });
+      navigate(paths.monitor(projectId, monitorId));
+    } catch (cause) {
+      setError(messageFor(cause, "The changes could not be saved."));
+      setWorking(null);
+    }
+  }
+
   function reviewPlan(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (allQueries(queries).length === 0 && subreddits.length === 0) {
@@ -545,6 +698,10 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         );
         return;
       }
+    }
+    if (editing) {
+      void saveEdit();
+      return;
     }
     goTo("launch");
   }
@@ -631,20 +788,29 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     <div className="product-page setup-page">
       <header className="topbar">
         <div>
-          <h1>New monitor</h1>
-          <p className="page-subtitle">A focused search for people you can help.</p>
+          <h1>{editing ? "Edit monitor" : "New monitor"}</h1>
+          <p className="page-subtitle">
+            {editing
+              ? "Change what it looks for and where."
+              : "A focused search for people you can help."}
+          </p>
         </div>
-        <Link className="top-secondary-link" to={paths.monitors(projectId)}>
-          Exit setup
+        <Link
+          className="top-secondary-link"
+          to={monitorId ? paths.monitor(projectId, monitorId) : paths.monitors(projectId)}
+        >
+          {editing ? "Cancel" : "Exit setup"}
         </Link>
       </header>
       <div className="setup-layout">
         <aside className="setup-progress" aria-label="Setup progress">
           <p className="setup-progress-label">
-            {stage === "created" ? "Setup complete" : `Step ${currentStep + 1} of ${steps.length}`}
+            {stage === "created"
+              ? "Setup complete"
+              : `Step ${currentStep + 1} of ${visibleSteps.length}`}
           </p>
           <ol>
-            {steps.map((step, index) => (
+            {visibleSteps.map((step, index) => (
               <li
                 key={step.id}
                 aria-current={stage === step.id ? "step" : undefined}
@@ -657,10 +823,17 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
               </li>
             ))}
           </ol>
-          <p className="setup-progress-note">Nothing starts collecting until you finish setup.</p>
+          <p className="setup-progress-note">
+            {editing
+              ? "Nothing changes until you save."
+              : "Nothing starts collecting until you finish setup."}
+          </p>
         </aside>
-        <section className="setup-content" aria-label="Create a new monitor">
-          {optionsState.state === "loading" && (
+        <section
+          className="setup-content"
+          aria-label={editing ? "Edit this monitor" : "Create a new monitor"}
+        >
+          {(optionsState.state === "loading" || (optionsState.state === "ready" && !loaded)) && (
             <PageState kind="loading" page={false} heading="Loading monitor options">
               Checking the sources and signals available in this deployment.
             </PageState>
@@ -688,9 +861,9 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
           {options && stage !== "created" && (
             <div className="setup-heading">
               <h2 ref={headingRef} tabIndex={-1}>
-                {steps[currentStep]?.title}
+                {visibleSteps[currentStep]?.title}
               </h2>
-              <p>{steps[currentStep]?.hint}</p>
+              <p>{visibleSteps[currentStep]?.hint}</p>
             </div>
           )}
           {options && stage === "answers" && (
@@ -762,7 +935,10 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
               </div>
 
               <div className="setup-actions">
-                <Link className="secondary-button" to={paths.monitors(projectId)}>
+                <Link
+                  className="secondary-button"
+                  to={monitorId ? paths.monitor(projectId, monitorId) : paths.monitors(projectId)}
+                >
                   Cancel
                 </Link>
                 <button className="primary-button" type="submit" disabled={working !== null}>
@@ -964,7 +1140,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                 <button className="primary-button" type="submit" disabled={working !== null}>
                   {working === "generating"
                     ? "Generating…"
-                    : generatedFor === generationSignature
+                    : editing || generatedFor === generationSignature
                       ? "Continue to search plan"
                       : options.canGenerateQueries
                         ? "Generate search plan"
@@ -1165,7 +1341,11 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   Back
                 </button>
                 <button className="primary-button" type="submit" disabled={working !== null}>
-                  Continue to schedule
+                  {editing
+                    ? working === "creating"
+                      ? "Saving…"
+                      : "Save changes"
+                    : "Continue to schedule"}
                 </button>
               </div>
             </form>

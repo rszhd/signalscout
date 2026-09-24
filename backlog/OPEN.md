@@ -2,7 +2,7 @@
 
 # Open tickets
 
-71 open — 11 doing, 51 todo, 9 parked (9 p1, 45 p2, 17 p3).
+72 open — 12 doing, 51 todo, 9 parked (10 p1, 45 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -11,6 +11,7 @@
 | p1 | US-399 | [A person sees the matches they replied to](doing/US-399-a-person-sees-the-matches-they-replied-to.md) | feature | doing | 2026-09-24T23:07+08:00 |
 | p1 | US-400 | [A post written twice is one card](doing/US-400-a-post-written-twice-is-one-card.md) | feature | doing | 2026-09-24T23:37+08:00 |
 | p1 | US-405 | [A reply voice holds every rule](doing/US-405-a-reply-voice-holds-every-rule.md) | feature | doing | 2026-09-25T00:03+08:00 |
+| p1 | US-407 | [A monitor is edited from its page](doing/US-407-a-monitor-is-edited-from-its-page.md) | feature | doing | 2026-09-25T00:29+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |

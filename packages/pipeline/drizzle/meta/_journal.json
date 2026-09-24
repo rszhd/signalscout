@@ -484,6 +484,13 @@
       "when": 1790010376253,
       "tag": "0068_a_window_belongs_to_a_search",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1790208100710,
+      "tag": "0069_add_harvestapi_provider",
+      "breakpoints": true
     }
   ]
 }

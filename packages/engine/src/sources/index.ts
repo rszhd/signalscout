@@ -46,6 +46,11 @@ export {
   toCandidatePost,
 } from "./providers/brightdata/reddit.js";
 export {
+  HarvestApiLinkedInSource,
+  harvestApiLinkedIn,
+} from "./providers/harvestapi/linkedin.js";
+export { harvestApiProvider, harvestApiProviderId } from "./providers/harvestapi/provider.js";
+export {
   scrapeCreatorsProvider,
   scrapeCreatorsProviderId,
 } from "./providers/scrapecreators/provider.js";
@@ -125,6 +130,7 @@ export { connectorIdPattern } from "./types.js";
 
 import { apifyLinkedIn } from "./providers/apify/linkedin.js";
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
+import { harvestApiLinkedIn } from "./providers/harvestapi/linkedin.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
 import { scrapeCreatorsTikTok } from "./providers/scrapecreators/tiktok.js";
 import { scrapeCreatorsYouTube } from "./providers/scrapecreators/youtube.js";
@@ -171,6 +177,7 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   // moves the platform up the screen for everybody. US-055 found that out.
   socialCrawlLinkedIn,
   apifyLinkedIn,
+  harvestApiLinkedIn,
   socialCrawlYouTube,
   scrapeCreatorsYouTube,
   socialCrawlTikTok,

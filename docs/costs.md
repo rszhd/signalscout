@@ -27,6 +27,9 @@ probably one more we have not met:
 - **A price changes without asking us.** Prices are constants in this
   repository.
 - **A free allowance is not modelled.** Every unit is priced at the paid rate.
+- **A volume discount is not modelled either.** Apify's price falls on a
+  higher plan and HarvestAPI's on a larger top-up; each connector declares the
+  dearest tier, so a figure here is high, never low.
 - **A vague query is not free silence.** X refunds a search that matches
   nothing; LinkedIn, YouTube and Instagram return unrelated results at full
   price, and then the model is paid to read them.

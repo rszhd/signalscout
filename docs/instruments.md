@@ -101,6 +101,7 @@ afterwards: the run is evidence only if the row is priced by the connector.
 | `live:x-poll` (`--platform=x --provider=socialdata`) | ~$0.0014 for 7 tweets | The one with a provider-side window; `--since-hours=` defaults to 24 and without it the window is never sent. |
 | `live:sc-tiktok-poll`, `live:sc-youtube-poll` | 2 credits, ~$0.004 | The cheapest polls; the model half is what costs. |
 | `live:apify-linkedin-poll` | ~$0.052 for 25 posts | The one that exercises a waiting collection. The pre-filter drops nothing on LinkedIn. |
+| `live:harvestapi-linkedin-poll` | $0.004 for up to 50 posts | One request per query. The model half is the larger bill here. |
 | `live:linkedin-poll` | ~$0.081 | **Refused as written**: SocialCrawl LinkedIn is switched off. Pass `--provider=apify`, or delete `notOffered` to re-measure. |
 | `live:tiktok-poll` | ~$0.37, then a triage call per comment | Turns replies on: 25 threads and 678 comments. Capped, and both paid stages stop at the cap. |
 | `live:instagram-poll` | ~$1.63 against $0.33 of model | **The most expensive poll here.** The first run overshot a $1.00 cap by 63%. |
@@ -124,6 +125,7 @@ what each call cost, and merges a partial run into the folder's manifest.
 | `socialcrawl/reddit-fixtures/capture.mjs --only=comments` | 5 credits, $0.041 | Reads the whole thread in one call. |
 | `socialdata/x-fixtures/capture.mjs --only=comments` | ~$0.012 | Prepaid; an empty balance answers 402. Read the balance it prints first. |
 | `apify/linkedin-fixtures/capture.mjs --only=comments` | ~$0.008 | The comments actor twice, with and without `scrapeReplies`. |
+| `harvestapi/linkedin-fixtures/capture.mjs` | 5 requests, $0.020 | `--only=credentials` is free: a refused key and the account read. `--rescrub` re-scrubs the last answers from the system temporary folder, buying nothing. An empty search is billed. |
 | `scrapecreators/tiktok-fixtures/capture.mjs` | 9 credits, ~$0.017 | A key with no query and a malformed URL are free. An invalid parameter value is **billed**; read `docs.scrapecreators.com/openapi.json` instead. Writes one whole video and a digest per page: a page is 1.8 MB. |
 | `scrapecreators/youtube-fixtures/capture.mjs` | 8 credits; `--only=comments` ~$0.008 | `includeExtras` is what fills the description and the real `publishDate`. The transcript endpoint is a credit a video. `uploadDate` narrows and leaks. |
 | `scrapecreators/instagram-fixtures/capture.mjs` | 6 credits | Two endpoints: the topic page has no dates, the reels search has everything. A search matching nothing, a page past the last and a key with no query are all free. |

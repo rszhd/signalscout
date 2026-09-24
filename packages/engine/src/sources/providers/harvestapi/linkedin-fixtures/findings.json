@@ -1,0 +1,177 @@
+{
+  "note": "Computed by capture.mjs from the answers it wrote. US-386 reads these.",
+  "accountRead": {
+    "httpStatus": 200,
+    "fieldsFound": [
+      "user.totalBalance",
+      "user.activePackages.0.amountRemaining",
+      "usage.balance"
+    ],
+    "movedBetweenTwoReads": {}
+  },
+  "pages": {
+    "search-by-date": {
+      "items": 50,
+      "pagination": {
+        "totalElements": 273,
+        "totalPages": 6,
+        "pageNumber": 1,
+        "previousElements": 0,
+        "pageSize": 50,
+        "totalResultCount": 273
+      },
+      "status": 200,
+      "error": null,
+      "newest": "2026-09-23T23:08:34.362Z",
+      "oldest": "2026-09-23T13:08:54.216Z",
+      "orderedNewestFirst": false,
+      "idsAreActivityIds": false,
+      "distinctIds": 50,
+      "fields": [
+        "article",
+        "author",
+        "comments",
+        "content",
+        "contentAttributes",
+        "document",
+        "engagement",
+        "entityId",
+        "header",
+        "id",
+        "linkedinUrl",
+        "postImages",
+        "postVideo",
+        "postedAt",
+        "repost",
+        "repostId",
+        "shareLinkedinUrl",
+        "shareUrn",
+        "socialContent"
+      ]
+    },
+    "search-past-24h": {
+      "items": 50,
+      "pagination": {
+        "totalElements": 158,
+        "totalPages": 4,
+        "pageNumber": 1,
+        "previousElements": 0,
+        "pageSize": 50,
+        "totalResultCount": 158
+      },
+      "status": 200,
+      "error": null,
+      "newest": "2026-09-23T23:08:34.362Z",
+      "oldest": "2026-09-23T13:08:54.216Z",
+      "orderedNewestFirst": false,
+      "idsAreActivityIds": false,
+      "distinctIds": 50,
+      "fields": [
+        "article",
+        "author",
+        "comments",
+        "content",
+        "contentAttributes",
+        "document",
+        "engagement",
+        "entityId",
+        "header",
+        "id",
+        "linkedinUrl",
+        "postImages",
+        "postVideo",
+        "postedAt",
+        "repost",
+        "repostId",
+        "shareLinkedinUrl",
+        "shareUrn",
+        "socialContent"
+      ]
+    },
+    "search-page-2": {
+      "items": 50,
+      "pagination": {
+        "totalElements": 273,
+        "totalPages": 6,
+        "pageNumber": 2,
+        "previousElements": 50,
+        "pageSize": 50,
+        "totalResultCount": 273
+      },
+      "status": 200,
+      "error": null,
+      "newest": "2026-09-23T13:08:58.482Z",
+      "oldest": "2026-09-23T09:00:05.157Z",
+      "orderedNewestFirst": false,
+      "idsAreActivityIds": true,
+      "distinctIds": 50,
+      "fields": [
+        "article",
+        "author",
+        "comments",
+        "content",
+        "contentAttributes",
+        "document",
+        "engagement",
+        "entityId",
+        "header",
+        "id",
+        "linkedinUrl",
+        "poll",
+        "postImages",
+        "postVideo",
+        "postedAt",
+        "repost",
+        "repostId",
+        "shareLinkedinUrl",
+        "shareUrn",
+        "socialContent"
+      ]
+    },
+    "search-no-results": {
+      "items": 0,
+      "pagination": {
+        "totalElements": 0,
+        "totalPages": 0,
+        "pageNumber": 1,
+        "previousElements": 0,
+        "pageSize": 50,
+        "totalResultCount": 0
+      },
+      "status": 200,
+      "error": null,
+      "newest": null,
+      "oldest": null,
+      "orderedNewestFirst": true,
+      "idsAreActivityIds": true,
+      "distinctIds": 0,
+      "fields": []
+    }
+  },
+  "pageTwoOverlapsPageOne": 0,
+  "comments": {
+    "items": 4,
+    "pagination": {
+      "totalElements": 4,
+      "totalPages": 1,
+      "pageNumber": 1,
+      "previousElements": 0,
+      "pageSize": 100
+    },
+    "fields": [
+      "actor",
+      "commentary",
+      "commentaryAttributes",
+      "contributed",
+      "createdAt",
+      "createdAtTimestamp",
+      "edited",
+      "engagement",
+      "id",
+      "linkedinUrl",
+      "pinned",
+      "postId"
+    ],
+    "nestedReplies": 0
+  }
+}

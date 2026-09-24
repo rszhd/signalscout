@@ -27,7 +27,7 @@ Rough prices, per item:
 |---|---|
 | A Reddit post | $0.0003 to $0.0015, depending on the provider |
 | An X post | $0.0002 |
-| A LinkedIn post | $0.002 |
+| A LinkedIn post | $0.00008 through HarvestAPI, $0.002 through Apify |
 | An Instagram comment | $0.0027, the most expensive item |
 | Scoring one post on a cheap model | $0.001 |
 

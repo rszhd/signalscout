@@ -1,5 +1,6 @@
 ---
 id: US-361
+issue: 104
 title: One command says why a post is not in the inbox
 type: feature
 priority: p2

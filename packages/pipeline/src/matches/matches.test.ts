@@ -13,7 +13,7 @@
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { type IntentType, matches, monitors, posts } from "../db/schema.js";
+import { type IntentType, matches, monitors, postCopies, posts } from "../db/schema.js";
 import { recordVerdict } from "../feedback/feedback.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
@@ -24,6 +24,7 @@ import {
   matchCounts,
   rankDecayPointsPerDay,
   readMatch,
+  setMatchReplied,
   setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";
@@ -471,6 +472,256 @@ describe("the inbox list", () => {
       expect(
         await setMatchSaved(db, owner, "00000000-0000-0000-0000-000000000000", true),
       ).toBeUndefined();
+    });
+  });
+
+  /**
+   * The person said they replied. US-396.
+   *
+   * The cases that matter are what the mark must not do: move the match, take
+   * it off the inbox, or touch the verdict and the saved state beside it.
+   */
+  describe("a match the person replied to", () => {
+    it("says so on the card, and stays on the inbox in its place", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      const strong = await seed({ monitorId, score: 90, postedAt: minutesAgo(1) });
+
+      const before = await listMatches(db, { userId: owner, asOf: now });
+      await setMatchReplied(db, owner, answered, true);
+      const after = await listMatches(db, { userId: owner, asOf: now });
+
+      expect(after.matches.map((match) => match.id)).toEqual([strong, answered]);
+      expect(after.matches.map((match) => match.id)).toEqual(
+        before.matches.map((match) => match.id),
+      );
+      expect(after.matches.find((match) => match.id === answered)?.replied).toBe(true);
+      expect(after.matches.find((match) => match.id === strong)?.replied).toBe(false);
+    });
+
+    it("leaves the verdict and the saved state as they were", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await recordVerdict(db, { matchId: answered, userId: owner, verdict: "good" });
+      await setMatchReplied(db, owner, answered, true);
+
+      const match = await readMatch(db, owner, answered);
+
+      expect(match?.verdict).toBe("good");
+      expect(match?.saved).toBe(false);
+      expect(match?.replied).toBe(true);
+    });
+
+    it("can be taken back", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchReplied(db, owner, answered, true);
+      const cleared = await setMatchReplied(db, owner, answered, false);
+
+      expect(cleared?.repliedAt).toBeNull();
+      expect((await readMatch(db, owner, answered))?.replied).toBe(false);
+    });
+
+    it("keeps the first time when it is marked twice", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      const first = new Date("2026-09-01T00:00:00.000Z");
+
+      await setMatchReplied(db, owner, answered, true, first);
+      const again = await setMatchReplied(
+        db,
+        owner,
+        answered,
+        true,
+        new Date("2026-09-03T00:00:00.000Z"),
+      );
+
+      expect(again?.repliedAt?.toISOString()).toBe(first.toISOString());
+    });
+
+    it("is left out when the person hides replied matches, and counted the same way", async () => {
+      const answered = await seed({
+        monitorId,
+        score: 70,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+      const open = await seed({
+        monitorId,
+        score: 60,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      await setMatchReplied(db, owner, answered, true);
+
+      const filters = { userId: owner, hideReplied: true };
+      const page = await listMatches(db, filters);
+
+      expect(page.matches.map((match) => match.id)).toEqual([open]);
+      expect(await countNewMatches(db, { ...filters, since: minutesAgo(15) })).toBe(1);
+    });
+
+    it("makes a list of its own, newest reply first, whatever the score", async () => {
+      const strong = await seed({ monitorId, score: 95, postedAt: minutesAgo(1) });
+      const weak = await seed({ monitorId, score: 40, postedAt: daysAgo(5) });
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(2) });
+
+      await setMatchReplied(db, owner, strong, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchReplied(db, owner, weak, true, new Date("2026-09-02T00:00:00.000Z"));
+
+      const replied = await listMatches(db, { userId: owner, repliedOnly: true, order: "score" });
+
+      // The weak, old one was answered later, so it is first. The order asked
+      // for is not a choice on this list.
+      expect(replied.matches.map((match) => match.id)).toEqual([weak, strong]);
+    });
+
+    it("keeps a replied match on its list after it is marked not relevant", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchReplied(db, owner, answered, true);
+      await recordVerdict(db, { matchId: answered, userId: owner, verdict: "not_relevant" });
+
+      expect(
+        (await listMatches(db, { userId: owner, repliedOnly: true })).matches.map((m) => m.id),
+      ).toEqual([answered]);
+    });
+
+    it("pages its list without losing a match", async () => {
+      const answered: string[] = [];
+
+      for (let index = 0; index < 5; index += 1) {
+        const id = await seed({ monitorId, score: 90 - index * 10, postedAt: minutesAgo(5) });
+        await setMatchReplied(db, owner, id, true, new Date(now.getTime() + index * 60_000));
+        answered.push(id);
+      }
+
+      const walked: string[] = [];
+      let cursor: string | null = null;
+
+      do {
+        const page: MatchPage = await listMatches(db, {
+          userId: owner,
+          repliedOnly: true,
+          limit: 2,
+          cursor,
+        });
+
+        walked.push(...page.matches.map((match) => match.id));
+        cursor = page.nextCursor;
+      } while (cursor);
+
+      expect(walked).toEqual([...answered].reverse());
+    });
+
+    it("counts only replied matches on its list", async () => {
+      const answered = await seed({
+        monitorId,
+        score: 70,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+
+      await setMatchReplied(db, owner, answered, true);
+
+      expect(
+        await countNewMatches(db, { userId: owner, repliedOnly: true, since: minutesAgo(15) }),
+      ).toBe(1);
+    });
+
+    it("does not mark another account's match", async () => {
+      const theirs = await seed({ monitorId: strangerMonitorId, score: 70, postedAt: now });
+
+      expect(await setMatchReplied(db, owner, theirs, true)).toBeUndefined();
+      expect((await readMatch(db, "stranger", theirs))?.replied).toBe(false);
+    });
+
+    it("answers nothing for a match that does not exist", async () => {
+      expect(
+        await setMatchReplied(db, owner, "00000000-0000-0000-0000-000000000000", true),
+      ).toBeUndefined();
+    });
+  });
+
+  /**
+   * The other places the author made the same post. US-400. The classify step
+   * records them; this is the card that shows them.
+   */
+  describe("a match whose post was copied elsewhere", () => {
+    async function copyPost(
+      channel: string,
+      minutesLater: number,
+      deleted = false,
+    ): Promise<string> {
+      postSequence += 1;
+      const row = inserted(
+        await db
+          .insert(posts)
+          .values({
+            source: "reddit",
+            externalId: `t3_copy_${postSequence}`,
+            url: `https://reddit.com/r/${channel}/comments/${postSequence}`,
+            author: "someone",
+            channel,
+            title: "How are small teams handling regression testing?",
+            excerpt: "We're manually checking our major flows before every release.",
+            postedAt: minutesAgo(30 - minutesLater),
+            deletedAt: deleted ? now : null,
+          })
+          .returning({ id: posts.id }),
+      );
+      return row.id;
+    }
+
+    async function originalOf(matchId: string): Promise<string> {
+      const [row] = await db
+        .select({ postId: matches.postId })
+        .from(matches)
+        .where(eq(matches.id, matchId));
+      if (!row) throw new Error("No such match.");
+      return row.postId;
+    }
+
+    it("lists them on the card, oldest first, without a deleted one", async () => {
+      const matchId = await seed({ monitorId, score: 80, postedAt: minutesAgo(30) });
+      const original = await originalOf(matchId);
+      const later = await copyPost("startups", 6);
+      const sooner = await copyPost("SideProject", 2);
+      const gone = await copyPost("Entrepreneur", 4, true);
+
+      await db
+        .insert(postCopies)
+        .values(
+          [later, sooner, gone].map((postId) => ({ monitorId, postId, cardPostId: original })),
+        );
+
+      const [card] = (await listMatches(db, { userId: owner })).matches;
+
+      expect(card?.copies.map((copy) => copy.channel)).toEqual(["SideProject", "startups"]);
+      expect(card?.copies[0]?.url).toContain("/r/SideProject/");
+      expect(card?.copies[0]?.postedAt).toBeInstanceOf(Date);
+    });
+
+    it("shows another monitor's copies on that monitor's card only", async () => {
+      const mine = await seed({ monitorId, score: 80, postedAt: minutesAgo(30) });
+      const original = await originalOf(mine);
+      const copy = await copyPost("SideProject", 2);
+
+      await db
+        .insert(postCopies)
+        .values({ monitorId: otherMonitorId, postId: copy, cardPostId: original });
+
+      const [card] = (await listMatches(db, { userId: owner, monitorId })).matches;
+
+      expect(card?.copies).toEqual([]);
+    });
+
+    it("is an empty list on a card with no copies", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(30) });
+
+      const [card] = (await listMatches(db, { userId: owner })).matches;
+
+      expect(card?.copies).toEqual([]);
     });
   });
 

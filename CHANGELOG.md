@@ -20,6 +20,51 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.17.0 — 2026-09-25
+
+**Migration.** Three, in order. `0070` adds `matches.replied_at`. `0071` adds
+the generated column `posts.text_fingerprint`, its index, and the table
+`post_copies`. `0072` rewrites each account's saved copy of the five shipped
+reply voices, but only a copy that still holds the old shipped words under the
+old name. Run the pipeline's migrations before this version runs.
+
+**Added.** A match can be marked replied (US-396, US-399): `setMatchReplied`,
+`InboxMatch.replied`, and the list and count options `hideReplied` and
+`repliedOnly`. `repliedOnly` is a list of its own, ordered by when the reply
+was marked, like `savedOnly`. The inbox CSV gains a `replied` column after
+`saved`.
+
+**Changed.** A post written twice is one card (US-400). The classify step does
+not score a post whose author made the same post within seven days — same
+platform, same words — when an earlier copy already has a card on the monitor;
+it records the copy in `post_copies` on that card. A copy of a post that
+scored below the threshold is still scored. `InboxMatch.copies` lists a card's
+copies (`MatchCopy`), and the CSV gains `also_posted_in` after `replied`. A
+consumer that reads the CSV by column position adjusts. The classify stage's
+detail may carry `copies`.
+
+**Changed.** The reply prompt holds no rules (US-405). `buildReplySystemPrompt`
+gives the model the task, the product and the voice's words, and nothing
+else; a draft with no voice gets no guidance. `replyVoicePresets` now carry
+every rule the prompt used to fix, and mention the product once, after the
+answer, as the person's own. A consumer that drafts without a voice should
+choose one.
+
+**Fixed.** An edit that removes a search, the subreddits or a platform drops
+the saved places the next poll cannot reach (US-407). Before, such a place was
+never read or abandoned, and the deletion check skipped the monitor for good.
+
+## @signalscout/ui — Unreleased
+
+**Added.** `MatchDetail` takes `onReplied` and `marking`, `ReplyDraft` asks
+"Did you post it?" after a copy when given `onReplied`, and `InboxFilters`
+takes `hideReplied`/`onHideReplied` and `repliedView`/`onRepliedView`. All are
+optional; a page without them looks as before. `MatchDetail` links a card's
+`copies` under *Also posted in*.
+
+**Changed.** `ReplyDraft` starts on the first saved voice, and neither it nor
+`ReplyVoices` promises a rule the prompt no longer holds.
+
 ## 0.16.0 — 2026-09-24
 
 **Migration.** `0069_add_harvestapi_provider` adds `harvestapi` to the

@@ -1,5 +1,6 @@
 ---
 id: US-360
+issue: 103
 title: A pull request builds the image beside the checks
 type: chore
 priority: p3

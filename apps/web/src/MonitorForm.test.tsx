@@ -879,3 +879,124 @@ describe("the monitor form", () => {
     expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors")).toBe(false);
   });
 });
+
+/**
+ * Editing a monitor that exists. US-407.
+ *
+ * The same steps, filled from the monitor, ending at the plan. The saved
+ * queries are the person's words and are kept; only a platform ticked in the
+ * edit gets a list written for it.
+ */
+describe("editing a monitor", () => {
+  const monitorId = "22222222-2222-2222-2222-222222222222";
+  const saved = {
+    name: "Journeys",
+    product: "A browser test runner",
+    idealCustomer: "Small SaaS teams",
+    problem: "Tests break after UI changes",
+    signals: ["problem"],
+    sources: ["reddit"],
+    queries: { reddit: ["my own words about flaky tests", "manual qa before a release"] },
+    subreddits: ["SaaS"],
+    includeReplies: true,
+  };
+  const x = {
+    id: "x",
+    displayName: "X",
+    search: { maxQueryWords: 4, hint: "Posts are short." },
+    missingCredentials: [],
+    ready: true,
+    canFetchReplies: false,
+  };
+
+  let screen: Screen;
+  let fetchMock: ReturnType<typeof vi.fn>;
+
+  function calls(path: string, method = "GET") {
+    return fetchMock.mock.calls.filter(
+      ([url, init]) => String(url) === path && ((init as RequestInit)?.method ?? "GET") === method,
+    );
+  }
+
+  async function edit(sources: unknown[] = options.sources) {
+    fetchMock = vi.fn(async (request: string | URL | Request, init?: RequestInit) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json({ ...options, sources });
+      if (url === `/api/monitors/${monitorId}` && (init?.method ?? "GET") === "GET") {
+        return json(saved);
+      }
+      if (url === `/api/monitors/${monitorId}` && init?.method === "PATCH") return json(saved);
+      if (url === "/api/monitors/queries") {
+        return json({ ...generated, queries: { x: ["flaky ci", "tests break"] } });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    screen = await mount(
+      <MonitorForm monitorId={monitorId} projectId={projectId} />,
+      `/projects/${projectId}/monitors/${monitorId}/edit`,
+    );
+    await settle();
+  }
+
+  async function toPlan() {
+    await act(async () => button("Continue").click());
+    await act(async () => button("Continue").click());
+    await act(async () => button("Continue to search plan").click());
+    await settle();
+  }
+
+  afterEach(async () => {
+    await screen?.unmount();
+    vi.unstubAllGlobals();
+  });
+
+  it("fills every step from the monitor and keeps its plan without writing one", async () => {
+    await edit();
+
+    expect(input("Monitor name").value).toBe("Journeys");
+    expect(input("What do you sell?").value).toBe("A browser test runner");
+    expect(screen.container.textContent).toContain("Step 1 of 4");
+
+    await toPlan();
+
+    expect(input("Reddit search query 1").value).toBe("my own words about flaky tests");
+    expect(calls("/api/monitors/queries", "POST")).toHaveLength(0);
+  });
+
+  it("saves the changed plan to the monitor and goes back to its page", async () => {
+    await edit();
+    await toPlan();
+
+    await act(async () => setValue(input("Reddit search query 2"), "regression testing is slow"));
+    await act(async () => button("Save changes").click());
+    await settle();
+
+    const init = calls(`/api/monitors/${monitorId}`, "PATCH")[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      name: "Journeys",
+      sources: ["reddit"],
+      queries: { reddit: ["my own words about flaky tests", "regression testing is slow"] },
+      subreddits: ["SaaS"],
+      includeReplies: true,
+    });
+    expect(screen.path()).toBe(`/projects/${projectId}/monitors/${monitorId}`);
+  });
+
+  it("writes a list only for a platform ticked in this edit", async () => {
+    await edit([...options.sources, x]);
+    await act(async () => button("Continue").click());
+    await act(async () => button("Continue").click());
+    const tickX = [...document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')].find(
+      (box) => box.closest("label")?.textContent?.includes("X"),
+    );
+    await act(async () => tickX?.click());
+    await act(async () => button("Continue to search plan").click());
+    await settle();
+
+    const init = calls("/api/monitors/queries", "POST")[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(init.body)).sources).toEqual(["x"]);
+    expect(input("Reddit search query 1").value).toBe("my own words about flaky tests");
+    expect(input("X search query 1").value).toBe("flaky ci");
+  });
+});

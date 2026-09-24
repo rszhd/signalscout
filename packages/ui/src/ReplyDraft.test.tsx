@@ -198,6 +198,61 @@ describe("the draft itself", () => {
   });
 });
 
+/**
+ * The question after a copy. US-396. A copy is not a post, so the copy sets
+ * nothing; the person answers, and a page without the mark asks nothing.
+ */
+describe("whether the reply was posted", () => {
+  function clipboard(): void {
+    Object.defineProperty(globalThis.navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+  }
+
+  it("asks after a copy, and marks nothing until the person answers", async () => {
+    clipboard();
+    server({});
+    const onReplied = vi.fn();
+    screen = await mount(<ReplyDraft matchId={matchId} onReplied={onReplied} />);
+
+    await press("Draft reply");
+    expect(text()).not.toContain("Did you post it?");
+
+    await press("Copy draft");
+
+    expect(text()).toContain("Did you post it?");
+    expect(onReplied).not.toHaveBeenCalled();
+
+    await press("Yes, mark as replied");
+
+    expect(onReplied).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it("says the match is marked once it is", async () => {
+    clipboard();
+    server({});
+    screen = await mount(<ReplyDraft matchId={matchId} replied onReplied={() => undefined} />);
+
+    await press("Draft reply");
+    await press("Copy draft");
+
+    expect(text()).toContain("Marked as replied.");
+    expect(text()).not.toContain("Did you post it?");
+  });
+
+  it("asks nothing on a page that does not store the mark", async () => {
+    clipboard();
+    server({});
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    await press("Draft reply");
+    await press("Copy draft");
+
+    expect(text()).not.toContain("Did you post it?");
+  });
+});
+
 describe("the saved prompts", () => {
   it("edits prompts in a dialog and returns focus when it closes", async () => {
     server({ prompts: { prompts: [] } });
@@ -215,12 +270,31 @@ describe("the saved prompts", () => {
     expect(document.activeElement).toBe(button("Customize"));
   });
 
-  it("offers the ones the account has, and none by default", async () => {
-    server({ prompts: { prompts: [prompt()] } });
+  /**
+   * US-405: the voice holds every rule a draft follows, so the panel starts on
+   * one. "No saved prompt" is still there, and choosing it drafts with none.
+   */
+  it("offers the ones the account has, and starts on the first", async () => {
+    const first = prompt();
+    const second = prompt({ id: "1f0f5e0a-0000-4000-8000-000000000002", name: "Second" });
+    server({ prompts: { prompts: [first, second] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
+    await settle();
 
     expect(text()).toContain("No saved prompt");
-    expect(text()).toContain("Short and plain");
+    expect(select("Saved prompt").value).toBe(first.id);
+  });
+
+  it("sends the first voice's words when nobody chose another", async () => {
+    const first = prompt();
+    const { calls } = server({ prompts: { prompts: [first] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+    await settle();
+
+    await press("Draft reply");
+
+    const drafted = calls.find((call) => call.url.includes("/draft"));
+    expect(drafted?.body).toEqual({ instruction: first.instruction });
   });
 
   it("sends the chosen one's words with the draft request", async () => {
@@ -237,10 +311,13 @@ describe("the saved prompts", () => {
     expect(drafted?.body).toEqual({ instruction: saved.instruction });
   });
 
-  it("sends no instruction when the box is empty", async () => {
+  it("sends no instruction when the person chooses no saved prompt", async () => {
     const { calls } = server({ prompts: { prompts: [prompt()] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
+    await settle();
 
+    setValue(select("Saved prompt"), "");
+    await settle();
     await press("Draft reply");
 
     expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({ instruction: null });
@@ -262,13 +339,13 @@ describe("the saved prompts", () => {
     expect(area?.value).toBe(saved.instruction);
   });
 
-  it("says an instruction cannot override the rules that keep a draft honest", async () => {
+  it("says the words are all the model is told", async () => {
     server({ prompts: { prompts: [] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
     await press("Customize");
 
-    expect(text()).toContain("cannot make the draft open with your product");
+    expect(text()).toContain("all the model is told about how to write this reply");
   });
 });
 

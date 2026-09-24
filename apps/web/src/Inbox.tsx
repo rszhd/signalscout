@@ -120,6 +120,8 @@ export function Inbox({
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [order, setOrder] = useState<InboxOrder>("rank");
   const [showDismissed, setShowDismissed] = useState(false);
+  /** Leave out the matches the person said they replied to. US-396. */
+  const [hideReplied, setHideReplied] = useState(false);
   /**
    * The saved list. US-043.
    *
@@ -129,6 +131,11 @@ export function Inbox({
    */
   const [showSaved, setShowSaved] = useState(false);
   /**
+   * The replied list. US-399. A view like the saved one: the matches the
+   * person answered, newest reply first.
+   */
+  const [showReplied, setShowReplied] = useState(false);
+  /**
    * How many matches arrived since this page was read. US-125.
    *
    * A number and not rows, because the list must not move while somebody is
@@ -137,6 +144,7 @@ export function Inbox({
   const [arrived, setArrived] = useState(0);
   const [judging, setJudging] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [marking, setMarking] = useState(false);
 
   /**
    * What the monitoring is doing, derived on every render. US-265.
@@ -209,12 +217,15 @@ export function Inbox({
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
+    // Not on the replied list, which it would empty.
+    if (hideReplied && !showReplied) query.set("hideReplied", "true");
     if (showSaved) query.set("saved", "true");
-    // Not on the saved list, which has an order of its own. Sending it would
-    // ask the server for something it is right to ignore. US-114.
-    if (!showSaved && order !== "rank") query.set("order", order);
+    if (showReplied) query.set("replied", "true");
+    // Not on the saved or replied list, which have orders of their own.
+    // Sending it would ask the server for something it is right to ignore.
+    if (!showSaved && !showReplied && order !== "rank") query.set("order", order);
     return query;
-  }, [projectId, monitorId, minScore, showDismissed, showSaved, order]);
+  }, [projectId, monitorId, minScore, showDismissed, hideReplied, showSaved, showReplied, order]);
 
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");
@@ -358,6 +369,47 @@ export function Inbox({
     setMatches((current) => current.map((row) => (row.id === match.id ? { ...row, saved } : row)));
   }
 
+  /**
+   * Say the person replied to a match, or take it back. US-396.
+   *
+   * The row stays, like a saved one, unless it no longer belongs on the list
+   * on screen — then it leaves the way a dismissed one does, and the next match
+   * down is selected.
+   */
+  async function markReplied(match: Match, replied: boolean): Promise<void> {
+    setMarking(true);
+    setError(null);
+
+    try {
+      await requestJson(`/api/matches/${match.id}/replied`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ replied }),
+      });
+    } catch (cause) {
+      setError(messageFor(cause, "The reply could not be recorded."));
+      return;
+    } finally {
+      setMarking(false);
+    }
+
+    // A match leaves the list it no longer belongs on: a replied one when
+    // replied matches are hidden, an unmarked one on the replied list.
+    if ((replied && hideReplied && !showReplied) || (!replied && showReplied)) {
+      setMatches((current) => {
+        const index = current.findIndex((row) => row.id === match.id);
+        const remaining = current.filter((row) => row.id !== match.id);
+        setSelectedMatchId(remaining[index]?.id ?? remaining.at(-1)?.id ?? null);
+        return remaining;
+      });
+      return;
+    }
+
+    setMatches((current) =>
+      current.map((row) => (row.id === match.id ? { ...row, replied } : row)),
+    );
+  }
+
   async function judge(match: Match, verdict: Verdict): Promise<void> {
     setJudging(true);
     setError(null);
@@ -392,7 +444,14 @@ export function Inbox({
     );
   }
 
-  const filtered = activeFilters({ monitors, monitorId, minScore, showDismissed }) > 0;
+  const filtered =
+    activeFilters({
+      monitors,
+      monitorId,
+      minScore,
+      showDismissed,
+      hideReplied: hideReplied && !showReplied,
+    }) > 0;
   const orderHeading =
     inboxOrders.find((option) => option.value === order)?.heading ?? inboxOrders[0].heading;
   /**
@@ -451,21 +510,6 @@ export function Inbox({
     };
   }, [addressed, matches, state]);
 
-  /** Whether the address was copied a moment ago, for the button's own word. */
-  const [copied, setCopied] = useState(false);
-
-  async function copyLink(match: Match): Promise<void> {
-    const address = `${window.location.origin}${paths.inboxMatch(projectId, match.id)}`;
-    try {
-      await navigator.clipboard.writeText(address);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // No clipboard: the address is already in the bar, and the person can
-      // copy it from there. Nothing to report.
-    }
-  }
-
   const selectedMatch =
     matches.find((match) => match.id === selectedMatchId) ?? addressedMatch ?? matches[0] ?? null;
 
@@ -473,6 +517,7 @@ export function Inbox({
     setMonitorId("");
     setMinScore(0);
     setShowDismissed(false);
+    setHideReplied(false);
   }
 
   return (
@@ -490,6 +535,8 @@ export function Inbox({
 
       <InboxFilters
         saved={showSaved}
+        repliedView={showReplied}
+        onRepliedView={setShowReplied}
         onSaved={setShowSaved}
         monitors={monitors}
         monitorId={monitorId}
@@ -500,6 +547,8 @@ export function Inbox({
         onMinScore={setMinScore}
         showDismissed={showDismissed}
         onShowDismissed={setShowDismissed}
+        hideReplied={hideReplied}
+        onHideReplied={setHideReplied}
         onClear={clearFilters}
       />
 
@@ -563,7 +612,7 @@ export function Inbox({
               </button>
             }
           >
-            There may be matches the monitor or the minimum score is hiding.
+            There may be matches these filters are hiding.
           </PageState>
         ) : showSaved ? (
           <PageState
@@ -581,6 +630,23 @@ export function Inbox({
             }
           >
             Save a conversation from your inbox to come back to it here.
+          </PageState>
+        ) : showReplied ? (
+          <PageState
+            kind="empty"
+            mark="↩"
+            heading="No replies marked yet"
+            action={
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => setShowReplied(false)}
+              >
+                Back to inbox
+              </button>
+            }
+          >
+            Mark a conversation as replied after you post, and it appears here.
           </PageState>
         ) : (
           <PageState
@@ -608,7 +674,9 @@ export function Inbox({
             <MatchListHeading
               count={matches.length}
               more={page?.nextCursor != null}
-              heading={showSaved ? "Recently saved" : orderHeading}
+              heading={
+                showSaved ? "Recently saved" : showReplied ? "Recently replied" : orderHeading
+              }
               exportHref={`/api/matches/export?${filterQuery()}`}
             />
             <div className="inbox-scroll-region">
@@ -647,16 +715,9 @@ export function Inbox({
                 judging={judging}
                 onSave={(saved) => void keep(selectedMatch, saved)}
                 onJudge={(verdict) => void judge(selectedMatch, verdict)}
+                marking={marking}
+                onReplied={(replied) => void markReplied(selectedMatch, replied)}
                 onBack={() => setMobileDetailOpen(false)}
-                actions={
-                  <button
-                    className="secondary-button"
-                    type="button"
-                    onClick={() => void copyLink(selectedMatch)}
-                  >
-                    {copied ? "Link copied" : "Copy link"}
-                  </button>
-                }
               />
             </div>
           </aside>

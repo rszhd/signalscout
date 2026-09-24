@@ -8,6 +8,7 @@ export {
   type InboxMatch,
   type ListMatchesOptions,
   listMatches,
+  type MatchCopy,
   type MatchCounts,
   type MatchOrder,
   type MatchPage,
@@ -19,6 +20,7 @@ export {
   ownsMatch,
   rankDecayPointsPerDay,
   readMatch,
+  setMatchReplied,
   setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";

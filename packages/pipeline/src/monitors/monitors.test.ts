@@ -15,7 +15,7 @@ import { scrapeCreatorsReddit } from "@signalscout/engine";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { matches, monitors, posts } from "../db/schema.js";
+import { matches, monitors, posts, sourceContinuations } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { findDueMonitors } from "../worker/schedule.js";
 import {
@@ -209,6 +209,116 @@ describe("a monitor's version", () => {
     });
 
     expect(updated?.version).toBe(1);
+  });
+});
+
+/**
+ * A collection stopped part way keeps its place, and an edit can take away
+ * the search that place belongs to. US-407: such a place would never be read
+ * or abandoned, and the deletion check skips a monitor with one in flight.
+ */
+describe("an edit that takes a search away", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  async function create(creditsPerHour: number | null = null) {
+    const { monitor } = await createMonitor(db, input(), {
+      descriptors,
+      environment: configured,
+    });
+    if (creditsPerHour !== null) {
+      await db
+        .update(monitors)
+        .set({ pollCreditsPerHour: String(creditsPerHour) })
+        .where(eq(monitors.id, monitor.id));
+    }
+    return monitor;
+  }
+
+  async function remember(monitorId: string, query: string, source: "reddit" | "x" = "reddit") {
+    await db.insert(sourceContinuations).values({
+      monitorId,
+      source,
+      query,
+      provider: "scrapecreators",
+      cursor: "page-2",
+      resumeAfter: new Date(),
+    });
+  }
+
+  async function placesOf(monitorId: string) {
+    const rows = await db
+      .select({ source: sourceContinuations.source, query: sourceContinuations.query })
+      .from(sourceContinuations)
+      .where(eq(sourceContinuations.monitorId, monitorId));
+    return rows.map((row) => `${row.source}:${row.query}`).sort();
+  }
+
+  beforeAll(async () => {
+    database = await createTestDatabase("monitor-edit-places");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    await db.delete(monitors);
+  });
+
+  it("keeps a platform's place when its searches change and they do not take turns", async () => {
+    const monitor = await create();
+    await remember(monitor.id, "");
+
+    await updateMonitor(db, monitor.id, { queries: { reddit: ["regression testing is slow"] } });
+
+    expect(await placesOf(monitor.id)).toEqual(["reddit:"]);
+  });
+
+  it("forgets a platform's place when the platform is taken away", async () => {
+    const monitor = await create();
+    await remember(monitor.id, "");
+
+    await updateMonitor(db, monitor.id, { sources: ["x"], queries: { x: ["flaky ci tests"] } });
+
+    expect(await placesOf(monitor.id)).toEqual([]);
+  });
+
+  it("forgets a removed search's place and keeps the rest when searches take turns", async () => {
+    const monitor = await create(2);
+    await remember(monitor.id, "flaky end to end tests");
+    await remember(monitor.id, "manual qa before every release");
+    await remember(monitor.id, "");
+
+    await updateMonitor(db, monitor.id, {
+      queries: { reddit: ["manual qa before every release", "regression testing is slow"] },
+    });
+
+    expect(await placesOf(monitor.id)).toEqual([
+      "reddit:",
+      "reddit:manual qa before every release",
+    ]);
+  });
+
+  it("forgets the channels' place when the subreddits are all taken away", async () => {
+    const monitor = await create(2);
+    await remember(monitor.id, "");
+
+    await updateMonitor(db, monitor.id, { subreddits: [] });
+
+    expect(await placesOf(monitor.id)).toEqual([]);
+  });
+
+  it("leaves every place alone on an edit that changes no search", async () => {
+    const monitor = await create(2);
+    await remember(monitor.id, "flaky end to end tests");
+
+    await updateMonitor(db, monitor.id, { name: "Journeys, renamed", minScore: 60 });
+
+    expect(await placesOf(monitor.id)).toEqual(["reddit:flaky end to end tests"]);
   });
 });
 

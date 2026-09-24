@@ -105,6 +105,15 @@ describe("one monitor's page", () => {
     expect(container.querySelector(`a[href="/projects/${projectId}/monitors"]`)).not.toBeNull();
   });
 
+  it("links to the form that edits what the monitor looks for", async () => {
+    await show(monitor());
+
+    const edit = [...container.querySelectorAll("a")].find(
+      (link) => link.textContent === "Edit monitor",
+    );
+    expect(edit?.getAttribute("href")).toBe(`/projects/${projectId}/monitors/${monitor().id}/edit`);
+  });
+
   it("reads the one monitor rather than the whole list", async () => {
     await show(monitor());
 

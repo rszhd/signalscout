@@ -2,6 +2,7 @@ import { type ReactNode, useState } from "react";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel } from "./labels.js";
 import {
+  copyPlace,
   limitWords,
   type Match,
   opensThreadOnly,
@@ -23,7 +24,7 @@ import { ReplyDraft } from "./ReplyDraft.js";
  * to another match folds it again.
  *
  * `actions` is where a product adds its own buttons beside the conversation
- * link: self-hosted it is *Copy link*.
+ * link. Neither application fills it today (US-398).
  */
 export interface MatchDetailProps {
   readonly match: Match;
@@ -34,6 +35,15 @@ export interface MatchDetailProps {
   /** Closes the pane on a phone, where it covers the list. */
   readonly onBack: () => void;
   readonly actions?: ReactNode;
+  /**
+   * Mark the match replied, or take the mark back. US-396.
+   *
+   * Optional, and the button and the question after *Copy* show only when it
+   * is given: a page that does not store the mark must not offer it.
+   */
+  readonly onReplied?: (replied: boolean) => void;
+  /** A replied request is in flight. */
+  readonly marking?: boolean;
 }
 
 export function MatchDetail({
@@ -44,7 +54,10 @@ export function MatchDetail({
   onJudge,
   onBack,
   actions,
+  onReplied,
+  marking = false,
 }: MatchDetailProps) {
+  const replied = match.replied === true;
   const [expanded, setExpanded] = useState(false);
   const post = limitWords(match.excerpt);
   const depth = threadDepth(match);
@@ -75,6 +88,20 @@ export function MatchDetail({
       <p className="detail-author">
         {match.author ?? "Unknown author"} · matched by {match.monitorName}
       </p>
+      {/* The same post in other places, so the card stands for all of them. US-400. */}
+      {(match.copies?.length ?? 0) > 0 && (
+        <p className="detail-copies">
+          Also posted in{" "}
+          {match.copies?.map((copy, index) => (
+            <span key={copy.url}>
+              {index > 0 && ", "}
+              <a href={copy.url} rel="noreferrer noopener" target="_blank">
+                {copyPlace(match, copy)} ↗
+              </a>
+            </span>
+          ))}
+        </p>
+      )}
 
       {/* The thread above a reply, first: a reply is a good lead or noise
           depending on the post it answers, and the classifier saw both. */}
@@ -147,6 +174,17 @@ export function MatchDetail({
         >
           {match.saved ? "Saved" : "Save for later"}
         </button>
+        {onReplied && (
+          <button
+            aria-pressed={replied}
+            className={replied ? "secondary-button chosen" : "secondary-button"}
+            disabled={marking}
+            type="button"
+            onClick={() => onReplied(!replied)}
+          >
+            {replied ? "Replied" : "Mark as replied"}
+          </button>
+        )}
         <span className="match-meta">{match.intentLabel}</span>
       </div>
 
@@ -162,7 +200,13 @@ export function MatchDetail({
         </ul>
       </div>
 
-      <ReplyDraft key={match.id} matchId={match.id} />
+      <ReplyDraft
+        key={match.id}
+        matchId={match.id}
+        replied={replied}
+        marking={marking}
+        onReplied={onReplied}
+      />
 
       <div className="verdict-actions">
         <p className="section-label">Was this a good lead?</p>

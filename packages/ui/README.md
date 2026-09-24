@@ -199,7 +199,7 @@ Each application's `Inbox` holds the state and the requests and renders them.
   the pane as it was. `saving` and `judging` are the page's answer to "is one
   in flight".
 - **A product's own action is a slot.** `MatchDetail`'s `actions` sits beside
-  the conversation link: self-hosted it holds *Copy link*.
+  the conversation link. Neither application fills it today (US-398).
 - **An address is a prop.** `MonitoringBar` takes `monitorHref`, because the
   hosted product opens its one monitor's list and this one opens the monitor.
 - **The look is the hosted one**, whose `inbox.css` refined an older layer of

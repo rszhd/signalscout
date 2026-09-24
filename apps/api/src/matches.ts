@@ -25,12 +25,14 @@ import {
   exportFeedback,
   type InboxMatch,
   listMatches,
+  type MatchCopy,
   matchesToCsv,
   matchOrders,
   maximumPageSize,
   ownsMatch,
   readMatch,
   recordVerdict,
+  setMatchReplied,
   setMatchSaved,
   verdicts,
 } from "@signalscout/pipeline";
@@ -53,6 +55,12 @@ const matchSchema = z.object({
   intentLabel: z.string(),
   reasons: z.array(z.string()),
   saved: z.boolean(),
+  /** The person said they replied. US-396. */
+  replied: z.boolean(),
+  /** The other places the author made the same post, oldest first. US-400. */
+  copies: z.array(
+    z.object({ channel: z.string().nullable(), url: z.string(), postedAt: z.string() }),
+  ),
   /** Null when this person has not judged the match. Not a third verdict. */
   verdict: z.enum(verdicts).nullable(),
   readAt: z.string().nullable(),
@@ -86,6 +94,10 @@ const matchSchema = z.object({
   parentRepliesStopped: z.string().nullable(),
 });
 
+function serialiseCopies(copies: readonly MatchCopy[]) {
+  return copies.map((copy) => ({ ...copy, postedAt: copy.postedAt.toISOString() }));
+}
+
 const query = z.object({
   monitorId: z.uuid().optional(),
   /** Every monitor in one project. US-045: a project has its own inbox. */
@@ -100,6 +112,11 @@ const query = z.object({
    * somebody who judged a match weak and kept it anyway meant both.
    */
   saved: z.stringbool().default(false),
+  /**
+   * Only what this person said they replied to. US-399. A list of its own,
+   * ordered by when the reply was marked, like the saved one.
+   */
+  replied: z.stringbool().default(false),
   /**
    * What to order the page by. US-114.
    *
@@ -120,6 +137,8 @@ const query = z.object({
    * dismissed — and how they undo one.
    */
   includeNotRelevant: z.stringbool().default(false),
+  /** Leave out the matches the person said they replied to. US-396. */
+  hideReplied: z.stringbool().default(false),
 });
 
 /**
@@ -135,7 +154,9 @@ const countQuery = query
     projectId: true,
     minScore: true,
     saved: true,
+    replied: true,
     includeNotRelevant: true,
+    hideReplied: true,
   })
   .extend({
     /**
@@ -187,7 +208,9 @@ export async function registerMatchRoutes(
         cursor,
         asOf,
         includeNotRelevant,
+        hideReplied,
         saved,
+        replied,
         order,
       } = request.query;
 
@@ -199,7 +222,9 @@ export async function registerMatchRoutes(
         limit,
         cursor,
         includeNotRelevant,
+        hideReplied,
         savedOnly: saved,
+        repliedOnly: replied,
         order,
         asOf: asOf ? new Date(asOf) : undefined,
       });
@@ -210,6 +235,7 @@ export async function registerMatchRoutes(
           reasons: [...match.reasons],
           readAt: match.readAt?.toISOString() ?? null,
           postedAt: match.postedAt.toISOString(),
+          copies: serialiseCopies(match.copies),
         })),
         nextCursor: page.nextCursor,
         asOf: page.asOf.toISOString(),
@@ -248,6 +274,7 @@ export async function registerMatchRoutes(
         reasons: [...match.reasons],
         readAt: match.readAt?.toISOString() ?? null,
         postedAt: match.postedAt.toISOString(),
+        copies: serialiseCopies(match.copies),
       };
     },
   });
@@ -275,7 +302,16 @@ export async function registerMatchRoutes(
       response: { 200: z.object({ count: z.number() }) },
     },
     handler: async (request) => {
-      const { monitorId, projectId, minScore, includeNotRelevant, saved, since } = request.query;
+      const {
+        monitorId,
+        projectId,
+        minScore,
+        includeNotRelevant,
+        hideReplied,
+        saved,
+        replied,
+        since,
+      } = request.query;
 
       const count = await countNewMatches(db, {
         userId: sessionUserId(request),
@@ -283,7 +319,9 @@ export async function registerMatchRoutes(
         projectId,
         minScore,
         includeNotRelevant,
+        hideReplied,
         savedOnly: saved,
+        repliedOnly: replied,
         since: new Date(since),
       });
 
@@ -333,6 +371,46 @@ export async function registerMatchRoutes(
         matchId: result.matchId,
         saved: result.savedAt !== null,
         savedAt: result.savedAt?.toISOString() ?? null,
+      };
+    },
+  });
+
+  /**
+   * Say the person replied to a match, or take it back. US-396.
+   *
+   * A `PUT` of the state, like the saved route, so a second press on a slow
+   * connection is the same as the first. The screen changes the row from this
+   * answer rather than re-reading the page, which would move every row.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/matches/:id/replied",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      body: z.object({ replied: z.boolean() }),
+      response: {
+        200: z.object({
+          matchId: z.string(),
+          replied: z.boolean(),
+          repliedAt: z.string().nullable(),
+        }),
+        404: z.object({ message: z.string() }),
+      },
+    },
+    handler: async (request, reply) => {
+      const result = await setMatchReplied(
+        db,
+        sessionUserId(request),
+        request.params.id,
+        request.body.replied,
+      );
+
+      if (!result) return reply.code(404).send({ message: "No match has that id." });
+
+      return {
+        matchId: result.matchId,
+        replied: result.repliedAt !== null,
+        repliedAt: result.repliedAt?.toISOString() ?? null,
       };
     },
   });
@@ -421,8 +499,17 @@ export async function registerMatchRoutes(
       response: { 200: z.string() },
     },
     handler: async (request, reply) => {
-      const { monitorId, projectId, minScore, asOf, includeNotRelevant, saved, order } =
-        request.query;
+      const {
+        monitorId,
+        projectId,
+        minScore,
+        asOf,
+        includeNotRelevant,
+        hideReplied,
+        saved,
+        replied,
+        order,
+      } = request.query;
 
       const collected: InboxMatch[] = [];
       let cursor: string | null = null;
@@ -443,7 +530,9 @@ export async function registerMatchRoutes(
           projectId,
           minScore,
           includeNotRelevant,
+          hideReplied,
           savedOnly: saved,
+          repliedOnly: replied,
           order,
           limit: exportPageSize,
           cursor,

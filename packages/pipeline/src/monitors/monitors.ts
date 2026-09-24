@@ -22,12 +22,13 @@ import {
 } from "@signalscout/engine";
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { monitors, projects, type Signal, type Source } from "../db/schema.js";
+import { monitors, projects, type Signal, type Source, sourceContinuations } from "../db/schema.js";
 import {
   defaultNotificationSettings,
   saveNotificationSettings,
 } from "../notifications/settings.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
+import { unitKey, unitsOf } from "../worker/rotation.js";
 import { ownsMonitor } from "./owner.js";
 
 /** A monitor row, as Drizzle selects it. */
@@ -565,7 +566,53 @@ export async function updateMonitor(
     .where(eq(monitors.id, id))
     .returning();
 
+  if (
+    monitor &&
+    (input.queries !== undefined || input.subreddits !== undefined || input.sources !== undefined)
+  ) {
+    await forgetUnreachableCollections(db, monitor);
+  }
+
   return monitor;
+}
+
+/**
+ * Drop the saved places of searches this monitor no longer runs. US-407.
+ *
+ * A collection stopped part way keeps its place in `source_continuations`,
+ * and the next poll reads on from each place whose key matches one of its
+ * units. After an edit that removes a search or a platform, no unit matches
+ * the old row, so nothing would ever read it or abandon it — and the deletion
+ * check skips paid verification for a monitor with any collection in flight,
+ * so one such row would switch it off for good.
+ *
+ * The units are built as the collect step builds them: one a platform when
+ * the searches do not take turns, and one a search plus a channels unit when
+ * they do. A place the next poll can still reach is kept.
+ */
+async function forgetUnreachableCollections(db: Database, monitor: Monitor): Promise<void> {
+  const units =
+    monitor.pollCreditsPerHour === null
+      ? monitor.sources.map((source) => ({ source, query: "" }))
+      : unitsOf(
+          monitor.sources,
+          (source) => monitorQueries(monitor.generatedQueries, source),
+          (source) => (source === "reddit" ? monitor.generatedSubreddits : []),
+        );
+  const reachable = new Set(units.map(unitKey));
+
+  const saved = await db
+    .select({
+      id: sourceContinuations.id,
+      source: sourceContinuations.source,
+      query: sourceContinuations.query,
+    })
+    .from(sourceContinuations)
+    .where(eq(sourceContinuations.monitorId, monitor.id));
+
+  for (const row of saved.filter((place) => !reachable.has(unitKey(place)))) {
+    await db.delete(sourceContinuations).where(eq(sourceContinuations.id, row.id));
+  }
 }
 
 /**

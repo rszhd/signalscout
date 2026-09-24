@@ -34,6 +34,8 @@ export function match(overrides: Partial<Match> = {}): Match {
     parentReplyCount: null,
     parentRepliesStopped: null,
     saved: false,
+    replied: false,
+    copies: [],
     url: "https://reddit.com/r/SaaS/comments/abc",
     postedAt: new Date(Date.now() - 12 * 60_000).toISOString(),
     ...overrides,

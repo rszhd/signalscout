@@ -100,6 +100,19 @@ Open a monitor from **Monitors** to see how it is doing.
   leads.
 - **Cost** — spent this month and budget left. Every amount is an estimate.
 
+### Edit what a monitor looks for
+
+Press **Edit monitor** on the monitor page. It opens the same steps as
+**Create a monitor**, filled in from this monitor: the answers, the signals,
+the platforms, and every search phrase and subreddit. Change what you need
+and press **Save changes**.
+
+- Your saved searches stay as they are. SignalScout writes new searches only
+  for a platform you tick in this edit.
+- A removed search stops on the next run.
+- If you change the answers or the signals, the AI scores new posts against
+  the new description. Matches you already have keep their scores.
+
 ### Settings you can change later
 
 Under **Monitor settings**: the schedule, the monthly budget, the minimum

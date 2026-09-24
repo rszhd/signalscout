@@ -1,5 +1,6 @@
 ---
 id: US-358
+issue: 101
 title: One command checks a change
 type: chore
 priority: p2

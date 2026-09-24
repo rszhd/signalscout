@@ -30,6 +30,8 @@ export const routes = {
   monitors: "/projects/:projectId/monitors",
   newMonitor: "/projects/:projectId/monitors/new",
   monitor: "/projects/:projectId/monitors/:monitorId",
+  /** The same steps as a new monitor, filled from this one. US-407. */
+  editMonitor: "/projects/:projectId/monitors/:monitorId/edit",
   notifications: "/projects/:projectId/monitors/:monitorId/notifications",
   connections: "/connections",
   providers: "/providers",
@@ -54,6 +56,8 @@ export const paths = {
   newMonitor: (projectId: string): string => `${paths.monitors(projectId)}/new`,
   monitor: (projectId: string, monitorId: string): string =>
     `${paths.monitors(projectId)}/${encodeURIComponent(monitorId)}`,
+  editMonitor: (projectId: string, monitorId: string): string =>
+    `${paths.monitors(projectId)}/${encodeURIComponent(monitorId)}/edit`,
   notifications: (projectId: string, monitorId: string): string =>
     `${paths.monitors(projectId)}/${encodeURIComponent(monitorId)}/notifications`,
   connections: routes.connections,

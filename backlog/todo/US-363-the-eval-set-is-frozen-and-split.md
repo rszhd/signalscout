@@ -1,5 +1,6 @@
 ---
 id: US-363
+issue: 106
 title: The eval set is frozen, and split into a tuning half and a held-out half
 type: chore
 priority: p2

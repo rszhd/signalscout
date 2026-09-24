@@ -7,6 +7,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -70,6 +71,15 @@ export const matches = pgTable(
      * is theirs.
      */
     savedAt: timestamp("saved_at", { withTimezone: true }),
+    /**
+     * When the person said they replied to this post, or null. US-396.
+     *
+     * Set by the person, never inferred: a copied draft is not a posted one,
+     * and a mark they did not give is a mark they learn not to trust. Like
+     * `savedAt` it is an intention and not a verdict, so a re-classification
+     * leaves it alone.
+     */
+    repliedAt: timestamp("replied_at", { withTimezone: true }),
     lastVerifiedAt: timestamp("last_verified_at", { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -143,3 +153,41 @@ export const feedback = pgTable(
 );
 
 /** What a monitor does when its cap is reached. STACK.md, *Budgets belong in the data model*. */
+
+/**
+ * A post shown on another post's card, because it is a copy. US-400.
+ *
+ * The same author, the same words, on the same platform, within a week: the
+ * question put to two subreddits, or posted twice. One card stands for all of
+ * them, so a person reads it once and answers it once.
+ *
+ * `card_post_id` is the post whose match is the card. It is the first of the
+ * copies to clear the monitor's threshold, not always the first written: the
+ * model's score varies between identical posts, so a copy of a post that
+ * scored below the threshold is still scored, and if it clears it, the earlier
+ * copies hang on its card. A copy of a post that already has a card is not
+ * scored at all.
+ *
+ * Per monitor, because a post is shared and a card belongs to one monitor.
+ */
+export const postCopies = pgTable(
+  "post_copies",
+  {
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    /** The post whose card shows this one. */
+    cardPostId: uuid("card_post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.monitorId, table.postId] }),
+    // The inbox asks for a card's copies by the card.
+    index("post_copies_card_idx").on(table.monitorId, table.cardPostId),
+  ],
+);

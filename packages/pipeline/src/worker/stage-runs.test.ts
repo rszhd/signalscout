@@ -259,7 +259,9 @@ describe("what a stage records about itself", () => {
        */
       const monitorId = await insertMonitor(database);
       const first = await insertPost(strongPost);
-      const second = await insertPost(strongPost, "second-post");
+      // Another post, not the same one stored twice: since US-400 a second
+      // copy of one post is put on the first one's card and not scored.
+      const second = await insertPost(offTopicPost, "second-post");
       await setBudget(db, monitorId, { monthlyCapMicros: 1, onExhausted: "notify" });
 
       await createClassifyStep({ classifierFor: async () => stubClassifier(() => scored) })(

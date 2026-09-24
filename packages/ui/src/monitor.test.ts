@@ -355,6 +355,22 @@ describe("a stage in the history", () => {
     );
   });
 
+  it("says how many posts were copies of one already scored", () => {
+    const state = run({
+      detail: {
+        stage: "classify",
+        scored: 5,
+        copies: 2,
+        matched: 1,
+        unclassified: 0,
+        dropped: 0,
+        leftByCap: 0,
+      },
+    });
+
+    expect(stageDidLabel(state)).toContain("2 copies of an earlier post");
+  });
+
   it("explains the pre-filter in the words the rest of the page uses", () => {
     const state = run({
       stage: "filter",

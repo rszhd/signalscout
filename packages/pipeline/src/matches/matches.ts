@@ -83,8 +83,15 @@ export const matchOrders = ["rank", "score", "newest"] as const;
 
 export type MatchOrder = (typeof matchOrders)[number];
 
-/** The saved list's own order, beside the two a caller may ask for. */
-type PageOrder = MatchOrder | "saved";
+/** The saved and replied lists' own orders, beside the ones a caller may ask for. */
+type PageOrder = MatchOrder | "saved" | "replied";
+
+/** Another place a match's post was made: the same author and words. US-400. */
+export interface MatchCopy {
+  readonly channel: string | null;
+  readonly url: string;
+  readonly postedAt: Date;
+}
 
 /** One match, with the post it is about and the monitor that found it. */
 export interface InboxMatch {
@@ -111,6 +118,16 @@ export interface InboxMatch {
   /** Specific claims about this post. The part that is not a keyword alert. */
   readonly reasons: readonly string[];
   readonly saved: boolean;
+  /** The person said they replied. US-396. */
+  readonly replied: boolean;
+  /**
+   * The other places the author posted these words, oldest first. US-400.
+   *
+   * Posts the classify step recorded as copies of this one for this monitor,
+   * so they are on this card rather than on cards of their own. A copy the
+   * author deleted is left out.
+   */
+  readonly copies: readonly MatchCopy[];
   /** The verdict this user has in force, or null when they have not judged it. */
   readonly verdict: Verdict | null;
   readonly readAt: Date | null;
@@ -217,6 +234,23 @@ export interface InboxFilters {
    * `order` is ignored.
    */
   readonly savedOnly?: boolean;
+  /**
+   * Leave out the matches the person said they replied to. US-396.
+   *
+   * A filter and not a list of its own: a replied match is still a lead, and
+   * it stays in the inbox unless the person asks for it to go.
+   */
+  readonly hideReplied?: boolean;
+  /**
+   * Only the matches the person said they replied to. US-399.
+   *
+   * A list of its own, like the saved one and for the same reason: it is
+   * ordered by when the reply was marked, newest first, because a reply from
+   * last week does not matter less because the post was old. It shows a
+   * replied match whatever its verdict. The screen offers it as a view beside
+   * *Saved*, never both at once; a caller that sets both gets the saved order.
+   */
+  readonly repliedOnly?: boolean;
 }
 
 export interface ListMatchesOptions extends InboxFilters {
@@ -320,6 +354,7 @@ function orderValue(order: PageOrder, asOf: Date): SQL<number> {
   // `double precision` like the rest, so one cursor shape carries all four
   // orders and `parseCursor` has one number to read.
   if (order === "score") return sql<number>`${matches.score}::double precision`;
+  if (order === "replied") return epochOf(matches.repliedAt);
 
   return epochOf(matches.savedAt);
 }
@@ -359,7 +394,7 @@ function currentVerdictOf(userId: string): SQL | undefined {
 function inboxConditions(options: InboxFilters): SQL[] {
   const conditions: SQL[] = [eq(matches.hidden, false), eq(monitors.userId, options.userId)];
 
-  if (!options.includeNotRelevant && !options.savedOnly) {
+  if (!options.includeNotRelevant && !options.savedOnly && !options.repliedOnly) {
     // `IS DISTINCT FROM` and not `<>`: an unjudged match has no feedback row,
     // so the column is null here, and null compared with `<>` would drop every
     // match nobody has judged yet.
@@ -380,6 +415,8 @@ function inboxConditions(options: InboxFilters): SQL[] {
    * and kept it anyway meant both, and hiding it would overrule them.
    */
   if (options.savedOnly) conditions.push(isNotNull(matches.savedAt));
+  if (options.hideReplied) conditions.push(isNull(matches.repliedAt));
+  if (options.repliedOnly) conditions.push(isNotNull(matches.repliedAt));
   if (options.minScore !== undefined) conditions.push(gte(matches.score, options.minScore));
 
   return conditions;
@@ -399,7 +436,11 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
   const rank = rankExpression(asOf);
   // The saved list wins over the caller's order rather than arguing with it.
   // Its order is what that list is, so there is nothing here to choose.
-  const order: PageOrder = options.savedOnly ? "saved" : (options.order ?? "rank");
+  const order: PageOrder = options.savedOnly
+    ? "saved"
+    : options.repliedOnly
+      ? "replied"
+      : (options.order ?? "rank");
   const sortBy = orderValue(order, asOf);
 
   const conditions = inboxConditions(options);
@@ -440,6 +481,20 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
       // Derived, so a screen keeps asking one simple question while the
       // column carries the ordering the saved list needs.
       saved: sql<boolean>`${matches.savedAt} is not null`,
+      replied: sql<boolean>`${matches.repliedAt} is not null`,
+      // One small read per card, on the index that names the original. A
+      // join would multiply the page's rows by the number of copies.
+      copies: sql<{ channel: string | null; url: string; postedAt: string }[]>`coalesce((
+        select json_agg(
+          json_build_object('channel', copy.channel, 'url', copy.url, 'postedAt', copy.posted_at)
+          order by copy.posted_at
+        )
+        from post_copies
+        join posts copy on copy.id = post_copies.post_id
+        where post_copies.monitor_id = ${matches.monitorId}
+          and post_copies.card_post_id = ${matches.postId}
+          and copy.deleted_at is null
+      ), '[]'::json)`,
       verdict: feedback.verdict,
       readAt: matches.readAt,
       source: posts.source,
@@ -485,6 +540,7 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
 
   const page = rows.slice(0, limit).map(({ sortBy: value, ...row }) => ({
     ...row,
+    copies: row.copies.map((copy) => ({ ...copy, postedAt: new Date(copy.postedAt) })),
     rank: Number(row.rank),
     intentLabel: intentTypeLabel(row.intentType),
     cursor: `${Number(value)}:${row.id}`,
@@ -654,6 +710,38 @@ export async function setMatchSaved(
     .returning({ id: matches.id, savedAt: matches.savedAt });
 
   return row ? { matchId: row.id, savedAt: row.savedAt } : undefined;
+}
+
+/**
+ * Say the person replied to a match, or take it back. US-396.
+ *
+ * The shape of `setMatchSaved`, for the same reasons: one column on the match,
+ * scoped in the statement that writes it, and nothing else touched — not the
+ * verdict, not the saved state, not the rank. Marking again keeps the first
+ * time. Undefined when no match of this account has that id.
+ */
+export async function setMatchReplied(
+  db: Database,
+  userId: string,
+  matchId: string,
+  replied: boolean,
+  now: Date = new Date(),
+): Promise<{ readonly matchId: string; readonly repliedAt: Date | null } | undefined> {
+  const [row] = await db
+    .update(matches)
+    .set({ repliedAt: replied ? sql`coalesce(${matches.repliedAt}, ${now})` : null })
+    .where(
+      and(
+        eq(matches.id, matchId),
+        inArray(
+          matches.monitorId,
+          db.select({ id: monitors.id }).from(monitors).where(eq(monitors.userId, userId)),
+        ),
+      ),
+    )
+    .returning({ id: matches.id, repliedAt: matches.repliedAt });
+
+  return row ? { matchId: row.id, repliedAt: row.repliedAt } : undefined;
 }
 
 /** How many matches one monitor holds, and how many nobody has opened. US-109. */

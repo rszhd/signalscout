@@ -1,5 +1,6 @@
 ---
 id: US-362
+issue: 105
 title: The worktree script finds what it left behind
 type: chore
 priority: p3

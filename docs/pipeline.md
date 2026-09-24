@@ -160,6 +160,14 @@ this version is skipped and not paid for again — the skip is asked of the call
 ledger, not of `matches`, because a post scored below the threshold writes no
 match. A score at or above the monitor's threshold becomes a match.
 
+**A post written twice is one card.** US-400. A
+post whose author made the same post within a week — same platform, same
+words by `posts.text_fingerprint` — and whose earlier copy already has a card
+on this monitor is not scored; `post_copies` puts it on that card. A copy of a
+post that scored below the threshold is scored, because the model's score
+varies between identical posts; if it makes a card, the earlier copies go on
+it. Replies are never treated as copies.
+
 **Notify.** Immediate email for a match above `immediate_score`, one delivery
 per match. Digest for everything above `min_score`, up to a hundred matches in
 one delivery, on the monitor's own digest clock. The scheduler's tick also
@@ -172,7 +180,7 @@ sweeps every monitor with settings, so a lost enqueue cannot lose a match.
 | Poll | `poll_runs`, `posts`, `post_discoveries`, `api_usage`, `source_continuations`, `source_coverage` |
 | Filter | `stage_runs`, `filter_drops`, `model_calls` (embedding, triage) |
 | Replies | `stage_runs`, `posts`, `api_usage` |
-| Classify | `stage_runs`, `model_calls`, `matches` |
+| Classify | `stage_runs`, `model_calls`, `matches`, `post_copies` |
 | Notify | `stage_runs`, `notification_deliveries` |
 
 `poll_runs` keeps 200 rows per monitor and `stage_runs` keeps 800, so a stage

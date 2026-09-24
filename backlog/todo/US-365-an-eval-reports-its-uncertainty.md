@@ -1,5 +1,6 @@
 ---
 id: US-365
+issue: 108
 title: An eval reports its uncertainty
 type: chore
 priority: p2

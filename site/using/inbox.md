@@ -17,7 +17,7 @@ flowchart TD
   post["The post<br/>platform · community · age"] --> score["Score 0–100"]
   score --> breakdown["Score breakdown<br/>Problem fit · ICP fit · Intent"]
   breakdown --> saw["What the model saw<br/>its reasons, in plain sentences"]
-  saw --> act["Your move<br/>open · save · draft a reply · verdict"]
+  saw --> act["Your move<br/>open · save · draft a reply · mark replied · verdict"]
 ```
 
 - **Score breakdown** — *Problem fit*: does the person describe the problem
@@ -26,15 +26,18 @@ flowchart TD
 - **What the model saw** — the reasons behind the score, one per line. Read
   these before you trust the number.
 - **Open conversation ↗** — the original post on its platform.
+- **Also posted in** — the same post in other places. When an author posts
+  the same words more than once in a week, for example in two subreddits,
+  the inbox shows one match, with a link to each copy.
 
 ## What you can do with a match
 
 | Button | What it does |
 |---|---|
 | **Open conversation ↗** | Opens the post on its platform, in a new tab. |
-| **Copy link** | Copies a link to this match inside SignalScout, to send to a colleague. |
 | **Save for later** | Keeps the match under **Saved**. |
 | **Draft reply** | Writes a reply for you to edit and post yourself. See [reply drafts](./replies). |
+| **Mark as replied** | Records that you answered this conversation. The match stays in the inbox, its card says **Replied**, and it appears under **Replied**. Press it again to take the mark back. |
 | **Good lead** / **Not relevant** | Your verdict. **Not relevant** removes the match from the inbox. |
 
 Removed a match by mistake? Open **Filters**, set **Not relevant** to
@@ -44,10 +47,13 @@ Removed a match by mistake? Open **Filters**, set **Not relevant** to
 
 | Control | Choices |
 |---|---|
-| **Inbox** / **Saved** | Every match, or only the ones you saved |
+| **Inbox** / **Saved** / **Replied** | Every match, the ones you saved, or the ones you replied to |
 | **Monitor** | All monitors, or one |
 | **Order** | Ranked by score & age, highest score first, or newest first |
-| **Filters** | A minimum score, and whether to show matches marked not relevant |
+| **Filters** | A minimum score, whether to show matches marked not relevant, and whether to show matches you replied to |
+
+**Saved** lists matches by when you saved them, and **Replied** by when you
+marked them replied, newest first. Neither list uses **Order**.
 
 "Ranked by score & age" is the default. A strong match from last week drops
 below a good one from this morning, so the top of the list is what to read
@@ -56,4 +62,5 @@ today.
 ## Export
 
 **Export CSV** downloads the matches in your current view, for a
-spreadsheet or a CRM. Your verdicts are in it too.
+spreadsheet or a CRM. Your verdicts, and whether you saved or replied to
+each match, are in it too.

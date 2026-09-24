@@ -72,6 +72,64 @@ describe("the reading pane", () => {
     expect(onSave).toHaveBeenLastCalledWith(false);
   });
 
+  it("asks to mark a match replied, and to take a mark back", async () => {
+    const onReplied = vi.fn();
+    await show({ onReplied });
+    expect(button("Mark as replied").getAttribute("aria-pressed")).toBe("false");
+    button("Mark as replied").click();
+    expect(onReplied).toHaveBeenLastCalledWith(true);
+    await screen.unmount();
+
+    await show({ onReplied, match: match({ replied: true }) });
+    expect(button("Replied").getAttribute("aria-pressed")).toBe("true");
+    button("Replied").click();
+    expect(onReplied).toHaveBeenLastCalledWith(false);
+  });
+
+  it("offers no replied button to a page that does not store the mark", async () => {
+    await show();
+
+    expect(() => button("Mark as replied")).toThrow();
+  });
+
+  it("disables the replied button while its request is in flight", async () => {
+    await show({ onReplied: () => undefined, marking: true });
+
+    expect(button("Mark as replied").disabled).toBe(true);
+  });
+
+  it("links the other places the author made the same post", async () => {
+    const container = await show({
+      match: match({
+        channel: "startups",
+        copies: [
+          { channel: "SideProject", url: "https://reddit.com/r/SideProject/a", postedAt: "" },
+          { channel: "startups", url: "https://reddit.com/r/startups/b", postedAt: "" },
+        ],
+      }),
+    });
+
+    const line = container.querySelector(".detail-copies");
+    const links = [...(line?.querySelectorAll("a") ?? [])];
+
+    expect(line?.textContent).toBe("Also posted in r/SideProject ↗, r/startups, again ↗");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "https://reddit.com/r/SideProject/a",
+      "https://reddit.com/r/startups/b",
+    ]);
+    expect(links.every((link) => link.getAttribute("target") === "_blank")).toBe(true);
+  });
+
+  it("says nothing about copies when there are none, or the API sends none", async () => {
+    const container = await show();
+    expect(container.querySelector(".detail-copies")).toBeNull();
+    await screen.unmount();
+
+    const { copies: _, ...older } = match();
+    const again = await show({ match: older });
+    expect(again.querySelector(".detail-copies")).toBeNull();
+  });
+
   it("disables the buttons while the page says a request is in flight", async () => {
     await show({ saving: true, judging: true });
 
@@ -83,7 +141,7 @@ describe("the reading pane", () => {
     const container = await show({
       actions: (
         <button className="secondary-button" type="button">
-          Copy link
+          A product action
         </button>
       ),
     });
@@ -91,7 +149,7 @@ describe("the reading pane", () => {
     const actions = [...(container.querySelector(".match-actions")?.children ?? [])];
     expect(actions.map((node) => node.textContent)).toEqual([
       "Open conversation ↗",
-      "Copy link",
+      "A product action",
       "Save for later",
       "Describing the problem",
     ]);

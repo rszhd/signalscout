@@ -1,5 +1,6 @@
 ---
 id: US-359
+issue: 102
 title: The rules for one folder load only in that folder
 type: chore
 priority: p2

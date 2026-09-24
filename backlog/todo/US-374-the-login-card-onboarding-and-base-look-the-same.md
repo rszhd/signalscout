@@ -1,5 +1,6 @@
 ---
 id: US-374
+issue: 112
 title: The login card, onboarding and the remaining base rules look the same in both products
 type: chore
 priority: p2

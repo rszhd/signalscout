@@ -111,6 +111,7 @@ describe("the inbox", () => {
       // Checked before the list, because a verdict's URL starts with the
       // list's. The body is what the assertions below read.
       if (url.endsWith("/verdict")) return json({ verdict: "good", changed: false });
+      if (url.endsWith("/replied")) return json({ matchId: "match-1", replied: true });
       if (url.endsWith("/saved")) {
         return json({ matchId: "match-1", saved: true, savedAt: "2026-09-06T12:00:00.000Z" });
       }
@@ -126,6 +127,15 @@ describe("the inbox", () => {
     answerWith(pages, monitorRows);
     screen = await mount(<Inbox projectId={projectId} />, `/projects/${projectId}`);
     container = screen.container;
+  }
+
+  /** A tab of the Inbox/Saved/Replied switch, by its label. */
+  function viewButton(label: string): HTMLButtonElement {
+    const found = [...container.querySelectorAll(".inbox-views button")].find(
+      (element) => element.textContent?.trim() === label,
+    );
+    if (!(found instanceof HTMLButtonElement)) throw new Error(`No view says "${label}".`);
+    return found;
   }
 
   beforeEach(() => {
@@ -232,7 +242,7 @@ describe("the inbox", () => {
     it("asks the server for the saved list, which it orders differently", async () => {
       await show();
 
-      const picker = container.querySelector(".inbox-views button:last-child") as HTMLButtonElement;
+      const picker = viewButton("Saved");
 
       await act(async () => picker.click());
       await settle();
@@ -676,7 +686,7 @@ describe("the inbox", () => {
     it("does not offer an order on the saved list, which has its own", async () => {
       await show();
 
-      const picker = container.querySelector(".inbox-views button:last-child") as HTMLButtonElement;
+      const picker = viewButton("Saved");
 
       await act(async () => picker.click());
       await settle();
@@ -818,6 +828,139 @@ describe("the inbox", () => {
 
       const asked = fetchMock.mock.calls.map(([url]) => String(url));
       expect(asked.some((url) => url.includes("includeNotRelevant"))).toBe(false);
+    });
+  });
+
+  /**
+   * The person says they replied. US-396.
+   *
+   * The row stays, like a saved one, because a replied lead is still a lead —
+   * unless the person asked to hide replied matches, and then it leaves the
+   * way a dismissed one does.
+   */
+  describe("marking a match replied", () => {
+    const twoMatches = {
+      matches: [
+        match(),
+        match({
+          id: "match-2",
+          title: "A second conversation",
+          url: "https://reddit.com/r/SaaS/comments/def",
+        }),
+      ],
+      nextCursor: null,
+      asOf: "2026-09-05T12:00:00.000Z",
+    };
+
+    function repliedCalls(): unknown[] {
+      return fetchMock.mock.calls
+        .filter(([url]) => String(url).endsWith("/replied"))
+        .map(([, init]) => JSON.parse(String((init as RequestInit).body)));
+    }
+
+    it("sends the mark, keeps the row, and says so on the card and the button", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      await act(async () => button("Mark as replied").click());
+      await settle();
+
+      expect(repliedCalls()).toEqual([{ replied: true }]);
+      expect(container.querySelectorAll(".match-card")).toHaveLength(2);
+      expect(container.querySelector(".match-card .match-list-status")?.textContent).toBe(
+        "Replied",
+      );
+      const mark = [...container.querySelectorAll(".match-actions button")].find(
+        (element) => element.textContent?.trim() === "Replied",
+      );
+      expect(mark?.getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("asks the server to leave replied matches out when the filter says so", async () => {
+      await show();
+
+      await act(async () => button("Filters").click());
+      await act(async () => setValue(select("Replied"), "hide"));
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+      expect(asked.some((url) => url.includes("hideReplied=true"))).toBe(true);
+      expect(container.querySelector(".list-heading a")?.getAttribute("href")).toContain(
+        "hideReplied=true",
+      );
+    });
+
+    it("takes the row out and reads on when replied matches are hidden", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      await act(async () => button("Filters").click());
+      await act(async () => setValue(select("Replied"), "hide"));
+      await settle();
+      await act(async () => button("Mark as replied").click());
+      await settle();
+
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+      expect(container.querySelector(".detail-title")?.textContent).toBe("A second conversation");
+    });
+
+    it("asks the server for the replied list, which has its own order and heading", async () => {
+      await show();
+
+      const view = viewButton("Replied");
+      expect(view.textContent).toBe("Replied");
+      await act(async () => view.click());
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+      const last = asked.filter((url) => url.startsWith("/api/matches?")).at(-1) ?? "";
+      expect(last).toContain("replied=true");
+      expect(last).not.toContain("order=");
+      expect(last).not.toContain("saved=true");
+      expect(container.querySelector('select[aria-label="Order"]')).toBeNull();
+      expect(container.querySelector(".list-heading")?.textContent).toContain("Recently replied");
+    });
+
+    it("takes a match off the replied list when its mark is taken back", async () => {
+      await show({
+        "replied=true": {
+          ...twoMatches,
+          matches: twoMatches.matches.map((row) => ({ ...row, replied: true })),
+        },
+      });
+
+      const view = viewButton("Replied");
+      await act(async () => view.click());
+      await settle();
+
+      const mark = [...container.querySelectorAll(".match-actions button")].find(
+        (element) => element.textContent?.trim() === "Replied",
+      ) as HTMLButtonElement;
+      await act(async () => mark.click());
+      await settle();
+
+      expect(repliedCalls()).toEqual([{ replied: false }]);
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+    });
+
+    it("says how to fill the replied list when it is empty", async () => {
+      await show({ "replied=true": { matches: [], nextCursor: null, asOf: firstPage.asOf } });
+
+      const view = viewButton("Replied");
+      await act(async () => view.click());
+      await settle();
+
+      expect(container.textContent).toContain("No replies marked yet");
+    });
+
+    it("leaves the button as it was when the mark could not be stored", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      fetchMock.mockImplementation(async () => json({ message: "The database is down." }, 500));
+
+      await act(async () => button("Mark as replied").click());
+      await settle();
+
+      expect(button("Mark as replied").getAttribute("aria-pressed")).toBe("false");
+      expect(container.textContent).toContain("The database is down.");
     });
   });
 
@@ -1039,18 +1182,10 @@ describe("the inbox", () => {
       expect(listReads()).toBe(before);
     });
 
-    it("copies the item's address", async () => {
-      const writeText = vi.fn(async () => undefined);
-      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    it("offers no copy button: the address bar already holds the link", async () => {
       await show();
 
-      await act(async () => button("Copy link").click());
-      await settle();
-
-      expect(writeText).toHaveBeenCalledWith(
-        `${window.location.origin}/projects/${projectId}/matches/match-1`,
-      );
-      expect(container.textContent).toContain("Link copied");
+      expect(() => button("Copy link")).toThrow();
     });
   });
 

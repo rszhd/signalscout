@@ -50,6 +50,10 @@ import { FormError } from "./components/FormError.js";
  * matters more than it looks: a draft left over from the previous match, shown
  * beside this match's post, is the one mistake here that could be pasted into
  * a real thread.
+ *
+ * **A copy asks whether it was posted, and sets nothing.** US-396. The
+ * question is asked where the person already is; the answer is theirs,
+ * because a copied draft is not a posted one.
  */
 
 interface SavedPrompt {
@@ -72,7 +76,22 @@ function cost(micros: number | null): string {
   return micros === null ? "an unknown amount" : `$${(micros / 1_000_000).toFixed(4)}`;
 }
 
-export function ReplyDraft({ matchId }: { matchId: string }) {
+export interface ReplyDraftProps {
+  readonly matchId: string;
+  /** Whether the match is marked replied. US-396. */
+  readonly replied?: boolean;
+  /** A replied request is in flight. */
+  readonly marking?: boolean;
+  /** Absent on a page that does not store the mark, and then nothing is asked. */
+  readonly onReplied?: (replied: boolean) => void;
+}
+
+export function ReplyDraft({
+  matchId,
+  replied = false,
+  marking = false,
+  onReplied,
+}: ReplyDraftProps) {
   const [prompts, setPrompts] = useState<SavedPrompt[]>([]);
   const [promptId, setPromptId] = useState("");
   const [instruction, setInstruction] = useState("");
@@ -83,6 +102,9 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
   const [reply, setReply] = useState("");
   const [drafting, setDrafting] = useState(false);
   const [copied, setCopied] = useState(false);
+  // Not reset by an edit, unlike `copied`: the text changing does not
+  // un-ask whether the last copy was posted.
+  const [askPosted, setAskPosted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const customizeButton = useRef<HTMLButtonElement>(null);
   const customInstructionField = useRef<HTMLTextAreaElement>(null);
@@ -91,7 +113,17 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
 
   useEffect(() => {
     requestJson<{ prompts: SavedPrompt[] }>("/api/reply-prompts")
-      .then((body) => setPrompts(body.prompts))
+      .then((body) => {
+        setPrompts(body.prompts);
+        // Start on the first voice. The voice holds every rule a draft
+        // follows (US-405), so starting on none would draft with no rules.
+        // A choice already made is left alone.
+        const first = body.prompts[0];
+        if (first) {
+          setPromptId((current) => current || first.id);
+          setInstruction((current) => current || first.instruction);
+        }
+      })
       .catch(() => {
         // A prompt list that will not load must not stop somebody drafting
         // without one. The button below works with no prompts at all.
@@ -166,6 +198,7 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
     try {
       await navigator.clipboard.writeText(reply);
       setCopied(true);
+      setAskPosted(true);
     } catch {
       // A browser that refuses the clipboard leaves the text selectable, which
       // is why the draft is a textarea and not a paragraph.
@@ -275,8 +308,8 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
               <label className="field">
                 <span>Instructions for this draft</span>
                 <small>
-                  Optional. Adjust the voice or tell the model what matters in this reply. It cannot
-                  make the draft open with your product or invent facts about it.
+                  These words are all the model is told about how to write this reply, including
+                  what it may say about your product.
                 </small>
                 <textarea
                   ref={customInstructionField}
@@ -365,6 +398,30 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
               {draft.model} · {cost(draft.estimatedCostMicros)} estimated
             </span>
           </div>
+
+          {/* Present and empty until a copy, so a screen reader hears the
+              question when it appears. */}
+          {onReplied && (
+            <div className="reply-draft-posted" role="status">
+              {askPosted &&
+                (replied ? (
+                  <span>Marked as replied.</span>
+                ) : (
+                  <>
+                    <span>Did you post it?</span>
+                    <button
+                      aria-label="Yes, mark as replied"
+                      className="secondary-button"
+                      disabled={marking}
+                      type="button"
+                      onClick={() => onReplied(true)}
+                    >
+                      Yes, mark as replied
+                    </button>
+                  </>
+                ))}
+            </div>
+          )}
         </div>
       )}
     </section>

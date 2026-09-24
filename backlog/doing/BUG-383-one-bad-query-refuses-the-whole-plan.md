@@ -1,5 +1,6 @@
 ---
 id: BUG-383
+issue: 97
 title: One bad query refuses the whole plan
 type: bug
 priority: p1

@@ -505,6 +505,13 @@
       "when": 1790264086432,
       "tag": "0071_a_copy_of_a_post_is_not_scored_again",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1790265703836,
+      "tag": "0072_the_shipped_reply_voices_carry_their_rules",
+      "breakpoints": true
     }
   ]
 }

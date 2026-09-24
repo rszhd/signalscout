@@ -436,8 +436,8 @@ export function ReplyVoices() {
                 </details>
 
                 <p className="reply-voice-boundary">
-                  A voice can guide style, but it cannot make a draft open with your product or
-                  invent facts about it.
+                  A voice is all the AI is told about how to write, including what it may say about
+                  your product. Keep the rules you want every draft to follow.
                 </p>
 
                 {error && <FormError>{error}</FormError>}

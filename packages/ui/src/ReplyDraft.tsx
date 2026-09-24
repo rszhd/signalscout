@@ -113,7 +113,17 @@ export function ReplyDraft({
 
   useEffect(() => {
     requestJson<{ prompts: SavedPrompt[] }>("/api/reply-prompts")
-      .then((body) => setPrompts(body.prompts))
+      .then((body) => {
+        setPrompts(body.prompts);
+        // Start on the first voice. The voice holds every rule a draft
+        // follows (US-405), so starting on none would draft with no rules.
+        // A choice already made is left alone.
+        const first = body.prompts[0];
+        if (first) {
+          setPromptId((current) => current || first.id);
+          setInstruction((current) => current || first.instruction);
+        }
+      })
       .catch(() => {
         // A prompt list that will not load must not stop somebody drafting
         // without one. The button below works with no prompts at all.
@@ -298,8 +308,8 @@ export function ReplyDraft({
               <label className="field">
                 <span>Instructions for this draft</span>
                 <small>
-                  Optional. Adjust the voice or tell the model what matters in this reply. It cannot
-                  make the draft open with your product or invent facts about it.
+                  These words are all the model is told about how to write this reply, including
+                  what it may say about your product.
                 </small>
                 <textarea
                   ref={customInstructionField}

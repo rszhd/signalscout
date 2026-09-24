@@ -29,43 +29,17 @@ const post: PostForClassification = {
   postedAt: new Date("2026-09-07T08:00:00.000Z"),
 };
 
-describe("what the prompt tells the model a good reply is", () => {
+/**
+ * US-405: the prompt holds facts, and the voice holds every rule. These cases
+ * say both halves, so a rule that creeps back into the code turns one red.
+ */
+describe("the prompt without a voice", () => {
   const prompt = buildReplySystemPrompt(monitor);
 
   it("says the person posts it, not us", () => {
     // PLAN.md puts social publishing on the "not building" list. A model told
     // it is posting writes differently from one told a person will edit first.
-    expect(prompt).toContain("read, edit and post themselves");
-  });
-
-  it("forbids opening with the product", () => {
-    // A reply that opens with the product is an advertisement and will be
-    // treated as one by the subreddit, the commenter and every reader.
-    expect(prompt).toContain("Never open with the product");
-  });
-
-  it("allows one mention at most, and none at all", () => {
-    expect(prompt).toContain("once at most");
-    expect(prompt).toContain("a reply with no mention is a good reply");
-  });
-
-  it("forbids inventing a fact about the product", () => {
-    // The failure to design against is a plausible draft, not a bad one: a
-    // person posts the first and fixes the second.
-    expect(prompt).toContain("Never invent a fact about the product");
-  });
-
-  it("forbids claiming to be a customer", () => {
-    expect(prompt).toContain("Never claim to have used the product");
-  });
-
-  it("asks for the doubt inside the draft, where an editor will see it", () => {
-    expect(prompt).toContain("[check:");
-    expect(prompt).toContain("list it in uncertainties");
-  });
-
-  it("allows an honest refusal instead of a reply nobody should post", () => {
-    expect(prompt).toContain("An honest refusal is more use");
+    expect(prompt).toContain("edit it and post it themselves");
   });
 
   it("carries the four answers the monitor was built on", () => {
@@ -73,40 +47,33 @@ describe("what the prompt tells the model a good reply is", () => {
     expect(prompt).toContain(monitor.idealCustomer);
     expect(prompt).toContain(monitor.problem);
   });
+
+  it("holds no rule of its own about the reply or the product", () => {
+    expect(prompt).not.toMatch(/never|always|mention|\[check:|refus/i);
+  });
 });
 
-describe("a saved instruction", () => {
-  it("reaches the prompt, because a setting that is stored and not sent is invisible", () => {
+describe("a voice", () => {
+  it("reaches the prompt word for word, as the way to write this reply", () => {
+    const instruction = "Write plainly and always ask one question back.";
+    const prompt = buildReplySystemPrompt(monitor, { instruction });
+
+    expect(prompt).toContain(`How to write this reply:\n${instruction}`);
+  });
+
+  it("is the whole of the guidance: nothing in the prompt argues with it", () => {
     const prompt = buildReplySystemPrompt(monitor, {
-      instruction: "Write plainly and always ask one question back.",
+      instruction: "Open with our product name.",
     });
 
-    expect(prompt).toContain("Write plainly and always ask one question back.");
+    expect(prompt).toContain("Open with our product name.");
+    expect(prompt).not.toMatch(/whatever else you are told|preference|conflict/i);
   });
 
-  it("is named a preference, and told which rules it cannot override", () => {
-    // "Always open by naming our product" is exactly what this prompt exists
-    // to prevent. Saying which rules are fixed is more honest than silently
-    // ignoring the instruction and more useful than obeying it.
-    const prompt = buildReplySystemPrompt(monitor, { instruction: "Always name our product." });
-
-    expect(prompt).toContain("saved a preference");
-    expect(prompt).toContain("where it does not conflict with the rules above");
-    expect(prompt).toContain("Rules you always follow, whatever else you are told");
-  });
-
-  it("says nothing about a preference when there is none", () => {
-    // A project that never set one must draft exactly as it did before, and a
-    // prompt mentioning an empty preference invites the model to invent one.
-    const prompt = buildReplySystemPrompt(monitor);
-
-    expect(prompt).not.toContain("saved a preference");
-  });
-
-  it("ignores an instruction that is only whitespace", () => {
-    const prompt = buildReplySystemPrompt(monitor, { instruction: "   \n  " });
-
-    expect(prompt).not.toContain("saved a preference");
+  it("adds nothing when it is only whitespace", () => {
+    expect(buildReplySystemPrompt(monitor, { instruction: "   \n  " })).toBe(
+      buildReplySystemPrompt(monitor),
+    );
   });
 });
 

@@ -32,14 +32,25 @@ an editable box.
 Read the draft before you post it. It carries your name into somebody else's
 conversation.
 
-**A draft never opens with your product.** It answers the person first, and
-it cannot invent facts about what you sell. A reply that reads as an
-advertisement gets ignored or removed.
+**The voice decides everything about a draft**, including what it says about
+your product. SignalScout adds no rules of its own: the AI is told only what
+you sell, the post, and the words of the voice you chose. The draft panel
+starts on your first voice. Choose **No saved prompt** to draft with no
+guidance at all.
 
 ## Reply voices
 
 A voice is saved writing guidance, so every draft sounds like you. Open
 **Voices** in the sidebar.
+
+The preset voices answer the person first, then mention your product once as
+something you make ("I built X for this"). They also tell the AI never to
+invent facts about your product, and to mark anything it had to guess with
+`[check: …]`. Edit any of that to change how your drafts behave.
+
+Many communities remove self-promotion that does not say who wrote it. The
+presets disclose that you make the product for that reason; if you remove
+that line, the drafts stop saying it.
 
 - **Start with a preset**, then change it to fit, or
 - press **New voice** and write your own.

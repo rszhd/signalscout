@@ -270,12 +270,31 @@ describe("the saved prompts", () => {
     expect(document.activeElement).toBe(button("Customize"));
   });
 
-  it("offers the ones the account has, and none by default", async () => {
-    server({ prompts: { prompts: [prompt()] } });
+  /**
+   * US-405: the voice holds every rule a draft follows, so the panel starts on
+   * one. "No saved prompt" is still there, and choosing it drafts with none.
+   */
+  it("offers the ones the account has, and starts on the first", async () => {
+    const first = prompt();
+    const second = prompt({ id: "1f0f5e0a-0000-4000-8000-000000000002", name: "Second" });
+    server({ prompts: { prompts: [first, second] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
+    await settle();
 
     expect(text()).toContain("No saved prompt");
-    expect(text()).toContain("Short and plain");
+    expect(select("Saved prompt").value).toBe(first.id);
+  });
+
+  it("sends the first voice's words when nobody chose another", async () => {
+    const first = prompt();
+    const { calls } = server({ prompts: { prompts: [first] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+    await settle();
+
+    await press("Draft reply");
+
+    const drafted = calls.find((call) => call.url.includes("/draft"));
+    expect(drafted?.body).toEqual({ instruction: first.instruction });
   });
 
   it("sends the chosen one's words with the draft request", async () => {
@@ -292,10 +311,13 @@ describe("the saved prompts", () => {
     expect(drafted?.body).toEqual({ instruction: saved.instruction });
   });
 
-  it("sends no instruction when the box is empty", async () => {
+  it("sends no instruction when the person chooses no saved prompt", async () => {
     const { calls } = server({ prompts: { prompts: [prompt()] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
+    await settle();
 
+    setValue(select("Saved prompt"), "");
+    await settle();
     await press("Draft reply");
 
     expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({ instruction: null });
@@ -317,13 +339,13 @@ describe("the saved prompts", () => {
     expect(area?.value).toBe(saved.instruction);
   });
 
-  it("says an instruction cannot override the rules that keep a draft honest", async () => {
+  it("says the words are all the model is told", async () => {
     server({ prompts: { prompts: [] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
     await press("Customize");
 
-    expect(text()).toContain("cannot make the draft open with your product");
+    expect(text()).toContain("all the model is told about how to write this reply");
   });
 });
 

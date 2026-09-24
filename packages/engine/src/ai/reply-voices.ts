@@ -1,24 +1,23 @@
 /**
  * Reply voices somebody can start from.
  *
- * US-065. The voices page opened on an empty box and the words "Create your
- * first reply voice", which is the hardest screen in the product to answer: a
- * person who has never written one does not know what a good instruction looks
- * like, and the ones they guess at tend to ask for the thing the prompt
- * refuses.
+ * US-065 wrote them as starting points; US-405 made each one the whole of the
+ * guidance. **Every rule is here, in words a person can read and change.**
+ * `reply.ts` gives the model only the facts — the task, the product, the post
+ * — so a voice that says nothing about the product gets a draft that says
+ * nothing sensible about it, and a person who deletes a rule has decided to.
  *
- * **These are starting points, not settings.** Choosing one fills the form; it
- * is saved, edited and deleted like any voice a person writes. Nothing here is
- * applied by default, and a deployment that ignores them behaves exactly as it
- * did.
+ * Each voice is complete on its own, because a person picks one voice per
+ * draft. They share the same product, honesty and uncertainty rules, written
+ * once below and copied into each text; what differs is the shape of the
+ * answer. The copies are saved to every account (`seedPresetReplyVoices`), so
+ * a later change here reaches a saved voice only through a migration that
+ * rewrites the rows still holding the old words.
  *
- * **Each one is grounded in something this repository measured**, not in
- * general advice about writing. The reason is in each `why`, and it is shown
- * on the screen — a preset a person does not understand is one they cannot
- * edit sensibly.
- *
- * None of them can override `ai/reply.ts`'s fixed rules, and none tries to.
- * They steer register, length and shape.
+ * **The product is mentioned, after the answer, as the person's own.** The
+ * owner asked for drafts that sell. A mention that says "I built it" is the
+ * one a subreddit tolerates and the one Reddit's own rules ask for; a hidden
+ * plug is the one that gets an account banned.
  */
 
 export interface ReplyVoicePreset {
@@ -30,19 +29,47 @@ export interface ReplyVoicePreset {
   readonly why: string;
 }
 
+/** How the product enters a reply. Shared by every voice below. */
+const productRules = [
+  "The product:",
+  "- Answer the person first. Mention the product only after that.",
+  '- Mention it once, as something you make: say "I built X" or "we make X",',
+  "  so nobody reads it as a hidden ad. Say what it does for their problem in",
+  "  one sentence.",
+  "- Say only what the product description says. Never invent a feature, a",
+  "  price, a customer, a result or a number.",
+  "- If the product does not fit what they asked, leave it out and write",
+  "  [check: the product does not fit this post] in the draft instead.",
+];
+
+/** What keeps a draft honest. Shared by every voice below. */
+const honestyRules = [
+  "Honesty:",
+  "- Never claim to be a customer of the product or to have used it as one.",
+  "- If you had to guess at anything — what they use now, what they meant, whether",
+  "  the product fits — write the doubt into the draft as [check: …] and list it",
+  "  in uncertainties.",
+  "- If this is not a post you can usefully answer, say so in the reply field",
+  "  instead of writing a reply.",
+];
+
+function voice(shape: readonly string[]): string {
+  return [...shape, "", ...productRules, "", ...honestyRules].join("\n");
+}
+
 export const replyVoicePresets: readonly ReplyVoicePreset[] = [
   {
     id: "answer-first",
     name: "Answer first",
     why: "The shape that works everywhere: useful on its own, whether or not anyone clicks.",
-    instruction: [
+    instruction: voice([
       "Answer the question in the first sentence. Give the specific thing you",
       "would tell a friend — a method, a trade-off, a number — not a summary of",
       "the problem they already described.",
       "",
-      "Keep it to three or four sentences. Do not restate their question back to",
-      "them, and do not open with praise.",
-    ].join("\n"),
+      "Keep it to three to five sentences. Do not restate their question back to",
+      "them, and do not open with praise. No greeting and no sign-off.",
+    ]),
   },
   {
     id: "reddit-regular",
@@ -50,15 +77,14 @@ export const replyVoicePresets: readonly ReplyVoicePreset[] = [
     why:
       "Subreddits treat a reply that opens with a product as an advertisement, and " +
       "so does everybody reading it.",
-    instruction: [
+    instruction: voice([
       "Write the way a regular in this subreddit writes: lower case is fine, no",
       "marketing words, no em dashes stacked into a pitch. Name what you would",
       "actually do, including the boring option.",
       "",
-      "If you mention a tool at all, mention it the way somebody lists what they",
-      "use — one clause, alongside the alternatives they are already weighing.",
-      "If the question does not call for a tool, do not name one.",
-    ].join("\n"),
+      "Mention the product the way a regular mentions what they built — one",
+      "sentence at the end, next to the alternatives they are already weighing.",
+    ]),
   },
   {
     id: "one-good-question",
@@ -66,15 +92,15 @@ export const replyVoicePresets: readonly ReplyVoicePreset[] = [
     why:
       "A post that is complaining rather than asking needs a conversation opened, " +
       "not an answer closed.",
-    instruction: [
+    instruction: voice([
       "Answer briefly, then end with exactly one question that is genuinely",
       "worth answering — something specific about their setup that would change",
       "what you would advise.",
       "",
-      "Never ask a question whose real purpose is to start a sales conversation.",
-      "'What are you using now?' is fine when the answer would change your",
-      "advice, and hollow when it would not.",
-    ].join("\n"),
+      "Put the product mention before the question, not in it. 'What are you",
+      "using now?' is fine when the answer would change your advice, and hollow",
+      "when it is only there to start a sales conversation.",
+    ]),
   },
   {
     id: "technical-detail",
@@ -82,14 +108,14 @@ export const replyVoicePresets: readonly ReplyVoicePreset[] = [
     why:
       "On LinkedIn the noise is on-topic expertise-signalling; naming a mechanism " +
       "is what separates an answer from an article.",
-    instruction: [
+    instruction: voice([
       "Be concrete and technical. Name the mechanism, the setting, the failure",
       "mode — the specific detail somebody could act on this afternoon.",
       "",
       "Avoid the register of a thought-leadership post: no opening line designed",
       "to be quotable, no list of three principles, no closing summary. If you",
       "cannot say something specific, say the one thing you would check first.",
-    ].join("\n"),
+    ]),
   },
   {
     id: "short-comment",
@@ -97,13 +123,13 @@ export const replyVoicePresets: readonly ReplyVoicePreset[] = [
     why:
       "Under a video the median comment is a few dozen characters, and a paragraph " +
       "reads as an advertisement whatever it says.",
-    instruction: [
-      "One or two sentences, and under about forty words. Plain, direct, no",
+    instruction: voice([
+      "Two sentences at most, and under about fifty words. Plain, direct, no",
       "greeting and no sign-off.",
       "",
-      "Match the register of a comment section rather than a forum post. If the",
-      "useful answer does not fit in two sentences, give the single most useful",
-      "part of it and stop.",
-    ].join("\n"),
+      "Match the register of a comment section rather than a forum post. Give the",
+      "single most useful part of the answer, then the product in one short",
+      'clause: "(I built X for this.)"',
+    ]),
   },
 ];

@@ -4,34 +4,33 @@ import { Field } from "./components/Field.js";
 import { LoginFrame } from "./LoginFrame.js";
 
 /**
- * A stand-in for the form. The real card is each application's, with its own
- * rules in its own `login.css`, so it is plain here on purpose.
+ * A stand-in for a screen, in the shape the frame lays out: the heading on
+ * the left, the form on the right, the buttons in one row at its end.
  */
 function Form() {
   return (
-    <form
-      style={{
-        display: "grid",
-        gap: 16,
-        width: "100%",
-        maxWidth: 440,
-        justifySelf: "center",
-        padding: 32,
-        borderRadius: 12,
-        background: "var(--surface)",
-      }}
-    >
-      <h1 style={{ margin: 0 }}>Sign in</h1>
-      <Field label="Email">
-        <input type="email" placeholder="you@example.com" />
-      </Field>
-      <Field label="Password">
-        <input type="password" placeholder="Enter your password" />
-      </Field>
-      <Button variant="primary" type="submit">
-        Sign in
-      </Button>
-    </form>
+    <section className="login-card" aria-labelledby="story-login-title">
+      <div className="login-head">
+        <h1 id="story-login-title">Sign in</h1>
+        <p className="page-subtitle">Use your SignalScout account.</p>
+      </div>
+      <form className="login-body field-stack">
+        <Field label="Email">
+          <input type="email" placeholder="you@example.com" />
+        </Field>
+        <Field label="Password">
+          <input type="password" placeholder="Enter your password" />
+        </Field>
+        <div className="login-actions">
+          <button type="button" className="login-text-button">
+            Create an account
+          </button>
+          <Button variant="primary" type="submit">
+            Sign in
+          </Button>
+        </div>
+      </form>
+    </section>
   );
 }
 
@@ -46,11 +45,3 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Hosted: Story = {};
-
-/** Self-hosted says whose accounts and keys these are, under the story. */
-export const SelfHosted: Story = {
-  args: {
-    storyNote: "Your accounts. Your API keys. Your data.",
-    footer: "AI intent monitoring you can self-host.",
-  },
-};

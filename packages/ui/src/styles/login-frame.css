@@ -1,155 +1,237 @@
 /*
- * `LoginFrame`: the page around a sign-in form. US-354.
+ * `LoginFrame` and the screens inside it. US-354.
  *
- * The hosted look: a flat story panel beside the form. The form's card is
- * each application's, in its own `login.css`.
+ * In the shape of Google's own sign-in: a pale page, one wide card with the
+ * mark at its top, the heading on the left and the form on the right, and
+ * the buttons in one row at the end. On a phone the card is the page, in one
+ * column. Both applications' sign-in screens take their whole look from here.
  */
 
 .login-page {
-  display: flex;
-  flex-direction: column;
   min-height: 100svh;
-  padding: var(--space-8) var(--page-gutter);
-  background: var(--background);
-}
-
-.login-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-6);
-  width: min(1120px, 100%);
-  margin: 0 auto;
-}
-
-.login-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--ink);
-  font-size: 1.0625rem;
-  font-weight: 600;
-}
-
-.login-header-note,
-.login-footer,
-.login-story-footer {
-  color: var(--muted);
-  font-size: var(--text-xs);
-}
-
-.login-layout {
   display: grid;
-  flex: 1;
-  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
-  align-items: center;
-  gap: var(--space-12);
-  width: min(1120px, 100%);
-  margin: var(--space-12) auto;
+  place-items: center;
+  padding: var(--space-8) var(--page-gutter);
+  background: color-mix(in srgb, var(--accent-soft) 45%, var(--background));
 }
 
-.login-story {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 560px;
-  padding: var(--space-12) var(--space-8);
-  border-radius: var(--radius-md);
-  background: var(--accent-soft);
+.login-column {
+  width: min(960px, 100%);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.login-shell {
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.login-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--space-12);
+  margin-top: var(--space-4);
 }
 
 .login-eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.login-card h1 {
   margin: 0 0 var(--space-4);
-  color: var(--accent-text);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: normal;
+  font-size: 2.25rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
-.login-story h2 {
+.login-card .page-subtitle {
   margin: 0;
-  font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.04em;
-}
-
-.login-story-copy {
-  max-width: 44ch;
-  margin: var(--space-5) 0 var(--space-8);
-  color: var(--muted-strong);
+  color: var(--ink);
   font-size: var(--text-body);
-  line-height: 1.65;
+  line-height: 1.5;
 }
 
-.login-story-points {
+.login-body {
   display: grid;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--surface-brand);
-  list-style: none;
+  gap: var(--space-5);
+  padding: var(--space-2) 0 0;
 }
 
-.login-story-points li {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-4) 0;
-  border-bottom: 1px solid var(--surface-brand);
+/*
+  Outlined fields with the label on the top border, as in Google's forms.
+  The label is set once, above the value, so it never has to move.
+*/
+.login-card .field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.login-story-points li > span {
-  color: var(--accent-text);
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-.login-story-points p {
-  display: grid;
-  gap: var(--space-1);
-  margin: 0;
+.login-card .field > span {
+  position: absolute;
+  top: 0;
+  left: var(--space-3);
+  z-index: 1;
+  padding: 0 var(--space-1);
+  background: var(--surface);
   color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.login-card .field:focus-within > span {
+  color: var(--accent);
+}
+
+.login-card .field input {
+  order: 1;
+  min-height: 56px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-body);
+}
+
+.login-card .field input:hover {
+  border-color: var(--muted);
+}
+
+.login-card .field input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/*
+  A field the browser filled in keeps the card's white. Chrome paints it pale
+  blue otherwise, and the label on the top border then sits in a white patch
+  cut into a blue field.
+*/
+.login-card .field input:autofill {
+  box-shadow: inset 0 0 0 100px var(--surface);
+  -webkit-text-fill-color: var(--ink);
+}
+
+.login-card .field input:autofill:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--accent),
+    inset 0 0 0 100px var(--surface);
+}
+
+.login-card .field input::placeholder {
+  color: var(--muted);
+}
+
+.login-card .field small {
+  order: 2;
+  margin: var(--space-1) 0 0 var(--space-4);
+  font-size: var(--text-xs);
+}
+
+.login-text-link {
+  justify-self: start;
+  margin-top: calc(var(--space-2) * -1);
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-text-link:hover {
+  text-decoration: underline;
+}
+
+/* The other way in on the left, the way forward on the right. */
+.login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.login-text-button {
+  min-height: var(--control-height);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: 999px;
+  color: var(--accent-text);
+  background: none;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.login-text-button:hover {
+  background: var(--accent-soft);
+}
+
+.login-actions .primary-button {
+  padding: 0 var(--space-6);
+}
+
+.login-note {
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--muted-strong);
+  background: var(--surface-soft);
   font-size: var(--text-sm);
   line-height: 1.6;
 }
 
-.login-story-points strong {
-  color: var(--ink);
-  font-weight: 500;
-}
-
-.login-story-footer {
-  margin: var(--space-6) 0 0;
-}
-
 .login-footer {
-  width: min(1120px, 100%);
-  margin: 0 auto;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-5);
+  padding: 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
 }
 
-@media (max-width: 820px) {
-  .login-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .login-story {
-    width: min(480px, 100%);
-    min-height: 0;
-    justify-self: center;
-  }
-}
-
-@media (max-width: 440px) {
+@media (max-width: 720px) {
   .login-page {
-    padding: var(--space-6) var(--space-5);
+    place-items: start stretch;
+    padding: 0;
+    background: var(--surface);
   }
 
-  .login-header-note {
-    display: none;
+  .login-column {
+    width: 100%;
+    min-height: 100svh;
+    grid-template-rows: 1fr auto;
   }
 
-  .login-story {
-    padding: var(--space-6);
+  .login-shell {
+    padding: var(--space-8) var(--space-5);
+    border-radius: 0;
+  }
+
+  .login-card {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-6);
+  }
+
+  .login-card h1 {
+    font-size: 1.75rem;
+  }
+
+  .login-footer {
+    justify-content: center;
+    padding: 0 var(--space-5) var(--space-6);
   }
 }

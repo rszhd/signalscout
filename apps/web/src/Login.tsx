@@ -157,10 +157,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
   }
 
   return (
-    <LoginFrame
-      storyNote="Your accounts. Your API keys. Your data."
-      footer="AI intent monitoring you can self-host."
-    >
+    <LoginFrame>
       {sentTo ? (
         /*
             Where the person goes next is their inbox, so this replaces the
@@ -169,13 +166,16 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
             again and sends a second link.
           */
         <section className="login-card" aria-labelledby="login-title">
-          <p className="login-eyebrow">One more step</p>
-          <h1 id="login-title">Check your email</h1>
-          <p className="page-subtitle">
-            We sent a confirmation link to <strong>{sentTo}</strong>. Open it to finish signing in.
-            The link works for 24 hours.
-          </p>
-          {/*
+          <div className="login-head">
+            <p className="login-eyebrow">One more step</p>
+            <h1 id="login-title">Check your email</h1>
+            <p className="page-subtitle">
+              We sent a confirmation link to <strong>{sentTo}</strong>. Open it to finish signing
+              in. The link works for 24 hours.
+            </p>
+          </div>
+          <div className="login-body">
+            {/*
               The second sentence is the one that matters, and it is here
               because a person met this screen and read it as the product
               being broken.
@@ -189,40 +189,44 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
               possibility leaks nothing: it is true of every address, and it is
               the one way out of the loop.
             */}
-          <p className="login-note">
-            Nothing arrived? Look in the spam folder. If you already have an account with this
-            address, no link is sent — sign in instead. Signing in also sends a new link if you
-            still need one.
-          </p>
-          <p className="login-switch">
-            <button
-              type="button"
-              onClick={() => {
-                setSentTo(null);
-                setRegistering(false);
-                setPassword("");
-                setError(null);
-              }}
-            >
-              Back to sign in
-            </button>
-          </p>
+            <p className="login-note">
+              Nothing arrived? Look in the spam folder. If you already have an account with this
+              address, no link is sent — sign in instead. Signing in also sends a new link if you
+              still need one.
+            </p>
+            <div className="login-actions">
+              <button
+                type="button"
+                className="login-text-button"
+                onClick={() => {
+                  setSentTo(null);
+                  setRegistering(false);
+                  setPassword("");
+                  setError(null);
+                }}
+              >
+                Back to sign in
+              </button>
+            </div>
+          </div>
         </section>
       ) : (
         <section className="login-card" aria-labelledby="login-title">
-          <p className="login-eyebrow">{signingUp ? "Get started" : "Welcome back"}</p>
-          <h1 id="login-title">
-            {firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}
-          </h1>
-          <p className="page-subtitle">
-            {firstRun
-              ? "This instance has no account yet. The first one is yours, and signup closes behind it."
-              : signingUp
-                ? "Your monitors, matches and saved replies are your own."
-                : "Sign in to read your inbox."}
-          </p>
+          <div className="login-head">
+            <h1 id="login-title">
+              {firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}
+            </h1>
+            {firstRun ? (
+              <p className="page-subtitle">
+                This instance has no account yet. The first one is yours, and signup closes behind
+                it.
+              </p>
+            ) : (
+              !signingUp && <p className="page-subtitle">Use your SignalScout account.</p>
+            )}
+          </div>
 
-          <form className="field-stack" onSubmit={submit} aria-busy={busy}>
+          <form className="login-body field-stack" onSubmit={submit} aria-busy={busy}>
             {signingUp && (
               <label className="field">
                 <span>Your name</span>
@@ -272,38 +276,39 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
 
             {error && <FormError>{error}</FormError>}
 
-            <button className="primary-button" disabled={busy} type="submit">
-              {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}
-            </button>
-          </form>
+            {firstRun && (
+              <p className="login-note">
+                Put this instance behind TLS before you open it to the internet. It holds provider
+                keys that spend money.
+              </p>
+            )}
 
-          {/*
-          Only where a second account is actually possible. On a closed instance
-          this is absent rather than disabled: an offer that refuses is worse
-          than no offer, because somebody will fill the form in first.
-        */}
-          {!firstRun && signUpOpen && (
-            <p className="login-switch">
-              {registering ? "Already have an account? " : "New here? "}
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  setRegistering(!registering);
-                  setError(null);
-                }}
-              >
-                {registering ? "Sign in" : "Create an account"}
+            {/* The other way in on the left, the way forward on the right. */}
+            <div className="login-actions">
+              {/*
+                Only where a second account is actually possible. On a closed
+                instance this is absent rather than disabled: an offer that
+                refuses is worse than no offer, because somebody will fill the
+                form in first.
+              */}
+              {!firstRun && signUpOpen && (
+                <button
+                  type="button"
+                  className="login-text-button"
+                  disabled={busy}
+                  onClick={() => {
+                    setRegistering(!registering);
+                    setError(null);
+                  }}
+                >
+                  {registering ? "Sign in" : "Create an account"}
+                </button>
+              )}
+              <button className="primary-button" disabled={busy} type="submit">
+                {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}
               </button>
-            </p>
-          )}
-
-          {firstRun && (
-            <p className="login-note">
-              Put this instance behind TLS before you open it to the internet. It holds provider
-              keys that spend money.
-            </p>
-          )}
+            </div>
+          </form>
         </section>
       )}
     </LoginFrame>

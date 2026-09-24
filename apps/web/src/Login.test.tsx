@@ -266,7 +266,7 @@ describe("the login screen", () => {
     // The wording changed in US-066 and the assertion moved with it. It used
     // to say "This instance is private", which is true of a self-hosted box and
     // false of a cloud tier taking registrations; one sentence now serves both.
-    expect(screen.container.textContent).toContain("Sign in to read your inbox");
+    expect(screen.container.textContent).toContain("Use your SignalScout account.");
     // No sidebar, no inbox, and nothing fetched behind the form.
     expect(screen.container.querySelector("nav")).toBeNull();
     expect(screen.container.querySelector(".topbar h1")).toBeNull();

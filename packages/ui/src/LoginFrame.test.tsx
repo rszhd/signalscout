@@ -16,31 +16,29 @@ afterEach(async () => {
 });
 
 describe("the login frame", () => {
-  it("puts the form beside the story, and says the hosted footer by default", async () => {
+  it("puts the mark at the top of one card, the screen under it, and no row by default", async () => {
     screen = await mount(
       <LoginFrame>
         <form aria-label="Sign in" />
       </LoginFrame>,
     );
-    const layout = screen.container.querySelector(".login-layout");
+    const shell = screen.container.querySelector(".login-shell");
 
-    expect(layout?.lastElementChild?.getAttribute("aria-label")).toBe("Sign in");
-    expect(screen.container.querySelector(".login-footer")?.textContent).toBe(
-      "AI intent monitoring.",
-    );
-    expect(screen.container.querySelector(".login-story-footer")).toBeNull();
+    expect(shell?.firstElementChild?.getAttribute("src")).toBe("/brand/mark.svg");
+    expect(shell?.lastElementChild?.getAttribute("aria-label")).toBe("Sign in");
+    // A product that says nothing about itself gets no row under the card.
+    expect(screen.container.querySelector(".login-footer")).toBeNull();
   });
 
-  it("says what the product passes under the story and in the footer", async () => {
+  it("says what the product passes in the row under the card", async () => {
     screen = await mount(
-      <LoginFrame storyNote="Your data." footer="AI intent monitoring you can self-host.">
+      <LoginFrame storyNote="Your data." footer={<a href="/help">Help</a>}>
         <form />
       </LoginFrame>,
     );
+    const row = screen.container.querySelector(".login-footer");
 
-    expect(screen.container.querySelector(".login-story-footer")?.textContent).toBe("Your data.");
-    expect(screen.container.querySelector(".login-footer")?.textContent).toBe(
-      "AI intent monitoring you can self-host.",
-    );
+    expect(row?.firstElementChild?.textContent).toBe("Your data.");
+    expect(row?.lastElementChild?.getAttribute("href")).toBe("/help");
   });
 });

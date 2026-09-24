@@ -1,5 +1,6 @@
 ---
 id: US-357
+issue: 100
 title: An edit is formatted as it is written
 type: chore
 priority: p2

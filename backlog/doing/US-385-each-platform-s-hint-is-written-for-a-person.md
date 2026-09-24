@@ -1,5 +1,6 @@
 ---
 id: US-385
+issue: 99
 title: Each platform's hint is written for a person
 type: chore
 priority: p2

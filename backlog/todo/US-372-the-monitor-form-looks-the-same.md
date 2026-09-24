@@ -1,5 +1,6 @@
 ---
 id: US-372
+issue: 110
 title: The monitor form looks the same in both products
 type: chore
 priority: p2

@@ -1,5 +1,6 @@
 ---
 id: US-366
+issue: 109
 title: An eval run records what produced it
 type: chore
 priority: p2

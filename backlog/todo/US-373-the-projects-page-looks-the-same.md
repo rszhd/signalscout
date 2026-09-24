@@ -1,5 +1,6 @@
 ---
 id: US-373
+issue: 111
 title: The projects page and the project form look the same in both products
 type: chore
 priority: p2

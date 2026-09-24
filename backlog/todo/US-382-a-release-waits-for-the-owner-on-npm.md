@@ -1,5 +1,6 @@
 ---
 id: US-382
+issue: 113
 title: A release waits for the owner on npm
 type: chore
 priority: p2

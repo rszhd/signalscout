@@ -1,5 +1,6 @@
 ---
 id: US-384
+issue: 98
 title: The OpenAI recommendations move to GPT-6
 type: chore
 priority: p2

@@ -1,5 +1,6 @@
 ---
 id: US-364
+issue: 107
 title: The score is evaluated against human verdicts
 type: chore
 priority: p1

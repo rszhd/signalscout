@@ -62,7 +62,7 @@ does**: the files are on `origin/main` and `origin/dev` since `b913fba`.
   offsets point at the wrong words — so it now accepts only a span shaped
   like a name, and says to run it once per folder. LinkedIn provider tests:
   11 files, 376 tests pass.
-- 2026-09-24T12:53+08:00 — The first commit left the HarvestAPI capture on
+- 2026-09-24T12:55+08:00 — The first commit left the HarvestAPI capture on
   its own copy of the scrubber (restoring its fixtures folder from git undid
   the import) and failed lint on formatting. The follow-up fixes both, and a
   check on a mention after styled Unicode letters replaced the name, the

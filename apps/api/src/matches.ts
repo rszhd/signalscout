@@ -104,6 +104,11 @@ const query = z.object({
    */
   saved: z.stringbool().default(false),
   /**
+   * Only what this person said they replied to. US-399. A list of its own,
+   * ordered by when the reply was marked, like the saved one.
+   */
+  replied: z.stringbool().default(false),
+  /**
    * What to order the page by. US-114.
    *
    * An enum rather than a free string: it names a column and an expression, so
@@ -140,6 +145,7 @@ const countQuery = query
     projectId: true,
     minScore: true,
     saved: true,
+    replied: true,
     includeNotRelevant: true,
     hideReplied: true,
   })
@@ -195,6 +201,7 @@ export async function registerMatchRoutes(
         includeNotRelevant,
         hideReplied,
         saved,
+        replied,
         order,
       } = request.query;
 
@@ -208,6 +215,7 @@ export async function registerMatchRoutes(
         includeNotRelevant,
         hideReplied,
         savedOnly: saved,
+        repliedOnly: replied,
         order,
         asOf: asOf ? new Date(asOf) : undefined,
       });
@@ -283,8 +291,16 @@ export async function registerMatchRoutes(
       response: { 200: z.object({ count: z.number() }) },
     },
     handler: async (request) => {
-      const { monitorId, projectId, minScore, includeNotRelevant, hideReplied, saved, since } =
-        request.query;
+      const {
+        monitorId,
+        projectId,
+        minScore,
+        includeNotRelevant,
+        hideReplied,
+        saved,
+        replied,
+        since,
+      } = request.query;
 
       const count = await countNewMatches(db, {
         userId: sessionUserId(request),
@@ -294,6 +310,7 @@ export async function registerMatchRoutes(
         includeNotRelevant,
         hideReplied,
         savedOnly: saved,
+        repliedOnly: replied,
         since: new Date(since),
       });
 
@@ -479,6 +496,7 @@ export async function registerMatchRoutes(
         includeNotRelevant,
         hideReplied,
         saved,
+        replied,
         order,
       } = request.query;
 
@@ -503,6 +521,7 @@ export async function registerMatchRoutes(
           includeNotRelevant,
           hideReplied,
           savedOnly: saved,
+          repliedOnly: replied,
           order,
           limit: exportPageSize,
           cursor,

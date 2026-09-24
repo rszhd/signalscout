@@ -13,6 +13,12 @@ export interface InboxFiltersProps {
   /** The Saved view rather than the inbox. */
   readonly saved: boolean;
   readonly onSaved: (saved: boolean) => void;
+  /**
+   * The Replied view: what the person answered, newest reply first. US-399.
+   * Optional as a pair: without it the switch has two views, as before.
+   */
+  readonly repliedView?: boolean;
+  readonly onRepliedView?: (replied: boolean) => void;
   readonly monitors: readonly { readonly id: string; readonly name: string }[];
   readonly monitorId: string;
   readonly onMonitor: (monitorId: string) => void;
@@ -32,14 +38,16 @@ export interface InboxFiltersProps {
 }
 
 /**
- * The Inbox/Saved switch, the monitor picker, the order and the Filters
- * panel. The picker shows only when a project has more than one monitor: a
- * choice of one narrows nothing. The order is hidden in the Saved view, which
- * has an order of its own.
+ * The Inbox/Saved/Replied switch, the monitor picker, the order and the
+ * Filters panel. The picker shows only when a project has more than one monitor: a
+ * choice of one narrows nothing. The order is hidden in the Saved and Replied
+ * views, which have orders of their own.
  */
 export function InboxFilters({
   saved,
   onSaved,
+  repliedView = false,
+  onRepliedView,
   monitors,
   monitorId,
   onMonitor,
@@ -54,18 +62,52 @@ export function InboxFilters({
   onClear,
 }: InboxFiltersProps) {
   const [open, setOpen] = useState(false);
-  const count = activeFilters({ monitors, monitorId, minScore, showDismissed, hideReplied });
+  const count = activeFilters({
+    monitors,
+    monitorId,
+    minScore,
+    showDismissed,
+    // Not offered on the Replied view, so not counted there either.
+    hideReplied: hideReplied && !repliedView,
+  });
 
   return (
     <>
       <div className="inbox-toolbar">
         <fieldset className="view-switch inbox-views" aria-label="Which matches">
-          <button type="button" aria-pressed={!saved} onClick={() => onSaved(false)}>
+          {/* The views are exclusive: each button turns the others off. */}
+          <button
+            type="button"
+            aria-pressed={!saved && !repliedView}
+            onClick={() => {
+              onRepliedView?.(false);
+              onSaved(false);
+            }}
+          >
             Inbox
           </button>
-          <button type="button" aria-pressed={saved} onClick={() => onSaved(true)}>
+          <button
+            type="button"
+            aria-pressed={saved}
+            onClick={() => {
+              onRepliedView?.(false);
+              onSaved(true);
+            }}
+          >
             Saved
           </button>
+          {onRepliedView && (
+            <button
+              type="button"
+              aria-pressed={repliedView}
+              onClick={() => {
+                onSaved(false);
+                onRepliedView(true);
+              }}
+            >
+              Replied
+            </button>
+          )}
         </fieldset>
         <div className="inbox-filters">
           {monitors.length > 1 && (
@@ -86,7 +128,7 @@ export function InboxFilters({
             </label>
           )}
 
-          {!saved && (
+          {!saved && !repliedView && (
             <label className="filter">
               <span>Order</span>
               <select
@@ -144,7 +186,8 @@ export function InboxFilters({
           </select>
         </label>
 
-        {onHideReplied && (
+        {/* Hiding replied matches would empty the Replied view. */}
+        {onHideReplied && !repliedView && (
           <label className="filter">
             <span>Replied</span>
             <select

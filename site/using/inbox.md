@@ -34,7 +34,7 @@ flowchart TD
 | **Open conversation ↗** | Opens the post on its platform, in a new tab. |
 | **Save for later** | Keeps the match under **Saved**. |
 | **Draft reply** | Writes a reply for you to edit and post yourself. See [reply drafts](./replies). |
-| **Mark as replied** | Records that you answered this conversation. The match stays in the inbox, and its card says **Replied**. Press it again to take the mark back. |
+| **Mark as replied** | Records that you answered this conversation. The match stays in the inbox, its card says **Replied**, and it appears under **Replied**. Press it again to take the mark back. |
 | **Good lead** / **Not relevant** | Your verdict. **Not relevant** removes the match from the inbox. |
 
 Removed a match by mistake? Open **Filters**, set **Not relevant** to
@@ -44,10 +44,13 @@ Removed a match by mistake? Open **Filters**, set **Not relevant** to
 
 | Control | Choices |
 |---|---|
-| **Inbox** / **Saved** | Every match, or only the ones you saved |
+| **Inbox** / **Saved** / **Replied** | Every match, the ones you saved, or the ones you replied to |
 | **Monitor** | All monitors, or one |
 | **Order** | Ranked by score & age, highest score first, or newest first |
 | **Filters** | A minimum score, whether to show matches marked not relevant, and whether to show matches you replied to |
+
+**Saved** lists matches by when you saved them, and **Replied** by when you
+marked them replied, newest first. Neither list uses **Order**.
 
 "Ranked by score & age" is the default. A strong match from last week drops
 below a good one from this morning, so the top of the list is what to read

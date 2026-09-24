@@ -129,6 +129,15 @@ describe("the inbox", () => {
     container = screen.container;
   }
 
+  /** A tab of the Inbox/Saved/Replied switch, by its label. */
+  function viewButton(label: string): HTMLButtonElement {
+    const found = [...container.querySelectorAll(".inbox-views button")].find(
+      (element) => element.textContent?.trim() === label,
+    );
+    if (!(found instanceof HTMLButtonElement)) throw new Error(`No view says "${label}".`);
+    return found;
+  }
+
   beforeEach(() => {
     fetchMock = vi.fn();
     arriving = 0;
@@ -233,7 +242,7 @@ describe("the inbox", () => {
     it("asks the server for the saved list, which it orders differently", async () => {
       await show();
 
-      const picker = container.querySelector(".inbox-views button:last-child") as HTMLButtonElement;
+      const picker = viewButton("Saved");
 
       await act(async () => picker.click());
       await settle();
@@ -677,7 +686,7 @@ describe("the inbox", () => {
     it("does not offer an order on the saved list, which has its own", async () => {
       await show();
 
-      const picker = container.querySelector(".inbox-views button:last-child") as HTMLButtonElement;
+      const picker = viewButton("Saved");
 
       await act(async () => picker.click());
       await settle();
@@ -860,7 +869,10 @@ describe("the inbox", () => {
       expect(container.querySelector(".match-card .match-list-status")?.textContent).toBe(
         "Replied",
       );
-      expect(button("Replied").getAttribute("aria-pressed")).toBe("true");
+      const mark = [...container.querySelectorAll(".match-actions button")].find(
+        (element) => element.textContent?.trim() === "Replied",
+      );
+      expect(mark?.getAttribute("aria-pressed")).toBe("true");
     });
 
     it("asks the server to leave replied matches out when the filter says so", async () => {
@@ -888,6 +900,55 @@ describe("the inbox", () => {
 
       expect(container.querySelectorAll(".match-card")).toHaveLength(1);
       expect(container.querySelector(".detail-title")?.textContent).toBe("A second conversation");
+    });
+
+    it("asks the server for the replied list, which has its own order and heading", async () => {
+      await show();
+
+      const view = viewButton("Replied");
+      expect(view.textContent).toBe("Replied");
+      await act(async () => view.click());
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+      const last = asked.filter((url) => url.startsWith("/api/matches?")).at(-1) ?? "";
+      expect(last).toContain("replied=true");
+      expect(last).not.toContain("order=");
+      expect(last).not.toContain("saved=true");
+      expect(container.querySelector('select[aria-label="Order"]')).toBeNull();
+      expect(container.querySelector(".list-heading")?.textContent).toContain("Recently replied");
+    });
+
+    it("takes a match off the replied list when its mark is taken back", async () => {
+      await show({
+        "replied=true": {
+          ...twoMatches,
+          matches: twoMatches.matches.map((row) => ({ ...row, replied: true })),
+        },
+      });
+
+      const view = viewButton("Replied");
+      await act(async () => view.click());
+      await settle();
+
+      const mark = [...container.querySelectorAll(".match-actions button")].find(
+        (element) => element.textContent?.trim() === "Replied",
+      ) as HTMLButtonElement;
+      await act(async () => mark.click());
+      await settle();
+
+      expect(repliedCalls()).toEqual([{ replied: false }]);
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+    });
+
+    it("says how to fill the replied list when it is empty", async () => {
+      await show({ "replied=true": { matches: [], nextCursor: null, asOf: firstPage.asOf } });
+
+      const view = viewButton("Replied");
+      await act(async () => view.click());
+      await settle();
+
+      expect(container.textContent).toContain("No replies marked yet");
     });
 
     it("leaves the button as it was when the mark could not be stored", async () => {

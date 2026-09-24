@@ -477,6 +477,22 @@ describe("the inbox route", () => {
       expect(file.body.trim().split("\r\n")).toHaveLength(2);
     });
 
+    it("lists only replied matches when asked, in the list, the count and the file", async () => {
+      const since = new Date(Date.now() - 60 * 60_000).toISOString();
+      await seed({ monitorId, score: 99, minutesOld: 1 });
+      const answered = await seed({ monitorId, score: 50, minutesOld: 5 });
+
+      await markReplied(answered, true);
+
+      const file = await get("/api/matches/export?replied=true");
+
+      expect(scores((await get("/api/matches?replied=true")).json<Page>())).toEqual([50]);
+      expect((await get(`/api/matches/count?since=${since}&replied=true`)).json()).toEqual({
+        count: 1,
+      });
+      expect(file.body.trim().split("\r\n")).toHaveLength(2);
+    });
+
     it("answers 404 for a match that does not exist", async () => {
       const response = await markReplied("00000000-0000-4000-8000-000000000000", true);
 

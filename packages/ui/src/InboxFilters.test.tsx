@@ -100,6 +100,53 @@ describe("the inbox filter bar", () => {
     expect(onOrder).toHaveBeenCalledWith("newest");
   });
 
+  it("offers the Replied view only to a page that has it", async () => {
+    screen = await mount(<InboxFilters {...props()} />);
+    expect(() => button("Replied")).toThrow();
+  });
+
+  it("switches views one at a time, and hides what the Replied view cannot use", async () => {
+    const onSaved = vi.fn();
+    const onRepliedView = vi.fn();
+    screen = await mount(
+      <InboxFilters
+        {...props({
+          onSaved,
+          repliedView: true,
+          onRepliedView,
+          hideReplied: true,
+          onHideReplied: () => undefined,
+        })}
+      />,
+    );
+
+    expect(button("Replied").getAttribute("aria-pressed")).toBe("true");
+    expect(button("Inbox").getAttribute("aria-pressed")).toBe("false");
+    expect(screen.container.querySelector('select[aria-label="Order"]')).toBeNull();
+    expect(screen.container.querySelector('select[aria-label="Replied"]')).toBeNull();
+    // The hidden filter is not counted on a view that does not offer it.
+    expect(button("Filters")).toBeDefined();
+
+    button("Saved").click();
+    expect(onRepliedView).toHaveBeenLastCalledWith(false);
+    expect(onSaved).toHaveBeenLastCalledWith(true);
+
+    button("Inbox").click();
+    expect(onRepliedView).toHaveBeenLastCalledWith(false);
+    expect(onSaved).toHaveBeenLastCalledWith(false);
+  });
+
+  it("turns the Saved view off when the Replied view is chosen", async () => {
+    const onSaved = vi.fn();
+    const onRepliedView = vi.fn();
+    screen = await mount(<InboxFilters {...props({ saved: true, onSaved, onRepliedView })} />);
+
+    button("Replied").click();
+
+    expect(onSaved).toHaveBeenLastCalledWith(false);
+    expect(onRepliedView).toHaveBeenLastCalledWith(true);
+  });
+
   it("offers the replied filter only to a page that stores the mark, and counts it", async () => {
     screen = await mount(<InboxFilters {...props()} />);
     expect(screen.container.querySelector('select[aria-label="Replied"]')).toBeNull();

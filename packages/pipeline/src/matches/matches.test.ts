@@ -560,6 +560,75 @@ describe("the inbox list", () => {
       expect(await countNewMatches(db, { ...filters, since: minutesAgo(15) })).toBe(1);
     });
 
+    it("makes a list of its own, newest reply first, whatever the score", async () => {
+      const strong = await seed({ monitorId, score: 95, postedAt: minutesAgo(1) });
+      const weak = await seed({ monitorId, score: 40, postedAt: daysAgo(5) });
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(2) });
+
+      await setMatchReplied(db, owner, strong, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchReplied(db, owner, weak, true, new Date("2026-09-02T00:00:00.000Z"));
+
+      const replied = await listMatches(db, { userId: owner, repliedOnly: true, order: "score" });
+
+      // The weak, old one was answered later, so it is first. The order asked
+      // for is not a choice on this list.
+      expect(replied.matches.map((match) => match.id)).toEqual([weak, strong]);
+    });
+
+    it("keeps a replied match on its list after it is marked not relevant", async () => {
+      const answered = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchReplied(db, owner, answered, true);
+      await recordVerdict(db, { matchId: answered, userId: owner, verdict: "not_relevant" });
+
+      expect(
+        (await listMatches(db, { userId: owner, repliedOnly: true })).matches.map((m) => m.id),
+      ).toEqual([answered]);
+    });
+
+    it("pages its list without losing a match", async () => {
+      const answered: string[] = [];
+
+      for (let index = 0; index < 5; index += 1) {
+        const id = await seed({ monitorId, score: 90 - index * 10, postedAt: minutesAgo(5) });
+        await setMatchReplied(db, owner, id, true, new Date(now.getTime() + index * 60_000));
+        answered.push(id);
+      }
+
+      const walked: string[] = [];
+      let cursor: string | null = null;
+
+      do {
+        const page: MatchPage = await listMatches(db, {
+          userId: owner,
+          repliedOnly: true,
+          limit: 2,
+          cursor,
+        });
+
+        walked.push(...page.matches.map((match) => match.id));
+        cursor = page.nextCursor;
+      } while (cursor);
+
+      expect(walked).toEqual([...answered].reverse());
+    });
+
+    it("counts only replied matches on its list", async () => {
+      const answered = await seed({
+        monitorId,
+        score: 70,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+
+      await setMatchReplied(db, owner, answered, true);
+
+      expect(
+        await countNewMatches(db, { userId: owner, repliedOnly: true, since: minutesAgo(15) }),
+      ).toBe(1);
+    });
+
     it("does not mark another account's match", async () => {
       const theirs = await seed({ monitorId: strangerMonitorId, score: 70, postedAt: now });
 

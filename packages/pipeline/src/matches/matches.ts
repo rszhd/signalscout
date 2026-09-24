@@ -83,8 +83,8 @@ export const matchOrders = ["rank", "score", "newest"] as const;
 
 export type MatchOrder = (typeof matchOrders)[number];
 
-/** The saved list's own order, beside the two a caller may ask for. */
-type PageOrder = MatchOrder | "saved";
+/** The saved and replied lists' own orders, beside the ones a caller may ask for. */
+type PageOrder = MatchOrder | "saved" | "replied";
 
 /** One match, with the post it is about and the monitor that found it. */
 export interface InboxMatch {
@@ -226,6 +226,16 @@ export interface InboxFilters {
    * it stays in the inbox unless the person asks for it to go.
    */
   readonly hideReplied?: boolean;
+  /**
+   * Only the matches the person said they replied to. US-399.
+   *
+   * A list of its own, like the saved one and for the same reason: it is
+   * ordered by when the reply was marked, newest first, because a reply from
+   * last week does not matter less because the post was old. It shows a
+   * replied match whatever its verdict. The screen offers it as a view beside
+   * *Saved*, never both at once; a caller that sets both gets the saved order.
+   */
+  readonly repliedOnly?: boolean;
 }
 
 export interface ListMatchesOptions extends InboxFilters {
@@ -329,6 +339,7 @@ function orderValue(order: PageOrder, asOf: Date): SQL<number> {
   // `double precision` like the rest, so one cursor shape carries all four
   // orders and `parseCursor` has one number to read.
   if (order === "score") return sql<number>`${matches.score}::double precision`;
+  if (order === "replied") return epochOf(matches.repliedAt);
 
   return epochOf(matches.savedAt);
 }
@@ -368,7 +379,7 @@ function currentVerdictOf(userId: string): SQL | undefined {
 function inboxConditions(options: InboxFilters): SQL[] {
   const conditions: SQL[] = [eq(matches.hidden, false), eq(monitors.userId, options.userId)];
 
-  if (!options.includeNotRelevant && !options.savedOnly) {
+  if (!options.includeNotRelevant && !options.savedOnly && !options.repliedOnly) {
     // `IS DISTINCT FROM` and not `<>`: an unjudged match has no feedback row,
     // so the column is null here, and null compared with `<>` would drop every
     // match nobody has judged yet.
@@ -390,6 +401,7 @@ function inboxConditions(options: InboxFilters): SQL[] {
    */
   if (options.savedOnly) conditions.push(isNotNull(matches.savedAt));
   if (options.hideReplied) conditions.push(isNull(matches.repliedAt));
+  if (options.repliedOnly) conditions.push(isNotNull(matches.repliedAt));
   if (options.minScore !== undefined) conditions.push(gte(matches.score, options.minScore));
 
   return conditions;
@@ -409,7 +421,11 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
   const rank = rankExpression(asOf);
   // The saved list wins over the caller's order rather than arguing with it.
   // Its order is what that list is, so there is nothing here to choose.
-  const order: PageOrder = options.savedOnly ? "saved" : (options.order ?? "rank");
+  const order: PageOrder = options.savedOnly
+    ? "saved"
+    : options.repliedOnly
+      ? "replied"
+      : (options.order ?? "rank");
   const sortBy = orderValue(order, asOf);
 
   const conditions = inboxConditions(options);

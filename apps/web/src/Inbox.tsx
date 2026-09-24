@@ -131,6 +131,11 @@ export function Inbox({
    */
   const [showSaved, setShowSaved] = useState(false);
   /**
+   * The replied list. US-399. A view like the saved one: the matches the
+   * person answered, newest reply first.
+   */
+  const [showReplied, setShowReplied] = useState(false);
+  /**
    * How many matches arrived since this page was read. US-125.
    *
    * A number and not rows, because the list must not move while somebody is
@@ -212,13 +217,15 @@ export function Inbox({
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
-    if (hideReplied) query.set("hideReplied", "true");
+    // Not on the replied list, which it would empty.
+    if (hideReplied && !showReplied) query.set("hideReplied", "true");
     if (showSaved) query.set("saved", "true");
-    // Not on the saved list, which has an order of its own. Sending it would
-    // ask the server for something it is right to ignore. US-114.
-    if (!showSaved && order !== "rank") query.set("order", order);
+    if (showReplied) query.set("replied", "true");
+    // Not on the saved or replied list, which have orders of their own.
+    // Sending it would ask the server for something it is right to ignore.
+    if (!showSaved && !showReplied && order !== "rank") query.set("order", order);
     return query;
-  }, [projectId, monitorId, minScore, showDismissed, hideReplied, showSaved, order]);
+  }, [projectId, monitorId, minScore, showDismissed, hideReplied, showSaved, showReplied, order]);
 
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");
@@ -365,8 +372,8 @@ export function Inbox({
   /**
    * Say the person replied to a match, or take it back. US-396.
    *
-   * The row stays, like a saved one, unless the person is hiding replied
-   * matches — then it leaves the way a dismissed one does, and the next match
+   * The row stays, like a saved one, unless it no longer belongs on the list
+   * on screen — then it leaves the way a dismissed one does, and the next match
    * down is selected.
    */
   async function markReplied(match: Match, replied: boolean): Promise<void> {
@@ -386,7 +393,9 @@ export function Inbox({
       setMarking(false);
     }
 
-    if (replied && hideReplied) {
+    // A match leaves the list it no longer belongs on: a replied one when
+    // replied matches are hidden, an unmarked one on the replied list.
+    if ((replied && hideReplied && !showReplied) || (!replied && showReplied)) {
       setMatches((current) => {
         const index = current.findIndex((row) => row.id === match.id);
         const remaining = current.filter((row) => row.id !== match.id);
@@ -435,7 +444,14 @@ export function Inbox({
     );
   }
 
-  const filtered = activeFilters({ monitors, monitorId, minScore, showDismissed, hideReplied }) > 0;
+  const filtered =
+    activeFilters({
+      monitors,
+      monitorId,
+      minScore,
+      showDismissed,
+      hideReplied: hideReplied && !showReplied,
+    }) > 0;
   const orderHeading =
     inboxOrders.find((option) => option.value === order)?.heading ?? inboxOrders[0].heading;
   /**
@@ -519,6 +535,8 @@ export function Inbox({
 
       <InboxFilters
         saved={showSaved}
+        repliedView={showReplied}
+        onRepliedView={setShowReplied}
         onSaved={setShowSaved}
         monitors={monitors}
         monitorId={monitorId}
@@ -613,6 +631,23 @@ export function Inbox({
           >
             Save a conversation from your inbox to come back to it here.
           </PageState>
+        ) : showReplied ? (
+          <PageState
+            kind="empty"
+            mark="↩"
+            heading="No replies marked yet"
+            action={
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => setShowReplied(false)}
+              >
+                Back to inbox
+              </button>
+            }
+          >
+            Mark a conversation as replied after you post, and it appears here.
+          </PageState>
         ) : (
           <PageState
             kind="empty"
@@ -639,7 +674,9 @@ export function Inbox({
             <MatchListHeading
               count={matches.length}
               more={page?.nextCursor != null}
-              heading={showSaved ? "Recently saved" : orderHeading}
+              heading={
+                showSaved ? "Recently saved" : showReplied ? "Recently replied" : orderHeading
+              }
               exportHref={`/api/matches/export?${filterQuery()}`}
             />
             <div className="inbox-scroll-region">

@@ -26,7 +26,9 @@ if (!folder) {
   process.exit(1);
 }
 
-for (const file of readdirSync(folder).filter((name) => name.endsWith(".json")).sort()) {
+for (const file of readdirSync(folder)
+  .filter((name) => name.endsWith(".json"))
+  .sort()) {
   if (records.has(file)) continue;
 
   const path = join(folder, file);

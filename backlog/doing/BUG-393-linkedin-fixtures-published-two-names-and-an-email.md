@@ -47,9 +47,9 @@ does**: the files are on `origin/main` and `origin/dev` since `b913fba`.
 
 ## Notes
 
-- SocialCrawl's LinkedIn capture keeps its own scrubber: its answer has
-  another shape, and its connector is switched off. The repair's email rule
-  covers what it let through.
+- The SocialCrawl and ScrapeCreators LinkedIn captures keep their own
+  scrubbers: their answers have other shapes, and both connectors are off.
+  The repair's email rule covers what SocialCrawl's let through.
 - Rewriting history means a force-push to `main` and `dev`, which every clone
   and open branch would feel. It is the owner's call.
 
@@ -62,3 +62,8 @@ does**: the files are on `origin/main` and `origin/dev` since `b913fba`.
   offsets point at the wrong words — so it now accepts only a span shaped
   like a name, and says to run it once per folder. LinkedIn provider tests:
   11 files, 376 tests pass.
+- 2026-09-24T12:53+08:00 — The first commit left the HarvestAPI capture on
+  its own copy of the scrubber (restoring its fixtures folder from git undid
+  the import) and failed lint on formatting. The follow-up fixes both, and a
+  check on a mention after styled Unicode letters replaced the name, the
+  address and the member number and kept the letters.

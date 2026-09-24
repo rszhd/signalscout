@@ -74,7 +74,7 @@ not measured, and the capture decides it.
       provider and its price
 - [x] One live poll through the connector is recorded in the Log, with what it
       cost
-- [ ] The hosted product's follow-up is written: its LinkedIn connector and
+- [x] The hosted product's follow-up is written: its LinkedIn connector and
       the LinkedIn poll weight in its plans
 
 ## Notes
@@ -136,3 +136,7 @@ not measured, and the capture decides it.
   cost table and the rule that a volume discount is not modelled went to
   `docs/costs.md`. `docker-compose.yml` passes the new key through;
   `compose-environment.test.ts` found the gap.
+- 2026-09-24T09:44+08:00 — The hosted follow-up is US-387 there, built
+  against this working copy: HarvestAPI for LinkedIn, a LinkedIn poll counted
+  as one credit, and Apify as a manual fallback. This ticket stays in doing
+  until the release.

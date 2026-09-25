@@ -121,7 +121,7 @@ what each call cost, and merges a partial run into the folder's manifest.
 | Script | Spends | Free calls and traps |
 |---|---|---|
 | `socialcrawl/linkedin-fixtures/capture.mjs` | 5 × 5 credits + 4 free probes | Run when the LinkedIn parser changes. |
-| `socialcrawl/instagram-fixtures/capture.mjs` | 24 credits; `--lean` 14 | `--lean` drops the hashtag search and the second `top` page. **The committed fixtures came from a lean run**, so those two questions are open. |
+| `socialcrawl/instagram-fixtures/capture.mjs` | 24 credits; `--lean` 14; `--comments-url=<reel>` 10 | `--lean` drops the hashtag search and the second `top` page. **The search fixtures came from a lean run**, so those two questions are open. `--comments-url` refreshes the two comment pages alone and merges their records. **A page the provider has cached is free and records `credits_used: 0`**: wait out the cache (longer than the 5 minutes documented) before capturing a page whose cost a test reads. |
 | `socialcrawl/reddit-fixtures/capture.mjs --only=comments` | 5 credits, $0.041 | Reads the whole thread in one call. |
 | `socialdata/x-fixtures/capture.mjs --only=comments` | ~$0.012 | Prepaid; an empty balance answers 402. Read the balance it prints first. |
 | `apify/linkedin-fixtures/capture.mjs --only=comments` | ~$0.008 | The comments actor twice, with and without `scrapeReplies`. |

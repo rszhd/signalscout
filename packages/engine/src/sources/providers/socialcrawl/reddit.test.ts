@@ -346,7 +346,11 @@ describe("the whole thread under one post", () => {
     expect(new URL(stub.calls[0]?.url ?? "").pathname).toBe("/v1/reddit/post/comments");
     expect(result.replies).toHaveLength(33);
     expect(result.itemsReturned).toBe(34);
-    expect(result.unitsConsumed).toBe(5);
+    // One call, in calls: the provider charged 5 credits and the reply price
+    // is per call, so it is recorded at 5 credits, not 25 (BUG-427).
+    expect((thread.body as { credits_used: number }).credits_used).toBe(5);
+    expect(result.unitsConsumed).toBe(1);
+    expect(result.unitsConsumed * (socialCrawlReddit.replyPricePerUnitMicros ?? 0)).toBe(5 * 8118);
   });
 
   /**
@@ -463,7 +467,7 @@ describe("the whole thread under one post", () => {
     expect(later.replies).toHaveLength(0);
     // Still billed, and still counted: an empty page is not a free one.
     expect(later.itemsReturned).toBe(34);
-    expect(later.unitsConsumed).toBe(5);
+    expect(later.unitsConsumed).toBe(1);
   });
 
   it("ends a walk rather than following a cycle in somebody else's data", () => {

@@ -31,6 +31,12 @@ export interface ReplyParseOptions {
   /** The post this reply hangs under, as its platform ids it. */
   readonly parentPostExternalId: string;
   /**
+   * Other ids the same post goes by. Instagram's comments name their reel by
+   * shortcode, and the reel's own id is a nineteen-digit number: both are the
+   * same post, and a comment naming either one belongs to it (BUG-426).
+   */
+  readonly parentPostAliases?: readonly string[];
+  /**
    * A link to the reply, for a platform that does not give one.
    *
    * Called only when the payload's own `url` is empty, so a provider that
@@ -58,7 +64,7 @@ export interface ReplyParseOptions {
  */
 export function toCandidateReply(
   record: unknown,
-  { parentPostExternalId, urlFor, channel, position }: ReplyParseOptions,
+  { parentPostExternalId, parentPostAliases = [], urlFor, channel, position }: ReplyParseOptions,
 ): CandidateReply | undefined {
   const item = objectOf(record);
   const comment = objectOf(item?.comment) ?? item;
@@ -88,17 +94,17 @@ export function toCandidateReply(
    * judge real words against a conversation they were never part of, and the
    * inbox then shows "Replying to" above a post the person never saw.
    *
-   * Three platforms send the field: 137 comments across the X, YouTube and
-   * TikTok fixtures, all with `post_id`. **Instagram sends it null on every
-   * comment** — 29 of 29, US-049 — so a comment that omits it is kept, because
-   * absence is not disagreement. The consequence is worth naming rather than
-   * leaving to be rediscovered: this check defends X, YouTube and TikTok, and
-   * on Instagram it is inert. Nothing there stops the endpoint returning a
-   * comment from another post.
+   * X, YouTube and TikTok send the post's own id. Instagram sent the field
+   * null until September 2026 and now sends the reel's shortcode, which the
+   * caller passes as an alias; before it did, this check dropped every
+   * Instagram comment it had just paid for (BUG-426). A comment that omits the
+   * field is kept, because absence is not disagreement.
    */
   const belongsTo = text(comment.post_id);
 
-  if (belongsTo && belongsTo !== parentPostExternalId) return undefined;
+  if (belongsTo && belongsTo !== parentPostExternalId && !parentPostAliases.includes(belongsTo)) {
+    return undefined;
+  }
 
   const author = objectOf(comment.author);
   const engagement = objectOf(comment.engagement);

@@ -91,17 +91,36 @@ describe("the connector's declared economics", () => {
   });
 
   /**
-   * **The one assertion in this file that guards somebody's money.**
+   * **The assertions in this file that guard somebody's money.**
    *
-   * A search page is 1 credit and a comment page is 5, measured. US-028 found
-   * the same shape on LinkedIn: where a request and a credit are different
-   * numbers, a guard fed the search price for a comment page lets a monitor
-   * spend five times its cap before anything refuses it.
+   * A search page is 1 credit and a comment page is 5, measured. The reply
+   * price is per page, because the Providers screen shows it as one; the
+   * pipeline records units × price, so a comment page must report one unit.
+   * It reported the provider's 5 credits until BUG-427, and every page was
+   * recorded at 25.
    */
   it("prices a comment page at five times a search page, because it is", () => {
     expect(socialCrawlInstagram.billableUnit).toBe("credit");
     expect(socialCrawlInstagram.pricePerUnitMicros).toBe(8118);
     expect(socialCrawlInstagram.replyPricePerUnitMicros).toBe(5 * 8118);
+  });
+
+  it("records a comment page at the 5 credits the provider charged, not 25", async () => {
+    const { fetch: fetchStub } = socialCrawl([commentsRecent]);
+    const source = new SocialCrawlInstagramSource(runtimeWith(fetchStub));
+    const charged = (commentsRecent.body as { credits_used: number }).credits_used;
+
+    const result = await source.fetchReplies({
+      postUrl: "https://www.instagram.com/reel/DPDwh4-CW8W/",
+      postExternalId: "3730038351538515734",
+      credentials,
+    });
+
+    expect(charged).toBe(5);
+    expect(result.unitsConsumed).toBe(1);
+    expect(result.unitsConsumed * (socialCrawlInstagram.replyPricePerUnitMicros ?? 0)).toBe(
+      5 * 8118,
+    );
   });
 
   it("declares that it reads replies, on the connector the registry builds", () => {
@@ -369,24 +388,40 @@ describe("reading the comments under a reel", () => {
       result.replies.every((reply) => reply.parentPostExternalId === replyRequest.postExternalId),
     ).toBe(true);
     expect(result.replies.every((reply) => reply.text.length > 0)).toBe(true);
-    expect(result.unitsConsumed).toBe(5);
+    // One page, in pages: five credits at the per-page price (BUG-427).
+    expect(result.unitsConsumed).toBe(1);
   });
 
   /**
-   * **`post_id` is null on every Instagram comment**, where X, YouTube and
-   * TikTok fill it on all 137 captured. BUG-007's check therefore decides
-   * nothing here, and the comments are kept rather than dropped — absence is
-   * not disagreement.
-   *
-   * This is asserted so that the day the provider starts sending the field, a
-   * reader can see what changed and what stopped being inert.
+   * **`post_id` names the reel by shortcode**, where the request names it by
+   * its nineteen-digit media id. It was null on every comment until September
+   * 2026; when the provider began filling it, BUG-007's check dropped every
+   * Instagram comment after it was paid for (BUG-426).
    */
-  it("keeps a comment that names no parent post, because none of them do", () => {
+  it("keeps a comment that names its reel by shortcode", async () => {
     const postIds = itemsOf(commentsRecent).map(
       (item) => (item as { comment: { post_id: unknown } }).comment.post_id,
     );
+    expect(postIds.every((id) => id === "DPDwh4-CW8W")).toBe(true);
 
-    expect(postIds.every((id) => id === null)).toBe(true);
+    const { fetch: fetchStub } = socialCrawl([commentsRecent]);
+    const source = new SocialCrawlInstagramSource(runtimeWith(fetchStub));
+    const result = await source.fetchReplies(replyRequest);
+
+    expect(result.replies.length).toBe(itemsOf(commentsRecent).length);
+  });
+
+  it("still drops a comment that names another reel", async () => {
+    const elsewhere = structuredClone(commentsRecent);
+    const items = itemsOf(elsewhere) as { comment: { post_id: string } }[];
+    for (const item of items) item.comment.post_id = "Cx0therReel1";
+
+    const { fetch: fetchStub } = socialCrawl([elsewhere]);
+    const source = new SocialCrawlInstagramSource(runtimeWith(fetchStub));
+    const result = await source.fetchReplies(replyRequest);
+
+    expect(result.replies).toEqual([]);
+    expect(result.itemsReturned).toBe(items.length);
   });
 
   /**
@@ -400,8 +435,9 @@ describe("reading the comments under a reel", () => {
 
     const result = await source.fetchReplies(replyRequest);
 
+    const first = itemsOf(commentsRecent)[0] as { comment: { author: { username: string } } };
     expect(result.replies.every((reply) => reply.author !== undefined)).toBe(true);
-    expect(result.replies[0]?.author).toBe("instagram-user-169");
+    expect(result.replies[0]?.author).toBe(first.comment.author.username);
   });
 
   /**
@@ -446,7 +482,9 @@ describe("reading the comments under a reel", () => {
     const source = new SocialCrawlInstagramSource(runtimeWith(fetchStub));
 
     const all = await source.fetchReplies(replyRequest);
-    const since = new Date("2025-09-29T00:00:00.000Z");
+    // The middle of the captured page, so the cut keeps some rows and drops some.
+    const dates = all.replies.map((reply) => reply.postedAt.getTime()).sort((a, b) => a - b);
+    const since = new Date(dates[Math.floor(dates.length / 2)] as number);
     const recent = await source.fetchReplies({ ...replyRequest, since });
 
     expect(recent.replies.length).toBeGreaterThan(0);
@@ -454,7 +492,7 @@ describe("reading the comments under a reel", () => {
     expect(recent.replies.every((reply) => reply.postedAt > since)).toBe(true);
     // The page was bought whole, whatever survived the cut.
     expect(recent.itemsReturned).toBe(all.itemsReturned);
-    expect(recent.unitsConsumed).toBe(5);
+    expect(recent.unitsConsumed).toBe(1);
   });
 
   it("counts a thread position through the walk, not from each page", async () => {

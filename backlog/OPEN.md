@@ -2,7 +2,7 @@
 
 # Open tickets
 
-75 open — 6 doing, 60 todo, 9 parked (9 p1, 49 p2, 17 p3).
+74 open — 6 doing, 59 todo, 9 parked (7 p1, 50 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,8 +13,6 @@
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p1 | US-418 | [The query plan writes the topic, not the question](todo/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p1 | US-419 | [Query performance shows what each phrase costs](todo/US-419-query-performance-shows-what-each-phrase-costs.md) | feature | todo | 2026-09-26T02:07+08:00 |
-| p1 | BUG-426 | [SocialCrawl drops every Instagram comment](todo/BUG-426-socialcrawl-drops-every-instagram-comment.md) | bug | todo | 2026-09-26T02:36+08:00 |
-| p1 | BUG-427 | [SocialCrawl comment pages are counted at five times their cost](todo/BUG-427-socialcrawl-comment-pages-are-counted-at-five-times-their-cost.md) | bug | todo | 2026-09-26T02:36+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
@@ -63,6 +61,7 @@
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-341 | [The boot check opens every stored secret](todo/BUG-341-the-boot-check-opens-every-stored-secret.md) | bug | todo | 2026-09-23T10:05+08:00 |
+| p2 | BUG-428 | [Committed fixtures carry numeric account ids](todo/BUG-428-committed-fixtures-carry-numeric-account-ids.md) | bug | todo | 2026-09-26T02:59+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |

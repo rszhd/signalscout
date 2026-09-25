@@ -28,24 +28,24 @@
     "note": "the catalogue says a filtered search comes from a different surface"
   },
   {
+    "name": "credentials-rejected",
+    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=flaky+tests",
+    "status": 401,
+    "elapsedMs": 215,
+    "note": "expected free"
+  },
+  {
     "name": "comments-top",
     "url": "https://www.socialcrawl.dev/v1/instagram/post/comments?url=https%3A%2F%2Fwww.instagram.com%2Freel%2FDPDwh4-CW8W%2F&sort=top",
     "status": 200,
-    "elapsedMs": 2321,
+    "elapsedMs": 5847,
     "note": null
   },
   {
     "name": "comments-recent",
     "url": "https://www.socialcrawl.dev/v1/instagram/post/comments?url=https%3A%2F%2Fwww.instagram.com%2Freel%2FDPDwh4-CW8W%2F&sort=recent",
     "status": 200,
-    "elapsedMs": 1727,
+    "elapsedMs": 3752,
     "note": "newest-first, which the catalogue says to use for a whole walk"
-  },
-  {
-    "name": "credentials-rejected",
-    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=flaky+tests",
-    "status": 401,
-    "elapsedMs": 215,
-    "note": "expected free"
   }
 ]

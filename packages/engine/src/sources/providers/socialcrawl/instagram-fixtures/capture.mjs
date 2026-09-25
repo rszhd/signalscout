@@ -43,6 +43,7 @@
  *
  *     node .../instagram-fixtures/capture.mjs           # 24 credits, all nine
  *     node .../instagram-fixtures/capture.mjs --lean    # 14 credits, seven
+ *     node .../instagram-fixtures/capture.mjs --comments-url=<reel>   # 10 credits, the comments alone
  *
  * About 24 billed credits — roughly $0.20 — plus one free refusal.
  *
@@ -56,6 +57,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const lean = process.argv.includes("--lean");
+/**
+ * `--comments-url=<reel>` captures the two comment pages for that reel alone,
+ * 10 credits, and merges their records into the manifest and the ledger. For
+ * a change to the comment shape (BUG-426), where re-capturing the searches
+ * would only move the data under the search tests.
+ */
+const commentsUrl = process.argv.find((arg) => arg.startsWith("--comments-url="))?.split("=")[1];
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 const root = fileURLToPath(new URL("../../../../../../../", import.meta.url));
@@ -126,6 +134,12 @@ const identityFields = new Set([
   "fullName",
   "handle",
   "owner_username",
+  // A numeric account id names a person as surely as a handle does, and one
+  // sits at `post.ext.author_id` outside any person container. BUG-426.
+  "author_id",
+  "authorId",
+  "owner_id",
+  "user_id",
 ]);
 const identityUrlFields = new Set([
   "avatar_url",
@@ -253,6 +267,30 @@ function overlap(left, right) {
 }
 
 console.log(`\nCapturing SocialCrawl Instagram payloads into ${here}\n`);
+
+if (commentsUrl) {
+  console.log(`comments on ${commentsUrl}, 5 credits each:`);
+  await capture("comments-top", endpoints.comments, { url: commentsUrl, sort: "top" });
+  await capture(
+    "comments-recent",
+    endpoints.comments,
+    { url: commentsUrl, sort: "recent" },
+    { note: "newest-first, which the catalogue says to use for a whole walk" },
+  );
+  const merge = (file, fresh) => {
+    const kept = JSON.parse(readFileSync(`${here}${file}`, "utf8"));
+    const names = new Set(fresh.map((entry) => entry.name));
+    const merged = [...kept.filter((entry) => !names.has(entry.name)), ...fresh];
+    writeFileSync(`${here}${file}`, `${JSON.stringify(merged, null, 2)}\n`);
+  };
+  merge("manifest.json", manifest);
+  merge("ledger.json", ledger);
+  console.log(
+    `\nCredits used, as the provider reported them: ${ledger.reduce((sum, e) => sum + (e.creditsUsed ?? 0), 0)}.`,
+  );
+  console.log("Read the fixtures before you commit them. See the header.");
+  process.exit(0);
+}
 
 console.log("search, 1 credit each:");
 await capture(

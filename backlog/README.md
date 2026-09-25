@@ -90,6 +90,16 @@ The next id, per series:
     ls backlog/*/*.md backlog/done/*/*.md 2>/dev/null \
       | grep -oE '(US|BUG)-[0-9]+' | sort -t- -k2 -n | tail -1
 
+That command sees only this repository, and the number is not only this
+repository's:
+
+- **The maintainer assigns the id.** A pull request that adds a ticket names
+  its file and its `id` as `US-new`, and the number is set at merge.
+- **The series is shared with private repositories,** so a gap in the numbers
+  here is an id used there, not a lost ticket.
+- **A ticket that cites a private one says what it says** in a sentence, not
+  only its id, because a contributor cannot open it.
+
 ## Frontmatter
 
 ```yaml

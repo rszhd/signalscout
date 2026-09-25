@@ -2,7 +2,7 @@
 
 # Open tickets
 
-66 open — 6 doing, 51 todo, 9 parked (5 p1, 44 p2, 17 p3).
+72 open — 6 doing, 57 todo, 9 parked (7 p1, 48 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -11,6 +11,8 @@
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p1 | US-418 | [The query plan writes the topic, not the question](todo/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p1 | US-419 | [Query performance shows what each phrase costs](todo/US-419-query-performance-shows-what-each-phrase-costs.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
@@ -50,6 +52,10 @@
 | p2 | US-373 | [The projects page and the project form look the same in both products](todo/US-373-the-projects-page-looks-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
 | p2 | US-374 | [The login card, onboarding and the remaining base rules look the same in both products](todo/US-374-the-login-card-onboarding-and-base-look-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
 | p2 | US-382 | [A release waits for the owner on npm](todo/US-382-a-release-waits-for-the-owner-on-npm.md) | chore | todo | 2026-09-23T21:18+08:00 |
+| p2 | US-420 | [A monitor sees which subreddits earn their reads](todo/US-420-a-monitor-sees-which-subreddits-earn-their-reads.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-421 | [A slow input is not read on every poll](todo/US-421-a-slow-input-is-not-read-on-every-poll.md) | spike | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-422 | [A phrase that hits the page limit says so](todo/US-422-a-phrase-that-hits-the-page-limit-says-so.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-423 | [A monitor is told what each platform returns](todo/US-423-a-monitor-is-told-what-each-platform-returns.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |

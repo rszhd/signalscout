@@ -22,7 +22,7 @@ US-417):
 | YouTube, comments under review videos | about $0.015 |
 | LinkedIn | about $0.09 (1 in 200 posts) |
 | TikTok comments | none; viewers name the item on screen |
-| Instagram | $0.63 for no comment |
+| Instagram | not measured: the connector dropped every comment (BUG-426); a comment costs about $0.0027 at SocialCrawl |
 
 **A person picking platforms for a monitor sees none of this.** Each box costs
 the same to tick, and a monitor on TikTok or LinkedIn pays for posts that

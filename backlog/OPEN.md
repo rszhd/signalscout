@@ -2,7 +2,7 @@
 
 # Open tickets
 
-72 open — 6 doing, 57 todo, 9 parked (7 p1, 48 p2, 17 p3).
+75 open — 6 doing, 60 todo, 9 parked (9 p1, 49 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,6 +13,8 @@
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p1 | US-418 | [The query plan writes the topic, not the question](todo/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p1 | US-419 | [Query performance shows what each phrase costs](todo/US-419-query-performance-shows-what-each-phrase-costs.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p1 | BUG-426 | [SocialCrawl drops every Instagram comment](todo/BUG-426-socialcrawl-drops-every-instagram-comment.md) | bug | todo | 2026-09-26T02:36+08:00 |
+| p1 | BUG-427 | [SocialCrawl comment pages are counted at five times their cost](todo/BUG-427-socialcrawl-comment-pages-are-counted-at-five-times-their-cost.md) | bug | todo | 2026-09-26T02:36+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
@@ -56,6 +58,7 @@
 | p2 | US-421 | [A slow input is not read on every poll](todo/US-421-a-slow-input-is-not-read-on-every-poll.md) | spike | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-422 | [A phrase that hits the page limit says so](todo/US-422-a-phrase-that-hits-the-page-limit-says-so.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-423 | [A monitor is told what each platform returns](todo/US-423-a-monitor-is-told-what-each-platform-returns.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-425 | [Instagram comments are read at a cheaper provider](todo/US-425-instagram-comments-are-read-at-a-cheaper-provider.md) | spike | todo | 2026-09-26T02:32+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |

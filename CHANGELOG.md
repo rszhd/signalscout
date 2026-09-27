@@ -20,6 +20,23 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.18.0 — 2026-09-27
+
+No migration.
+
+**Changed.** Search queries are shorter (US-418). `redditPlatform` allows four
+words a query, not eight, and `xPlatform` three, not four, so
+`searchQuerySchemaFor` and the query plan schema refuse longer ones. A
+consumer that validates saved queries with them refuses a longer query on the
+next save of that monitor; a poll does not check the limit, so a monitor that
+runs keeps running. A consumer's own fixtures may need shorter example
+queries.
+
+**Changed.** The query prompt asks for the topic in two words, leaves out the
+words of a question ("can anyone recommend"), and lists each platform's queries
+best first. A consumer that keeps fewer queries than the model writes keeps
+the best ones.
+
 ## 0.17.1 — 2026-09-27
 
 No migration, and nothing to change in a consumer's code.

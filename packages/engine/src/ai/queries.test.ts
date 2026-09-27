@@ -221,6 +221,32 @@ describe("the prompt the model is given", () => {
     expect(prompt).toContain("a long phrase matches nothing at all");
   });
 
+  it("asks for the topic in short words, without the words of a question", () => {
+    // US-418. The search matches words one at a time, so "can anyone
+    // recommend" pulls posts about everything; the classifier finds the
+    // asking without it.
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).toContain("Leave out the words that make a phrase a question or a request");
+    expect(prompt).toContain("'can\nanyone recommend'");
+    expect(prompt).toContain("the query only has to find the topic");
+    expect(prompt).toContain("Two or three words find the most posts");
+  });
+
+  it("asks for the best query first, because a monitor may run only that one", () => {
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).toContain("List each platform's queries best first");
+    expect(prompt).toContain("A monitor may run only the first");
+  });
+
+  it("no longer tells the model that Reddit rewards a long phrase", () => {
+    const prompt = buildQuerySystemPrompt([redditPlatform]);
+
+    expect(prompt).not.toContain("so a longer phrase can appear");
+    expect(prompt).toContain("two or three words find more");
+  });
+
   it("does not describe a platform the monitor does not watch", () => {
     expect(buildQuerySystemPrompt([redditPlatform])).not.toContain('X (key "x")');
   });

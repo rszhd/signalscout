@@ -28,12 +28,13 @@ export const redditPlatform: PlatformDescriptor = {
      */
     maxQueryWords: 8,
     hint:
-      "Reddit posts are long, so a full phrase can match. Use the words a " +
-      "person with the problem would type, not the name of your product " +
-      "category.",
+      "Short phrases find the most. Use the words a person with the " +
+      "problem would type, not the name of your product category, and leave " +
+      "out words like “can anyone recommend”.",
     note:
-      "A Reddit post has a title and paragraphs, so a longer phrase can appear " +
-      "in one. Prefer the words a person in trouble types over the words of " +
+      "A Reddit post has a title and paragraphs, so a phrase of up to eight " +
+      "words can match, but two or three words find more of the posts that " +
+      "matter. Prefer the words a person in trouble types over the words of " +
       "the product category.",
   },
 };

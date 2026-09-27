@@ -40,10 +40,10 @@ const monitor: MonitorProfile = {
 const goodPlan = {
   queries: {
     reddit: [
-      "playwright tests break every release",
-      "how do small teams handle regression testing",
-      "tired of manually testing signup and checkout",
-      "alternative to maintaining e2e tests",
+      "playwright tests break",
+      "small team regression testing",
+      "manually testing checkout",
+      "e2e maintenance alternative",
     ],
     x: ["flaky tests", "e2e suite broken", "regression testing pain"],
   },
@@ -111,9 +111,9 @@ describe("what a query may be", () => {
     // good queries to catch a Boolean operator nobody typed.
     const result = parse(
       withQueries(
-        "manually testing signup and checkout",
-        "regression testing takes too long",
-        "our e2e suite is unmaintainable",
+        "testing checkout manually",
+        "slow regression testing",
+        "unmaintainable e2e suite",
       ),
     );
 
@@ -146,9 +146,9 @@ describe("what a query may be", () => {
   });
 
   it("refuses two queries that differ only in case", () => {
-    expect(
-      parse(withQueries("flaky end to end tests", "Flaky End To End Tests", "a b c")).success,
-    ).toBe(false);
+    expect(parse(withQueries("flaky e2e tests", "Flaky End To End Tests", "a b c")).success).toBe(
+      false,
+    );
   });
 
   it("refuses a plan with fewer than three queries", () => {
@@ -169,10 +169,9 @@ describe("a query is written for one platform", () => {
     expect(parse(withXQueries("end to end tests keep breaking", "a b", "c d")).success).toBe(false);
   });
 
-  it("accepts the same phrase on Reddit, where a post has paragraphs", () => {
-    expect(parse(withQueries("end to end tests keep breaking", "a b c", "d e f")).success).toBe(
-      true,
-    );
+  it("accepts a four-word phrase on Reddit that X refuses", () => {
+    expect(parse(withQueries("ui tests keep breaking", "a b c", "d e f")).success).toBe(true);
+    expect(parse(withXQueries("ui tests keep breaking", "a b", "c d")).success).toBe(false);
   });
 
   it("accepts a short phrase on X", () => {
@@ -182,11 +181,12 @@ describe("a query is written for one platform", () => {
   });
 
   it("holds each platform to its own ceiling and not to the other's", () => {
-    // Eight words is Reddit's limit and four is X's, so a plan that is legal
-    // on one side and not the other fails the schema as a whole. The
-    // generator drops such a line before the schema sees the plan (BUG-383).
-    expect(redditPlatform.search?.maxQueryWords).toBe(8);
-    expect(xPlatform.search?.maxQueryWords).toBe(4);
+    // Four words is Reddit's limit and three is X's since US-418, so a plan
+    // that is legal on one side and not the other fails the schema as a
+    // whole. The generator drops such a line before the schema sees the plan
+    // (BUG-383).
+    expect(redditPlatform.search?.maxQueryWords).toBe(4);
+    expect(xPlatform.search?.maxQueryWords).toBe(3);
     expect(
       parse(withQueries("one two three four five six seven eight nine", "a b", "c d")).success,
     ).toBe(false);
@@ -213,12 +213,40 @@ describe("the prompt the model is given", () => {
 
     expect(prompt).toContain('REDDIT (key "reddit")');
     expect(prompt).toContain('X (key "x")');
+    // Reddit four and X three since US-418.
     expect(prompt).toContain("At most 4 words per query.");
-    expect(prompt).toContain("At most 8 words per query.");
+    expect(prompt).toContain("At most 3 words per query.");
 
     // The reason travels with the number. A model told only a limit talks
     // itself out of it on the query it likes.
     expect(prompt).toContain("a long phrase matches nothing at all");
+  });
+
+  it("asks for the topic in short words, without the words of a question", () => {
+    // US-418. The search matches words one at a time, so "can anyone
+    // recommend" pulls posts about everything; the classifier finds the
+    // asking without it.
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).toContain("Leave out the words that make a phrase a question or a request");
+    expect(prompt).toContain("'can\nanyone recommend'");
+    expect(prompt).toContain("the query only has to find the topic");
+    expect(prompt).toContain("Most queries are two words");
+    expect(prompt).toContain("'customer call', 'class notes'");
+  });
+
+  it("asks for the best query first, because a monitor may run only that one", () => {
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).toContain("List each platform's queries best first");
+    expect(prompt).toContain("A monitor may run only the first");
+  });
+
+  it("no longer tells the model that Reddit rewards a long phrase", () => {
+    const prompt = buildQuerySystemPrompt([redditPlatform]);
+
+    expect(prompt).not.toContain("so a longer phrase can appear");
+    expect(prompt).toContain("two words, four at most");
   });
 
   it("does not describe a platform the monitor does not watch", () => {
@@ -293,7 +321,7 @@ describe("a model that breaks a rule on one line", () => {
     if (outcome.status !== "generated") return;
     expect(outcome.plan.queries.reddit).toEqual(goodPlan.queries.reddit);
     expect(outcome.dropped).toEqual([
-      { list: "reddit", value: tooLong, reason: expect.stringContaining("at most 8 words") },
+      { list: "reddit", value: tooLong, reason: expect.stringContaining("at most 4 words") },
     ]);
   });
 

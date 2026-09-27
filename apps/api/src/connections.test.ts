@@ -723,7 +723,7 @@ describe("connecting a provider", () => {
             idealCustomer: "A QA lead at a small software company.",
             problem: "Their end-to-end tests break on every release.",
             signals: ["problem"],
-            queries: { reddit: ["end to end tests keep breaking"] },
+            queries: { reddit: ["ui tests keep breaking"] },
             sources: ["reddit"],
           },
         });

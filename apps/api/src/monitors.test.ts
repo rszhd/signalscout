@@ -61,9 +61,9 @@ const call: ModelCall = {
 const plan = {
   queries: {
     reddit: [
-      "playwright tests break every release",
-      "how do small teams handle regression testing",
-      "tired of manually testing signup and checkout",
+      "playwright tests break",
+      "small team regression testing",
+      "manually testing checkout",
     ],
     x: ["flaky tests", "e2e suite broken", "regression testing pain"],
   },
@@ -104,7 +104,7 @@ const newMonitor = {
    * its own history.
    */
   queries: {
-    reddit: ["flaky end to end tests", "manual qa before every release"],
+    reddit: ["flaky e2e tests", "manual qa releases"],
     x: [],
     linkedin: [],
     youtube: [],
@@ -466,8 +466,9 @@ describe("the monitor routes", () => {
        * `end to end tests keep breaking` to a live X search twice: unquoted it
        * returned anime, Bitcoin and a CIA story across three weeks, and quoted
        * it matched nothing at all. Two words returned twenty posts, all on
-       * topic. So the ceiling is four words on X and eight on Reddit, and a
-       * person editing here is held to the same rule as the model.
+       * topic. So the ceiling is three words on X and four on Reddit since
+       * US-418, and a person editing here is held to the same rule as the
+       * model.
        */
       await withServer({}, async (app) => {
         const tooLongForX = await app.inject({
@@ -476,7 +477,7 @@ describe("the monitor routes", () => {
           payload: {
             ...newMonitor,
             sources: ["x"],
-            queries: { x: ["end to end tests keep breaking"] },
+            queries: { x: ["ui tests keep breaking"] },
           },
         });
 
@@ -487,7 +488,7 @@ describe("the monitor routes", () => {
           url: "/api/monitors",
           payload: {
             ...newMonitor,
-            queries: { reddit: ["end to end tests keep breaking"] },
+            queries: { reddit: ["ui tests keep breaking"] },
           },
         });
 
@@ -504,7 +505,7 @@ describe("the monitor routes", () => {
             ...newMonitor,
             sources: ["reddit", "x"],
             queries: {
-              reddit: ["manual qa before every release"],
+              reddit: ["manual qa releases"],
               x: ["flaky tests"],
             },
           },
@@ -512,7 +513,7 @@ describe("the monitor routes", () => {
 
         expect(response.statusCode).toBe(201);
         expect(response.json().queries).toEqual({
-          reddit: ["manual qa before every release"],
+          reddit: ["manual qa releases"],
           x: ["flaky tests"],
           // Named by no monitor here, and still its own list. The lists are
           // kept apart by platform and not by what the monitor watches.
@@ -592,12 +593,12 @@ describe("the monitor routes", () => {
         const response = await app.inject({
           method: "PATCH",
           url: `/api/monitors/${id}`,
-          payload: { queries: { reddit: ["regression testing takes too long"] }, subreddits: [] },
+          payload: { queries: { reddit: ["slow regression testing"] }, subreddits: [] },
         });
 
         expect(response.statusCode).toBe(200);
         expect(response.json().queries).toEqual({
-          reddit: ["regression testing takes too long"],
+          reddit: ["slow regression testing"],
           x: [],
           linkedin: [],
           youtube: [],
@@ -644,7 +645,7 @@ describe("the monitor routes", () => {
         await app.inject({
           method: "PATCH",
           url: `/api/monitors/${id}`,
-          payload: { queries: { reddit: ["regression testing takes too long"] }, subreddits: [] },
+          payload: { queries: { reddit: ["slow regression testing"] }, subreddits: [] },
         });
 
         const after = await getMonitor(db, id);
@@ -1661,11 +1662,11 @@ describe("the monitor routes", () => {
     it("counts the same leads on the page, beside each phrase and under each source", async () => {
       await withServer({}, async (app) => {
         const id = await create(app, { ...newMonitor, minScore: 60 });
-        const thread = await found(id, "flaky end to end tests", 91);
-        await found(id, "flaky end to end tests", 45);
-        await found(id, "manual qa before every release", 88, { replyTo: thread });
-        await found(id, "manual qa before every release", null);
-        await found(id, "manual qa before every release", 95, { hidden: true });
+        const thread = await found(id, "flaky e2e tests", 91);
+        await found(id, "flaky e2e tests", 45);
+        await found(id, "manual qa releases", 88, { replyTo: thread });
+        await found(id, "manual qa releases", null);
+        await found(id, "manual qa releases", 95, { hidden: true });
 
         const monitor = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
         const queries = (
@@ -1686,12 +1687,12 @@ describe("the monitor routes", () => {
             input,
           ]),
         );
-        expect(byQuery["flaky end to end tests"]).toMatchObject({
+        expect(byQuery["flaky e2e tests"]).toMatchObject({
           posts: 2,
           matches: 1,
           bestScore: 91,
         });
-        expect(byQuery["manual qa before every release"]).toMatchObject({
+        expect(byQuery["manual qa releases"]).toMatchObject({
           posts: 3,
           matches: 1,
           bestScore: 88,
@@ -1721,8 +1722,8 @@ describe("the monitor routes", () => {
     it("says when a phrase last matched, so a dead one can be seen", async () => {
       await withServer({}, async (app) => {
         const id = await create(app, { ...newMonitor, minScore: 30 });
-        await found(id, "flaky end to end tests", 80, { ageDays: 45 });
-        await found(id, "manual qa before every release", null);
+        await found(id, "flaky e2e tests", 80, { ageDays: 45 });
+        await found(id, "manual qa releases", null);
 
         const queries = (
           await app.inject({ method: "GET", url: `/api/monitors/${id}/queries` })
@@ -1734,9 +1735,9 @@ describe("the monitor routes", () => {
           ]),
         );
 
-        const lastMatched = Date.parse(byQuery["flaky end to end tests"].lastMatchedAt);
+        const lastMatched = Date.parse(byQuery["flaky e2e tests"].lastMatchedAt);
         expect(Date.now() - lastMatched).toBeGreaterThan(44 * 86_400_000);
-        expect(byQuery["manual qa before every release"].lastMatchedAt).toBeNull();
+        expect(byQuery["manual qa releases"].lastMatchedAt).toBeNull();
       });
     });
 

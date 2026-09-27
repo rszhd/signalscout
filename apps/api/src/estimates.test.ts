@@ -28,7 +28,7 @@ import { asOwner, asUser, createTestDatabase, type TestDatabase } from "./testin
 const logger = createLogger({ level: "silent", name: "test" });
 
 const plan = {
-  queries: { reddit: ["flaky end to end tests", "manual qa before every release"] },
+  queries: { reddit: ["flaky e2e tests", "manual qa releases"] },
   subreddits: ["SaaS"],
   sources: ["reddit"],
 };
@@ -99,8 +99,8 @@ describe("the cost test routes", () => {
 
       expect(body.status).toBe("collecting");
       expect(body.queries.map((probe: { term: string }) => probe.term)).toEqual([
-        "flaky end to end tests",
-        "manual qa before every release",
+        "flaky e2e tests",
+        "manual qa releases",
         "SaaS",
       ]);
       expect(body.queries.map((probe: { kind: string }) => probe.kind)).toEqual([
@@ -329,7 +329,7 @@ describe("the cost test routes", () => {
       const theirs = await stranger.inject({ method: "GET", url: `/api/monitors/estimates/${id}` });
 
       expect(theirs.statusCode).toBe(404);
-      expect(theirs.body).not.toContain("flaky end to end tests");
+      expect(theirs.body).not.toContain("flaky e2e tests");
     } finally {
       await stranger.close();
     }

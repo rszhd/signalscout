@@ -2,10 +2,11 @@
 
 # Done
 
-252 finished.
+253 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-431 | [A thread test reads the previous test's continuation](done/2026-09/BUG-431-a-thread-test-reads-the-previous-test-s-continuation.md) | bug | shipped | 2026-09 |
 | BUG-427 | [SocialCrawl comment pages are counted at five times their cost](done/2026-09/BUG-427-socialcrawl-comment-pages-are-counted-at-five-times-their-cost.md) | bug | shipped | 2026-09 |
 | BUG-426 | [SocialCrawl drops every Instagram comment](done/2026-09/BUG-426-socialcrawl-drops-every-instagram-comment.md) | bug | shipped | 2026-09 |
 | BUG-393 | [LinkedIn fixtures published two names and an email address](done/2026-09/BUG-393-linkedin-fixtures-published-two-names-and-an-email.md) | bug | shipped | 2026-09 |

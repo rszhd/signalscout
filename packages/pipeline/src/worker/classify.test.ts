@@ -960,6 +960,15 @@ describe("a copy of a post this monitor already scored", () => {
 });
 
 describe("continuing a thread after its batch has been judged", () => {
+  /**
+   * This monitor's continuations, and no other's. BUG-431: the classify step
+   * sends the replies job after the notify job, so a test that waits only for
+   * notify can finish with its replies job still queued. It then lands in the
+   * next test, after `beforeEach` emptied the list.
+   */
+  const continuedFor = (monitorId: string) =>
+    continued.filter((entry) => entry.monitorId === monitorId);
+
   it("sends the parent thread back once per batch of replies", async () => {
     const monitorId = await insertMonitor(database, {});
     const parentId = await insertPost(fakePosts[0] as (typeof fakePosts)[number], "t3_loop_parent");
@@ -985,12 +994,12 @@ describe("continuing a thread after its batch has been judged", () => {
     const replyIds = [await asReply("t1_loop_a"), await asReply("t1_loop_b")];
 
     await worker.boss.send(classifyQueue, { monitorId, postIds: replyIds });
-    await until("the thread to be offered again", () => continued[0]);
+    await until("the thread to be offered again", () => continuedFor(monitorId)[0]);
 
     // One job for the thread, not one per reply: two replies of the same
     // thread are one batch and one decision.
-    expect(continued).toHaveLength(1);
-    expect(continued[0]?.postIds).toEqual([parentId]);
+    expect(continuedFor(monitorId)).toHaveLength(1);
+    expect(continuedFor(monitorId)[0]?.postIds).toEqual([parentId]);
   }, 30_000);
 
   it("offers nothing when the batch held no replies, because a post has no thread", async () => {
@@ -1000,7 +1009,7 @@ describe("continuing a thread after its batch has been judged", () => {
     await worker.boss.send(classifyQueue, { monitorId, postIds: [postId] });
     await until("the notification", () => notified[0]);
 
-    expect(continued).toEqual([]);
+    expect(continuedFor(monitorId)).toEqual([]);
   }, 30_000);
 });
 

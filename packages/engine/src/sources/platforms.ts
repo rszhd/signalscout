@@ -20,22 +20,25 @@ export const redditPlatform: PlatformDescriptor = {
   displayName: "Reddit",
   search: {
     /**
-     * Eight words, which is the generator's own ceiling: a Reddit post has a
-     * title and paragraphs, so a long phrase has somewhere to appear. US-022
-     * measured the real limit here, and it is not length — the keyword
-     * `end to end tests keep breaking` returned posts from r/AllFinraExams and
-     * r/islam because the provider matched `test` and `end` as ordinary words.
+     * Four words (US-418; eight before). US-022 showed that length does not
+     * make a Reddit search precise: `end to end tests keep breaking` returned
+     * r/AllFinraExams and r/islam because the provider matched `test` and
+     * `end` as ordinary words. The cloud's production data then showed short
+     * phrases finding more: on the owner's monitor, two-word queries found
+     * 595 posts and 5.3 matches each in three days, longer ones 216 and 0.6,
+     * at the same match rate. Asked for two or three words with an eight-word
+     * ceiling, the model still wrote five and six; the ceiling is what it
+     * obeys.
      */
-    maxQueryWords: 8,
+    maxQueryWords: 4,
     hint:
       "Short phrases find the most. Use the words a person with the " +
       "problem would type, not the name of your product category, and leave " +
       "out words like “can anyone recommend”.",
     note:
-      "A Reddit post has a title and paragraphs, so a phrase of up to eight " +
-      "words can match, but two or three words find more of the posts that " +
-      "matter. Prefer the words a person in trouble types over the words of " +
-      "the product category.",
+      "The search matches words, not sentences, so a short phrase finds the " +
+      "most: two words, four at most. Name the topic in the words a person " +
+      "in trouble uses, not the words of the product category.",
   },
 };
 
@@ -52,17 +55,19 @@ export const xPlatform: PlatformDescriptor = {
      * three weeks, and quoted it matched nothing at all. `flaky tests`
      * returned twenty posts, all on topic and all within three days.
      *
-     * Four leaves room for a short phrase and stops a sentence. It is a
-     * ceiling and not a target: two words is a good X query.
+     * Three since US-418 (four before): on the cloud's production data,
+     * two-word X queries found 788 posts and 6.3 matches each in three days,
+     * longer ones 40 and 0.6. Two words is the target; three is room for a
+     * word that changes the meaning.
      */
-    maxQueryWords: 4,
+    maxQueryWords: 3,
     hint:
       "X posts are short, so a long phrase finds nothing. Use the words a " +
       "person would put in a complaint.",
     note:
       "An X post is a few sentences, so a long phrase matches nothing at all. " +
-      "Two to four words. Write the words that would appear inside somebody's " +
-      "complaint, not a description of it.",
+      "Two words, three at most. Write the words that would appear inside " +
+      "somebody's complaint, not a description of it.",
   },
 };
 

@@ -33,7 +33,7 @@ matched none.
 - [x] `buildQuerySystemPrompt` tells the model to write the topic and the
       problem in the person's words, and to leave out ask words ("can anyone
       recommend", "what do you use", "looking for"), with the reason
-- [ ] The query capture (`ai/fixtures/capture-queries.ts`) is re-run, and
+- [x] The query capture (`ai/fixtures/capture-queries.ts`) is re-run, and
       the Log compares the phrases before and after for the same monitors
 - [ ] One monitor's phrases, old and new, are run once each on Reddit and X,
       and the Log gives posts and matches per phrase
@@ -61,4 +61,27 @@ two or three words, and the best query first. Best first is for any consumer
 that runs fewer queries than the model writes; the cloud keeps one a
 platform on the first press (its US-285). The Reddit note and hint no longer
 say a longer phrase can match; the eight-word ceiling stays.
+
+**2026-09-27T21:26+08:00** Captured with production's query model,
+gpt-6-sol, on the example monitor and the owner's four production monitors
+(read from the cloud, not changed). The owner approved this spend: about
+$0.074 over two rounds.
+
+Round one, the prompt change alone: no ask words any more, but three to six
+words. Callsect on Reddit went from `customer call`, `Gong alternatives` to
+`keeping track of customer calls`, `preparing for the next customer call`.
+The model obeyed the eight-word ceiling, not the "two or three words" line.
+
+So the owner chose to lower the ceilings as well: Reddit 8 to 4, X 4 to 3,
+with two-word examples in the prompt. Round two: two and three words, for
+example `customer call notes`, `account history`, `study group notes`,
+`finding customers`. The example monitor's fixture (`query-plan.json`) is the
+round-two capture.
+
+**The lower ceilings refuse longer queries a person already saved**, on the
+next save of that monitor; a poll does not check them. On the cloud on
+2026-09-27 that is the owner's Callsect and Graphite monitors and one
+customer monitor with six. The form names the query to shorten. Fixture
+queries in four test files were shortened for the same reason; the three
+tests about the ceilings themselves moved with it (8 and 4 to 4 and 3).
 

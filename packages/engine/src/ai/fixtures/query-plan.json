@@ -1,7 +1,7 @@
 {
   "provider": "openai",
-  "model": "gpt-5.6-terra",
-  "capturedAt": "2026-09-05T18:55:07.639Z",
+  "model": "gpt-6-sol",
+  "capturedAt": "2026-09-27T13:24:58.102Z",
   "note": "The model's own answer for `exampleMonitor` in examples.ts, as the AI SDK parsed it.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -16,33 +16,44 @@
   "object": {
     "queries": {
       "reddit": [
-        "e2e tests break after UI changes",
-        "how do you test before every release",
-        "manual testing every deploy",
-        "looking for better than Cypress",
-        "Playwright tests keep breaking",
-        "what do you use for regression testing",
-        "end to end tests too brittle",
-        "no dedicated QA manual testing"
+        "flaky e2e tests",
+        "selectors keep breaking",
+        "manual regression testing",
+        "Cypress tests brittle",
+        "testing before release"
       ],
       "x": [
-        "tests keep breaking",
-        "manual testing releases",
-        "Cypress alternative",
-        "brittle e2e tests",
-        "regression testing help",
-        "Playwright tests breaking",
-        "testing before deploy"
+        "flaky e2e",
+        "selectors break",
+        "manual regression",
+        "Cypress tests fail",
+        "release testing"
       ],
       "linkedin": [
-        "end to end tests break after UI changes",
-        "we are back to manual testing before releases",
-        "how do small teams handle regression testing",
-        "looking for an alternative to Cypress",
-        "our Playwright tests are too brittle",
-        "no QA engineer and weekly releases",
-        "what do teams use for release testing",
-        "tests need constant maintenance"
+        "end to end tests keep breaking",
+        "UI changes break our tests",
+        "testing by hand before every release",
+        "Cypress tests are hard to maintain",
+        "shipping without a QA engineer"
+      ],
+      "youtube": [
+        "flaky end to end tests",
+        "selectors break after UI changes",
+        "manual regression testing before release",
+        "Cypress tests keep failing",
+        "testing releases without a QA engineer"
+      ],
+      "tiktok": [
+        "website tests keep breaking",
+        "testing everything before launch",
+        "changed a button tests failed",
+        "Cypress tests keep failing"
+      ],
+      "instagram": [
+        "flaky end to end tests",
+        "UI changes break tests",
+        "manual testing before release",
+        "Cypress tests keep failing"
       ]
     },
     "subreddits": [
@@ -50,16 +61,15 @@
       "startups",
       "webdev",
       "QualityAssurance",
-      "ExperiencedDevs",
-      "indiehackers",
-      "Entrepreneur",
-      "cypressio"
+      "softwaretesting",
+      "Frontend",
+      "devops"
     ]
   },
   "usage": {
-    "inputTokens": 833,
-    "outputTokens": 435
+    "inputTokens": 1448,
+    "outputTokens": 730
   },
-  "latencyMs": 6185,
-  "estimatedCostMicros": 6886
+  "latencyMs": 13470,
+  "estimatedCostMicros": 10196
 }

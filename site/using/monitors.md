@@ -56,8 +56,10 @@ but the model reads more text, so it costs more.
 
 ### The search plan
 
-Keep the searches **focused**. A short, specific phrase that people really
-write finds better conversations than a broad one, and costs less. Use plain
+Keep the searches **short**. The search matches words, not sentences, so a
+two-word phrase that names the topic, such as `customer call` or
+`class notes`, finds more conversations than a question such as `can anyone
+recommend a call notes tool`. Reddit allows four words and X three. Use plain
 phrases of at least two words; `AND` and `OR` are not supported. On Reddit
 you can also name subreddits to watch.
 

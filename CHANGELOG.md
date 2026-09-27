@@ -20,6 +20,21 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.17.1 — 2026-09-27
+
+No migration, and nothing to change in a consumer's code.
+
+**Fixed.** SocialCrawl's Instagram comments are kept (BUG-426). SocialCrawl
+began sending a comment's `post_id` as the reel's shortcode, and the check that
+keeps a reply under the right post compared it with the media id, so every
+comment was dropped after it was paid for. The connector now accepts every id
+the post goes by.
+
+**Fixed.** SocialCrawl comment pages on Instagram and Reddit are recorded at
+their price (BUG-427). Each page was counted as five, so the ledger read five
+times high for those calls. Spend figures and allowances read from the ledger
+are lower from this version on; the rows already written are not rewritten.
+
 ## 0.17.0 — 2026-09-25
 
 **Migration.** Three, in order. `0070` adds `matches.replied_at`. `0071` adds

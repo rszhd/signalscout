@@ -24,21 +24,21 @@
     "cached": false
   },
   {
+    "name": "credentials-rejected",
+    "creditsUsed": 0,
+    "creditsRemaining": null,
+    "cached": false
+  },
+  {
     "name": "comments-top",
     "creditsUsed": 5,
-    "creditsRemaining": 2476,
+    "creditsRemaining": 1013,
     "cached": false
   },
   {
     "name": "comments-recent",
     "creditsUsed": 5,
-    "creditsRemaining": 2471,
-    "cached": false
-  },
-  {
-    "name": "credentials-rejected",
-    "creditsUsed": 0,
-    "creditsRemaining": null,
+    "creditsRemaining": 1008,
     "cached": false
   }
 ]

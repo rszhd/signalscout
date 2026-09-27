@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-24T23:37+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -85,3 +85,6 @@ may each show the same post; the owner said that is fine.
   newest. The batch keeps its handed order; the first copy reached is scored.
   The full suite passes (2,530 tests), with lint and typecheck. The reading
   pane's line is covered by the UI tests and was not rendered in a browser.
+- 2026-09-25T01:34+08:00 — Released in 0.17.0 (tag v0.17.0), with migration 0071, and deployed with the
+  hosted application's production release, where all 4,590 stored posts got a
+  fingerprint.

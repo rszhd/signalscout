@@ -45,6 +45,8 @@ const maxPagesPerInput = 2;
 
 /** One SocialCrawl credit, in micro-dollars. The same pack as every platform. */
 const creditMicros = 8118;
+/** What one comment page costs, in the provider's credits. */
+const commentPageCredits = 5;
 
 export const socialCrawlInstagram: ConnectorDefinition = {
   platform: instagramPlatform,
@@ -67,16 +69,13 @@ export const socialCrawlInstagram: ConnectorDefinition = {
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /**
-   * **Five credits, not one, and this is the field that stops a fivefold
-   * overspend.**
-   *
-   * US-028 found the same shape on LinkedIn: where a request and a credit are
-   * different numbers, a guard fed the wrong one lets a monitor spend five
-   * times its cap before anything refuses it. A comment page here is 5 credits
-   * against the search's 1, so the two prices are declared separately and the
-   * connector reports what the provider says it charged.
+   * **A reply unit is one comment page, five credits.** The Providers screen
+   * shows this as the price per comment page, and the connector reports its
+   * comment units in pages to match: the provider's `credits_used` divided by
+   * five. Until BUG-427 it reported the credits, 5, against this per-page
+   * price, and every page was recorded at 25 credits.
    */
-  replyPricePerUnitMicros: 5 * creditMicros,
+  replyPricePerUnitMicros: commentPageCredits * creditMicros,
   create: (runtime) => new SocialCrawlInstagramSource(runtime),
 };
 
@@ -276,6 +275,9 @@ export class SocialCrawlInstagramSource implements SocialSource {
    * claims have already been measured wrong.
    */
   async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    // A comment names its reel by shortcode, the request by media id.
+    const shortcode = shortcodeOf(request.postUrl);
+    const aliases = shortcode ? [shortcode] : [];
     const page = await this.client(request.credentials, instagramCommentsProfile).fetchPage(
       {
         url: request.postUrl,
@@ -289,6 +291,7 @@ export class SocialCrawlInstagramSource implements SocialSource {
       .map((record, index) =>
         toCandidateReply(record, {
           parentPostExternalId: request.postExternalId,
+          parentPostAliases: aliases,
           position: (request.positionOffset ?? 0) + index,
           /**
            * Instagram leaves `url` null on every comment, so one is built.
@@ -317,7 +320,9 @@ export class SocialCrawlInstagramSource implements SocialSource {
     return {
       replies,
       itemsReturned: page.records.length,
-      unitsConsumed: page.creditsUsed,
+      // In pages, to match the per-page price above: a cached page is 0 and a
+      // 15-credit deep scan counts as three.
+      unitsConsumed: page.creditsUsed / commentPageCredits,
       next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
       /**
        * Partial while the provider offers another page, and it may over-report.
@@ -399,8 +404,13 @@ export class SocialCrawlInstagramSource implements SocialSource {
  * appended in the same shape, because a link that is merely the post is more
  * use than no link at all — and `toCandidateReply` drops a comment with no URL.
  */
+/** The reel's shortcode, from any of the URL shapes Instagram uses for a post. */
+export function shortcodeOf(postUrl: string): string | undefined {
+  return /\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/.exec(postUrl)?.[1];
+}
+
 export function commentLink(postUrl: string, commentId: string): string {
-  const shortcode = /\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/.exec(postUrl)?.[1];
+  const shortcode = shortcodeOf(postUrl);
 
   if (!shortcode) return `${postUrl.replace(/\/+$/, "")}/c/${commentId}/`;
 

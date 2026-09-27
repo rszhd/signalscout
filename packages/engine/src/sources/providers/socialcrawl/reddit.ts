@@ -44,6 +44,9 @@ import { socialCrawlProvider } from "./provider.js";
 /** The most pages one input may buy in one poll. A page is about 25 posts. */
 const maxPagesPerInput = 2;
 
+/** What one comment call costs, in the provider's credits. */
+const commentCallCredits = 5;
+
 export const socialCrawlReddit: ConnectorDefinition = {
   platform: redditPlatform,
   provider: socialCrawlProvider,
@@ -67,8 +70,14 @@ export const socialCrawlReddit: ConnectorDefinition = {
    * monitor form says what it costs before a person ticks the box.
    */
   canFetchReplies: true,
-  /** Five credits a call, where every search endpoint here is one. */
-  replyPricePerUnitMicros: 5 * 8118,
+  /**
+   * A reply unit is one comment call, five credits, where every search
+   * endpoint here is one. The connector reports its comment units in calls to
+   * match — the provider's `credits_used` divided by five — because the client
+   * reports credits, and credits against this price were recorded at 25 a
+   * call until BUG-427.
+   */
+  replyPricePerUnitMicros: commentCallCredits * 8118,
   create: (runtime) => new SocialCrawlRedditSource(runtime),
 };
 
@@ -298,7 +307,8 @@ export class SocialCrawlRedditSource implements SocialSource {
        * positions 26 places too low.
        */
       itemsReturned: flattened.length,
-      unitsConsumed: page.creditsUsed,
+      // In calls, to match the per-call reply price.
+      unitsConsumed: page.creditsUsed / commentCallCredits,
       next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
       /**
        * `truncated` is believed here, and it is the one completeness claim in

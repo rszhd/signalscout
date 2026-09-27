@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-24T23:07+08:00
 parent: US-396
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -53,3 +53,5 @@ list is the record of that.
   lint. Rendered in headless Chromium against the worktree's API: the view
   lists only the replied match, heads it *Recently replied*, hides the
   order, and fits a 390-pixel screen with no sideways scroll.
+- 2026-09-25T01:34+08:00 — Released in 0.17.0 (tag v0.17.0) and deployed with the hosted application's
+  production release.

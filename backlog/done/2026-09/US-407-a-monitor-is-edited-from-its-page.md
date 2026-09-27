@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-25T00:29+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -55,3 +55,5 @@ so it had the same gap.
 - 2026-09-25T00:29+08:00 — Built in a worktree. The pipeline cases cover both polling shapes;
   the form cases cover the fill, the save and a platform added in the edit.
   The edit form was not rendered in a browser.
+- 2026-09-25T01:34+08:00 — Released in 0.17.0 (tag v0.17.0); the hosted application edits monitors
+  through the same call and took the fix with it.

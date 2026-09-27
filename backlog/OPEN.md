@@ -2,24 +2,20 @@
 
 # Open tickets
 
-72 open — 12 doing, 51 todo, 9 parked (10 p1, 45 p2, 17 p3).
+74 open — 6 doing, 59 todo, 9 parked (7 p1, 50 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
-| p1 | US-396 | [A match records that the person replied](doing/US-396-a-match-records-that-the-person-replied.md) | feature | doing | 2026-09-24T22:04+08:00 |
-| p1 | US-399 | [A person sees the matches they replied to](doing/US-399-a-person-sees-the-matches-they-replied-to.md) | feature | doing | 2026-09-24T23:07+08:00 |
-| p1 | US-400 | [A post written twice is one card](doing/US-400-a-post-written-twice-is-one-card.md) | feature | doing | 2026-09-24T23:37+08:00 |
-| p1 | US-405 | [A reply voice holds every rule](doing/US-405-a-reply-voice-holds-every-rule.md) | feature | doing | 2026-09-25T00:03+08:00 |
-| p1 | US-407 | [A monitor is edited from its page](doing/US-407-a-monitor-is-edited-from-its-page.md) | feature | doing | 2026-09-25T00:29+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p1 | US-418 | [The query plan writes the topic, not the question](todo/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p1 | US-419 | [Query performance shows what each phrase costs](todo/US-419-query-performance-shows-what-each-phrase-costs.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
-| p2 | US-398 | [The inbox has no Copy link button](doing/US-398-the-inbox-has-no-copy-link-button.md) | chore | doing | 2026-09-24T22:32+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
@@ -56,10 +52,16 @@
 | p2 | US-373 | [The projects page and the project form look the same in both products](todo/US-373-the-projects-page-looks-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
 | p2 | US-374 | [The login card, onboarding and the remaining base rules look the same in both products](todo/US-374-the-login-card-onboarding-and-base-look-the-same.md) | chore | todo | 2026-09-23T16:35+08:00 |
 | p2 | US-382 | [A release waits for the owner on npm](todo/US-382-a-release-waits-for-the-owner-on-npm.md) | chore | todo | 2026-09-23T21:18+08:00 |
+| p2 | US-420 | [A monitor sees which subreddits earn their reads](todo/US-420-a-monitor-sees-which-subreddits-earn-their-reads.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-421 | [A slow input is not read on every poll](todo/US-421-a-slow-input-is-not-read-on-every-poll.md) | spike | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-422 | [A phrase that hits the page limit says so](todo/US-422-a-phrase-that-hits-the-page-limit-says-so.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-423 | [A monitor is told what each platform returns](todo/US-423-a-monitor-is-told-what-each-platform-returns.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p2 | US-425 | [Instagram comments are read at a cheaper provider](todo/US-425-instagram-comments-are-read-at-a-cheaper-provider.md) | spike | todo | 2026-09-26T02:32+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-341 | [The boot check opens every stored secret](todo/BUG-341-the-boot-check-opens-every-stored-secret.md) | bug | todo | 2026-09-23T10:05+08:00 |
+| p2 | BUG-428 | [Committed fixtures carry numeric account ids](todo/BUG-428-committed-fixtures-carry-numeric-account-ids.md) | bug | todo | 2026-09-26T02:59+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |

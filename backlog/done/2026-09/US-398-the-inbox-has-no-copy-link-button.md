@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-24T22:32+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -41,3 +41,4 @@ and removing it would break a consumer. No application fills it after this.
 
 - 2026-09-24T22:32+08:00 — Written and built at the owner's request, while
   they looked at the local build of US-396.
+- 2026-09-25T01:34+08:00 — On main with the 0.17.0 release.

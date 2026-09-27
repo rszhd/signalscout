@@ -85,3 +85,8 @@ customer monitor with six. The form names the query to shorten. Fixture
 queries in four test files were shortened for the same reason; the three
 tests about the ceilings themselves moved with it (8 and 4 to 4 and 3).
 
+
+**2026-09-27T22:21+08:00** Released in 0.18.0 and in production on the cloud
+(with the cloud's US-433, three queries a platform on the first plan). The
+live run of old and new phrases, the last Acceptance box, is not done: it
+spends about $0.30 to $0.50 and waits for the owner's yes.

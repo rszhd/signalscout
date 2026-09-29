@@ -727,8 +727,14 @@ export async function enforceBudget(
 const recheckEvery = 20;
 
 export interface SpendMeter {
-  /** True once the cap is reached. Ask before every call, not after. */
-  exhausted(): Promise<boolean>;
+  /**
+   * True once the cap is reached. Ask before every call, not after.
+   *
+   * `reservedMicros` is what calls already started but not yet reported may
+   * cost, for a loop that keeps several in flight (US-438). Zero, the
+   * default, is the one-at-a-time answer.
+   */
+  exhausted(reservedMicros?: number): Promise<boolean>;
   /** Record what one call cost. An unpriced call counts as nothing, honestly. */
   spent(micros: number | undefined): void;
   /** The state as last read, for a log line or a message to a person. */
@@ -773,7 +779,7 @@ export async function createSpendMeter(
       sinceRead += 1;
     },
 
-    async exhausted() {
+    async exhausted(reservedMicros = 0) {
       if (state.capMicros === null) return false;
 
       if (sinceRead >= recheckEvery) {
@@ -787,7 +793,7 @@ export async function createSpendMeter(
       // Between readings, the estimate is what the ledger said plus what this
       // loop has spent since. Erring towards stopping early is the safe
       // direction: a person can see an unfinished batch and raise the cap.
-      return spentSinceRead >= (state.remainingMicros ?? 0);
+      return spentSinceRead + reservedMicros >= (state.remainingMicros ?? 0);
     },
   };
 }

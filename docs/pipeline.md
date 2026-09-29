@@ -107,6 +107,7 @@ later.
 | Pages per thread | 4 | One conversation paging for ever |
 | Comments per thread | 500 | A thread that grows faster than it is read |
 | Classification attempts per post | 3 | A post the model refuses being paid for on every poll |
+| Classify calls in flight | 1, or `classifyConcurrency` | A burst of calls hitting the model's rate limit, or passing the cap before one reports its cost |
 | Job attempts | 4, backing off from 30s | A job that throws for ever, retrying all night |
 | Posts per pair per day | unset; the application's | One search putting its whole backlog, or a busy day, to the classifier |
 

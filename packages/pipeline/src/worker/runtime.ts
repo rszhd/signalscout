@@ -213,6 +213,12 @@ export interface StartWorkerOptions {
    * Unset, later polls use the connectors' caps, as before.
    */
   pollPagesPerInput?: PageCount;
+  /**
+   * How many posts one classify job may score at the same time, 1 to 16.
+   * US-438. Raise it only for a model provider whose rate limit allows it.
+   * Unset, one at a time, as before.
+   */
+  classifyConcurrency?: number;
 }
 
 /**
@@ -414,6 +420,7 @@ export async function startWorker({
   firstPollPagesPerInput,
   firstPollWindowDays,
   pollPagesPerInput,
+  classifyConcurrency,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -601,6 +608,7 @@ export async function startWorker({
       createClassifyStep({
         classifierFor: async (userId) => (await modelsFor(userId)).classifier,
         newPostsPerPairPerDay,
+        ...(classifyConcurrency === undefined ? {} : { concurrency: classifyConcurrency }),
       }),
     notify:
       steps.notify ??

@@ -53,6 +53,14 @@ newest pages can be months old. Later polls keep to their coverage as before,
 and a worker that does not set it is unchanged. `maximumFirstPollWindowDays`
 is exported.
 
+**Added.** A classify job may score a few posts at once (US-438).
+`startWorker` takes `classifyConcurrency`, 1 to 16, and `createClassifyStep`
+takes it as `concurrency`. The posts still start in the order they were
+handed, a copy waits for the post it copies, and the spend meter reserves
+what the calls in flight may cost, so the cap is crossed by at most one call,
+as before. `SpendMeter.exhausted` takes that reservation as an optional
+argument. Unset, one at a time, as before.
+
 **Fixed.** A source that fails part way through a poll keeps what it read
 (BUG-436). The posts of the pages before the error are stored and sent to the
 filter, the poll run records that source as `error` with those pages, and the

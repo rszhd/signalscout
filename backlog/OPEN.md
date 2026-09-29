@@ -2,7 +2,7 @@
 
 # Open tickets
 
-77 open — 10 doing, 58 todo, 9 parked (8 p1, 52 p2, 17 p3).
+78 open — 11 doing, 58 todo, 9 parked (8 p1, 53 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -17,6 +17,7 @@
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
+| p2 | US-438 | [A classify job may score a few posts at the same time](doing/US-438-a-classify-job-may-score-a-few-posts-at-once.md) | feature | doing | 2026-09-29T23:45+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | BUG-436 | [A source that fails part way through a poll loses the pages it already billed](doing/BUG-436-a-source-that-fails-mid-walk-loses-the-pages-it-already-billed.md) | bug | doing | 2026-09-29T21:07+08:00 |
 | p2 | BUG-437 | [One reason over 160 characters refuses a whole classification](doing/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | doing | 2026-09-29T21:29+08:00 |

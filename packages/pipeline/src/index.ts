@@ -386,6 +386,7 @@ export {
   type ClassifyOptions,
   createClassifyStep,
   maxClassificationAttempts,
+  maximumClassifyConcurrency,
 } from "./worker/classify.js";
 export {
   createCollectStep,

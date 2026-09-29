@@ -1,5 +1,5 @@
 {
-  "capturedBy": "packages/core/src/sources/providers/scrapecreators/fixtures/capture.mjs",
+  "capturedBy": "packages/pipeline/src/sources/providers/scrapecreators/fixtures/capture.mjs",
   "provider": "ScrapeCreators, Reddit API v1",
   "note": "Author identity is replaced with stable pseudonyms. Everything else is whole.",
   "fixtures": [
@@ -50,6 +50,25 @@
       },
       "capturedAt": "2026-09-05T09:35:57.824Z",
       "identitiesReplaced": 44
+    },
+    {
+      "file": "subreddit-search-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/subreddit/search?subreddit=softwaretesting&query=flaky+tests&sort=new&timeframe=month&cursor=eyJjYW5kaWRhdGVzX3JldHVybmVkIjoie1wic2VjdGlvbl8xX3BpcGVsaW5lXzBfZ2xvYmFsX21vZGlmaWVyc1wiOlwiMVwiLFwic2VjdGlvbl8xX3BpcGVsaW5lXzFfbG9jYWxfbW9kaWZpZXJzXCI6XCIxXCIsXCJzZWN0aW9uXzJfcGlwZWxpbmVfN19zY29wZV9zd2l0Y2hlclwiOlwiMFwiLFwic2VjdGlvbl8yX3BpcGVsaW5lXzhfcG9zdF9zZWFyY2hcIjpcIjdcIixcInNlY3Rpb25fM19waXBlbGluZV8wX3NpZGViYXJfY29tbXVuaXR5X2luZm9cIjpcIjBcIn0iLCJleHBlcmllbmNlX3NlbGVjdGlvbiI6InBvc3Rfd2l0aF9jb21tdW5pdHlfc2lkZWJhciIsImV4cGVyaWVuY2VfdmVyc2lvbiI6ImRlZmF1bHQiLCJzZWN0aW9uXzJfcGlwZWxpbmVfOF9wb3N0X3NlYXJjaCI6IjcifQ%3D%3D",
+        "note": "followed the cursor from subreddit-search.json"
+      },
+      "capturedAt": "2026-09-29T15:02:44.034Z",
+      "identitiesReplaced": 14
+    },
+    {
+      "file": "subreddit-search.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/subreddit/search?subreddit=softwaretesting&query=flaky+tests&sort=new&timeframe=month"
+      },
+      "capturedAt": "2026-09-29T15:02:42.635Z",
+      "identitiesReplaced": 14
     },
     {
       "file": "timeframe-rejected.json",

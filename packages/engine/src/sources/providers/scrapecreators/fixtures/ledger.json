@@ -56,6 +56,22 @@
       "creditsCharged": 1,
       "creditsRemaining": 2091,
       "note": "a subreddit that does not exist; answers 200 with no posts, and bills for it"
+    },
+    {
+      "call": "subreddit-search",
+      "httpStatus": 200,
+      "elapsedMs": 2413,
+      "creditsCharged": 1,
+      "creditsRemaining": 89,
+      "note": null
+    },
+    {
+      "call": "subreddit-search-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 1398,
+      "creditsCharged": 1,
+      "creditsRemaining": 88,
+      "note": "followed the cursor from subreddit-search.json"
     }
   ]
 }

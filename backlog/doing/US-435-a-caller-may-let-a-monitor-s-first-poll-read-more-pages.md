@@ -89,3 +89,13 @@ the budget guard checks the monthly cap before it as before.
   connector and only posts inside it are stored; a later poll keeps its
   coverage; no option, no window; out-of-range values are refused. The full
   suite passes, 2,566 tests. Not yet run against a real provider.
+- 2026-09-29T23:04+08:00 — The owner wants a phrase searched inside each subreddit for Lookout.
+  ScrapeCreators has `GET /v1/reddit/subreddit/search` (subreddit, query,
+  sort, timeframe, cursor; 1 credit). Captured twice (`subreddit-search`,
+  `subreddit-search-page-2`, 2 credits): the answer is the same Reddit post
+  shape as the keyword search, 7 posts a page, the cursor under `cursor`,
+  `timeframe=month` ignored beside `sort=new` (page two reached back to May),
+  and **no body**: `selftext` was empty on all 14 posts, where the keyword
+  search and the subreddit feed carry it (7 of 7, 23 of 23). No identity
+  survived the scrubber. Not wired into the connector yet: whether a
+  title-only post is worth classifying is the owner's call.

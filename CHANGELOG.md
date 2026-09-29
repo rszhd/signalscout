@@ -40,6 +40,12 @@ newest pages can be months old. Later polls keep to their coverage as before,
 and a worker that does not set it is unchanged. `maximumFirstPollWindowDays`
 is exported.
 
+**Fixed.** One long reason no longer refuses a whole classification
+(BUG-437). A reason over 160 characters is cut to 160, ending in "…", and the
+answer keeps its scores; before, the post was retried and in the end dropped.
+The JSON schema sent to the model is unchanged, so the prompt is the same and
+no score moves.
+
 ## 0.18.0 — 2026-09-27
 
 No migration.

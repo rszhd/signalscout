@@ -310,6 +310,25 @@ describe("a monitor that runs out of money mid-batch", () => {
 });
 
 describe("a post the model scores", () => {
+  it("becomes a match when one of its reasons runs past the limit (BUG-437)", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(strongPost, "long-reason-1");
+    const long = `Four-person SaaS team that ships every week and ${"still tests signup and checkout by hand, ".repeat(4)}`;
+
+    answer = () =>
+      JSON.stringify({
+        ...JSON.parse(strongAnswer),
+        reasons: [long, "Asks what tools other small teams use"],
+      });
+    await classifyAndWait(monitorId, [postId]);
+
+    const [match] = await db.select().from(matches).where(eq(matches.monitorId, monitorId));
+    expect(long.length).toBeGreaterThan(160);
+    expect(match?.score).toBeGreaterThan(0);
+    expect(match?.reasons[0]?.length).toBeLessThanOrEqual(160);
+    expect((await callsFor(monitorId, postId)).map((call) => call.outcome)).toEqual(["scored"]);
+  }, 30_000);
+
   it("becomes a match carrying the model's scores and reasons, and is notified", async () => {
     const monitorId = await insertMonitor(database);
 

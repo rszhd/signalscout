@@ -42,15 +42,15 @@ did not say why.
 
 ## Acceptance
 
-- [ ] An answer with one reason over 160 characters is stored with its
+- [x] An answer with one reason over 160 characters is stored with its
       scores, and the post can become a match.
-- [ ] The reason shown is at most 160 characters.
-- [ ] An answer with fewer than `minimumReasons` usable reasons is still
+- [x] The reason shown is at most 160 characters.
+- [x] An answer with fewer than `minimumReasons` usable reasons is still
       refused.
-- [ ] The prompt does not change, so the scoring captures are not needed;
+- [x] The prompt does not change, so the scoring captures are not needed;
       if the fix changes a score or the prompt, `docs/instruments.md`'s
       scoring loop runs before release.
-- [ ] The suite passes.
+- [x] The suite passes.
 
 ## Notes
 
@@ -63,3 +63,14 @@ did not say why.
 ## Log
 
 - 2026-09-29T21:29+08:00 — Written from US-434's scans of invoiceninja.com and plausible.io.
+- 2026-09-29T22:30+08:00 — Fixed by cutting, the first of the two ways: `reason` is a
+  `z.preprocess` that cuts a string over `longestReason` to 159 characters
+  and "…" before the same `min`/`max` check. `z.toJSONSchema` of
+  `classificationSchema` is byte for byte what it was, so a model that is sent
+  the schema, and one that reads it in the prompt, see the same text, and the
+  scoring captures are not needed. Tests first: the schema keeps an answer
+  with a long reason and its scores; the JSON schema still says 12 to 160; the
+  classify step turns such an answer into a match with one `scored` call (red
+  without the fix). Two more live scans on 2026-09-29 had 6 more refusals of
+  this shape.
+

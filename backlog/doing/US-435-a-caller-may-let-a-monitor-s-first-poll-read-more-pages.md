@@ -62,6 +62,8 @@ the budget guard checks the monthly cap before it as before.
 - [x] The window refuses a value below 1 day or above 365.
 - [x] A worker started with `pollPagesPerInput` reads that many pages of
       each input on every later poll, and a first poll keeps its own count.
+- [x] Either page option takes a count for each platform, and a platform it
+      does not name keeps its connector's cap.
 - [x] `docs/pipeline.md` and `docs/sources.md` name the option beside the
       caps, and `CHANGELOG.md` says what it changes for a consumer.
 - [x] The suite passes.
@@ -107,4 +109,7 @@ the budget guard checks the monthly cap before it as before.
   first. With either count set, a platform's cap for that poll is the count
   times its inputs, not `max(5, …)`: the old first-poll rule would have
   kept five pages when the caller asked for one.
+- 2026-09-29T23:24+08:00 — Six X phrases of two pages found 11 matches where three of four
+  found 25, on the same three pages (US-434), so Lookout wants X deeper than
+  Reddit: both page options now take a count per platform, `PageCount`.
 

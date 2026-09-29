@@ -53,7 +53,7 @@ import { webhookSecretFor } from "../notifications/secret.js";
 import { createNotificationTransport } from "../notifications/transport.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { createClassifyStep } from "./classify.js";
-import { createCollectStep } from "./collect.js";
+import { createCollectStep, type PageCount } from "./collect.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { admitEveryone, type EntitlementGate } from "./entitlement.js";
 import { createEstimateStep } from "./estimate.js";
@@ -202,7 +202,7 @@ export interface StartWorkerOptions {
    * in place of each connector's own cap. US-435. Unset, a first poll is
    * like every other, which is what both applications want.
    */
-  firstPollPagesPerInput?: number;
+  firstPollPagesPerInput?: PageCount;
   /**
    * How many days back a monitor's first poll may look, 1 to 365. US-435.
    * Unset, the first poll has no window, as before.
@@ -212,7 +212,7 @@ export interface StartWorkerOptions {
    * How many pages of each input every later poll may read, 1 to 20. US-435.
    * Unset, later polls use the connectors' caps, as before.
    */
-  pollPagesPerInput?: number;
+  pollPagesPerInput?: PageCount;
 }
 
 /**

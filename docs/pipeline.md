@@ -123,6 +123,8 @@ otherwise be months old. Later polls keep to their coverage.
 `pollPagesPerInput` does the same for every poll after the first, usually to
 read fewer pages than the connectors' two. With either count set, the
 platform's cap for that poll is the count times its inputs, not five.
+Either option takes one number, or a count for each platform by id; a
+platform a record leaves out keeps its connector's cap.
 
 **A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an

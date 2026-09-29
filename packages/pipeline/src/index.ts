@@ -392,6 +392,7 @@ export {
   excerptLength,
   maximumFirstPollWindowDays,
   maxPagesPerPoll,
+  type PageCount,
 } from "./worker/collect.js";
 export {
   type CredentialLookup,

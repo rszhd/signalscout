@@ -34,6 +34,12 @@ connector takes the count as `pagesPerInput` on `SearchRequest`; the engine
 exports `pagesPerInputFor` and `maximumPagesPerInput` for a connector of your
 own. A connector that buys one fixed batch per input ignores it.
 
+**Added.** A page count may differ by platform (US-435). Both
+`firstPollPagesPerInput` and `pollPagesPerInput` take one number for every
+platform, or a record by platform id such as `{ x: 4, reddit: 2 }`; a
+platform the record does not name keeps its connector's cap. `PageCount` is
+the type.
+
 **Added.** Every later poll may read another page count (US-435).
 `startWorker` takes `pollPagesPerInput`, 1 to 20, for every poll after the
 first, with the same rule: that many pages of each input, and the poll's cap

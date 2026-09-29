@@ -102,7 +102,7 @@ export interface CollectOptions {
    * a day with one input never reads further. Every later poll uses the
    * connectors' caps. Unset, the first poll is like every other.
    */
-  readonly firstPollPagesPerInput?: number | undefined;
+  readonly firstPollPagesPerInput?: PageCount | undefined;
   /**
    * How many days back a monitor's first poll may look, 1 to 365. US-435.
    * A first poll has no coverage, so it asks for everything, and a quiet
@@ -116,11 +116,22 @@ export interface CollectOptions {
    * daily poll cheaper; the first poll keeps `firstPollPagesPerInput`.
    * Unset, later polls use the connectors' caps, as before.
    */
-  readonly pollPagesPerInput?: number | undefined;
+  readonly pollPagesPerInput?: PageCount | undefined;
 }
 
 /** The longest window a first poll may be given. */
 export const maximumFirstPollWindowDays = 365;
+
+/**
+ * A page count for every platform, or one for each platform by id. A platform
+ * a record does not name keeps its connector's own cap. US-435.
+ */
+export type PageCount = number | Readonly<Record<string, number>>;
+
+/** The count for one platform, or nothing when it has none. */
+function countFor(count: PageCount | undefined, platform: string): number | undefined {
+  return typeof count === "number" ? count : count?.[platform];
+}
 
 /** How far one poll may page one source: per input, and in all. */
 interface PageLimits {
@@ -881,7 +892,9 @@ export function createCollectStep({
   // Refused at start-up, with the connectors' own rule, rather than on the
   // first monitor that meets it.
   for (const count of [firstPollPagesPerInput, pollPagesPerInput]) {
-    if (count !== undefined) pagesPerInputFor({ pagesPerInput: count }, maxPagesPerPoll);
+    const each =
+      count === undefined ? [] : typeof count === "number" ? [count] : Object.values(count);
+    for (const pages of each) pagesPerInputFor({ pagesPerInput: pages }, maxPagesPerPoll);
   }
   if (
     firstPollWindowDays !== undefined &&
@@ -1190,7 +1203,7 @@ export function createCollectStep({
             });
           },
           pageLimits(
-            firstPoll ? firstPollPagesPerInput : pollPagesPerInput,
+            countFor(firstPoll ? firstPollPagesPerInput : pollPagesPerInput, source.platform.id),
             queries.length + unitChannels.length,
           ),
           /**

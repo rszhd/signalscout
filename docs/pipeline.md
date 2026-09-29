@@ -55,7 +55,10 @@ at the end.
 7. **Stop** at five pages for this platform, or when the inputs are exhausted,
    or when the provider says it needs more time.
 8. **Count every page as it arrives.** A platform that throws on its third page
-   still reports the two it was billed for.
+   still reports the two it was billed for, and keeps their posts: they are
+   stored and filtered like any others, and the walk resumes at the page that
+   failed after ten minutes (BUG-436). A platform that throws on its first
+   page is a failed platform, as before.
 
 Then, once for the whole poll:
 

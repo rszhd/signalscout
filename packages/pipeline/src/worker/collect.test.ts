@@ -19,6 +19,7 @@ import {
   apiUsage,
   maxResumeAttempts,
   monitors,
+  pollRuns,
   posts,
   sourceContinuations,
   sourceCoverage,
@@ -251,6 +252,96 @@ describe("the poll step", () => {
     expect(stored).toHaveLength(fakePosts.length);
     expect(stored.every((post) => post.source === "reddit")).toBe(true);
     expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  describe("a source that fails part way through its walk (BUG-436)", () => {
+    const many: CandidatePost[] = Array.from({ length: 10 }, (_, index) => ({
+      externalId: `midwalk-${index}`,
+      url: `https://example.test/midwalk/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    /** The fake source, set to throw on the given call and answer every other. */
+    function failingOn(call: number) {
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+      const search = source.search.bind(source);
+      let calls = 0;
+      (source as { search: SocialSource["search"] }).search = async (request) => {
+        calls += 1;
+        if (calls === call) throw new Error("ScrapeCreators answered 500: Internal Server Error.");
+        return search(request);
+      };
+      return { registry, source };
+    }
+
+    it("keeps the pages it read before the error, and sends them to the filter", async () => {
+      const monitorId = await insertMonitor(database);
+      const { registry } = failingOn(3);
+      const boss = stubBoss();
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, boss),
+      );
+
+      const stored = await db.select().from(posts);
+      expect(stored.map((post) => post.externalId).sort()).toEqual(["midwalk-0", "midwalk-1"]);
+      expect(sentTo(boss, filterQueue).postIds).toHaveLength(2);
+
+      const [run] = await db.select().from(pollRuns).where(eq(pollRuns.monitorId, monitorId));
+      expect(run?.sources[0]).toMatchObject({ reason: "error", pages: 2, postsReturned: 2 });
+    });
+
+    it("resumes at the page that failed, later, rather than buying the first pages again", async () => {
+      const monitorId = await insertMonitor(database);
+      const { registry } = failingOn(3);
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const [kept] = await db
+        .select()
+        .from(sourceContinuations)
+        .where(eq(sourceContinuations.monitorId, monitorId));
+      // Not at once: the provider has just failed.
+      expect(kept?.resumeAfter.getTime()).toBeGreaterThan(Date.now());
+
+      await db
+        .update(sourceContinuations)
+        .set({ resumeAfter: new Date(Date.now() - 1000) })
+        .where(eq(sourceContinuations.monitorId, monitorId));
+      const healthy = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = healthy.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+      await createCollectStep({ registry: healthy, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls[0]?.cursor).toBe(kept?.cursor);
+      expect(source.calls[0]?.cursor).toBeDefined();
+    });
+
+    it("keeps nothing and remembers nothing when the first page fails, as before", async () => {
+      const monitorId = await insertMonitor(database);
+      const { registry } = failingOn(1);
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      ).catch(() => undefined);
+
+      expect(await db.select().from(posts)).toHaveLength(0);
+      expect(
+        await db
+          .select()
+          .from(sourceContinuations)
+          .where(eq(sourceContinuations.monitorId, monitorId)),
+      ).toHaveLength(0);
+    });
   });
 
   it("keeps Reddit's posts when SocialCrawl answers 503 for X, through the real connector", async () => {
@@ -1737,16 +1828,17 @@ describe("the poll step", () => {
         return search(request);
       };
 
-      await expect(
-        createCollectStep({ registry, credentialsFor: credentials })(
-          { monitorId },
-          contextFor(db, stubBoss()),
-        ),
-      ).rejects.toThrow("the provider hung up");
+      // Since BUG-436 the job finishes and keeps the two pages it paid for,
+      // where it used to throw them away with the error.
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
 
       const [usage] = await db.select().from(apiUsage);
 
       expect(usage?.units).toBe(8);
+      expect(await db.select().from(posts)).toHaveLength(2);
     });
   });
 });

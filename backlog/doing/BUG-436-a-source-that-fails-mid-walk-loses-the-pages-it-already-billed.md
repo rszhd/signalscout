@@ -41,14 +41,14 @@ the provider has just refused may not be one it takes back.
 
 ## Acceptance
 
-- [ ] A connector that throws on its third page leaves the posts of the first
+- [x] A connector that throws on its third page leaves the posts of the first
       two in `posts` and `post_discoveries`, and they reach the filter queue.
-- [ ] The poll run still records that source as `error`, with the units
+- [x] The poll run still records that source as `error`, with the units
       and cost of the pages it read.
-- [ ] The next poll does not buy the pages that were stored, or the ticket
+- [x] The next poll does not buy the pages that were stored, or the ticket
       says why it must.
-- [ ] A source that throws on its first page behaves as today.
-- [ ] The suite passes.
+- [x] A source that throws on its first page behaves as today.
+- [x] The suite passes.
 
 ## Notes
 
@@ -61,3 +61,18 @@ the provider has just refused may not be one it takes back.
 ## Log
 
 - 2026-09-29T21:07+08:00 — Written from US-434's fourth live scan.
+- 2026-09-29T23:31+08:00 — Fixed. `readSource` returns the pages it has, the error and the
+  failed page's cursor when a connector throws after at least one page; on
+  the first page it throws as before. The collect step stores and filters
+  those posts, notes the source as `error` with its pages and cost, and
+  remembers a continuation at the failed cursor, due after
+  `failedPageRetryMs` (ten minutes) rather than at once, so an outage is not
+  a loop of paid retries; the existing attempt limit drops a cursor that
+  keeps failing. The decision the Context left open: resume, not restart.
+  Such a source is not counted among the failed platforms, because the
+  all-failed throw comes before the insert and would lose the posts again; a
+  provider still down fails the resumed walk on its first page, which does
+  count. One existing test expected the job to throw after two billed pages;
+  it now expects the job to finish and keep them, and its point — both pages
+  on the ledger — is unchanged.
+

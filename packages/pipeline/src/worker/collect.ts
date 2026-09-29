@@ -173,7 +173,23 @@ interface SourceOutcome {
    * next one buy them a second time.
    */
   readonly moreCursor?: string;
+  /**
+   * Set when the connector failed after at least one page. BUG-436.
+   *
+   * The pages before it are collected and paid for, so they are returned and
+   * stored like any others, and the walk resumes at the page that failed.
+   */
+  readonly failure?: unknown;
+  /** The cursor of the page that failed, where the walk resumes. */
+  readonly failedCursor?: string;
 }
+
+/**
+ * How long a walk waits before it asks again for a page that failed. The
+ * provider has just answered with an error, and asking again at once is how
+ * one outage becomes a loop of paid retries.
+ */
+export const failedPageRetryMs = 10 * 60_000;
 
 /**
  * Page through one source until it is done, until it asks us to wait, or until
@@ -208,12 +224,28 @@ async function readSource(
   let more: string | undefined;
 
   while (pages < limits.perPoll) {
-    const result = await source.search({
-      query,
-      credentials,
-      cursor,
-      ...(limits.perInput === undefined ? {} : { pagesPerInput: limits.perInput }),
-    });
+    let result: Awaited<ReturnType<SocialSource["search"]>>;
+    try {
+      result = await source.search({
+        query,
+        credentials,
+        cursor,
+        ...(limits.perInput === undefined ? {} : { pagesPerInput: limits.perInput }),
+      });
+    } catch (error) {
+      // Nothing read yet: the source failed, as it always has. BUG-016.
+      if (pages === 0) throw error;
+      // Pages already read and paid for are kept. BUG-436.
+      return {
+        sourceId: source.platform.id,
+        providerId: source.provider.id,
+        pages,
+        posts: collected,
+        unitsConsumed,
+        failure: error,
+        ...(cursor === undefined ? {} : { failedCursor: cursor }),
+      };
+    }
 
     pages += 1;
     unitsConsumed += result.unitsConsumed;
@@ -708,6 +740,27 @@ async function recordWhereTheWalkStands(
         continuation.provider,
         continuation.query,
       );
+    }
+  } else if (outcome.failure !== undefined) {
+    /**
+     * The source failed part way. BUG-436. The walk is remembered at the page
+     * that failed, and asked again after `failedPageRetryMs`. A cursor that
+     * keeps failing is dropped by the attempt limit the resume path already
+     * applies. With no cursor the failure was on the walk's first page of
+     * this input, and nothing is remembered.
+     */
+    if (outcome.failedCursor) {
+      const resumeAfter = new Date(now.getTime() + failedPageRetryMs);
+      await rememberContinuation(db, monitorId, {
+        source: source.platform.id as Source,
+        query: unit.query,
+        provider: providerId as Provider,
+        cursor: outcome.failedCursor,
+        ...(window ? { since: window } : {}),
+        resumeAfter,
+        progressed,
+      });
+      wake = resumeAfter;
     }
   } else if (outcome.moreCursor) {
     /**
@@ -1238,13 +1291,30 @@ export function createCollectStep({
 
         outcomes.push(outcome);
 
+        if (outcome.failure !== undefined) {
+          // Not counted among `failures`: this platform returned pages, and
+          // the job must reach the insert below to keep them. A provider
+          // still down fails the resumed walk on its first page, which does
+          // count. BUG-436.
+          logger.error(
+            { monitorId, sourceId, providerId, pages: outcome.pages, err: outcome.failure },
+            "source failed part way: its pages are kept and the walk resumes later",
+          );
+        }
+
         poll.note(
           sourceId,
           providerId,
           // A wait and a page cap are both "there is more", and they send a
           // person nowhere: the walk comes back for it. They are recorded
           // because a short poll otherwise reads as a finished one.
-          outcome.waitUntil ? "provider_wait" : outcome.moreCursor ? "page_cap" : null,
+          outcome.failure !== undefined
+            ? "error"
+            : outcome.waitUntil
+              ? "provider_wait"
+              : outcome.moreCursor
+                ? "page_cap"
+                : null,
           {
             pages: outcome.pages,
             postsReturned: outcome.posts.length,

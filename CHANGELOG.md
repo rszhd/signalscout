@@ -53,6 +53,14 @@ newest pages can be months old. Later polls keep to their coverage as before,
 and a worker that does not set it is unchanged. `maximumFirstPollWindowDays`
 is exported.
 
+**Fixed.** A source that fails part way through a poll keeps what it read
+(BUG-436). The posts of the pages before the error are stored and sent to the
+filter, the poll run records that source as `error` with those pages, and the
+walk resumes at the page that failed ten minutes later instead of buying the
+first pages again. Such a source no longer counts as a failed platform, so a
+poll whose only platform failed on its third page now completes rather than
+throwing; one that fails on its first page throws as before.
+
 **Fixed.** One long reason no longer refuses a whole classification
 (BUG-437). A reason over 160 characters is cut to 160, ending in "…", and the
 answer keeps its scores; before, the post was retried and in the end dropped.

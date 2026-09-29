@@ -60,6 +60,8 @@ the budget guard checks the monthly cap before it as before.
       posts from that many days back and stores nothing older; a later poll
       keeps to its coverage; without it a first poll has no window.
 - [x] The window refuses a value below 1 day or above 365.
+- [x] A worker started with `pollPagesPerInput` reads that many pages of
+      each input on every later poll, and a first poll keeps its own count.
 - [x] `docs/pipeline.md` and `docs/sources.md` name the option beside the
       caps, and `CHANGELOG.md` says what it changes for a consumer.
 - [x] The suite passes.
@@ -99,3 +101,10 @@ the budget guard checks the monthly cap before it as before.
   search and the subreddit feed carry it (7 of 7, 23 of 23). No identity
   survived the scrubber. Not wired into the connector yet: whether a
   title-only post is worth classifying is the owner's call.
+- 2026-09-29T23:06+08:00 — The owner chose each subreddit's newest posts (with their
+  bodies) over the title-only subreddit search, and one page a daily poll.
+  So `startWorker` also takes `pollPagesPerInput`, for every poll after the
+  first. With either count set, a platform's cap for that poll is the count
+  times its inputs, not `max(5, …)`: the old first-poll rule would have
+  kept five pages when the caller asked for one.
+

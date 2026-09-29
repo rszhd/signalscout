@@ -682,6 +682,57 @@ describe("the poll step", () => {
     });
   });
 
+  describe("every later poll allowed another page count (US-435)", () => {
+    const many: CandidatePost[] = Array.from({ length: 40 }, (_, index) => ({
+      externalId: `later-${index}`,
+      url: `https://example.test/later/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    it("reads that many pages on a later poll", async () => {
+      const monitorId = await insertMonitor(database, {
+        lastPolledAt: new Date("2026-08-10T08:00:00.000Z"),
+      });
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, pollPagesPerInput: 1 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls).toHaveLength(1);
+      expect(source.calls[0]?.pagesPerInput).toBe(1);
+    });
+
+    it("leaves a first poll to its own option", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        firstPollPagesPerInput: 8,
+        pollPagesPerInput: 1,
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(source.calls).toHaveLength(8);
+      expect(source.calls.every((call) => call.pagesPerInput === 8)).toBe(true);
+    });
+
+    it("refuses a count the connectors would refuse", () => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          pollPagesPerInput: 0,
+        }),
+      ).toThrow(RangeError);
+    });
+  });
+
   describe("a first poll with a window (US-435)", () => {
     const day = 86_400_000;
     const recentAndOld = (): CandidatePost[] => [

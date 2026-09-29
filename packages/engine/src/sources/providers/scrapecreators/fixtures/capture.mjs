@@ -414,7 +414,9 @@ if (wanted("subreddit-search")) {
       { note: `followed the cursor from subreddit-search.json` },
     );
   } else {
-    failures.push("subreddit-search: the first page reported no cursor, so page two was not captured.");
+    failures.push(
+      "subreddit-search: the first page reported no cursor, so page two was not captured.",
+    );
   }
 }
 

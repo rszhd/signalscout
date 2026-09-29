@@ -110,6 +110,13 @@ export interface CollectOptions {
    * coverage. Unset, the first poll has no window, as before.
    */
   readonly firstPollWindowDays?: number | undefined;
+  /**
+   * How many pages of each input every poll after the first may read, in
+   * place of each connector's own cap. US-435. Lower than the cap makes a
+   * daily poll cheaper; the first poll keeps `firstPollPagesPerInput`.
+   * Unset, later polls use the connectors' caps, as before.
+   */
+  readonly pollPagesPerInput?: number | undefined;
 }
 
 /** The longest window a first poll may be given. */
@@ -120,6 +127,17 @@ interface PageLimits {
   /** Handed to the connector as `pagesPerInput`. Absent means its own cap. */
   readonly perInput?: number;
   readonly perPoll: number;
+}
+
+/**
+ * The limits for one platform in one poll. With a count set, each input may
+ * read that many pages and the poll's own cap is the count times the inputs,
+ * so a lower count really is fewer pages and a higher one reaches the last
+ * input. Unset, the connector's cap and `maxPagesPerPoll`, as always.
+ */
+function pageLimits(perInput: number | undefined, inputs: number): PageLimits {
+  if (perInput === undefined) return { perPoll: maxPagesPerPoll };
+  return { perInput, perPoll: perInput * Math.max(1, inputs) };
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -858,11 +876,12 @@ export function createCollectStep({
   creditWeights = {},
   firstPollPagesPerInput,
   firstPollWindowDays,
+  pollPagesPerInput,
 }: CollectOptions): Step<PollPayload> {
   // Refused at start-up, with the connectors' own rule, rather than on the
   // first monitor that meets it.
-  if (firstPollPagesPerInput !== undefined) {
-    pagesPerInputFor({ pagesPerInput: firstPollPagesPerInput }, maxPagesPerPoll);
+  for (const count of [firstPollPagesPerInput, pollPagesPerInput]) {
+    if (count !== undefined) pagesPerInputFor({ pagesPerInput: count }, maxPagesPerPoll);
   }
   if (
     firstPollWindowDays !== undefined &&
@@ -1170,17 +1189,10 @@ export function createCollectStep({
               pricePerUnitMicros: source.pricePerUnitMicros,
             });
           },
-          firstPoll && firstPollPagesPerInput !== undefined
-            ? {
-                perInput: firstPollPagesPerInput,
-                // Each input may use its pages, so the poll's own cap grows
-                // with the inputs rather than cutting the last ones off.
-                perPoll: Math.max(
-                  maxPagesPerPoll,
-                  firstPollPagesPerInput * Math.max(1, queries.length + unitChannels.length),
-                ),
-              }
-            : { perPoll: maxPagesPerPoll },
+          pageLimits(
+            firstPoll ? firstPollPagesPerInput : pollPagesPerInput,
+            queries.length + unitChannels.length,
+          ),
           /**
            * One platform's failure, kept to itself. BUG-016.
            *

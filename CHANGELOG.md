@@ -27,11 +27,18 @@ No migration.
 **Added.** A monitor's first poll may read more pages (US-435).
 `startWorker` takes `firstPollPagesPerInput`, 1 to 20: on a monitor's first
 poll each input may read that many pages in place of its connector's cap of
-two, and the poll's own cap of five pages a platform grows to fit. Every later
+two, and the poll's own cap of five pages a platform becomes that count
+times the platform's inputs. Every later
 poll is unchanged, and so is every poll of a worker that does not set it. A
 connector takes the count as `pagesPerInput` on `SearchRequest`; the engine
 exports `pagesPerInputFor` and `maximumPagesPerInput` for a connector of your
 own. A connector that buys one fixed batch per input ignores it.
+
+**Added.** Every later poll may read another page count (US-435).
+`startWorker` takes `pollPagesPerInput`, 1 to 20, for every poll after the
+first, with the same rule: that many pages of each input, and the poll's cap
+that count times the inputs. One page makes a daily poll cheaper. Unset,
+later polls are unchanged.
 
 **Added.** A monitor's first poll may have a window (US-435). `startWorker`
 takes `firstPollWindowDays`, 1 to 365: a first poll asks only for posts from

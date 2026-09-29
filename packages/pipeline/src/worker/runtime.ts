@@ -208,6 +208,11 @@ export interface StartWorkerOptions {
    * Unset, the first poll has no window, as before.
    */
   firstPollWindowDays?: number;
+  /**
+   * How many pages of each input every later poll may read, 1 to 20. US-435.
+   * Unset, later polls use the connectors' caps, as before.
+   */
+  pollPagesPerInput?: number;
 }
 
 /**
@@ -408,6 +413,7 @@ export async function startWorker({
   creditWeights,
   firstPollPagesPerInput,
   firstPollWindowDays,
+  pollPagesPerInput,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -578,6 +584,7 @@ export async function startWorker({
         creditWeights,
         firstPollPagesPerInput,
         firstPollWindowDays,
+        pollPagesPerInput,
       }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter:

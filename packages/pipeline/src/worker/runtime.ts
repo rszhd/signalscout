@@ -219,6 +219,13 @@ export interface StartWorkerOptions {
    * Unset, one at a time, as before.
    */
   classifyConcurrency?: number;
+  /**
+   * How many jobs of each pipeline queue (poll, filter, replies, classify,
+   * notify) the worker runs at the same time, 1 to 16. US-439. Two jobs of
+   * one monitor never overlap: each job's group is its monitor. Unset, one
+   * job at a time in each queue, as before.
+   */
+  queueConcurrency?: number;
 }
 
 /**
@@ -398,6 +405,9 @@ function triagerFromEnvironment(
   return createTriager({ config });
 }
 
+/** The most jobs of one queue a worker may run at once. */
+export const maximumQueueConcurrency = 16;
+
 export async function startWorker({
   databaseUrl,
   logger,
@@ -421,9 +431,22 @@ export async function startWorker({
   firstPollWindowDays,
   pollPagesPerInput,
   classifyConcurrency,
+  queueConcurrency,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
+  // Refused before anything connects, so a typo leaves nothing running.
+  if (
+    queueConcurrency !== undefined &&
+    (!Number.isInteger(queueConcurrency) ||
+      queueConcurrency < 1 ||
+      queueConcurrency > maximumQueueConcurrency)
+  ) {
+    throw new RangeError(
+      `queueConcurrency must be a whole number from 1 to ${maximumQueueConcurrency}, not ${queueConcurrency}`,
+    );
+  }
+
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
   configureNetworking();
@@ -654,13 +677,30 @@ export async function startWorker({
   const interval = pollingIntervalSeconds ?? pollingIntervalFromEnvironment();
   const workerOptions = interval === undefined ? {} : { pollingIntervalSeconds: interval };
 
+  /**
+   * A monitor's queues may run several jobs at once, one per monitor at most:
+   * the jobs are sent with their monitor as the group (`forMonitor`). US-439.
+   *
+   * `localGroupConcurrency`, counted in this process, and not the database's
+   * `groupConcurrency`: that one checks for a running job of the group as it
+   * fetches, and two pollers fetching at once both find none and both take a
+   * job of one monitor, which its test caught. So the rule holds within one
+   * worker process; two worker processes on one monitor are no better
+   * guarded than they were before this option.
+   */
+  const perMonitorOptions =
+    queueConcurrency === undefined || queueConcurrency === 1
+      ? workerOptions
+      : { ...workerOptions, localConcurrency: queueConcurrency, localGroupConcurrency: 1 };
+
   const work = async <Payload>(
     queue: string,
     step: Step<Payload>,
     subject: (payload: Payload) => Record<string, unknown>,
+    options: typeof perMonitorOptions = workerOptions,
   ): Promise<void> => {
     const run = instrument(queue, step, context, subject);
-    await boss.work<Payload>(queue, workerOptions, async (jobs) => {
+    await boss.work<Payload>(queue, options, async (jobs) => {
       for (const job of jobs) await run(job.data, job.id);
     });
   };
@@ -670,11 +710,11 @@ export async function startWorker({
   });
 
   await work(reconcileQueue, pipeline.reconcile, () => ({}));
-  await work<PollPayload>(pollQueue, pipeline.poll, named);
-  await work<FilterPayload>(filterQueue, pipeline.filter, named);
-  await work<RepliesPayload>(repliesQueue, pipeline.replies, named);
-  await work<ClassifyPayload>(classifyQueue, pipeline.classify, named);
-  await work<NotifyPayload>(notifyQueue, pipeline.notify, named);
+  await work<PollPayload>(pollQueue, pipeline.poll, named, perMonitorOptions);
+  await work<FilterPayload>(filterQueue, pipeline.filter, named, perMonitorOptions);
+  await work<RepliesPayload>(repliesQueue, pipeline.replies, named, perMonitorOptions);
+  await work<ClassifyPayload>(classifyQueue, pipeline.classify, named, perMonitorOptions);
+  await work<NotifyPayload>(notifyQueue, pipeline.notify, named, perMonitorOptions);
   await work<EstimatePayload>(estimateQueue, pipeline.estimate, ({ estimateId }) => ({
     estimateId,
   }));

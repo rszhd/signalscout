@@ -53,6 +53,14 @@ newest pages can be months old. Later polls keep to their coverage as before,
 and a worker that does not set it is unchanged. `maximumFirstPollWindowDays`
 is exported.
 
+**Added.** A worker may run a few jobs of one queue at once (US-439).
+`startWorker` takes `queueConcurrency`, 1 to 16, for the poll, filter,
+replies, classify and notify queues; two jobs of one monitor never overlap.
+Every pipeline job is now sent with its monitor as its pg-boss group, and
+`forMonitor` builds those options for a consumer that sends one itself. The
+limit is kept in the worker's memory, so it holds within one process. Unset,
+one job at a time in each queue, as before.
+
 **Added.** A classify job may score a few posts at once (US-438).
 `startWorker` takes `classifyConcurrency`, 1 to 16, and `createClassifyStep`
 takes it as `concurrency`. The posts still start in the order they were

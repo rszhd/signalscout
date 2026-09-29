@@ -72,7 +72,7 @@ import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
 import { loadCeiling } from "./ceiling.js";
 import { sendNotify } from "./notify.js";
 import type { ClassifyPayload } from "./queues.js";
-import { repliesQueue } from "./queues.js";
+import { forMonitor, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -367,7 +367,11 @@ async function sendJudgedThreads(
   if (threadIds.length > 0) {
     // The thread's own poll travels with it: a reply belongs to the poll
     // that found the post above it. US-211.
-    await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId, pollRunId });
+    await boss.send(
+      repliesQueue,
+      { monitorId, postIds: threadIds, walkId, pollRunId },
+      forMonitor(monitorId),
+    );
   }
 }
 

@@ -18,7 +18,7 @@ import type { PgBoss } from "pg-boss";
 import type { Database } from "../db/client.js";
 import { monitors } from "../db/schema.js";
 import { admitEveryone, type EntitlementGate } from "./entitlement.js";
-import { pollQueue } from "./queues.js";
+import { forMonitor, pollQueue } from "./queues.js";
 
 export interface DueMonitor {
   readonly id: string;
@@ -114,7 +114,7 @@ export async function enqueueDuePolls(
     const jobId = await boss.send(
       pollQueue,
       { monitorId: monitor.id },
-      { singletonKey: monitor.id },
+      forMonitor(monitor.id, { singletonKey: monitor.id }),
     );
 
     if (jobId === null) {

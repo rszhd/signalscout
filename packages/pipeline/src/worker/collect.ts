@@ -57,7 +57,7 @@ import {
 } from "./continuations.js";
 import { coverageFor, recordCoverage } from "./coverage.js";
 import type { CredentialLookup } from "./credentials.js";
-import { filterQueue, type PollPayload, pollQueue } from "./queues.js";
+import { filterQueue, forMonitor, type PollPayload, pollQueue } from "./queues.js";
 import { type CreditWeights, nextTurn, type Unit, unitKey, unitsOf } from "./rotation.js";
 import type { Step, StepContext } from "./steps.js";
 
@@ -1376,7 +1376,7 @@ export function createCollectStep({
         const jobId = await boss.send(
           pollQueue,
           { monitorId },
-          { singletonKey: monitorId, startAfter: wakeAt },
+          forMonitor(monitorId, { singletonKey: monitorId, startAfter: wakeAt }),
         );
 
         if (jobId === null) {
@@ -1406,14 +1406,18 @@ export function createCollectStep({
 
       await poll.finish(poll.stopReason === "provider_wait" ? "waiting" : "collected");
 
-      await boss.send(filterQueue, {
-        monitorId,
-        postIds: stored.map((row) => row.id),
-        walkId: await poll.walkId(),
-        // `finish` ran on the line above, so the row exists and this is its
-        // id. US-211.
-        ...(poll.pollRunId ? { pollRunId: poll.pollRunId } : {}),
-      });
+      await boss.send(
+        filterQueue,
+        {
+          monitorId,
+          postIds: stored.map((row) => row.id),
+          walkId: await poll.walkId(),
+          // `finish` ran on the line above, so the row exists and this is its
+          // id. US-211.
+          ...(poll.pollRunId ? { pollRunId: poll.pollRunId } : {}),
+        },
+        forMonitor(monitorId),
+      );
     } catch (error) {
       /**
        * The step threw, and the row is the only thing that will remember.

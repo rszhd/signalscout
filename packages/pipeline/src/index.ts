@@ -426,6 +426,7 @@ export {
   estimateQueue,
   type FilterPayload,
   filterQueue,
+  forMonitor,
   heartbeatQueue,
   type NotifyPayload,
   notifyQueue,
@@ -443,6 +444,7 @@ export {
 } from "./worker/queues.js";
 export {
   type HeartbeatPayload,
+  maximumQueueConcurrency,
   type StartWorkerOptions,
   startWorker,
   type WorkerHandle,

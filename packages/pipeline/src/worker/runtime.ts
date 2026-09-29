@@ -203,6 +203,11 @@ export interface StartWorkerOptions {
    * like every other, which is what both applications want.
    */
   firstPollPagesPerInput?: number;
+  /**
+   * How many days back a monitor's first poll may look, 1 to 365. US-435.
+   * Unset, the first poll has no window, as before.
+   */
+  firstPollWindowDays?: number;
 }
 
 /**
@@ -402,6 +407,7 @@ export async function startWorker({
   newPostsPerPairPerDay,
   creditWeights,
   firstPollPagesPerInput,
+  firstPollWindowDays,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -571,6 +577,7 @@ export async function startWorker({
         credentialsFor: lookup,
         creditWeights,
         firstPollPagesPerInput,
+        firstPollWindowDays,
       }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter:

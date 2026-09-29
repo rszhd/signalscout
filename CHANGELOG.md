@@ -33,6 +33,13 @@ connector takes the count as `pagesPerInput` on `SearchRequest`; the engine
 exports `pagesPerInputFor` and `maximumPagesPerInput` for a connector of your
 own. A connector that buys one fixed batch per input ignores it.
 
+**Added.** A monitor's first poll may have a window (US-435). `startWorker`
+takes `firstPollWindowDays`, 1 to 365: a first poll asks only for posts from
+that many days back, where today it asks for everything and a quiet query's
+newest pages can be months old. Later polls keep to their coverage as before,
+and a worker that does not set it is unchanged. `maximumFirstPollWindowDays`
+is exported.
+
 ## 0.18.0 — 2026-09-27
 
 No migration.

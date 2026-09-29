@@ -387,7 +387,12 @@ export {
   createClassifyStep,
   maxClassificationAttempts,
 } from "./worker/classify.js";
-export { createCollectStep, excerptLength, maxPagesPerPoll } from "./worker/collect.js";
+export {
+  createCollectStep,
+  excerptLength,
+  maximumFirstPollWindowDays,
+  maxPagesPerPoll,
+} from "./worker/collect.js";
 export {
   type CredentialLookup,
   credentialsFromEnvironment,

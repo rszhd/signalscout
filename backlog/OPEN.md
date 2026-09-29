@@ -8,7 +8,7 @@
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-418 | [The query plan writes the topic, not the question](doing/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | doing | 2026-09-26T02:07+08:00 |
-| p1 | US-435 | [A caller may let a monitor's first poll read more pages of each input](doing/US-435-a-caller-may-let-a-monitor-s-first-poll-read-more-pages.md) | feature | doing | 2026-09-29T20:04+08:00 |
+| p1 | US-435 | [A caller may let a monitor's first poll read more pages, and give it a window](doing/US-435-a-caller-may-let-a-monitor-s-first-poll-read-more-pages.md) | feature | doing | 2026-09-29T20:04+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |

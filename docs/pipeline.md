@@ -117,6 +117,9 @@ step hands that count to the connector as `pagesPerInput`, and lets the poll
 read that many pages of each input on each platform. Every later poll uses
 the caps above. Unset, which both applications leave it, a first poll is like
 any other. The cost test still projects an ordinary poll.
+`firstPollWindowDays` gives the same first poll a window: posts from that
+many days back and nothing older, where a quiet query's newest pages can
+otherwise be months old. Later polls keep to their coverage.
 
 **A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an

@@ -1,6 +1,6 @@
 ---
 id: US-435
-title: A caller may let a monitor's first poll read more pages of each input
+title: A caller may let a monitor's first poll read more pages, and give it a window
 type: feature
 priority: p1
 created: 2026-09-29T20:04+08:00
@@ -34,7 +34,13 @@ So the caller may raise the page count, and only for the first poll:
   passes it only while `last_polled_at` is empty, and lets that poll read
   that many pages of each input for each platform.
 
-**Nothing changes when the option is not set.** The self-hosted application
+**The first poll may also have a window.** With no window, a quiet query's
+newest pages reach back months: two of eleven matches in one US-434 scan were
+70 days and 1.5 years old. `startWorker` gains an optional
+`firstPollWindowDays`, and a first poll with no coverage asks only for posts
+from that many days back. Later polls keep to their coverage.
+
+**Nothing changes when an option is not set.** The self-hosted application
 and the hosted one do not set it, so their polls and their cost projections
 stay as they are. The cost test still projects an ordinary poll: a raised
 first poll is one poll's spend, counted in `api_usage` like any other, and
@@ -50,6 +56,10 @@ the budget guard checks the monthly cap before it as before.
       poll.
 - [x] A worker started without it polls exactly as before.
 - [x] The option refuses a value below 1 or above a fixed ceiling.
+- [x] A worker started with `firstPollWindowDays` asks a first poll for
+      posts from that many days back and stores nothing older; a later poll
+      keeps to its coverage; without it a first poll has no window.
+- [x] The window refuses a value below 1 day or above 365.
 - [x] `docs/pipeline.md` and `docs/sources.md` name the option beside the
       caps, and `CHANGELOG.md` says what it changes for a consumer.
 - [x] The suite passes.
@@ -73,3 +83,9 @@ the budget guard checks the monthly cap before it as before.
   poll, later poll, no option, a refused count). The full suite passes,
   2,559 tests. Not yet run against a real provider.
 
+- 2026-09-29T21:33+08:00 — The owner added the first-poll window to this ticket. `firstPollWindowDays`
+  on `startWorker`, 1 to 365, used only when a unit has no continuation and
+  no coverage on a first poll. Tests first: the window reaches the
+  connector and only posts inside it are stored; a later poll keeps its
+  coverage; no option, no window; out-of-range values are refused. The full
+  suite passes, 2,566 tests. Not yet run against a real provider.

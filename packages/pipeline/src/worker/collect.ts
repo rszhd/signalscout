@@ -103,7 +103,17 @@ export interface CollectOptions {
    * connectors' caps. Unset, the first poll is like every other.
    */
   readonly firstPollPagesPerInput?: number | undefined;
+  /**
+   * How many days back a monitor's first poll may look, 1 to 365. US-435.
+   * A first poll has no coverage, so it asks for everything, and a quiet
+   * query's newest pages can be months old. Every later poll keeps to its
+   * coverage. Unset, the first poll has no window, as before.
+   */
+  readonly firstPollWindowDays?: number | undefined;
 }
+
+/** The longest window a first poll may be given. */
+export const maximumFirstPollWindowDays = 365;
 
 /** How far one poll may page one source: per input, and in all. */
 interface PageLimits {
@@ -847,11 +857,22 @@ export function createCollectStep({
   credentialsFor,
   creditWeights = {},
   firstPollPagesPerInput,
+  firstPollWindowDays,
 }: CollectOptions): Step<PollPayload> {
   // Refused at start-up, with the connectors' own rule, rather than on the
   // first monitor that meets it.
   if (firstPollPagesPerInput !== undefined) {
     pagesPerInputFor({ pagesPerInput: firstPollPagesPerInput }, maxPagesPerPoll);
+  }
+  if (
+    firstPollWindowDays !== undefined &&
+    (!Number.isInteger(firstPollWindowDays) ||
+      firstPollWindowDays < 1 ||
+      firstPollWindowDays > maximumFirstPollWindowDays)
+  ) {
+    throw new RangeError(
+      `firstPollWindowDays must be a whole number from 1 to ${maximumFirstPollWindowDays}, not ${firstPollWindowDays}`,
+    );
   }
 
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
@@ -1076,7 +1097,13 @@ export function createCollectStep({
          * reading it here would ask for posts newer than the trigger, and every
          * record the collection was paid for would be filtered away as old.
          */
-        const window = continuation ? continuation.since : covered.get(unitKey(unit));
+        const window = continuation
+          ? continuation.since
+          : (covered.get(unitKey(unit)) ??
+            // A first poll's own window, when the application gives one.
+            (firstPoll && firstPollWindowDays !== undefined
+              ? new Date(now.getTime() - firstPollWindowDays * 86_400_000)
+              : undefined));
 
         /**
          * When this walk began, which is what a finished one marks. BUG-017.

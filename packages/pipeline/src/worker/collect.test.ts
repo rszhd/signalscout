@@ -682,6 +682,79 @@ describe("the poll step", () => {
     });
   });
 
+  describe("a first poll with a window (US-435)", () => {
+    const day = 86_400_000;
+    const recentAndOld = (): CandidatePost[] => [
+      {
+        externalId: "recent",
+        url: "https://example.test/recent",
+        text: "A recent post",
+        postedAt: new Date(Date.now() - day),
+      },
+      {
+        externalId: "old",
+        url: "https://example.test/old",
+        text: "An old post",
+        postedAt: new Date(Date.now() - 30 * day),
+      },
+    ];
+
+    it("asks only for posts inside the window, and stores only those", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: recentAndOld() });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      const before = Date.now();
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollWindowDays: 14 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const since = source.calls[0]?.query.since;
+      expect(since).toBeInstanceOf(Date);
+      expect(Math.abs((since as Date).getTime() - (before - 14 * day))).toBeLessThan(60_000);
+      const stored = await db.select().from(posts);
+      expect(stored.map((row) => row.externalId)).toEqual(["recent"]);
+    });
+
+    it("leaves a later poll to its coverage, as before", async () => {
+      const monitorId = await insertMonitor(database, { lastPolledAt: new Date(Date.now() - day) });
+      const registry = fakeRegistry({ posts: recentAndOld() });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollWindowDays: 14 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls[0]?.query.since).toBeUndefined();
+    });
+
+    it("sends no window on a first poll when the option is not given", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: recentAndOld() });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls[0]?.query.since).toBeUndefined();
+      expect(await db.select().from(posts)).toHaveLength(2);
+    });
+
+    it.each([0, -1, 1.5, 366])("refuses a window of %s days", (days) => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          firstPollWindowDays: days,
+        }),
+      ).toThrow(RangeError);
+    });
+  });
+
   it("stops when the source asks to be called back later", async () => {
     const monitorId = await insertMonitor(database);
     // One search, then the allowance is gone and the connector reports a wait.

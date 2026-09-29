@@ -17,6 +17,8 @@
  * Data are one row in `posts`, because that table is keyed by the platform.
  * STACK.md, *A source is not a provider*.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { redditPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -383,7 +385,8 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
   ): SearchResult["next"] {
     const pages = at.pages + 1;
     const reachedSince = request.query.since !== undefined && collected.length > 0 && kept === 0;
-    const exhausted = !page.after || pages >= maxPagesPerInput || reachedSince;
+    const exhausted =
+      !page.after || pages >= pagesPerInputFor(request, maxPagesPerInput) || reachedSince;
 
     if (!exhausted && page.after) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.after }) };

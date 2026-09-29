@@ -15,6 +15,8 @@
  * of a poll outweighs the model half, alone among the platforms. The leads
  * are in the few long comments; the median comment is four characters.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { instagramPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -253,7 +255,7 @@ export class SocialCrawlInstagramSource implements SocialSource {
       // The one input this request was for. US-212.
       foundBy: { kind: "query", value: query },
       unitsConsumed: page.creditsUsed,
-      next: this.nextAfter(request.query, start, page),
+      next: this.nextAfter(request.query, start, page, pagesPerInputFor(request, maxPagesPerInput)),
     };
   }
 
@@ -359,7 +361,7 @@ export class SocialCrawlInstagramSource implements SocialSource {
     return (windows.find((candidate) => age <= candidate.covers) ?? { value: widestWindow }).value;
   }
 
-  private nextAfter(query: SourceQuery, at: Cursor, page: Page): SearchResult["next"] {
+  private nextAfter(query: SourceQuery, at: Cursor, page: Page, cap: number): SearchResult["next"] {
     const pages = at.pages + 1;
 
     /**
@@ -376,7 +378,7 @@ export class SocialCrawlInstagramSource implements SocialSource {
      */
     const exhausted = page.records.length === 0;
 
-    if (!exhausted && page.cursor !== undefined && pages < maxPagesPerInput) {
+    if (!exhausted && page.cursor !== undefined && pages < cap) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.cursor }) };
     }
 

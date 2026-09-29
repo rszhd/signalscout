@@ -13,6 +13,7 @@ export {
   offeredConnectors,
   reasonsByProvider,
 } from "./offering.js";
+export { maximumPagesPerInput, pagesPerInputFor } from "./pages.js";
 export {
   groupByPlatform,
   instagramPlatform,

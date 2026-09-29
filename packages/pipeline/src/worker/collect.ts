@@ -32,6 +32,7 @@ import type {
   SourceQuery,
   SourceRegistry,
 } from "@signalscout/engine";
+import { pagesPerInputFor } from "@signalscout/engine";
 import { eq, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
@@ -94,6 +95,21 @@ export interface CollectOptions {
    * weighs one.
    */
   readonly creditWeights?: CreditWeights | undefined;
+  /**
+   * How many pages of each input a monitor's first poll may read, in place
+   * of each connector's own cap. US-435. The first poll has no window, so the
+   * cap is the newest few pages and nothing older; a caller that polls once
+   * a day with one input never reads further. Every later poll uses the
+   * connectors' caps. Unset, the first poll is like every other.
+   */
+  readonly firstPollPagesPerInput?: number | undefined;
+}
+
+/** How far one poll may page one source: per input, and in all. */
+interface PageLimits {
+  /** Handed to the connector as `pagesPerInput`. Absent means its own cap. */
+  readonly perInput?: number;
+  readonly perPoll: number;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -143,6 +159,7 @@ async function readSource(
    * same cap.
    */
   bill: (units: number) => Promise<void>,
+  limits: PageLimits,
 ): Promise<SourceOutcome> {
   const collected: CandidatePost[] = [];
   let unitsConsumed = 0;
@@ -151,8 +168,13 @@ async function readSource(
   /** Where the next page starts, while there is one. Cleared when the source is done. */
   let more: string | undefined;
 
-  while (pages < maxPagesPerPoll) {
-    const result = await source.search({ query, credentials, cursor });
+  while (pages < limits.perPoll) {
+    const result = await source.search({
+      query,
+      credentials,
+      cursor,
+      ...(limits.perInput === undefined ? {} : { pagesPerInput: limits.perInput }),
+    });
 
     pages += 1;
     unitsConsumed += result.unitsConsumed;
@@ -824,7 +846,14 @@ export function createCollectStep({
   registry,
   credentialsFor,
   creditWeights = {},
+  firstPollPagesPerInput,
 }: CollectOptions): Step<PollPayload> {
+  // Refused at start-up, with the connectors' own rule, rather than on the
+  // first monitor that meets it.
+  if (firstPollPagesPerInput !== undefined) {
+    pagesPerInputFor({ pagesPerInput: firstPollPagesPerInput }, maxPagesPerPoll);
+  }
+
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
 
@@ -840,6 +869,8 @@ export function createCollectStep({
     }
 
     const poll = new PollRecord(db, logger, monitor);
+    // Read before this poll marks `last_polled_at`, so it is the fact.
+    const firstPoll = monitor.lastPolledAt === null;
 
     /**
      * Platforms that were actually asked, and the ones whose provider threw.
@@ -1112,6 +1143,17 @@ export function createCollectStep({
               pricePerUnitMicros: source.pricePerUnitMicros,
             });
           },
+          firstPoll && firstPollPagesPerInput !== undefined
+            ? {
+                perInput: firstPollPagesPerInput,
+                // Each input may use its pages, so the poll's own cap grows
+                // with the inputs rather than cutting the last ones off.
+                perPoll: Math.max(
+                  maxPagesPerPoll,
+                  firstPollPagesPerInput * Math.max(1, queries.length + unitChannels.length),
+                ),
+              }
+            : { perPoll: maxPagesPerPoll },
           /**
            * One platform's failure, kept to itself. BUG-016.
            *

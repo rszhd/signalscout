@@ -197,6 +197,12 @@ export interface StartWorkerOptions {
    * numbers, like the ceiling above.
    */
   creditWeights?: CreditWeights;
+  /**
+   * How many pages of each input a monitor's first poll may read, 1 to 20,
+   * in place of each connector's own cap. US-435. Unset, a first poll is
+   * like every other, which is what both applications want.
+   */
+  firstPollPagesPerInput?: number;
 }
 
 /**
@@ -395,6 +401,7 @@ export async function startWorker({
   entitled = admitEveryone,
   newPostsPerPairPerDay,
   creditWeights,
+  firstPollPagesPerInput,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -558,7 +565,13 @@ export async function startWorker({
     reconcile:
       steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
     poll:
-      steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup, creditWeights }),
+      steps.poll ??
+      createCollectStep({
+        registry: sources,
+        credentialsFor: lookup,
+        creditWeights,
+        firstPollPagesPerInput,
+      }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter:
       steps.filter ??

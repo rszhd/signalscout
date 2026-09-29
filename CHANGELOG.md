@@ -20,6 +20,19 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## Unreleased
+
+No migration.
+
+**Added.** A monitor's first poll may read more pages (US-435).
+`startWorker` takes `firstPollPagesPerInput`, 1 to 20: on a monitor's first
+poll each input may read that many pages in place of its connector's cap of
+two, and the poll's own cap of five pages a platform grows to fit. Every later
+poll is unchanged, and so is every poll of a worker that does not set it. A
+connector takes the count as `pagesPerInput` on `SearchRequest`; the engine
+exports `pagesPerInputFor` and `maximumPagesPerInput` for a connector of your
+own. A connector that buys one fixed batch per input ignores it.
+
 ## 0.18.0 — 2026-09-27
 
 No migration.

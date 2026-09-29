@@ -99,7 +99,7 @@ later.
 | Cap | Value | What it stops |
 | --- | --- | --- |
 | Pages per poll, per platform | 5 | One poll spending without bound. A page's cost is known only after it is fetched |
-| Pages per input | 2 on Reddit | One keyword eating a whole poll |
+| Pages per input | 2, in every connector that pages | One keyword eating a whole poll |
 | Threads per replies job | 25 | One job opening every thread a poll found |
 | Pages per thread | 4 | One conversation paging for ever |
 | Comments per thread | 500 | A thread that grows faster than it is read |
@@ -109,6 +109,14 @@ later.
 
 The monthly cap in `budgets` is the limit on what a monitor may spend. These
 are the limits on how far one job can carry it past that before the next check.
+
+**A first poll may read further.** US-435. The first poll has no window, so
+two pages of an input are its newest posts and nothing older. `startWorker`
+takes `firstPollPagesPerInput`: while `last_polled_at` is empty, the collect
+step hands that count to the connector as `pagesPerInput`, and lets the poll
+read that many pages of each input on each platform. Every later poll uses
+the caps above. Unset, which both applications leave it, a first poll is like
+any other. The cost test still projects an ordinary poll.
 
 **A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an

@@ -284,6 +284,19 @@ describe("searching", () => {
     expect(scrapeCreatorsReddit.maxUnitsPerQueryPoll).toBe(2);
   });
 
+  it("pages one input further when the caller allows more pages", async () => {
+    const stub = scrapeCreators([searchPage1, searchPage2]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const first = await source.search(request({ pagesPerInput: 3 }));
+    const second = await source.search(
+      request({ pagesPerInput: 3, cursor: (first.next as { cursor: string }).cursor }),
+    );
+
+    // The same two pages that stop the test above; the caller asked for three.
+    expect(second.next.status).toBe("ready");
+  });
+
   it("moves to the next keyword when the provider reports no more pages", async () => {
     const exhausted: Captured = {
       httpStatus: 200,

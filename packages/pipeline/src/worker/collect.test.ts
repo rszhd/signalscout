@@ -611,6 +611,77 @@ describe("the poll step", () => {
     expect(await db.select().from(posts)).toHaveLength(maxPagesPerPoll);
   });
 
+  describe("a first poll allowed more pages (US-435)", () => {
+    const many: CandidatePost[] = Array.from({ length: 40 }, (_, index) => ({
+      externalId: `first-${index}`,
+      url: `https://example.test/first/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    it("reads that many pages of its one input, past the poll's own cap", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollPagesPerInput: 8 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(maxPagesPerPoll).toBeLessThan(8);
+      expect(source.calls).toHaveLength(8);
+      expect(source.calls.every((call) => call.pagesPerInput === 8)).toBe(true);
+    });
+
+    it("asks for the connector's own cap on every later poll", async () => {
+      const monitorId = await insertMonitor(database, {
+        lastPolledAt: new Date("2026-08-10T08:00:00.000Z"),
+      });
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollPagesPerInput: 8 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls).toHaveLength(maxPagesPerPoll);
+      expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+    });
+
+    it("changes nothing when the option is not given", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls).toHaveLength(maxPagesPerPoll);
+      expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+    });
+
+    it("refuses a count the connectors would refuse", () => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          firstPollPagesPerInput: 0,
+        }),
+      ).toThrow(RangeError);
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          firstPollPagesPerInput: 21,
+        }),
+      ).toThrow(RangeError);
+    });
+  });
+
   it("stops when the source asks to be called back later", async () => {
     const monitorId = await insertMonitor(database);
     // One search, then the allowance is gone and the connector reports a wait.

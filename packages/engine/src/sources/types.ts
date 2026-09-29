@@ -125,6 +125,12 @@ export interface SearchRequest {
    * have more: read `next`, never the length of `posts`.
    */
   readonly limit?: number;
+  /**
+   * How many pages of one input this poll may buy, in place of the
+   * connector's own cap. Absent means the cap. A connector that buys one
+   * fixed batch per input ignores it. `pages.ts` holds the rule. US-435.
+   */
+  readonly pagesPerInput?: number;
   readonly signal?: AbortSignal;
 }
 

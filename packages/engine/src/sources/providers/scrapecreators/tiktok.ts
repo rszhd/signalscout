@@ -36,6 +36,7 @@
  *    deduplicates on the id, which is TikTok's own.
  */
 
+import { pagesPerInputFor } from "../../pages.js";
 import { tikTokPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -284,7 +285,7 @@ export class ScrapeCreatorsTikTokSource implements SocialSource {
       // The one input this request was for. US-212.
       foundBy: { kind: "query", value: query },
       unitsConsumed: page.creditsCharged,
-      next: this.nextAfter(request.query, start, page),
+      next: this.nextAfter(request.query, start, page, pagesPerInputFor(request, maxPagesPerInput)),
     };
   }
 
@@ -337,10 +338,10 @@ export class ScrapeCreatorsTikTokSource implements SocialSource {
    * missing: this page is not in date order, so a page of old videos says
    * nothing about the next page and cannot end the walk.
    */
-  private nextAfter(query: SourceQuery, at: Cursor, page: Page): SearchResult["next"] {
+  private nextAfter(query: SourceQuery, at: Cursor, page: Page, cap: number): SearchResult["next"] {
     const pages = at.pages + 1;
 
-    if (page.after && pages < maxPagesPerInput) {
+    if (page.after && pages < cap) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.after }) };
     }
 

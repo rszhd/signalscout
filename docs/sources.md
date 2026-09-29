@@ -76,6 +76,14 @@ five times its cap. Where replies cost differently from posts, declare
 caller sets no limit. The cost test uses it as the top of its range for a
 query whose sample came back full.
 
+**A connector that pages by cursor honours `pagesPerInput`.** US-435. Stop
+an input at `pagesPerInputFor(request, yourCap)` pages, never at your cap
+alone: the pipeline asks for more on a monitor's first poll when an
+application tells it to, and the helper throws on a count outside 1 to 20.
+`maxUnitsPerQueryPoll` stays your cap's figure, because the cost test
+projects ordinary polls. A connector that buys one fixed batch per input has
+nothing to page and ignores the field.
+
 **The client builds on `providers/core.ts`.** Its error subclasses
 `ProviderError` with the kinds this provider can produce; `readAnswer` reads
 every response; `retryAfterDate` turns a `Retry-After` header into a wait,

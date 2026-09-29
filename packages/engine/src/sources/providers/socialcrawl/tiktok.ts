@@ -36,6 +36,8 @@
  * is written down here because the classifier will meet it before anybody
  * plans for it.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { tikTokPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -209,7 +211,7 @@ export class SocialCrawlTikTokSource implements SocialSource {
       // The one input this request was for. US-212.
       foundBy: { kind: "query", value: query },
       unitsConsumed: page.creditsUsed,
-      next: this.nextAfter(request.query, start, page),
+      next: this.nextAfter(request.query, start, page, pagesPerInputFor(request, maxPagesPerInput)),
     };
   }
 
@@ -289,10 +291,10 @@ export class SocialCrawlTikTokSource implements SocialSource {
     return query.queries.length > 0 ? { index: 0, pages: 0 } : undefined;
   }
 
-  private nextAfter(query: SourceQuery, at: Cursor, page: Page): SearchResult["next"] {
+  private nextAfter(query: SourceQuery, at: Cursor, page: Page, cap: number): SearchResult["next"] {
     const pages = at.pages + 1;
 
-    if (page.cursor !== undefined && pages < maxPagesPerInput) {
+    if (page.cursor !== undefined && pages < cap) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.cursor }) };
     }
 

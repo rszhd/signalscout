@@ -15,6 +15,8 @@
  * It is the first connector for X, and X is the second platform. Nothing
  * downstream learns which provider answered.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { xPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -399,7 +401,8 @@ export class SocialCrawlXSource implements SocialSource {
   ): SearchResult["next"] {
     const pages = at.pages + 1;
     const reachedSince = request.query.since !== undefined && collected.length > 0 && kept === 0;
-    const exhausted = !page.cursor || pages >= maxPagesPerInput || reachedSince;
+    const exhausted =
+      !page.cursor || pages >= pagesPerInputFor(request, maxPagesPerInput) || reachedSince;
 
     if (!exhausted && page.cursor) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.cursor }) };

@@ -62,7 +62,7 @@ best first, no ask words, the subreddit section.
       side. The cost is said before it runs (`docs/instruments.md`).
 - [ ] Two or three real monitors' plans, old and new, are run once each, and
       the Log gives posts and matches per phrase.
-- [ ] The owner decides the release: it changes the queries of every new
+- [x] The owner decides the release: it changes the queries of every new
       monitor, in both applications.
 
 ## Notes
@@ -104,3 +104,5 @@ best first, no ask words, the subreddit section.
   Not a clear win at eight queries a platform. What US-434 measured was one
   to three queries, where the first one decides the scan. The live run
   (acceptance four) decides whether this ships.
+- 2026-09-30T10:11+08:00 — Shipped in 0.19.0 on the owner's word, before the live run. The
+  live run stays open: compare new cloud monitors' queries with older ones.

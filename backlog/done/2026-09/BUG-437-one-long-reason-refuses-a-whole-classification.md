@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-29T21:29+08:00
 parent:
 area: classifier
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -73,4 +73,4 @@ did not say why.
   classify step turns such an answer into a match with one `scored` call (red
   without the fix). Two more live scans on 2026-09-29 had 6 more refusals of
   this shape.
-
+- 2026-09-30T10:11+08:00 — Shipped in 0.19.0 (tag v0.19.0, merge commit f94b846).

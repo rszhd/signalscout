@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-29T23:45+08:00
 parent:
 area: classifier
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -62,3 +62,4 @@ The default stays one. Neither application changes unless it sets it.
   while the loop awaits the database does not stop the process; the loop
   still sees it and the job fails as before. Not run against a real
   provider's rate limit yet.
+- 2026-09-30T10:11+08:00 — Shipped in 0.19.0 (tag v0.19.0, merge commit f94b846).

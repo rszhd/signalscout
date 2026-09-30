@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-29T23:57+08:00
 parent:
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -51,3 +51,4 @@ the spend meter's re-read already covers.
 - 2026-09-29T23:57+08:00 — Built on the owner's word, three at a time for Lookout. Jobs queued
   before an upgrade carry no group and are not held to the limit; they
   drain within minutes.
+- 2026-09-30T10:11+08:00 — Shipped in 0.19.0 (tag v0.19.0, merge commit f94b846).

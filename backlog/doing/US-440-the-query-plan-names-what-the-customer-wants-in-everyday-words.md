@@ -51,13 +51,13 @@ best first, no ask words, the subreddit section.
 
 ## Acceptance
 
-- [ ] `buildQuerySystemPrompt` gives examples from several kinds of product,
+- [x] `buildQuerySystemPrompt` gives examples from several kinds of product,
       allows an everyday category name and refuses jargon, writes for the
       main everyday use, and asks for different ways in, with the situation
       in complaint words.
-- [ ] The per-platform rules, the word limits and the 3-to-8 count are
+- [x] The per-platform rules, the word limits and the 3-to-8 count are
       unchanged, and `usablePlanFrom`'s tests pass as they are.
-- [ ] The query capture (`ai/fixtures/capture-queries.ts`) is re-run before
+- [x] The query capture (`ai/fixtures/capture-queries.ts`) is re-run before
       and after on the same projects, and the Log lists the phrases side by
       side. The cost is said before it runs (`docs/instruments.md`).
 - [ ] Two or three real monitors' plans, old and new, are run once each, and
@@ -85,3 +85,22 @@ best first, no ask words, the subreddit section.
   `platforms.ts` still says "not the words of the product category"; it is
   US-385's text and is left alone, and the new rule reads it as the
   marketing words. No model has seen the new prompt yet.
+- 2026-09-30T09:52+08:00 — Side by side, no search, gpt-5.6-sol (the cloud's query model),
+  Reddit and X only, five of US-434's page descriptions, the owner's lower
+  budget: $0.193 for ten calls. With eight queries a platform the two
+  prompts write close lists; the difference is mostly the first query.
+  calendly.com: "scheduling back and forth" / "scheduling ping pong" became
+  "meeting scheduler", beside "schedule meetings", the phrase that matched
+  in US-434's live scan. mailchimp.com: "email marketing tool" became
+  "email marketing", which found no match in 85 X posts there, and "SMS
+  marketing" came in from the page's newer features. allbirds.com gained
+  complaint phrases ("sweaty feet", "shoes hurt"). plausible.io and
+  supabase.com changed little; both prompts put a competitor first
+  ("Google Analytics alternative", "Firebase alternative"). The capture
+  (`capture:queries`, $0.010) ran on gpt-5.6-terra, the open repo's
+  model, where the last one ran on gpt-6-sol, so its before and after
+  differ by model too: the new plan names more tools ("Cypress tests",
+  "Playwright tests") and one broad phrase on X ("UI changes").
+  Not a clear win at eight queries a platform. What US-434 measured was one
+  to three queries, where the first one decides the scan. The live run
+  (acceptance four) decides whether this ships.

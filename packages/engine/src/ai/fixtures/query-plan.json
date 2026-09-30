@@ -1,7 +1,7 @@
 {
   "provider": "openai",
-  "model": "gpt-6-sol",
-  "capturedAt": "2026-09-27T13:24:58.102Z",
+  "model": "gpt-5.6-terra",
+  "capturedAt": "2026-09-30T01:51:40.593Z",
   "note": "The model's own answer for `exampleMonitor` in examples.ts, as the AI SDK parsed it.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -16,60 +16,71 @@
   "object": {
     "queries": {
       "reddit": [
-        "flaky e2e tests",
-        "selectors keep breaking",
+        "flaky tests",
         "manual regression testing",
-        "Cypress tests brittle",
-        "testing before release"
+        "tests break UI",
+        "end to end tests",
+        "browser tests",
+        "Cypress tests",
+        "Playwright tests"
       ],
       "x": [
-        "flaky e2e",
-        "selectors break",
-        "manual regression",
-        "Cypress tests fail",
-        "release testing"
+        "flaky tests",
+        "manual testing",
+        "regression testing",
+        "UI changes",
+        "Cypress tests",
+        "Playwright tests"
       ],
       "linkedin": [
         "end to end tests keep breaking",
-        "UI changes break our tests",
-        "testing by hand before every release",
-        "Cypress tests are hard to maintain",
-        "shipping without a QA engineer"
+        "manual testing before every release",
+        "regression testing takes too long",
+        "UI changes break tests",
+        "flaky browser tests",
+        "testing releases without QA",
+        "Cypress tests"
       ],
       "youtube": [
         "flaky end to end tests",
-        "selectors break after UI changes",
-        "manual regression testing before release",
-        "Cypress tests keep failing",
-        "testing releases without a QA engineer"
+        "manual regression testing",
+        "UI changes break tests",
+        "browser tests keep failing",
+        "Cypress tests flaky",
+        "Playwright tests flaky"
       ],
       "tiktok": [
-        "website tests keep breaking",
-        "testing everything before launch",
-        "changed a button tests failed",
-        "Cypress tests keep failing"
+        "flaky tests",
+        "manual regression testing",
+        "tests keep failing",
+        "UI changes tests",
+        "browser tests",
+        "Cypress tests"
       ],
       "instagram": [
         "flaky end to end tests",
+        "manual regression testing",
+        "browser tests failing",
         "UI changes break tests",
-        "manual testing before release",
-        "Cypress tests keep failing"
+        "testing every release",
+        "Cypress tests"
       ]
     },
     "subreddits": [
       "SaaS",
       "startups",
       "webdev",
-      "QualityAssurance",
-      "softwaretesting",
-      "Frontend",
-      "devops"
+      "Entrepreneur",
+      "indiehackers",
+      "reactjs",
+      "node",
+      "QualityAssurance"
     ]
   },
   "usage": {
-    "inputTokens": 1448,
-    "outputTokens": 730
+    "inputTokens": 1670,
+    "outputTokens": 579
   },
-  "latencyMs": 13470,
-  "estimatedCostMicros": 10196
+  "latencyMs": 9080,
+  "estimatedCostMicros": 10288
 }

@@ -20,6 +20,33 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.20.0 — 2026-09-30
+
+One migration, in the pipeline's stream: `0073` adds `rescore` to the
+purposes `model_calls` accepts. It widens a check constraint and changes no
+row.
+
+**Added.** A second model may confirm a match before it is written (US-441).
+`startWorker` takes `rescorer`, a `Classifier`: a post the classifier scores
+at or above the monitor's bar is classified again with the same input, and
+the match takes the second answer; below the bar there, no match. A second
+call that fails leaves the first score. Its call is recorded under the
+purpose `rescore`, so a count of classifications stays one per post, and the
+monitor's spend includes it. `rescorePolls: "first"` limits it to each
+monitor's first collection; `"every"` is the default. `createClassifyStep`
+takes the same as `rescorerFor` and `rescorePolls`. Unset, scores are
+unchanged.
+
+**Added.** The SocialCrawl Reddit connector may browse a subreddit beside
+its keyword searches (US-442). `createSocialCrawlReddit({ browseSubreddits:
+true })` reads each subreddit's new posts first, then every keyword inside
+every subreddit; the default, and the `socialCrawlReddit` export, keep the
+scoped searches alone. A browsed post is found by the subreddit.
+
+**Security.** The pipeline depends on `nodemailer` `^10.0.6`, past a high
+advisory of 2026-09-29 (backtracking in its address parser). Nothing else
+changes for a consumer.
+
 ## 0.19.0 — 2026-09-30
 
 No migration.

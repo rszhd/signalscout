@@ -16,7 +16,13 @@ import { redditPlatformId } from "../../platforms.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
 import type { ReplyRequest, SearchRequest, SourceRuntime } from "../../types.js";
 import { socialCrawlProviderId } from "./provider.js";
-import { flatten, SocialCrawlRedditSource, socialCrawlReddit, toCandidatePost } from "./reddit.js";
+import {
+  createSocialCrawlReddit,
+  flatten,
+  SocialCrawlRedditSource,
+  socialCrawlReddit,
+  toCandidatePost,
+} from "./reddit.js";
 
 interface Captured {
   readonly httpStatus: number;
@@ -188,6 +194,56 @@ describe("which endpoint a monitor's answers reach", () => {
 
     // Two queries by two subreddits is four pairs, however many pages each.
     expect(new Set([...asked].map((url) => url.replace(/&cursor=[^&]*/, ""))).size).toBe(4);
+  });
+});
+
+describe("a connector asked to browse the subreddits too", () => {
+  /** Every url one monitor's walk asks, without the page cursor. */
+  async function walk(source: SocialCrawlRedditSource, query: Partial<SearchRequest["query"]>) {
+    const { calls } = stub;
+    let cursor: string | undefined;
+    for (let call = 0; call < 20; call += 1) {
+      const result = await source.search(request(query, { cursor }));
+      if (result.next.status !== "ready") break;
+      cursor = result.next.cursor;
+    }
+    return calls.map((call) => call.url.replace(/&cursor=[^&]*/, ""));
+  }
+  let stub: ReturnType<typeof socialCrawl>;
+
+  it("reads each subreddit first, then the keyword inside it", async () => {
+    stub = socialCrawl([subredditPosts]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch), { browseSubreddits: true });
+
+    const asked = await walk(source, { queries: ["flaky tests"], channels: ["a", "b"] });
+    const firstScoped = asked.findIndex((url) => url.includes("/subreddit/search"));
+
+    expect(asked[0]).toContain("/v1/reddit/subreddit?");
+    expect(asked[0]).toContain("subreddit=a");
+    expect(asked.slice(0, firstScoped).every((url) => url.includes("/v1/reddit/subreddit?"))).toBe(
+      true,
+    );
+    expect(new Set(asked.filter((url) => url.includes("/v1/reddit/subreddit?"))).size).toBe(2);
+    expect(new Set(asked.filter((url) => url.includes("/subreddit/search"))).size).toBe(2);
+    // Never across all of Reddit: the monitor named its subreddits.
+    expect(asked.some((url) => url.includes("/v1/reddit/search?"))).toBe(false);
+  });
+
+  it("names the subreddit as what found a browsed post", async () => {
+    stub = socialCrawl([subredditPosts]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch), { browseSubreddits: true });
+
+    const result = await source.search(request({ queries: ["flaky tests"], channels: ["a"] }));
+
+    expect(result.foundBy).toEqual({ kind: "channel", value: "a" });
+  });
+
+  it("is the same connector otherwise, built by the factory", () => {
+    const { create, ...rest } = createSocialCrawlReddit({ browseSubreddits: true });
+    const { create: _, ...plain } = socialCrawlReddit;
+
+    expect(rest).toEqual(plain);
+    expect(create(runtimeWith(unreachableFetch))).toBeInstanceOf(SocialCrawlRedditSource);
   });
 });
 

@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-29T20:04+08:00
 parent:
 area: sources
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -112,4 +112,4 @@ the budget guard checks the monthly cap before it as before.
 - 2026-09-29T23:24+08:00 — Six X phrases of two pages found 11 matches where three of four
   found 25, on the same three pages (US-434), so Lookout wants X deeper than
   Reddit: both page options now take a count per platform, `PageCount`.
-
+- 2026-09-30T10:11+08:00 — Shipped in 0.19.0 (tag v0.19.0, merge commit f94b846).

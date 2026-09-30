@@ -220,6 +220,17 @@ export interface StartWorkerOptions {
    */
   classifyConcurrency?: number;
   /**
+   * A second model that reads again every post the classifier passes, for
+   * every owner on the instance. US-441. The match takes its scores. Unset,
+   * the classifier's score stands, as before.
+   */
+  rescorer?: Classifier;
+  /**
+   * Which polls the rescorer reads: `every`, the default, or only each
+   * monitor's `first` collection.
+   */
+  rescorePolls?: "first" | "every";
+  /**
    * How many jobs of each pipeline queue (poll, filter, replies, classify,
    * notify) the worker runs at the same time, 1 to 16. US-439. Two jobs of
    * one monitor never overlap: each job's group is its monitor. Unset, one
@@ -431,6 +442,8 @@ export async function startWorker({
   firstPollWindowDays,
   pollPagesPerInput,
   classifyConcurrency,
+  rescorer,
+  rescorePolls,
   queueConcurrency,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
@@ -632,6 +645,7 @@ export async function startWorker({
         classifierFor: async (userId) => (await modelsFor(userId)).classifier,
         newPostsPerPairPerDay,
         ...(classifyConcurrency === undefined ? {} : { concurrency: classifyConcurrency }),
+        ...(rescorer === undefined ? {} : { rescorerFor: async () => rescorer, rescorePolls }),
       }),
     notify:
       steps.notify ??

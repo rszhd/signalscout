@@ -2,10 +2,12 @@
 
 # Done
 
-253 finished.
+258 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-437 | [One reason over 160 characters refuses a whole classification](done/2026-09/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | shipped | 2026-09 |
+| BUG-436 | [A source that fails part way through a poll loses the pages it already billed](done/2026-09/BUG-436-a-source-that-fails-mid-walk-loses-the-pages-it-already-billed.md) | bug | shipped | 2026-09 |
 | BUG-431 | [A thread test reads the previous test's continuation](done/2026-09/BUG-431-a-thread-test-reads-the-previous-test-s-continuation.md) | bug | shipped | 2026-09 |
 | BUG-427 | [SocialCrawl comment pages are counted at five times their cost](done/2026-09/BUG-427-socialcrawl-comment-pages-are-counted-at-five-times-their-cost.md) | bug | shipped | 2026-09 |
 | BUG-426 | [SocialCrawl drops every Instagram comment](done/2026-09/BUG-426-socialcrawl-drops-every-instagram-comment.md) | bug | shipped | 2026-09 |
@@ -41,6 +43,9 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-439 | [A worker may run a few jobs of one queue at once, one per monitor](done/2026-09/US-439-a-worker-may-run-a-few-jobs-of-one-queue-at-once.md) | feature | shipped | 2026-09 |
+| US-438 | [A classify job may score a few posts at the same time](done/2026-09/US-438-a-classify-job-may-score-a-few-posts-at-once.md) | feature | shipped | 2026-09 |
+| US-435 | [A caller may let a monitor's first poll read more pages, and give it a window](done/2026-09/US-435-a-caller-may-let-a-monitor-s-first-poll-read-more-pages.md) | feature | shipped | 2026-09 |
 | US-407 | [A monitor is edited from its page](done/2026-09/US-407-a-monitor-is-edited-from-its-page.md) | feature | shipped | 2026-09 |
 | US-405 | [A reply voice holds every rule](done/2026-09/US-405-a-reply-voice-holds-every-rule.md) | feature | shipped | 2026-09 |
 | US-400 | [A post written twice is one card](done/2026-09/US-400-a-post-written-twice-is-one-card.md) | feature | shipped | 2026-09 |

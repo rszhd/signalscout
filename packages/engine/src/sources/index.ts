@@ -84,6 +84,11 @@ export {
   socialCrawlLinkedIn,
   toCandidatePost as toSocialCrawlLinkedInCandidatePost,
 } from "./providers/socialcrawl/linkedin.js";
+export {
+  createSocialCrawlReddit,
+  type SocialCrawlRedditOptions,
+  socialCrawlReddit,
+} from "./providers/socialcrawl/reddit.js";
 export { socialDataProvider, socialDataProviderId } from "./providers/socialdata/provider.js";
 export {
   SocialDataXSource,

@@ -52,7 +52,7 @@ import {
   scoreColumns,
   type ThreadContext,
 } from "@signalscout/engine";
-import { and, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
@@ -63,6 +63,7 @@ import {
   matches,
   modelCalls,
   monitors,
+  pollRuns,
   postCopies,
   posts,
   type Signal,
@@ -126,6 +127,21 @@ export interface ClassifyOptions {
    * always did.
    */
   readonly concurrency?: number | undefined;
+  /**
+   * A second, stronger model for the posts the first one passes. US-441.
+   *
+   * The first model reads every post, so it is the cheap one. Only a post it
+   * scores at or above the bar is read again, and the match takes the second
+   * model's scores: below the bar there, no match. Unset, or undefined for an
+   * owner, the first model's score stands, as before.
+   */
+  readonly rescorerFor?: ((userId: string) => Promise<Classifier | undefined>) | undefined;
+  /**
+   * Which polls the rescorer reads: `every`, the default, or only the
+   * monitor's `first` collection, whose posts are the ones a new monitor is
+   * judged by. A later poll's matches keep the first model's score.
+   */
+  readonly rescorePolls?: "first" | "every" | undefined;
 }
 
 /** The most calls one classify job may keep in flight. */
@@ -375,10 +391,37 @@ async function sendJudgedThreads(
   }
 }
 
+/**
+ * Whether a job's posts come from the monitor's first collection.
+ *
+ * A collection is a walk: every poll job of it, a resumed page included,
+ * carries one `walk_id`, and so does every classify job it leads to, replies
+ * too. The first walk is the one on the monitor's earliest poll row. A job
+ * with no walk is not the first. `poll_runs` keeps a monitor's newest 200
+ * rows, so after that many polls the earliest row left is a later walk's,
+ * whose jobs finished long before.
+ */
+async function isFirstWalk(
+  db: Database,
+  monitorId: string,
+  walkId: string | undefined,
+): Promise<boolean> {
+  if (!walkId) return false;
+  const [earliest] = await db
+    .select({ walkId: pollRuns.walkId })
+    .from(pollRuns)
+    .where(eq(pollRuns.monitorId, monitorId))
+    .orderBy(asc(pollRuns.startedAt))
+    .limit(1);
+  return earliest?.walkId === walkId;
+}
+
 export function createClassifyStep({
   classifierFor,
   newPostsPerPairPerDay,
   concurrency = 1,
+  rescorerFor,
+  rescorePolls = "every",
 }: ClassifyOptions): Step<ClassifyPayload> {
   if (
     !Number.isInteger(concurrency) ||
@@ -477,6 +520,11 @@ export function createClassifyStep({
       return;
     }
 
+    const rescorer =
+      rescorerFor && (rescorePolls === "every" || (await isFirstWalk(db, monitorId, walkId)))
+        ? await rescorerFor(monitor.userId)
+        : undefined;
+
     const ids = [...postIds];
 
     const { candidates, alreadyScored, alreadyMatched, attemptsByPost, alreadyCopied, copiesOf } =
@@ -551,7 +599,8 @@ export function createClassifyStep({
     const meter = await createSpendMeter(db, monitorId);
     let unspentFor = 0;
 
-    const record = async (
+    const recordAs = async (
+      purpose: "classification" | "rescore",
       tx: Queryable,
       postId: string,
       outcome: ModelCallOutcome,
@@ -561,7 +610,7 @@ export function createClassifyStep({
       spentMicros += call.estimatedCostMicros ?? 0;
       meter.spent(call.estimatedCostMicros);
       await recordModelCall(tx, {
-        purpose: "classification",
+        purpose,
         outcome,
         call,
         userId: monitor.userId,
@@ -571,6 +620,13 @@ export function createClassifyStep({
         error,
       });
     };
+    const record = (
+      tx: Queryable,
+      postId: string,
+      outcome: ModelCallOutcome,
+      call: ModelCall,
+      error?: string,
+    ) => recordAs("classification", tx, postId, outcome, call, error);
 
     /**
      * `concurrency` calls at most, one by default. US-438. The provider's rate
@@ -594,10 +650,8 @@ export function createClassifyStep({
       key: string | undefined,
       others: NonNullable<ReturnType<typeof copiesOf.get>>,
     ): Promise<void> => {
-      const outcome = await classifier.classify({
-        monitor: profile,
-        post: { ...post, ...(threads.get(post.id) ?? {}) },
-      });
+      const request = { monitor: profile, post: { ...post, ...(threads.get(post.id) ?? {}) } };
+      const outcome = await classifier.classify(request);
       returned += 1;
       largestCallMicros = Math.max(largestCallMicros, outcome.call.estimatedCostMicros ?? 0);
 
@@ -622,7 +676,40 @@ export function createClassifyStep({
         );
       }
 
-      if (outcome.score < monitor.minScore) {
+      /**
+       * The second model's read, for a post the first one passed. US-441.
+       *
+       * Same request, thread included. Its answer replaces the first: the
+       * match gets its scores, and below the bar there is no match. A second
+       * call that fails leaves the first answer standing, because the post's
+       * classification row is written below and nothing would ever ask again.
+       */
+      let final = outcome;
+      if (rescorer && outcome.score >= monitor.minScore) {
+        const second = await rescorer.classify(request);
+        // The reservation above reads this: with a second model, a post that
+        // passes costs both calls.
+        largestCallMicros = Math.max(
+          largestCallMicros,
+          (outcome.call.estimatedCostMicros ?? 0) + (second.call.estimatedCostMicros ?? 0),
+        );
+        if (second.status === "scored") {
+          await recordAs("rescore", db, post.id, "scored", second.call);
+          logger.info(
+            { monitorId, postId: post.id, first: outcome.score, second: second.score },
+            "match rescored",
+          );
+          final = second;
+        } else {
+          await recordAs("rescore", db, post.id, second.status, second.call, second.error);
+          logger.warn(
+            { monitorId, postId: post.id, outcome: second.status, err: second.error },
+            "the second model did not score this match; the first model's score stands",
+          );
+        }
+      }
+
+      if (final.score < monitor.minScore) {
         if (key) {
           belowHere.set(key, [
             ...(belowHere.get(key) ?? []),
@@ -631,13 +718,16 @@ export function createClassifyStep({
         }
         await record(db, post.id, "scored", outcome.call);
         logger.debug(
-          { monitorId, postId: post.id, score: outcome.score, threshold: monitor.minScore },
+          { monitorId, postId: post.id, score: final.score, threshold: monitor.minScore },
           "post scored below the monitor's threshold",
         );
         return;
       }
 
-      const row = await writeMatch(db, record, monitorId, post.id, outcome);
+      const row = await writeMatch(db, record, monitorId, post.id, {
+        call: outcome.call,
+        classification: final.classification,
+      });
 
       if (row && !alreadyMatched.has(post.id)) matchIds.push(row.id);
 

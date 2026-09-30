@@ -61,7 +61,7 @@
     "@signalscout/engine": "workspace:*",
     "ai": "7.0.106",
     "drizzle-orm": "0.45.2",
-    "nodemailer": "^10.0.0",
+    "nodemailer": "^10.0.6",
     "pg": "8.23.0",
     "pg-boss": "12.30.0",
     "pino": "10.1.0",

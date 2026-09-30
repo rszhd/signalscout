@@ -124,6 +124,15 @@ export const modelCallPurposes = [
    * would report a monitor reading posts it never read.
    */
   "key_test",
+  /**
+   * A second model's read of a post the classifier passed. US-441.
+   *
+   * Its own purpose because every count of classifications is one per post:
+   * the daily ceiling, the scan's "scored" figure. A second row under
+   * `classification` would count a post twice. The money is the monitor's
+   * like any other call, so the budget and the spend include it.
+   */
+  "rescore",
 ] as const;
 
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];

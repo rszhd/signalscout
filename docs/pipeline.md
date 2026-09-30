@@ -181,6 +181,16 @@ this version is skipped and not paid for again — the skip is asked of the call
 ledger, not of `matches`, because a post scored below the threshold writes no
 match. A score at or above the monitor's threshold becomes a match.
 
+**A second model may confirm a match.** US-441. `startWorker` takes a
+`rescorer`, a second classifier, usually a stronger model. A post the
+classifier scores at or above the threshold is read again with the same
+input, and the match takes the second model's scores; below the threshold
+there, no match. A second call that fails leaves the first score standing.
+The call is recorded under the purpose `rescore`, so every count of
+classifications stays one per post, and the monitor's spend includes it.
+Unset, which this repository's application leaves it, the classifier's
+score stands.
+
 **A post written twice is one card.** US-400. A
 post whose author made the same post within a week — same platform, same
 words by `posts.text_fingerprint` — and whose earlier copy already has a card
@@ -201,7 +211,7 @@ sweeps every monitor with settings, so a lost enqueue cannot lose a match.
 | Poll | `poll_runs`, `posts`, `post_discoveries`, `api_usage`, `source_continuations`, `source_coverage` |
 | Filter | `stage_runs`, `filter_drops`, `model_calls` (embedding, triage) |
 | Replies | `stage_runs`, `posts`, `api_usage` |
-| Classify | `stage_runs`, `model_calls`, `matches`, `post_copies` |
+| Classify | `stage_runs`, `model_calls` (classification, rescore), `matches`, `post_copies` |
 | Notify | `stage_runs`, `notification_deliveries` |
 
 `poll_runs` keeps 200 rows per monitor and `stage_runs` keeps 800, so a stage

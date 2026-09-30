@@ -2,7 +2,7 @@
 
 # Open tickets
 
-80 open — 12 doing, 59 todo, 9 parked (8 p1, 55 p2, 17 p3).
+80 open — 13 doing, 58 todo, 9 parked (8 p1, 55 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -19,6 +19,7 @@
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
 | p2 | US-438 | [A classify job may score a few posts at the same time](doing/US-438-a-classify-job-may-score-a-few-posts-at-once.md) | feature | doing | 2026-09-29T23:45+08:00 |
 | p2 | US-439 | [A worker may run a few jobs of one queue at once, one per monitor](doing/US-439-a-worker-may-run-a-few-jobs-of-one-queue-at-once.md) | feature | doing | 2026-09-29T23:57+08:00 |
+| p2 | US-440 | [The query plan names what the customer wants, in everyday words](doing/US-440-the-query-plan-names-what-the-customer-wants-in-everyday-words.md) | feature | doing | 2026-09-30T09:42+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | BUG-436 | [A source that fails part way through a poll loses the pages it already billed](doing/BUG-436-a-source-that-fails-mid-walk-loses-the-pages-it-already-billed.md) | bug | doing | 2026-09-29T21:07+08:00 |
 | p2 | BUG-437 | [One reason over 160 characters refuses a whole classification](doing/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | doing | 2026-09-29T21:29+08:00 |
@@ -62,7 +63,6 @@
 | p2 | US-422 | [A phrase that hits the page limit says so](todo/US-422-a-phrase-that-hits-the-page-limit-says-so.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-423 | [A monitor is told what each platform returns](todo/US-423-a-monitor-is-told-what-each-platform-returns.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-425 | [Instagram comments are read at a cheaper provider](todo/US-425-instagram-comments-are-read-at-a-cheaper-provider.md) | spike | todo | 2026-09-26T02:32+08:00 |
-| p2 | US-440 | [The query plan names what the customer wants, in everyday words](todo/US-440-the-query-plan-names-what-the-customer-wants-in-everyday-words.md) | feature | todo | 2026-09-30T09:42+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |

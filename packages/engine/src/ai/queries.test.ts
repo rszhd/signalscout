@@ -235,6 +235,36 @@ describe("the prompt the model is given", () => {
     expect(prompt).toContain("'customer call', 'class notes'");
   });
 
+  it("names what the customer wants, with everyday category words but no jargon", () => {
+    // US-440. "prefer the problem over the category" gave "customer
+    // conversations" and "social listening"; the everyday name of the thing
+    // is what people type, and marketing words find vendors.
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).not.toContain("Prefer the words of the problem over the words of the category");
+    expect(prompt).toContain("the everyday name of the thing they want");
+    expect(prompt).toContain("'password manager'");
+    expect(prompt).toContain("A word from the product's marketing is not");
+    expect(prompt).toContain("main everyday use");
+  });
+
+  it("gives examples from more than one kind of product", () => {
+    // US-440. Examples from one kind were copied onto every other kind.
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    for (const example of ["'find leads'", "'running shoes'", "'invoice clients'"]) {
+      expect(prompt).toContain(example);
+    }
+  });
+
+  it("asks for different ways in, with the situation in a customer's words", () => {
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).toContain("the thing itself, the task, and the situation");
+    expect(prompt).toContain("in the words a customer puts in a complaint");
+    expect(prompt).toContain("never an industry term");
+  });
+
   it("asks for the best query first, because a monitor may run only that one", () => {
     const prompt = buildQuerySystemPrompt(bothPlatforms);
 

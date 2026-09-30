@@ -76,3 +76,12 @@ best first, no ask words, the subreddit section.
 ## Log
 
 - 2026-09-30T09:42+08:00 — Written on the owner's word, from US-434's comparisons.
+- 2026-09-30T09:46+08:00 — Prompt changed. The first paragraph now asks for the everyday
+  name of the thing, the task or the situation, for the main everyday use;
+  an everyday category name is allowed and marketing words are refused;
+  examples come from four kinds of product; the ways-in paragraph names the
+  thing, the task and the situation, the situation in complaint words. The
+  US-418 sentences its tests quote are unchanged. The Reddit note in
+  `platforms.ts` still says "not the words of the product category"; it is
+  US-385's text and is left alone, and the new rule reads it as the
+  marketing words. No model has seen the new prompt yet.

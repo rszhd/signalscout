@@ -49,6 +49,27 @@ const maxPagesPerInput = 2;
 /** What one comment call costs, in the provider's credits. */
 const commentCallCredits = 5;
 
+export interface SocialCrawlRedditOptions {
+  /**
+   * Also read everything new in each subreddit, before the keyword searches
+   * inside it. Off, a monitor that names both keywords and subreddits gets
+   * only the scoped searches, which is the precise and the thin mode: a
+   * keyword inside a small subreddit returns a few posts a page. On, the
+   * classifier reads the rest of the subreddit too.
+   */
+  readonly browseSubreddits?: boolean;
+}
+
+/** This connector with options; `socialCrawlReddit` is it with none. */
+export function createSocialCrawlReddit(
+  options: SocialCrawlRedditOptions = {},
+): ConnectorDefinition {
+  return {
+    ...socialCrawlReddit,
+    create: (runtime) => new SocialCrawlRedditSource(runtime, options),
+  };
+}
+
 export const socialCrawlReddit: ConnectorDefinition = {
   platform: redditPlatform,
   provider: socialCrawlProvider,
@@ -155,7 +176,18 @@ export class SocialCrawlRedditSource implements SocialSource {
   readonly canFetchReplies = socialCrawlReddit.canFetchReplies;
   readonly replyPricePerUnitMicros = socialCrawlReddit.replyPricePerUnitMicros;
 
-  constructor(private readonly runtime: SourceRuntime) {}
+  /** The phases in the order this instance walks them. */
+  private readonly phases: readonly Phase[];
+
+  constructor(
+    private readonly runtime: SourceRuntime,
+    private readonly options: SocialCrawlRedditOptions = {},
+  ) {
+    // Browsing goes first: a poll that stops at its page cap has read the
+    // subreddits, which gave most of the matches on the other Reddit
+    // connectors, and a later poll picks the scoped searches up.
+    this.phases = options.browseSubreddits ? ["subreddit", "scoped", "keyword"] : phases;
+  }
 
   private client(
     credentials: SourceCredentials,
@@ -352,8 +384,9 @@ export class SocialCrawlRedditSource implements SocialSource {
     if (phase === "subreddit") {
       // Skipped when the scoped phase already covered these channels: asking
       // for everything recent in a subreddit we just searched by keyword buys
-      // the noise the keyword was there to avoid.
-      if (queries.length > 0) return [];
+      // the noise the keyword was there to avoid. Unless the application asked
+      // for that noise, and has a classifier to read it.
+      if (queries.length > 0 && !this.options.browseSubreddits) return [];
 
       return channels.map((channel) => ({
         profile: redditSubredditProfile,
@@ -383,7 +416,7 @@ export class SocialCrawlRedditSource implements SocialSource {
   }
 
   private first(query: SourceQuery): Cursor | undefined {
-    for (const phase of phases) {
+    for (const phase of this.phases) {
       if (this.inputsFor(query, phase).length > 0) return { phase, index: 0, pages: 0 };
     }
     return undefined;
@@ -405,7 +438,7 @@ export class SocialCrawlRedditSource implements SocialSource {
       };
     }
 
-    for (const phase of phases.slice(phases.indexOf(at.phase) + 1)) {
+    for (const phase of this.phases.slice(this.phases.indexOf(at.phase) + 1)) {
       if (this.inputsFor(query, phase).length > 0) {
         return { status: "ready", cursor: encodeCursor({ phase, index: 0, pages: 0 }) };
       }

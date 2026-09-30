@@ -231,6 +231,11 @@ export interface StartWorkerOptions {
    */
   rescorePolls?: "first" | "every";
   /**
+   * The most matches one collection may make. US-443. Past it, the classify
+   * step reads no more of that collection's posts. Unset, no cap.
+   */
+  matchesPerCollection?: number;
+  /**
    * How many jobs of each pipeline queue (poll, filter, replies, classify,
    * notify) the worker runs at the same time, 1 to 16. US-439. Two jobs of
    * one monitor never overlap: each job's group is its monitor. Unset, one
@@ -444,6 +449,7 @@ export async function startWorker({
   classifyConcurrency,
   rescorer,
   rescorePolls,
+  matchesPerCollection,
   queueConcurrency,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
@@ -646,6 +652,7 @@ export async function startWorker({
         newPostsPerPairPerDay,
         ...(classifyConcurrency === undefined ? {} : { concurrency: classifyConcurrency }),
         ...(rescorer === undefined ? {} : { rescorerFor: async () => rescorer, rescorePolls }),
+        ...(matchesPerCollection === undefined ? {} : { matchesPerCollection }),
       }),
     notify:
       steps.notify ??

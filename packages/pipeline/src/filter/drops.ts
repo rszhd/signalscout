@@ -101,6 +101,9 @@ export async function filterDropCounts(
   >();
 
   for (const row of rows) {
+    // Not a filter a person tunes: the classify step's match cap (US-443)
+    // writes its drops here only so a screen counts the post as seen.
+    if (row.stage === "match_cap") continue;
     const entry = counts.get(row.monitorId) ?? { ...noFilterDrops };
     entry[row.stage] = Number(row.dropped);
     counts.set(row.monitorId, entry);

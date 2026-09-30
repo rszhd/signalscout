@@ -142,6 +142,13 @@ export interface ClassifyOptions {
    * judged by. A later poll's matches keep the first model's score.
    */
   readonly rescorePolls?: "first" | "every" | undefined;
+  /**
+   * The most matches one collection may make, 1 or more. US-443. Once a walk
+   * has that many, the step reads no more of its posts: they are written as
+   * `match_cap` drops, never paid for. Calls already in flight finish, so a
+   * collection can end up to `concurrency - 1` over. Unset, no cap.
+   */
+  readonly matchesPerCollection?: number | undefined;
 }
 
 /** The most calls one classify job may keep in flight. */
@@ -392,6 +399,30 @@ async function sendJudgedThreads(
 }
 
 /**
+ * The matches a collection has made so far. US-443.
+ *
+ * A match is counted from the start of its walk's first poll, so every job of
+ * one collection shares one count. A job with no walk counts only its own.
+ */
+async function matchesInWalk(
+  db: Database,
+  monitorId: string,
+  walkId: string | undefined,
+): Promise<number> {
+  if (!walkId) return 0;
+  const [start] = await db
+    .select({ at: sql<Date | null>`min(${pollRuns.startedAt})` })
+    .from(pollRuns)
+    .where(and(eq(pollRuns.monitorId, monitorId), eq(pollRuns.walkId, walkId)));
+  if (!start?.at) return 0;
+  const [row] = await db
+    .select({ n: count() })
+    .from(matches)
+    .where(and(eq(matches.monitorId, monitorId), sql`${matches.createdAt} >= ${start.at}`));
+  return Number(row?.n ?? 0);
+}
+
+/**
  * Whether a job's posts come from the monitor's first collection.
  *
  * A collection is a walk: every poll job of it, a resumed page included,
@@ -422,6 +453,7 @@ export function createClassifyStep({
   concurrency = 1,
   rescorerFor,
   rescorePolls = "every",
+  matchesPerCollection,
 }: ClassifyOptions): Step<ClassifyPayload> {
   if (
     !Number.isInteger(concurrency) ||
@@ -430,6 +462,14 @@ export function createClassifyStep({
   ) {
     throw new RangeError(
       `concurrency must be a whole number from 1 to ${maximumClassifyConcurrency}, not ${concurrency}`,
+    );
+  }
+  if (
+    matchesPerCollection !== undefined &&
+    (!Number.isInteger(matchesPerCollection) || matchesPerCollection < 1)
+  ) {
+    throw new RangeError(
+      `matchesPerCollection must be a whole number of 1 or more, not ${matchesPerCollection}`,
     );
   }
 
@@ -572,6 +612,10 @@ export function createClassifyStep({
             newPostsPerPairPerDay,
           );
     const refused: string[] = [];
+    /** Posts left unread because the collection had its matches. US-443. */
+    const capped: string[] = [];
+    const matchedBefore =
+      matchesPerCollection === undefined ? 0 : await matchesInWalk(db, monitorId, walkId);
 
     const profile = profileOf(monitor);
     const matchIds: string[] = [];
@@ -781,6 +825,15 @@ export function createClassifyStep({
           await settleOne();
         }
 
+        // Asked after the wait, so the calls that just finished have counted.
+        if (
+          matchesPerCollection !== undefined &&
+          matchedBefore + matchIds.length >= matchesPerCollection
+        ) {
+          capped.push(post.id);
+          continue;
+        }
+
         /**
          * Out of money, so stop rather than finish the batch.
          *
@@ -861,6 +914,17 @@ export function createClassifyStep({
         "posts left unread: their pairs have put the day's number to the classifier",
       );
     }
+    await recordFilterDrops(
+      db,
+      monitorId,
+      capped.map((postId) => ({ postId, stage: "match_cap" as const })),
+    );
+    if (capped.length > 0) {
+      logger.info(
+        { monitorId, capped: capped.length, limit: matchesPerCollection },
+        "posts left unread: the collection has its matches",
+      );
+    }
 
     logger.info(
       {
@@ -873,6 +937,7 @@ export function createClassifyStep({
         dropped,
         unclassified: retryable,
         atCeiling: refused.length,
+        atMatchCap: capped.length,
         spentMicros,
         model: classifier.model,
         unspentFor,
@@ -912,6 +977,7 @@ export function createClassifyStep({
           unclassified: retryable,
           dropped,
           leftByCap: unspentFor,
+          leftByMatchCap: capped.length,
         },
         stopReason: retryable > 0 ? "error" : unspentFor > 0 ? "budget_exhausted" : null,
       },

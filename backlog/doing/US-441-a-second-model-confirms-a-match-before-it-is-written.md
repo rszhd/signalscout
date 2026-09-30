@@ -49,7 +49,7 @@ not the posts read.
       first model's score.
 - [x] Tests cover: a confirmed match, a match the second model drops, a
       second call that fails, and no rescorer.
-- [ ] One live scan with the rescorer on (BuyerFinder, gpt-6-sol), and the
+- [x] One live scan with the rescorer on (BuyerFinder, gpt-6-sol), and the
       Log gives each match's first and second score and the cost.
 
 ## Notes
@@ -86,3 +86,10 @@ not the posts read.
 - 2026-09-30 14:46 — The owner asked for the rescorer on the first scan only.
   `rescorePolls: "first"` reads the job's walk against the monitor's earliest
   poll row; `every` stays the default.
+- 2026-09-30 15:31 — Live again, allbirds.com with US-442's browse, first
+  and second scores at info. 216 posts classified ($0.135); 67 passed the
+  bar and were rescored ($0.263, $0.0039 a call). The second model moved 37
+  up and 28 down (median +1, from -54 to +22), put 13 below the bar, and
+  raised the strong leads (75 and over) from 14 to 24. No second call failed.
+  The rescore cost as much as the classifier: with the browse, far more posts
+  pass the bar than the 10 of the first run.

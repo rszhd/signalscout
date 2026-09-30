@@ -38,7 +38,7 @@ option adds it; the default stays the scoped mode alone.
 - [x] A browsed post is found by the subreddit (`kind: "channel"`).
 - [x] Tests cover the order, the discovery, and the factory; nothing reaches
       the network.
-- [ ] One live scan with the option (BuyerFinder), and the Log gives posts
+- [x] One live scan with the option (BuyerFinder), and the Log gives posts
       and matches for browse and scoped searches.
 
 ## Notes
@@ -57,3 +57,11 @@ option adds it; the default stays the scoped mode alone.
   `reddit.test.ts` (31 pass); the engine suite passes (41 files, 822 tests),
   and lint and the type-check pass. BuyerFinder runs it against this working
   copy; not live yet.
+- 2026-09-30 15:31 — Live, one BuyerFinder scan of allbirds.com on this
+  working copy, 3 keywords and 6 subreddits. Reddit read 32 pages ($0.260)
+  over three polls; SocialCrawl answered 503 twice and the walk resumed. The
+  browse found 285 posts and 23 matches; the keyword inside the subreddits
+  81 posts and 33 matches (49 Reddit matches in all). The same scan this
+  morning, scoped only and stopped by a 503 after one page: 16 posts, 8
+  matches. The browse's matches per post (8%) are lower than the scoped
+  search's (41%), and it is what adds most of the posts.

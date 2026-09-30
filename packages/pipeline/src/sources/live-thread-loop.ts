@@ -46,7 +46,13 @@ import { ownerUserId } from "../live/owner.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import { createFilterStep } from "../worker/filter.js";
-import { classifyQueue, filterQueue, notifyQueue, repliesQueue } from "../worker/queues.js";
+import {
+  classifyQueue,
+  filterQueue,
+  forMonitor,
+  notifyQueue,
+  repliesQueue,
+} from "../worker/queues.js";
 import { createRepliesStep, maxCommentsPerThread, replyBatchSize } from "../worker/replies.js";
 import type { StepContext } from "../worker/steps.js";
 
@@ -243,7 +249,11 @@ async function main(): Promise<void> {
   const { boss, batchCount } = inlineQueue(() => context());
 
   // The only job this script sends. Everything after it is the loop.
-  await boss.send(repliesQueue, { monitorId: monitor.id, postIds: [post.id] });
+  await boss.send(
+    repliesQueue,
+    { monitorId: monitor.id, postIds: [post.id] },
+    forMonitor(monitor.id),
+  );
 
   const [after] = await db
     .select({

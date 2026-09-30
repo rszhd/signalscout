@@ -13,6 +13,8 @@
  * On the median twelve-comment thread the cheap one is complete too. The
  * monitor form states the price; the choice stays the person's.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { redditPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -231,7 +233,7 @@ export class SocialCrawlRedditSource implements SocialSource {
       posts,
       foundBy: input.foundBy,
       unitsConsumed: page.creditsUsed,
-      next: this.nextAfter(request.query, start, page),
+      next: this.nextAfter(request.query, start, page, pagesPerInputFor(request, maxPagesPerInput)),
     };
   }
 
@@ -387,10 +389,10 @@ export class SocialCrawlRedditSource implements SocialSource {
     return undefined;
   }
 
-  private nextAfter(query: SourceQuery, at: Cursor, page: Page): SearchResult["next"] {
+  private nextAfter(query: SourceQuery, at: Cursor, page: Page, cap: number): SearchResult["next"] {
     const pages = at.pages + 1;
 
-    if (page.cursor !== undefined && pages < maxPagesPerInput) {
+    if (page.cursor !== undefined && pages < cap) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.cursor }) };
     }
 

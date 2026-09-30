@@ -32,6 +32,7 @@ import type {
   SourceQuery,
   SourceRegistry,
 } from "@signalscout/engine";
+import { pagesPerInputFor } from "@signalscout/engine";
 import { eq, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
@@ -56,7 +57,7 @@ import {
 } from "./continuations.js";
 import { coverageFor, recordCoverage } from "./coverage.js";
 import type { CredentialLookup } from "./credentials.js";
-import { filterQueue, type PollPayload, pollQueue } from "./queues.js";
+import { filterQueue, forMonitor, type PollPayload, pollQueue } from "./queues.js";
 import { type CreditWeights, nextTurn, type Unit, unitKey, unitsOf } from "./rotation.js";
 import type { Step, StepContext } from "./steps.js";
 
@@ -94,6 +95,60 @@ export interface CollectOptions {
    * weighs one.
    */
   readonly creditWeights?: CreditWeights | undefined;
+  /**
+   * How many pages of each input a monitor's first poll may read, in place
+   * of each connector's own cap. US-435. The first poll has no window, so the
+   * cap is the newest few pages and nothing older; a caller that polls once
+   * a day with one input never reads further. Every later poll uses the
+   * connectors' caps. Unset, the first poll is like every other.
+   */
+  readonly firstPollPagesPerInput?: PageCount | undefined;
+  /**
+   * How many days back a monitor's first poll may look, 1 to 365. US-435.
+   * A first poll has no coverage, so it asks for everything, and a quiet
+   * query's newest pages can be months old. Every later poll keeps to its
+   * coverage. Unset, the first poll has no window, as before.
+   */
+  readonly firstPollWindowDays?: number | undefined;
+  /**
+   * How many pages of each input every poll after the first may read, in
+   * place of each connector's own cap. US-435. Lower than the cap makes a
+   * daily poll cheaper; the first poll keeps `firstPollPagesPerInput`.
+   * Unset, later polls use the connectors' caps, as before.
+   */
+  readonly pollPagesPerInput?: PageCount | undefined;
+}
+
+/** The longest window a first poll may be given. */
+export const maximumFirstPollWindowDays = 365;
+
+/**
+ * A page count for every platform, or one for each platform by id. A platform
+ * a record does not name keeps its connector's own cap. US-435.
+ */
+export type PageCount = number | Readonly<Record<string, number>>;
+
+/** The count for one platform, or nothing when it has none. */
+function countFor(count: PageCount | undefined, platform: string): number | undefined {
+  return typeof count === "number" ? count : count?.[platform];
+}
+
+/** How far one poll may page one source: per input, and in all. */
+interface PageLimits {
+  /** Handed to the connector as `pagesPerInput`. Absent means its own cap. */
+  readonly perInput?: number;
+  readonly perPoll: number;
+}
+
+/**
+ * The limits for one platform in one poll. With a count set, each input may
+ * read that many pages and the poll's own cap is the count times the inputs,
+ * so a lower count really is fewer pages and a higher one reaches the last
+ * input. Unset, the connector's cap and `maxPagesPerPoll`, as always.
+ */
+function pageLimits(perInput: number | undefined, inputs: number): PageLimits {
+  if (perInput === undefined) return { perPoll: maxPagesPerPoll };
+  return { perInput, perPoll: perInput * Math.max(1, inputs) };
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -118,7 +173,23 @@ interface SourceOutcome {
    * next one buy them a second time.
    */
   readonly moreCursor?: string;
+  /**
+   * Set when the connector failed after at least one page. BUG-436.
+   *
+   * The pages before it are collected and paid for, so they are returned and
+   * stored like any others, and the walk resumes at the page that failed.
+   */
+  readonly failure?: unknown;
+  /** The cursor of the page that failed, where the walk resumes. */
+  readonly failedCursor?: string;
 }
+
+/**
+ * How long a walk waits before it asks again for a page that failed. The
+ * provider has just answered with an error, and asking again at once is how
+ * one outage becomes a loop of paid retries.
+ */
+export const failedPageRetryMs = 10 * 60_000;
 
 /**
  * Page through one source until it is done, until it asks us to wait, or until
@@ -143,6 +214,7 @@ async function readSource(
    * same cap.
    */
   bill: (units: number) => Promise<void>,
+  limits: PageLimits,
 ): Promise<SourceOutcome> {
   const collected: CandidatePost[] = [];
   let unitsConsumed = 0;
@@ -151,8 +223,29 @@ async function readSource(
   /** Where the next page starts, while there is one. Cleared when the source is done. */
   let more: string | undefined;
 
-  while (pages < maxPagesPerPoll) {
-    const result = await source.search({ query, credentials, cursor });
+  while (pages < limits.perPoll) {
+    let result: Awaited<ReturnType<SocialSource["search"]>>;
+    try {
+      result = await source.search({
+        query,
+        credentials,
+        cursor,
+        ...(limits.perInput === undefined ? {} : { pagesPerInput: limits.perInput }),
+      });
+    } catch (error) {
+      // Nothing read yet: the source failed, as it always has. BUG-016.
+      if (pages === 0) throw error;
+      // Pages already read and paid for are kept. BUG-436.
+      return {
+        sourceId: source.platform.id,
+        providerId: source.provider.id,
+        pages,
+        posts: collected,
+        unitsConsumed,
+        failure: error,
+        ...(cursor === undefined ? {} : { failedCursor: cursor }),
+      };
+    }
 
     pages += 1;
     unitsConsumed += result.unitsConsumed;
@@ -648,6 +741,27 @@ async function recordWhereTheWalkStands(
         continuation.query,
       );
     }
+  } else if (outcome.failure !== undefined) {
+    /**
+     * The source failed part way. BUG-436. The walk is remembered at the page
+     * that failed, and asked again after `failedPageRetryMs`. A cursor that
+     * keeps failing is dropped by the attempt limit the resume path already
+     * applies. With no cursor the failure was on the walk's first page of
+     * this input, and nothing is remembered.
+     */
+    if (outcome.failedCursor) {
+      const resumeAfter = new Date(now.getTime() + failedPageRetryMs);
+      await rememberContinuation(db, monitorId, {
+        source: source.platform.id as Source,
+        query: unit.query,
+        provider: providerId as Provider,
+        cursor: outcome.failedCursor,
+        ...(window ? { since: window } : {}),
+        resumeAfter,
+        progressed,
+      });
+      wake = resumeAfter;
+    }
   } else if (outcome.moreCursor) {
     /**
      * The page cap stopped a source that had another page ready.
@@ -824,7 +938,28 @@ export function createCollectStep({
   registry,
   credentialsFor,
   creditWeights = {},
+  firstPollPagesPerInput,
+  firstPollWindowDays,
+  pollPagesPerInput,
 }: CollectOptions): Step<PollPayload> {
+  // Refused at start-up, with the connectors' own rule, rather than on the
+  // first monitor that meets it.
+  for (const count of [firstPollPagesPerInput, pollPagesPerInput]) {
+    const each =
+      count === undefined ? [] : typeof count === "number" ? [count] : Object.values(count);
+    for (const pages of each) pagesPerInputFor({ pagesPerInput: pages }, maxPagesPerPoll);
+  }
+  if (
+    firstPollWindowDays !== undefined &&
+    (!Number.isInteger(firstPollWindowDays) ||
+      firstPollWindowDays < 1 ||
+      firstPollWindowDays > maximumFirstPollWindowDays)
+  ) {
+    throw new RangeError(
+      `firstPollWindowDays must be a whole number from 1 to ${maximumFirstPollWindowDays}, not ${firstPollWindowDays}`,
+    );
+  }
+
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
 
@@ -840,6 +975,8 @@ export function createCollectStep({
     }
 
     const poll = new PollRecord(db, logger, monitor);
+    // Read before this poll marks `last_polled_at`, so it is the fact.
+    const firstPoll = monitor.lastPolledAt === null;
 
     /**
      * Platforms that were actually asked, and the ones whose provider threw.
@@ -1045,7 +1182,13 @@ export function createCollectStep({
          * reading it here would ask for posts newer than the trigger, and every
          * record the collection was paid for would be filtered away as old.
          */
-        const window = continuation ? continuation.since : covered.get(unitKey(unit));
+        const window = continuation
+          ? continuation.since
+          : (covered.get(unitKey(unit)) ??
+            // A first poll's own window, when the application gives one.
+            (firstPoll && firstPollWindowDays !== undefined
+              ? new Date(now.getTime() - firstPollWindowDays * 86_400_000)
+              : undefined));
 
         /**
          * When this walk began, which is what a finished one marks. BUG-017.
@@ -1112,6 +1255,10 @@ export function createCollectStep({
               pricePerUnitMicros: source.pricePerUnitMicros,
             });
           },
+          pageLimits(
+            countFor(firstPoll ? firstPollPagesPerInput : pollPagesPerInput, source.platform.id),
+            queries.length + unitChannels.length,
+          ),
           /**
            * One platform's failure, kept to itself. BUG-016.
            *
@@ -1144,13 +1291,30 @@ export function createCollectStep({
 
         outcomes.push(outcome);
 
+        if (outcome.failure !== undefined) {
+          // Not counted among `failures`: this platform returned pages, and
+          // the job must reach the insert below to keep them. A provider
+          // still down fails the resumed walk on its first page, which does
+          // count. BUG-436.
+          logger.error(
+            { monitorId, sourceId, providerId, pages: outcome.pages, err: outcome.failure },
+            "source failed part way: its pages are kept and the walk resumes later",
+          );
+        }
+
         poll.note(
           sourceId,
           providerId,
           // A wait and a page cap are both "there is more", and they send a
           // person nowhere: the walk comes back for it. They are recorded
           // because a short poll otherwise reads as a finished one.
-          outcome.waitUntil ? "provider_wait" : outcome.moreCursor ? "page_cap" : null,
+          outcome.failure !== undefined
+            ? "error"
+            : outcome.waitUntil
+              ? "provider_wait"
+              : outcome.moreCursor
+                ? "page_cap"
+                : null,
           {
             pages: outcome.pages,
             postsReturned: outcome.posts.length,
@@ -1212,7 +1376,7 @@ export function createCollectStep({
         const jobId = await boss.send(
           pollQueue,
           { monitorId },
-          { singletonKey: monitorId, startAfter: wakeAt },
+          forMonitor(monitorId, { singletonKey: monitorId, startAfter: wakeAt }),
         );
 
         if (jobId === null) {
@@ -1242,14 +1406,18 @@ export function createCollectStep({
 
       await poll.finish(poll.stopReason === "provider_wait" ? "waiting" : "collected");
 
-      await boss.send(filterQueue, {
-        monitorId,
-        postIds: stored.map((row) => row.id),
-        walkId: await poll.walkId(),
-        // `finish` ran on the line above, so the row exists and this is its
-        // id. US-211.
-        ...(poll.pollRunId ? { pollRunId: poll.pollRunId } : {}),
-      });
+      await boss.send(
+        filterQueue,
+        {
+          monitorId,
+          postIds: stored.map((row) => row.id),
+          walkId: await poll.walkId(),
+          // `finish` ran on the line above, so the row exists and this is its
+          // id. US-211.
+          ...(poll.pollRunId ? { pollRunId: poll.pollRunId } : {}),
+        },
+        forMonitor(monitorId),
+      );
     } catch (error) {
       /**
        * The step threw, and the row is the only thing that will remember.

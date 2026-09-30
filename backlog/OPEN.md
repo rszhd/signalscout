@@ -2,12 +2,13 @@
 
 # Open tickets
 
-74 open — 7 doing, 58 todo, 9 parked (7 p1, 50 p2, 17 p3).
+80 open — 13 doing, 58 todo, 9 parked (8 p1, 55 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-418 | [The query plan writes the topic, not the question](doing/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | doing | 2026-09-26T02:07+08:00 |
+| p1 | US-435 | [A caller may let a monitor's first poll read more pages, and give it a window](doing/US-435-a-caller-may-let-a-monitor-s-first-poll-read-more-pages.md) | feature | doing | 2026-09-29T20:04+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
@@ -16,7 +17,12 @@
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |
+| p2 | US-438 | [A classify job may score a few posts at the same time](doing/US-438-a-classify-job-may-score-a-few-posts-at-once.md) | feature | doing | 2026-09-29T23:45+08:00 |
+| p2 | US-439 | [A worker may run a few jobs of one queue at once, one per monitor](doing/US-439-a-worker-may-run-a-few-jobs-of-one-queue-at-once.md) | feature | doing | 2026-09-29T23:57+08:00 |
+| p2 | US-440 | [The query plan names what the customer wants, in everyday words](doing/US-440-the-query-plan-names-what-the-customer-wants-in-everyday-words.md) | feature | doing | 2026-09-30T09:42+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
+| p2 | BUG-436 | [A source that fails part way through a poll loses the pages it already billed](doing/BUG-436-a-source-that-fails-mid-walk-loses-the-pages-it-already-billed.md) | bug | doing | 2026-09-29T21:07+08:00 |
+| p2 | BUG-437 | [One reason over 160 characters refuses a whole classification](doing/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | doing | 2026-09-29T21:29+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |

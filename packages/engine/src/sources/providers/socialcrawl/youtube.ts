@@ -35,6 +35,8 @@
  *    51 comments for one credit, exact per-second timestamps, strictly
  *    newest-first. `fetchReplies` rests on that ordering and says so.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { youTubePlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -372,7 +374,7 @@ export class SocialCrawlYouTubeSource implements SocialSource {
   private nextAfter(request: SearchRequest, at: Cursor, page: Page): SearchResult["next"] {
     const pages = at.pages + 1;
 
-    if (page.cursor !== undefined && pages < maxPagesPerInput) {
+    if (page.cursor !== undefined && pages < pagesPerInputFor(request, maxPagesPerInput)) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.cursor }) };
     }
 

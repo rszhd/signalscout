@@ -20,6 +20,81 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.19.0 — 2026-09-30
+
+No migration.
+
+**Changed.** The query plan names what the customer wants, in everyday words
+(US-440). `buildQuerySystemPrompt` allows an everyday category name ("password
+manager") and refuses marketing words, gives examples from several kinds of
+product, writes for the product's main everyday use, and asks for the thing,
+the task and the situation, the situation in a customer's complaint words.
+The platform rules, the word limits and the 3-to-8 count are unchanged. A
+monitor created after the upgrade gets different queries; existing monitors
+keep theirs.
+
+**Changed.** Every pipeline job is sent with its monitor as its pg-boss group
+(US-439). Nothing changes for a worker that does not set `queueConcurrency`.
+
+**Added.** A monitor's first poll may read more pages (US-435).
+`startWorker` takes `firstPollPagesPerInput`, 1 to 20: on a monitor's first
+poll each input may read that many pages in place of its connector's cap of
+two, and the poll's own cap of five pages a platform becomes that count
+times the platform's inputs. Every later
+poll is unchanged, and so is every poll of a worker that does not set it. A
+connector takes the count as `pagesPerInput` on `SearchRequest`; the engine
+exports `pagesPerInputFor` and `maximumPagesPerInput` for a connector of your
+own. A connector that buys one fixed batch per input ignores it.
+
+**Added.** A page count may differ by platform (US-435). Both
+`firstPollPagesPerInput` and `pollPagesPerInput` take one number for every
+platform, or a record by platform id such as `{ x: 4, reddit: 2 }`; a
+platform the record does not name keeps its connector's cap. `PageCount` is
+the type.
+
+**Added.** Every later poll may read another page count (US-435).
+`startWorker` takes `pollPagesPerInput`, 1 to 20, for every poll after the
+first, with the same rule: that many pages of each input, and the poll's cap
+that count times the inputs. One page makes a daily poll cheaper. Unset,
+later polls are unchanged.
+
+**Added.** A monitor's first poll may have a window (US-435). `startWorker`
+takes `firstPollWindowDays`, 1 to 365: a first poll asks only for posts from
+that many days back, where today it asks for everything and a quiet query's
+newest pages can be months old. Later polls keep to their coverage as before,
+and a worker that does not set it is unchanged. `maximumFirstPollWindowDays`
+is exported.
+
+**Added.** A worker may run a few jobs of one queue at once (US-439).
+`startWorker` takes `queueConcurrency`, 1 to 16, for the poll, filter,
+replies, classify and notify queues; two jobs of one monitor never overlap.
+Every pipeline job is now sent with its monitor as its pg-boss group, and
+`forMonitor` builds those options for a consumer that sends one itself. The
+limit is kept in the worker's memory, so it holds within one process. Unset,
+one job at a time in each queue, as before.
+
+**Added.** A classify job may score a few posts at once (US-438).
+`startWorker` takes `classifyConcurrency`, 1 to 16, and `createClassifyStep`
+takes it as `concurrency`. The posts still start in the order they were
+handed, a copy waits for the post it copies, and the spend meter reserves
+what the calls in flight may cost, so the cap is crossed by at most one call,
+as before. `SpendMeter.exhausted` takes that reservation as an optional
+argument. Unset, one at a time, as before.
+
+**Fixed.** A source that fails part way through a poll keeps what it read
+(BUG-436). The posts of the pages before the error are stored and sent to the
+filter, the poll run records that source as `error` with those pages, and the
+walk resumes at the page that failed ten minutes later instead of buying the
+first pages again. Such a source no longer counts as a failed platform, so a
+poll whose only platform failed on its third page now completes rather than
+throwing; one that fails on its first page throws as before.
+
+**Fixed.** One long reason no longer refuses a whole classification
+(BUG-437). A reason over 160 characters is cut to 160, ending in "…", and the
+answer keeps its scores; before, the post was retried and in the end dropped.
+The JSON schema sent to the model is unchanged, so the prompt is the same and
+no score moves.
+
 ## 0.18.0 — 2026-09-27
 
 No migration.

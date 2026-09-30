@@ -295,6 +295,26 @@ describe("searching", () => {
     expect(second.next).toEqual({ status: "done" });
   });
 
+  it("reads as many pages of one query as the caller allows", async () => {
+    const { source } = sourceFor([searchLatest, searchPage2]);
+
+    const first = await source.search(request({ pagesPerInput: 3 }));
+    const second = await source.search(request({ pagesPerInput: 3, cursor: cursorOf(first.next) }));
+    // Two pages would have finished the query here; the caller asked for three.
+    expect(second.next.status).toBe("ready");
+
+    const third = await source.search(request({ pagesPerInput: 3, cursor: cursorOf(second.next) }));
+    expect(third.next).toEqual({ status: "done" });
+  });
+
+  it("stops after one page when the caller allows one", async () => {
+    const { source } = sourceFor([searchLatest]);
+
+    const result = await source.search(request({ pagesPerInput: 1 }));
+
+    expect(result.next).toEqual({ status: "done" });
+  });
+
   it("finishes when the cursor points past the queries a monitor still names", async () => {
     const { source, provider } = sourceFor([searchLatest]);
 

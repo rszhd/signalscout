@@ -228,3 +228,17 @@ export function queueDefinitions(retry: RetryPolicy = retryPolicy): readonly Que
     { name: notifyQueue, policy: "stately", deadLetter: deadLetterQueue, ...retry },
   ];
 }
+
+/**
+ * A pipeline job's options, with its monitor as the job's group. US-439.
+ *
+ * The worker may run several jobs of one queue at once (`queueConcurrency`),
+ * and a group lets pg-boss run at most one job of each monitor at a time, so
+ * the spend meter and the copy rule never see half a monitor's batch.
+ */
+export function forMonitor<Options extends object>(
+  monitorId: string,
+  options?: Options,
+): Options & { group: { id: string } } {
+  return { ...(options ?? ({} as Options)), group: { id: monitorId } };
+}

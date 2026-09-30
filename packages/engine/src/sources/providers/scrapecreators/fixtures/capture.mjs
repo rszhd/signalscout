@@ -54,6 +54,9 @@ const api = "https://api.scrapecreators.com/v1/reddit";
 const endpoints = {
   search: `${api}/search`,
   subreddit: `${api}/subreddit`,
+  // US-435's addition: a phrase inside one subreddit, read from the
+  // documentation on 2026-09-29.
+  subredditSearch: `${api}/subreddit/search`,
 };
 
 /**
@@ -387,6 +390,34 @@ if (wanted("search")) {
  */
 if (wanted("subreddit")) {
   await capture("subreddit-posts", endpoints.subreddit, { subreddit, sort: "new" });
+}
+
+/**
+ * A phrase inside one subreddit, newest first, and the page its cursor gives.
+ * US-435.
+ *
+ * The documentation lists a post's title and link but no body and no author,
+ * and says posts, comments and media come back together. Whether the body is
+ * really missing decides whether this endpoint can feed the classifier, which
+ * is why the whole answer is kept.
+ */
+if (wanted("subreddit-search")) {
+  const params = { subreddit, query: "flaky tests", sort: "new", timeframe: "month" };
+  const first = await capture("subreddit-search", endpoints.subredditSearch, params);
+  const cursor = first.body?.cursor;
+
+  if (typeof cursor === "string" && cursor !== "") {
+    await capture(
+      "subreddit-search-page-2",
+      endpoints.subredditSearch,
+      { ...params, cursor },
+      { note: `followed the cursor from subreddit-search.json` },
+    );
+  } else {
+    failures.push(
+      "subreddit-search: the first page reported no cursor, so page two was not captured.",
+    );
+  }
 }
 
 /**

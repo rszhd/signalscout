@@ -386,8 +386,15 @@ export {
   type ClassifyOptions,
   createClassifyStep,
   maxClassificationAttempts,
+  maximumClassifyConcurrency,
 } from "./worker/classify.js";
-export { createCollectStep, excerptLength, maxPagesPerPoll } from "./worker/collect.js";
+export {
+  createCollectStep,
+  excerptLength,
+  maximumFirstPollWindowDays,
+  maxPagesPerPoll,
+  type PageCount,
+} from "./worker/collect.js";
 export {
   type CredentialLookup,
   credentialsFromEnvironment,
@@ -419,6 +426,7 @@ export {
   estimateQueue,
   type FilterPayload,
   filterQueue,
+  forMonitor,
   heartbeatQueue,
   type NotifyPayload,
   notifyQueue,
@@ -436,6 +444,7 @@ export {
 } from "./worker/queues.js";
 export {
   type HeartbeatPayload,
+  maximumQueueConcurrency,
   type StartWorkerOptions,
   startWorker,
   type WorkerHandle,

@@ -72,7 +72,7 @@ import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
 import { loadCeiling } from "./ceiling.js";
 import { sendNotify } from "./notify.js";
 import type { ClassifyPayload } from "./queues.js";
-import { repliesQueue } from "./queues.js";
+import { forMonitor, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -120,7 +120,16 @@ export interface ClassifyOptions {
    * self-hosted instance wants. `ceiling.ts` is the rule.
    */
   readonly newPostsPerPairPerDay?: number | undefined;
+  /**
+   * How many posts may be scored at the same time, 1 to
+   * `maximumClassifyConcurrency`. US-438. One, the default, is what the step
+   * always did.
+   */
+  readonly concurrency?: number | undefined;
 }
+
+/** The most calls one classify job may keep in flight. */
+export const maximumClassifyConcurrency = 16;
 
 function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
   return {
@@ -358,14 +367,29 @@ async function sendJudgedThreads(
   if (threadIds.length > 0) {
     // The thread's own poll travels with it: a reply belongs to the poll
     // that found the post above it. US-211.
-    await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId, pollRunId });
+    await boss.send(
+      repliesQueue,
+      { monitorId, postIds: threadIds, walkId, pollRunId },
+      forMonitor(monitorId),
+    );
   }
 }
 
 export function createClassifyStep({
   classifierFor,
   newPostsPerPairPerDay,
+  concurrency = 1,
 }: ClassifyOptions): Step<ClassifyPayload> {
+  if (
+    !Number.isInteger(concurrency) ||
+    concurrency < 1 ||
+    concurrency > maximumClassifyConcurrency
+  ) {
+    throw new RangeError(
+      `concurrency must be a whole number from 1 to ${maximumClassifyConcurrency}, not ${concurrency}`,
+    );
+  }
+
   return async function classify(
     { monitorId, postIds, walkId, pollRunId },
     { db, boss, logger }: StepContext,
@@ -548,74 +572,34 @@ export function createClassifyStep({
       });
     };
 
-    // One at a time. The provider's rate limit is the binding constraint, and
-    // a batch of parallel calls hits it as one burst that the connector-level
-    // back-off in `sources/` cannot help with here.
-    for (const post of candidates) {
-      if (alreadyScored.has(post.id)) {
-        skipped += 1;
-        continue;
-      }
+    /**
+     * `concurrency` calls at most, one by default. US-438. The provider's rate
+     * limit is the binding constraint, and a batch of parallel calls hits it as
+     * one burst that the connector-level back-off in `sources/` cannot help
+     * with here, so an application raises it only for a provider that allows
+     * it.
+     *
+     * Everything that depends on order stays in this loop, in the order the
+     * batch was handed: the skips, the copy rule, the cap, the daily ceiling.
+     * Only the call and what follows it run beside others.
+     */
+    const inFlight = new Set<Promise<void>>();
+    const keysInFlight = new Set<string>();
+    let returned = 0;
+    let largestCallMicros = 0;
+    const settleOne = () => Promise.race(inFlight);
 
-      if (alreadyCopied.has(post.id)) {
-        skipped += 1;
-        continue;
-      }
-
-      const key = copyKey(post);
-      const others = copiesOf.get(post.id) ?? [];
-      const madeHere = key ? cardHere.get(key) : undefined;
-      // The oldest card, so every copy of one post lands on the same one.
-      const card =
-        others
-          .filter((other) => other.hasCard)
-          .sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime())[0] ??
-        (madeHere && withinCopyWindow(madeHere.postedAt, post.postedAt) ? madeHere : undefined);
-
-      if (card) {
-        copies.push({ postId: post.id, cardPostId: card.id });
-        copiesSkipped += 1;
-        continue;
-      }
-
-      /**
-       * Out of money, so stop rather than finish the batch.
-       *
-       * The posts left are not dropped and not marked in any way: they have no
-       * `model_calls` row, so a later poll that sees them again classifies
-       * them, exactly as a post the model had never reached. That is the whole
-       * difference between stopping and losing.
-       */
-      if (await meter.exhausted()) {
-        unspentFor = candidates.length - matchIds.length - retryable - dropped;
-        break;
-      }
-
-      const attempts = attemptsByPost.get(post.id) ?? 0;
-
-      if (ceiling && !ceiling.hasRoom(post.id)) {
-        // Stored, and not read: the pairs that found it have put the day's
-        // number to the classifier. Written as a drop so the screen counts
-        // it, and never asked again. US-287.
-        refused.push(post.id);
-        continue;
-      }
-      // Charged on the attempt, not the answer: a refusal is paid for too.
-      ceiling?.charge(post.id);
-
-      if (attempts >= maxClassificationAttempts) {
-        dropped += 1;
-        logger.error(
-          { monitorId, postId: post.id, url: post.url, attempts },
-          "classification dropped: the model failed on this post too many times",
-        );
-        continue;
-      }
-
+    const scoreOne = async (
+      post: (typeof candidates)[number],
+      key: string | undefined,
+      others: NonNullable<ReturnType<typeof copiesOf.get>>,
+    ): Promise<void> => {
       const outcome = await classifier.classify({
         monitor: profile,
         post: { ...post, ...(threads.get(post.id) ?? {}) },
       });
+      returned += 1;
+      largestCallMicros = Math.max(largestCallMicros, outcome.call.estimatedCostMicros ?? 0);
 
       if (outcome.status !== "scored") {
         retryable += 1;
@@ -624,7 +608,7 @@ export function createClassifyStep({
           { monitorId, postId: post.id, outcome: outcome.status, err: outcome.error },
           "post left unclassified",
         );
-        continue;
+        return;
       }
 
       scoredNow += 1;
@@ -650,7 +634,7 @@ export function createClassifyStep({
           { monitorId, postId: post.id, score: outcome.score, threshold: monitor.minScore },
           "post scored below the monitor's threshold",
         );
-        continue;
+        return;
       }
 
       const row = await writeMatch(db, record, monitorId, post.id, outcome);
@@ -669,6 +653,99 @@ export function createClassifyStep({
         ];
         for (const other of carried) copies.push({ postId: other.id, cardPostId: post.id });
       }
+    };
+
+    try {
+      for (const post of candidates) {
+        if (alreadyScored.has(post.id)) {
+          skipped += 1;
+          continue;
+        }
+
+        if (alreadyCopied.has(post.id)) {
+          skipped += 1;
+          continue;
+        }
+
+        const key = copyKey(post);
+        // A copy waits for the post it copies: the card rule reads its answer.
+        while (key && keysInFlight.has(key)) await settleOne();
+        const others = copiesOf.get(post.id) ?? [];
+        const madeHere = key ? cardHere.get(key) : undefined;
+        // The oldest card, so every copy of one post lands on the same one.
+        const card =
+          others
+            .filter((other) => other.hasCard)
+            .sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime())[0] ??
+          (madeHere && withinCopyWindow(madeHere.postedAt, post.postedAt) ? madeHere : undefined);
+
+        if (card) {
+          copies.push({ postId: post.id, cardPostId: card.id });
+          copiesSkipped += 1;
+          continue;
+        }
+
+        // A free slot. Until one call has come back, one at a time: the cap's
+        // reservation below needs the price of a call.
+        while (inFlight.size >= concurrency || (inFlight.size > 0 && returned === 0)) {
+          await settleOne();
+        }
+
+        /**
+         * Out of money, so stop rather than finish the batch.
+         *
+         * The posts left are not dropped and not marked in any way: they have no
+         * `model_calls` row, so a later poll that sees them again classifies
+         * them, exactly as a post the model had never reached. That is the whole
+         * difference between stopping and losing.
+         */
+        //
+        // Reserved: what the calls still in flight may cost. With one at a time
+        // nothing is in flight here, and this is the check it always was.
+        if (await meter.exhausted(inFlight.size * largestCallMicros)) {
+          await Promise.all(inFlight);
+          unspentFor = candidates.length - matchIds.length - retryable - dropped;
+          break;
+        }
+
+        const attempts = attemptsByPost.get(post.id) ?? 0;
+
+        if (ceiling && !ceiling.hasRoom(post.id)) {
+          // Stored, and not read: the pairs that found it have put the day's
+          // number to the classifier. Written as a drop so the screen counts
+          // it, and never asked again. US-287.
+          refused.push(post.id);
+          continue;
+        }
+        // Charged on the attempt, not the answer: a refusal is paid for too.
+        ceiling?.charge(post.id);
+
+        if (attempts >= maxClassificationAttempts) {
+          dropped += 1;
+          logger.error(
+            { monitorId, postId: post.id, url: post.url, attempts },
+            "classification dropped: the model failed on this post too many times",
+          );
+          continue;
+        }
+
+        if (key) keysInFlight.add(key);
+        const task: Promise<void> = scoreOne(post, key, others).finally(() => {
+          inFlight.delete(task);
+          if (key) keysInFlight.delete(key);
+        });
+        // Handled at once, so a throw while the loop awaits something else is
+        // not an unhandled rejection that stops the process; the loop still
+        // sees it the next time it waits on the tasks.
+        task.catch(() => undefined);
+        inFlight.add(task);
+      }
+      await Promise.all(inFlight);
+    } catch (error) {
+      // Nothing left running behind a throw: the calls already started finish
+      // and are recorded, then the job fails as it always did.
+      await Promise.allSettled(inFlight);
+      throw error;
     }
 
     // Written once for the batch. A copy already recorded is left as it is:

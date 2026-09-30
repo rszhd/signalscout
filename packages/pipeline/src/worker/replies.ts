@@ -47,7 +47,7 @@ import { type Ceiling, loadCeiling } from "./ceiling.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
 import type { RepliesPayload } from "./queues.js";
-import { filterQueue } from "./queues.js";
+import { filterQueue, forMonitor } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -938,7 +938,11 @@ export function createRepliesStep({
     // Back through the filter, where a reply meets triage and nothing else.
     // The replies go back through the filter under the poll that found their
     // thread. They were collected by no poll of their own. US-211.
-    await boss.send(filterQueue, { monitorId, postIds: storedReplyIds, walkId, pollRunId });
+    await boss.send(
+      filterQueue,
+      { monitorId, postIds: storedReplyIds, walkId, pollRunId },
+      forMonitor(monitorId),
+    );
   };
 }
 

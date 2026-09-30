@@ -8,7 +8,7 @@ import {
   processNotifications,
 } from "../notifications/deliver.js";
 import type { NotifyPayload } from "./queues.js";
-import { notifyQueue } from "./queues.js";
+import { forMonitor, notifyQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 export interface NotifyStepOptions {
@@ -89,7 +89,11 @@ export function createNotifyStep(
  * pass delivers the monitor's whole outbox, not the matches in its payload.
  */
 export function sendNotify(boss: StepContext["boss"], payload: NotifyPayload) {
-  return boss.send(notifyQueue, payload, { singletonKey: payload.monitorId });
+  return boss.send(
+    notifyQueue,
+    payload,
+    forMonitor(payload.monitorId, { singletonKey: payload.monitorId }),
+  );
 }
 
 export async function enqueueNotifications(db: Database, boss: StepContext["boss"]) {

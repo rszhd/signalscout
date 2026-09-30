@@ -19,6 +19,7 @@ import {
   apiUsage,
   maxResumeAttempts,
   monitors,
+  pollRuns,
   posts,
   sourceContinuations,
   sourceCoverage,
@@ -251,6 +252,96 @@ describe("the poll step", () => {
     expect(stored).toHaveLength(fakePosts.length);
     expect(stored.every((post) => post.source === "reddit")).toBe(true);
     expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  describe("a source that fails part way through its walk (BUG-436)", () => {
+    const many: CandidatePost[] = Array.from({ length: 10 }, (_, index) => ({
+      externalId: `midwalk-${index}`,
+      url: `https://example.test/midwalk/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    /** The fake source, set to throw on the given call and answer every other. */
+    function failingOn(call: number) {
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+      const search = source.search.bind(source);
+      let calls = 0;
+      (source as { search: SocialSource["search"] }).search = async (request) => {
+        calls += 1;
+        if (calls === call) throw new Error("ScrapeCreators answered 500: Internal Server Error.");
+        return search(request);
+      };
+      return { registry, source };
+    }
+
+    it("keeps the pages it read before the error, and sends them to the filter", async () => {
+      const monitorId = await insertMonitor(database);
+      const { registry } = failingOn(3);
+      const boss = stubBoss();
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, boss),
+      );
+
+      const stored = await db.select().from(posts);
+      expect(stored.map((post) => post.externalId).sort()).toEqual(["midwalk-0", "midwalk-1"]);
+      expect(sentTo(boss, filterQueue).postIds).toHaveLength(2);
+
+      const [run] = await db.select().from(pollRuns).where(eq(pollRuns.monitorId, monitorId));
+      expect(run?.sources[0]).toMatchObject({ reason: "error", pages: 2, postsReturned: 2 });
+    });
+
+    it("resumes at the page that failed, later, rather than buying the first pages again", async () => {
+      const monitorId = await insertMonitor(database);
+      const { registry } = failingOn(3);
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const [kept] = await db
+        .select()
+        .from(sourceContinuations)
+        .where(eq(sourceContinuations.monitorId, monitorId));
+      // Not at once: the provider has just failed.
+      expect(kept?.resumeAfter.getTime()).toBeGreaterThan(Date.now());
+
+      await db
+        .update(sourceContinuations)
+        .set({ resumeAfter: new Date(Date.now() - 1000) })
+        .where(eq(sourceContinuations.monitorId, monitorId));
+      const healthy = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = healthy.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+      await createCollectStep({ registry: healthy, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls[0]?.cursor).toBe(kept?.cursor);
+      expect(source.calls[0]?.cursor).toBeDefined();
+    });
+
+    it("keeps nothing and remembers nothing when the first page fails, as before", async () => {
+      const monitorId = await insertMonitor(database);
+      const { registry } = failingOn(1);
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      ).catch(() => undefined);
+
+      expect(await db.select().from(posts)).toHaveLength(0);
+      expect(
+        await db
+          .select()
+          .from(sourceContinuations)
+          .where(eq(sourceContinuations.monitorId, monitorId)),
+      ).toHaveLength(0);
+    });
   });
 
   it("keeps Reddit's posts when SocialCrawl answers 503 for X, through the real connector", async () => {
@@ -609,6 +700,252 @@ describe("the poll step", () => {
     // past that, which is the part a monthly cap cannot do on its own.
     expect(source.calls).toHaveLength(maxPagesPerPoll);
     expect(await db.select().from(posts)).toHaveLength(maxPagesPerPoll);
+  });
+
+  describe("a first poll allowed more pages (US-435)", () => {
+    const many: CandidatePost[] = Array.from({ length: 40 }, (_, index) => ({
+      externalId: `first-${index}`,
+      url: `https://example.test/first/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    it("reads that many pages of its one input, past the poll's own cap", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollPagesPerInput: 8 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(maxPagesPerPoll).toBeLessThan(8);
+      expect(source.calls).toHaveLength(8);
+      expect(source.calls.every((call) => call.pagesPerInput === 8)).toBe(true);
+    });
+
+    it("asks for the connector's own cap on every later poll", async () => {
+      const monitorId = await insertMonitor(database, {
+        lastPolledAt: new Date("2026-08-10T08:00:00.000Z"),
+      });
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollPagesPerInput: 8 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls).toHaveLength(maxPagesPerPoll);
+      expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+    });
+
+    it("changes nothing when the option is not given", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls).toHaveLength(maxPagesPerPoll);
+      expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+    });
+
+    it("refuses a count the connectors would refuse", () => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          firstPollPagesPerInput: 0,
+        }),
+      ).toThrow(RangeError);
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          firstPollPagesPerInput: 21,
+        }),
+      ).toThrow(RangeError);
+    });
+  });
+
+  describe("every later poll allowed another page count (US-435)", () => {
+    const many: CandidatePost[] = Array.from({ length: 40 }, (_, index) => ({
+      externalId: `later-${index}`,
+      url: `https://example.test/later/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    it("reads that many pages on a later poll", async () => {
+      const monitorId = await insertMonitor(database, {
+        lastPolledAt: new Date("2026-08-10T08:00:00.000Z"),
+      });
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, pollPagesPerInput: 1 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls).toHaveLength(1);
+      expect(source.calls[0]?.pagesPerInput).toBe(1);
+    });
+
+    it("leaves a first poll to its own option", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        firstPollPagesPerInput: 8,
+        pollPagesPerInput: 1,
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(source.calls).toHaveLength(8);
+      expect(source.calls.every((call) => call.pagesPerInput === 8)).toBe(true);
+    });
+
+    it("refuses a count the connectors would refuse", () => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          pollPagesPerInput: 0,
+        }),
+      ).toThrow(RangeError);
+    });
+  });
+
+  describe("a page count for each platform (US-435)", () => {
+    const many: CandidatePost[] = Array.from({ length: 40 }, (_, index) => ({
+      externalId: `platform-${index}`,
+      url: `https://example.test/platform/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    it("uses the count named for this platform", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        firstPollPagesPerInput: { reddit: 8, x: 2 },
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(source.calls).toHaveLength(8);
+      expect(source.calls.every((call) => call.pagesPerInput === 8)).toBe(true);
+    });
+
+    it("leaves a platform the counts do not name to its connector", async () => {
+      const monitorId = await insertMonitor(database, {
+        lastPolledAt: new Date("2026-08-10T08:00:00.000Z"),
+      });
+      const registry = fakeRegistry({ posts: many, pageSize: 1 });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        pollPagesPerInput: { x: 1 },
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(source.calls).toHaveLength(maxPagesPerPoll);
+      expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+    });
+
+    it("refuses a count out of range for any platform", () => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          pollPagesPerInput: { x: 2, reddit: 0 },
+        }),
+      ).toThrow(RangeError);
+    });
+  });
+
+  describe("a first poll with a window (US-435)", () => {
+    const day = 86_400_000;
+    const recentAndOld = (): CandidatePost[] => [
+      {
+        externalId: "recent",
+        url: "https://example.test/recent",
+        text: "A recent post",
+        postedAt: new Date(Date.now() - day),
+      },
+      {
+        externalId: "old",
+        url: "https://example.test/old",
+        text: "An old post",
+        postedAt: new Date(Date.now() - 30 * day),
+      },
+    ];
+
+    it("asks only for posts inside the window, and stores only those", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: recentAndOld() });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      const before = Date.now();
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollWindowDays: 14 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const since = source.calls[0]?.query.since;
+      expect(since).toBeInstanceOf(Date);
+      expect(Math.abs((since as Date).getTime() - (before - 14 * day))).toBeLessThan(60_000);
+      const stored = await db.select().from(posts);
+      expect(stored.map((row) => row.externalId)).toEqual(["recent"]);
+    });
+
+    it("leaves a later poll to its coverage, as before", async () => {
+      const monitorId = await insertMonitor(database, { lastPolledAt: new Date(Date.now() - day) });
+      const registry = fakeRegistry({ posts: recentAndOld() });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials, firstPollWindowDays: 14 })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls[0]?.query.since).toBeUndefined();
+    });
+
+    it("sends no window on a first poll when the option is not given", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: recentAndOld() });
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(source.calls[0]?.query.since).toBeUndefined();
+      expect(await db.select().from(posts)).toHaveLength(2);
+    });
+
+    it.each([0, -1, 1.5, 366])("refuses a window of %s days", (days) => {
+      expect(() =>
+        createCollectStep({
+          registry: fakeRegistry(),
+          credentialsFor: credentials,
+          firstPollWindowDays: days,
+        }),
+      ).toThrow(RangeError);
+    });
   });
 
   it("stops when the source asks to be called back later", async () => {
@@ -1491,16 +1828,17 @@ describe("the poll step", () => {
         return search(request);
       };
 
-      await expect(
-        createCollectStep({ registry, credentialsFor: credentials })(
-          { monitorId },
-          contextFor(db, stubBoss()),
-        ),
-      ).rejects.toThrow("the provider hung up");
+      // Since BUG-436 the job finishes and keeps the two pages it paid for,
+      // where it used to throw them away with the error.
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
 
       const [usage] = await db.select().from(apiUsage);
 
       expect(usage?.units).toBe(8);
+      expect(await db.select().from(posts)).toHaveLength(2);
     });
   });
 });

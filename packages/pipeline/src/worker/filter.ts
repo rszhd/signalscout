@@ -33,7 +33,7 @@ import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
 import { type Monitor, monitorQueries } from "../monitors/monitors.js";
 import { recordStageRun } from "../monitors/stage-runs.js";
 import type { FilterPayload } from "./queues.js";
-import { classifyQueue, repliesQueue } from "./queues.js";
+import { classifyQueue, forMonitor, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 export interface FilterOptions {
@@ -149,12 +149,11 @@ async function deliver(
 
   await recordFilterDrops(db, monitorId, drops);
   await writeStageRun(run, survivors, drops);
-  await boss.send(classifyQueue, {
-    monitorId,
-    postIds: survivors.map((candidate) => candidate.id),
-    walkId,
-    pollRunId,
-  });
+  await boss.send(
+    classifyQueue,
+    { monitorId, postIds: survivors.map((candidate) => candidate.id), walkId, pollRunId },
+    forMonitor(monitorId),
+  );
 
   if (!monitor.includeReplies) return;
 
@@ -172,12 +171,11 @@ async function deliver(
   const threads = survivors.filter((candidate) => candidate.kind !== "reply");
   if (threads.length === 0) return;
 
-  await boss.send(repliesQueue, {
-    monitorId,
-    postIds: threads.map((candidate) => candidate.id),
-    walkId,
-    pollRunId,
-  });
+  await boss.send(
+    repliesQueue,
+    { monitorId, postIds: threads.map((candidate) => candidate.id), walkId, pollRunId },
+    forMonitor(monitorId),
+  );
 }
 
 /**
@@ -560,7 +558,11 @@ export function createFilterStep({
     const startedAt = new Date();
 
     if (ids.length === 0) {
-      await boss.send(classifyQueue, { monitorId, postIds: [], walkId, pollRunId });
+      await boss.send(
+        classifyQueue,
+        { monitorId, postIds: [], walkId, pollRunId },
+        forMonitor(monitorId),
+      );
       return;
     }
 

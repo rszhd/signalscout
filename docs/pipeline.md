@@ -55,7 +55,10 @@ at the end.
 7. **Stop** at five pages for this platform, or when the inputs are exhausted,
    or when the provider says it needs more time.
 8. **Count every page as it arrives.** A platform that throws on its third page
-   still reports the two it was billed for.
+   still reports the two it was billed for, and keeps their posts: they are
+   stored and filtered like any others, and the walk resumes at the page that
+   failed after ten minutes (BUG-436). A platform that throws on its first
+   page is a failed platform, as before.
 
 Then, once for the whole poll:
 
@@ -99,16 +102,34 @@ later.
 | Cap | Value | What it stops |
 | --- | --- | --- |
 | Pages per poll, per platform | 5 | One poll spending without bound. A page's cost is known only after it is fetched |
-| Pages per input | 2 on Reddit | One keyword eating a whole poll |
+| Pages per input | 2, in every connector that pages | One keyword eating a whole poll |
 | Threads per replies job | 25 | One job opening every thread a poll found |
 | Pages per thread | 4 | One conversation paging for ever |
 | Comments per thread | 500 | A thread that grows faster than it is read |
 | Classification attempts per post | 3 | A post the model refuses being paid for on every poll |
+| Classify calls in flight | 1, or `classifyConcurrency` | A burst of calls hitting the model's rate limit, or passing the cap before one reports its cost |
+| Jobs of one queue at once | 1, or `queueConcurrency`; one per monitor always | One monitor's batch split between two jobs that each see half of it |
 | Job attempts | 4, backing off from 30s | A job that throws for ever, retrying all night |
 | Posts per pair per day | unset; the application's | One search putting its whole backlog, or a busy day, to the classifier |
 
 The monthly cap in `budgets` is the limit on what a monitor may spend. These
 are the limits on how far one job can carry it past that before the next check.
+
+**A first poll may read further.** US-435. The first poll has no window, so
+two pages of an input are its newest posts and nothing older. `startWorker`
+takes `firstPollPagesPerInput`: while `last_polled_at` is empty, the collect
+step hands that count to the connector as `pagesPerInput`, and lets the poll
+read that many pages of each input on each platform. Every later poll uses
+the caps above. Unset, which both applications leave it, a first poll is like
+any other. The cost test still projects an ordinary poll.
+`firstPollWindowDays` gives the same first poll a window: posts from that
+many days back and nothing older, where a quiet query's newest pages can
+otherwise be months old. Later polls keep to their coverage.
+`pollPagesPerInput` does the same for every poll after the first, usually to
+read fewer pages than the connectors' two. With either count set, the
+platform's cap for that poll is the count times its inputs, not five.
+Either option takes one number, or a count for each platform by id; a
+platform a record leaves out keeps its connector's cap.
 
 **A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an

@@ -10,6 +10,7 @@
  * without reading the implementation.
  */
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import {
   classificationSchema,
   leadScore,
@@ -176,6 +177,29 @@ describe("the reasons", () => {
   it("rejects the same claim twice", () => {
     const reasons = [planExample.reasons[0], planExample.reasons[0]];
     expect(classificationSchema.safeParse(withScores({ reasons })).success).toBe(false);
+  });
+
+  it("keeps an answer whose one reason runs long, and cuts that reason (BUG-437)", () => {
+    const long = `The author asks which invoicing app to use for ${"a small agency with many clients, ".repeat(5)}today`;
+    const parsed = classificationSchema.safeParse(
+      withScores({ reasons: [long, planExample.reasons[0]] }),
+    );
+
+    expect(long.length).toBeGreaterThan(160);
+    expect(parsed.success).toBe(true);
+    const kept = parsed.success ? parsed.data : undefined;
+    expect(kept?.reasons[0]?.length).toBeLessThanOrEqual(160);
+    expect(kept?.reasons[0]?.endsWith("…")).toBe(true);
+    expect(kept?.reasons[1]).toBe(planExample.reasons[0]);
+    // The scores are the answer's, unchanged.
+    expect(kept?.intent).toBe(withScores({ reasons: [] }).intent);
+  });
+
+  it("tells the model the same limit as before, so the prompt does not change", () => {
+    const reasons = z.toJSONSchema(classificationSchema).properties?.reasons as
+      | { items?: unknown }
+      | undefined;
+    expect(reasons?.items).toEqual({ type: "string", minLength: 12, maxLength: 160 });
   });
 
   it("rejects a claim too short to say anything", () => {

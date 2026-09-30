@@ -27,6 +27,8 @@
  *    ten unrelated posts and cost the full five credits. An empty page is a
  *    signal on X; here there is no such signal to read.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { linkedInPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -346,7 +348,7 @@ export class SocialCrawlLinkedInSource implements SocialSource {
   private nextAfter(request: SearchRequest, at: Cursor, page: Page): SearchResult["next"] {
     const pages = at.pages + 1;
 
-    if (page.cursor && pages < maxPagesPerQuery) {
+    if (page.cursor && pages < pagesPerInputFor(request, maxPagesPerQuery)) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.cursor }) };
     }
 

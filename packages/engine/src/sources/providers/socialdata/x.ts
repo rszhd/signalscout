@@ -34,6 +34,8 @@
  * 4. **The id is the bare tweet id**, the same number `socialcrawl/x.ts` reads
  *    out of its own `id`, so the two providers deduplicate against each other.
  */
+
+import { pagesPerInputFor } from "../../pages.js";
 import { xPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -422,7 +424,8 @@ export class SocialDataXSource implements SocialSource {
   ): SearchResult["next"] {
     const pages = at.pages + 1;
     const reachedSince = request.query.since !== undefined && collected.length > 0 && kept === 0;
-    const exhausted = !page.after || pages >= maxPagesPerQuery || reachedSince;
+    const exhausted =
+      !page.after || pages >= pagesPerInputFor(request, maxPagesPerQuery) || reachedSince;
 
     if (!exhausted && page.after) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.after }) };

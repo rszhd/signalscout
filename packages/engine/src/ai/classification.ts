@@ -95,7 +95,24 @@ export function withoutRestatedScores(reasons: readonly string[]): {
   return { kept, removed };
 }
 
-const reason = z.string().trim().min(shortestReason).max(longestReason);
+/**
+ * A reason over the limit is cut, not refused. BUG-437.
+ *
+ * One long reason used to fail the whole answer and throw its scores away,
+ * and the post was retried and in the end dropped. The model is still told
+ * the limit — `z.preprocess` leaves the JSON schema as it was, so the prompt
+ * does not change — and a reason too short is still refused, because then
+ * the model did not say why.
+ */
+function cutToLimit(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed.length > longestReason
+    ? `${trimmed.slice(0, longestReason - 1).trimEnd()}…`
+    : trimmed;
+}
+
+const reason = z.preprocess(cutToLimit, z.string().trim().min(shortestReason).max(longestReason));
 
 /**
  * The classification, in the order the model writes it.

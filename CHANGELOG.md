@@ -43,6 +43,10 @@ true })` reads each subreddit's new posts first, then every keyword inside
 every subreddit; the default, and the `socialCrawlReddit` export, keep the
 scoped searches alone. A browsed post is found by the subreddit.
 
+**Security.** The pipeline depends on `nodemailer` `^10.0.6`, past a high
+advisory of 2026-09-29 (backtracking in its address parser). Nothing else
+changes for a consumer.
+
 ## 0.19.0 — 2026-09-30
 
 No migration.

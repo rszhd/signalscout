@@ -188,6 +188,8 @@ input, and the match takes the second model's scores; below the threshold
 there, no match. A second call that fails leaves the first score standing.
 The call is recorded under the purpose `rescore`, so every count of
 classifications stays one per post, and the monitor's spend includes it.
+`rescorePolls: "first"` limits it to each monitor's first collection, the
+walk on its earliest poll row; later polls keep the classifier's score.
 Unset, which this repository's application leaves it, the classifier's
 score stands.
 

@@ -52,7 +52,7 @@ import {
   scoreColumns,
   type ThreadContext,
 } from "@signalscout/engine";
-import { and, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
@@ -63,6 +63,7 @@ import {
   matches,
   modelCalls,
   monitors,
+  pollRuns,
   postCopies,
   posts,
   type Signal,
@@ -135,6 +136,12 @@ export interface ClassifyOptions {
    * owner, the first model's score stands, as before.
    */
   readonly rescorerFor?: ((userId: string) => Promise<Classifier | undefined>) | undefined;
+  /**
+   * Which polls the rescorer reads: `every`, the default, or only the
+   * monitor's `first` collection, whose posts are the ones a new monitor is
+   * judged by. A later poll's matches keep the first model's score.
+   */
+  readonly rescorePolls?: "first" | "every" | undefined;
 }
 
 /** The most calls one classify job may keep in flight. */
@@ -384,11 +391,37 @@ async function sendJudgedThreads(
   }
 }
 
+/**
+ * Whether a job's posts come from the monitor's first collection.
+ *
+ * A collection is a walk: every poll job of it, a resumed page included,
+ * carries one `walk_id`, and so does every classify job it leads to, replies
+ * too. The first walk is the one on the monitor's earliest poll row. A job
+ * with no walk is not the first. `poll_runs` keeps a monitor's newest 200
+ * rows, so after that many polls the earliest row left is a later walk's,
+ * whose jobs finished long before.
+ */
+async function isFirstWalk(
+  db: Database,
+  monitorId: string,
+  walkId: string | undefined,
+): Promise<boolean> {
+  if (!walkId) return false;
+  const [earliest] = await db
+    .select({ walkId: pollRuns.walkId })
+    .from(pollRuns)
+    .where(eq(pollRuns.monitorId, monitorId))
+    .orderBy(asc(pollRuns.startedAt))
+    .limit(1);
+  return earliest?.walkId === walkId;
+}
+
 export function createClassifyStep({
   classifierFor,
   newPostsPerPairPerDay,
   concurrency = 1,
   rescorerFor,
+  rescorePolls = "every",
 }: ClassifyOptions): Step<ClassifyPayload> {
   if (
     !Number.isInteger(concurrency) ||
@@ -487,7 +520,10 @@ export function createClassifyStep({
       return;
     }
 
-    const rescorer = await rescorerFor?.(monitor.userId);
+    const rescorer =
+      rescorerFor && (rescorePolls === "every" || (await isFirstWalk(db, monitorId, walkId)))
+        ? await rescorerFor(monitor.userId)
+        : undefined;
 
     const ids = [...postIds];
 
@@ -659,7 +695,7 @@ export function createClassifyStep({
         );
         if (second.status === "scored") {
           await recordAs("rescore", db, post.id, "scored", second.call);
-          logger.debug(
+          logger.info(
             { monitorId, postId: post.id, first: outcome.score, second: second.score },
             "match rescored",
           );

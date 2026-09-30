@@ -17,7 +17,7 @@ import {
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { matches, modelCalls, posts } from "../db/schema.js";
+import { matches, modelCalls, pollRuns, posts } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createClassifyStep } from "./classify.js";
 import type { StepContext } from "./steps.js";
@@ -154,5 +154,68 @@ describe("a second model for the posts the first one passes", () => {
 
     expect(match?.score).toBe(leadScore(answer(70)));
     expect(calls).toEqual([{ purpose: "classification", model: "cheap", outcome: "scored" }]);
+  });
+});
+
+describe("a rescorer for the first collection only", () => {
+  /** Two collections on one monitor: the first a day before the second. */
+  async function twoWalks() {
+    const monitorId = await insertMonitor(database, { minScore: 50 });
+    const first = crypto.randomUUID();
+    const later = crypto.randomUUID();
+    await db.insert(pollRuns).values([
+      {
+        monitorId,
+        userId: "user-1",
+        walkId: first,
+        outcome: "collected",
+        startedAt: new Date(Date.now() - 86_400_000),
+      },
+      { monitorId, userId: "user-1", walkId: later, outcome: "collected" },
+    ]);
+    return { monitorId, first, later };
+  }
+
+  async function classifyIn(monitorId: string, walkId: string | undefined) {
+    const postId = await onePost();
+    const strong = fixedClassifier("strong", 95);
+    const step = createClassifyStep({
+      classifierFor: async () => fixedClassifier("cheap", 70).classifier,
+      rescorerFor: async () => strong.classifier,
+      rescorePolls: "first",
+    });
+    await step({ monitorId, postIds: [postId], ...(walkId ? { walkId } : {}) }, contextFor(db));
+    const [match] = await db
+      .select()
+      .from(matches)
+      .where(and(eq(matches.monitorId, monitorId), eq(matches.postId, postId)));
+    return { score: match?.score, rescored: strong.classify.mock.calls.length };
+  }
+
+  it("rescores the posts of the monitor's first walk", async () => {
+    const { monitorId, first } = await twoWalks();
+
+    expect(await classifyIn(monitorId, first)).toEqual({
+      score: leadScore(answer(95)),
+      rescored: 1,
+    });
+  });
+
+  it("keeps the first model's score on a later walk", async () => {
+    const { monitorId, later } = await twoWalks();
+
+    expect(await classifyIn(monitorId, later)).toEqual({
+      score: leadScore(answer(70)),
+      rescored: 0,
+    });
+  });
+
+  it("keeps the first model's score on a job with no walk", async () => {
+    const { monitorId } = await twoWalks();
+
+    expect(await classifyIn(monitorId, undefined)).toEqual({
+      score: leadScore(answer(70)),
+      rescored: 0,
+    });
   });
 });

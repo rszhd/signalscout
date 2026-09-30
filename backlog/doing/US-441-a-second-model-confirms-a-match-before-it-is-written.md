@@ -41,9 +41,12 @@ not the posts read.
       `rescore`, so a count of classifications stays one per post, and the
       monitor's spend and the budget cap include it.
 - [ ] The cap's reservation for calls in flight counts both calls of a post.
-- [ ] `startWorker` takes the option (`rescorer`), for every owner on the
+- [x] `startWorker` takes the option (`rescorer`), for every owner on the
       instance. Off by default: a monitor's scores do not change unless an
       application turns it on, so the scoring captures are not needed.
+- [x] `rescorePolls: "first"` rescores only the monitor's first collection
+      (its earliest walk); a later walk, or a job with no walk, keeps the
+      first model's score.
 - [x] Tests cover: a confirmed match, a match the second model drops, a
       second call that fails, and no rescorer.
 - [ ] One live scan with the rescorer on (BuyerFinder, gpt-6-sol), and the
@@ -72,3 +75,14 @@ not the posts read.
   of one post, but only after a post has been rescored: before that it counts
   one call. No test covers it, so its box stays open. BuyerFinder runs it
   against this working copy with `LOOKOUT_RESCORE=on`; not live yet.
+- 2026-09-30 14:46 — Live, one BuyerFinder scan of allbirds.com on this
+  working copy, rescorer gpt-6-sol, classifier deepseek-flash. 213 posts
+  checked, 63 classified ($0.0363), 10 passed the bar and were rescored
+  ($0.0379, $0.0038 a call: 844 input and 210 output tokens on average,
+  4.9 s). The second model kept all 10 at 50 or above (57 to 91). The first
+  scores were not kept: the step logged them at debug and the worker ran at
+  info, so the line is now at info, and the live box stays open until a run
+  records both.
+- 2026-09-30 14:46 — The owner asked for the rescorer on the first scan only.
+  `rescorePolls: "first"` reads the job's walk against the monitor's earliest
+  poll row; `every` stays the default.

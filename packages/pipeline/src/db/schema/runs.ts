@@ -212,6 +212,8 @@ export type StageRunDetail =
       readonly dropped: number;
       /** Posts the cap stopped this run from reaching. They keep their place. */
       readonly leftByCap: number;
+      /** Posts left unread because the collection had its matches. US-443. */
+      readonly leftByMatchCap?: number;
     }
   | {
       readonly stage: "notify";

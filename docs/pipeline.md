@@ -193,6 +193,13 @@ walk on its earliest poll row; later polls keep the classifier's score.
 Unset, which this repository's application leaves it, the classifier's
 score stands.
 
+**A collection may stop at a number of matches.** US-443. `startWorker`
+takes `matchesPerCollection`. Once a walk has that many matches, the classify
+step reads no more of its posts and writes each as a `match_cap` drop, so it
+is never paid for and a screen counts it as seen. Every job of one walk
+shares the count; the next walk starts again. Calls already in flight
+finish, so a walk can end a few over. Unset, there is no cap.
+
 **A post written twice is one card.** US-400. A
 post whose author made the same post within a week — same platform, same
 words by `posts.text_fingerprint` — and whose earlier copy already has a card

@@ -63,7 +63,11 @@ export const minimumPollIntervalSeconds = 60;
  * Monitors screen counts it where it counts every other post kept from the
  * model.
  */
-export const filterStages = ["keyword", "embedding", "triage", "ceiling"] as const;
+/**
+ * `match_cap` is a post a collection that already had its matches did not
+ * read. US-443. Written here so a screen counts it as seen.
+ */
+export const filterStages = ["keyword", "embedding", "triage", "ceiling", "match_cap"] as const;
 
 export type FilterStage = (typeof filterStages)[number];
 

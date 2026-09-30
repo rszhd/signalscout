@@ -20,6 +20,21 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.21.0 — 2026-09-30
+
+One migration, in the pipeline's stream: `0074` adds `match_cap` to the
+stages `filter_drops` accepts. It widens a check constraint and changes no
+row.
+
+**Added.** A collection may stop scoring once it has enough matches
+(US-443). `startWorker` and `createClassifyStep` take `matchesPerCollection`,
+1 or more: once a walk has that many matches, the classify step reads no more
+of its posts and writes each as a `match_cap` drop, so no model is paid for
+it. Every job of one walk shares the count, and the next walk starts again.
+Calls already in flight finish, so a walk can end a few over. Unset, there
+is no cap. The per-stage drop counts a monitor screen reads leave `match_cap`
+out.
+
 ## 0.20.0 — 2026-09-30
 
 One migration, in the pipeline's stream: `0073` adds `rescore` to the

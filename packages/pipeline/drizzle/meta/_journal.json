@@ -519,6 +519,13 @@
       "when": 1790750037298,
       "tag": "0073_a_second_model_can_rescore_a_match",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1790782665600,
+      "tag": "0074_a_collection_can_stop_at_its_match_cap",
+      "breakpoints": true
     }
   ]
 }

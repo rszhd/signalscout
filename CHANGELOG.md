@@ -20,9 +20,21 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
-## Unreleased
+## 0.19.0 — 2026-09-30
 
 No migration.
+
+**Changed.** The query plan names what the customer wants, in everyday words
+(US-440). `buildQuerySystemPrompt` allows an everyday category name ("password
+manager") and refuses marketing words, gives examples from several kinds of
+product, writes for the product's main everyday use, and asks for the thing,
+the task and the situation, the situation in a customer's complaint words.
+The platform rules, the word limits and the 3-to-8 count are unchanged. A
+monitor created after the upgrade gets different queries; existing monitors
+keep theirs.
+
+**Changed.** Every pipeline job is sent with its monitor as its pg-boss group
+(US-439). Nothing changes for a worker that does not set `queueConcurrency`.
 
 **Added.** A monitor's first poll may read more pages (US-435).
 `startWorker` takes `firstPollPagesPerInput`, 1 to 20: on a monitor's first

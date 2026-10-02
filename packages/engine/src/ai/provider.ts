@@ -218,6 +218,8 @@ export const modelPrices: Readonly<
   "gpt-5.6-luna": { input: 200_000, output: 1_200_000, provider: "openai" },
   "gpt-5.6-terra": { input: 2_000_000, output: 12_000_000, provider: "openai" },
   "gpt-6-sol": { input: 2_000_000, output: 10_000_000, provider: "openai" },
+  // Read 2026-10-02 off OpenAI's pricing page: the same as gpt-6-sol. US-448.
+  "gpt-6.1-sol": { input: 2_000_000, output: 10_000_000, provider: "openai" },
   "gpt-5.6-sol": { input: 4_000_000, output: 20_000_000, provider: "openai" },
   "gpt-6-astra": { input: 10_000_000, output: 50_000_000, provider: "openai" },
   "gemini-3.5-flash-lite": { input: 300_000, output: 2_500_000, provider: "google" },

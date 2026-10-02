@@ -2,7 +2,7 @@
 
 # Open tickets
 
-78 open — 11 doing, 58 todo, 9 parked (7 p1, 54 p2, 17 p3).
+79 open — 12 doing, 58 todo, 9 parked (7 p1, 55 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -20,6 +20,7 @@
 | p2 | US-441 | [A second model confirms a match before it is written](doing/US-441-a-second-model-confirms-a-match-before-it-is-written.md) | feature | doing | 2026-09-30T14:32+08:00 |
 | p2 | US-442 | [SocialCrawl can browse a subreddit beside its keyword searches](doing/US-442-socialcrawl-can-browse-a-subreddit-beside-its-keyword-searches.md) | feature | doing | 2026-09-30T15:03+08:00 |
 | p2 | US-443 | [A collection stops scoring at its match cap](doing/US-443-a-collection-stops-scoring-at-its-match-cap.md) | feature | doing | 2026-09-30T23:41+08:00 |
+| p2 | US-448 | [gpt-6.1-sol is priced](doing/US-448-gpt-6-1-sol-is-priced.md) | feature | doing | 2026-10-02T09:24+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |

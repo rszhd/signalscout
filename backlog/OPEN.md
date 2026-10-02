@@ -2,12 +2,13 @@
 
 # Open tickets
 
-78 open — 11 doing, 58 todo, 9 parked (7 p1, 54 p2, 17 p3).
+80 open — 13 doing, 58 todo, 9 parked (8 p1, 55 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-418 | [The query plan writes the topic, not the question](doing/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | doing | 2026-09-26T02:07+08:00 |
+| p1 | US-449 | [Intent means wanting a product, not asking for advice](doing/US-449-intent-means-wanting-a-product-not-asking-for-advice.md) | feature | doing | 2026-10-02T16:42+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
@@ -20,6 +21,7 @@
 | p2 | US-441 | [A second model confirms a match before it is written](doing/US-441-a-second-model-confirms-a-match-before-it-is-written.md) | feature | doing | 2026-09-30T14:32+08:00 |
 | p2 | US-442 | [SocialCrawl can browse a subreddit beside its keyword searches](doing/US-442-socialcrawl-can-browse-a-subreddit-beside-its-keyword-searches.md) | feature | doing | 2026-09-30T15:03+08:00 |
 | p2 | US-443 | [A collection stops scoring at its match cap](doing/US-443-a-collection-stops-scoring-at-its-match-cap.md) | feature | doing | 2026-09-30T23:41+08:00 |
+| p2 | US-448 | [gpt-6.1-sol is priced](doing/US-448-gpt-6-1-sol-is-priced.md) | feature | doing | 2026-10-02T09:24+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |

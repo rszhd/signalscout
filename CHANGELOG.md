@@ -20,6 +20,25 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.22.0 — 2026-10-02
+
+No migration.
+
+**Changed.** The classifier scores intent as wanting a product (US-449).
+`buildSystemPrompt`'s intent line now says asking what others use, or for a
+product to be recommended, is strong intent, and asking for advice,
+opinions, help with a life or career choice or support is not, nor is
+venting, telling a story or showing one's own project. Its icpFit line
+scores an author shown to be elsewhere, when the ideal customer is in one
+place, 10 or less. Scores move: on a hand-judged set of 247 matches from a
+private application, 75% of the real leads stayed and 69% of the rest fell
+below the bar, where the old wording kept 87% and dropped 37%. A monitor's
+inbox gets fewer matches, more of them real.
+
+**Added.** gpt-6.1-sol is in `modelPrices` (US-448), at $2.00 a million input
+tokens and $10.00 output, as OpenAI lists it. A call on it was recorded at no
+cost before.
+
 ## 0.21.0 — 2026-09-30
 
 One migration, in the pipeline's stream: `0074` adds `match_cap` to the

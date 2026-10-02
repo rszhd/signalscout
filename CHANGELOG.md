@@ -20,6 +20,14 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.22.0 — 2026-10-02
+
+No migration.
+
+**Added.** gpt-6.1-sol is in `modelPrices` (US-448), at $2.00 a million input
+tokens and $10.00 output, as OpenAI lists it. A call on it was recorded at no
+cost before.
+
 ## 0.21.0 — 2026-09-30
 
 One migration, in the pipeline's stream: `0074` adds `match_cap` to the

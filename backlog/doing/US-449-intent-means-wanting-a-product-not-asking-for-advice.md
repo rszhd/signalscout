@@ -130,3 +130,8 @@ now?") is the lever, not the model.
   line does not fully hold back. No earlier run on terra to compare with.
 
   The fixtures are captured again; the engine suite passes (822).
+- 2026-10-02 18:02 — The owner edited the cloud production `.env` (backup
+  `.env.bak-gpt61`): AI_QUERY_MODEL and AI_DESCRIBE_MODEL are gpt-6.1-sol;
+  AI_MODEL stays gpt-6-luna. The running container keeps the old values
+  until the next deploy; production waits for the owner to promote staging
+  (0.22.0, commit 900142c).

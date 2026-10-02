@@ -2,10 +2,11 @@
 
 # Done
 
-258 finished.
+259 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| US-449 | [Intent means wanting a product, not asking for advice](done/2026-10/US-449-intent-means-wanting-a-product-not-asking-for-advice.md) | feature | shipped | 2026-10 |
 | BUG-437 | [One reason over 160 characters refuses a whole classification](done/2026-09/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | shipped | 2026-09 |
 | BUG-436 | [A source that fails part way through a poll loses the pages it already billed](done/2026-09/BUG-436-a-source-that-fails-mid-walk-loses-the-pages-it-already-billed.md) | bug | shipped | 2026-09 |
 | BUG-431 | [A thread test reads the previous test's continuation](done/2026-09/BUG-431-a-thread-test-reads-the-previous-test-s-continuation.md) | bug | shipped | 2026-09 |

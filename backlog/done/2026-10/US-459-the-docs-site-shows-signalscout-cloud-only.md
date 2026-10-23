@@ -6,7 +6,7 @@ priority: p1
 created: 2026-10-23T12:33+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -32,7 +32,7 @@ arrives from GitHub still gets the guide's own sidebar.
       you run.
 - [x] `site/README.md` says the guide is hidden, so the next page added
       does not link into it.
-- [ ] Deployed to docs.signalscout.run, and the live menu shows Getting
+- [x] Deployed to docs.signalscout.run, and the live menu shows Getting
       started and Cloud only.
 
 ## Notes
@@ -51,3 +51,9 @@ arrives from GitHub still gets the guide's own sidebar.
   hold no self-hosting page. Screenshots of the home, Cloud, Webhooks and
   Install pages look right, and the diagrams render once the page has had
   time to draw them.
+- 2026-10-23 12:45 — Deployed by the owner from the `dev` checkout
+  (dpl_TPrqoy78FJZ1Vd8yEdWjGhEE1fpC, Ready). The first try said "Not
+  authorized"; the second, with `--debug`, went through. Live: the menu shows
+  Getting started and Cloud, `/using/webhooks` answers 200, `/self-hosting/`
+  and `/self-hosting/install` still answer 200, and `llms.txt` lists no
+  self-hosting page.

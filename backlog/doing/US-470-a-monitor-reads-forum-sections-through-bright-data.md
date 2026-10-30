@@ -98,3 +98,9 @@ a forum yet.
   other than the thread. The skip log lines now carry the page's title and
   size. A thread lost this way is not retried: a later `since` passes it by.
   About 40 Bright Data requests used in all.
+- 2026-10-30T15:52+08:00 — For US-466: `createBrightDataForum({ threadsPerSection })`
+  lets an application open fewer threads a section a poll, and prices its
+  cap to match; 20 stays the default. A free public scan of five sections
+  at 20 each could open 100 threads. `fetchThroughUnlocker` is exported, so
+  an application checks a section's address with the same request.
+  12 connector tests; root `pnpm test` (2,666) passes.

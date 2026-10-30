@@ -33,7 +33,10 @@ import { fetchThroughUnlocker, UnlockerError } from "./unlocker.js";
 
 /** Threads one call opens. */
 export const threadsPerCall = 5;
-/** Threads one section may open in one poll: the cost cap's figure too. */
+/**
+ * Threads one section may open in one poll, unless the application sets its
+ * own (`createBrightDataForum`): the cost cap's figure too.
+ */
 export const maxThreadsPerSection = 20;
 /** How far back a start read from words is trusted to be early. */
 const wordsMarginMs = 86_400_000;
@@ -95,9 +98,14 @@ export class BrightDataForumSource implements SocialSource {
   readonly pricePerUnitMicros = brightDataForum.pricePerUnitMicros;
   readonly postsPerUnit = brightDataForum.postsPerUnit;
   readonly discovery = brightDataForum.discovery;
-  readonly maxUnitsPerQueryPoll = brightDataForum.maxUnitsPerQueryPoll;
+  readonly maxUnitsPerQueryPoll: number;
 
-  constructor(private readonly runtime: SourceRuntime) {}
+  constructor(
+    private readonly runtime: SourceRuntime,
+    private readonly threadsPerSection = maxThreadsPerSection,
+  ) {
+    this.maxUnitsPerQueryPoll = 1 + threadsPerSection;
+  }
 
   async validateCredentials(credentials: SourceCredentials): Promise<CredentialCheck> {
     if (!credentials.apiKey) return { valid: false, reason: "Enter your Bright Data API key." };
@@ -175,7 +183,7 @@ export class BrightDataForumSource implements SocialSource {
       const chosen = program
         .listThreads(answer.body, section, this.runtime.now())
         .filter((thread) => worthOpening(thread, request.query.since))
-        .slice(0, maxThreadsPerSection)
+        .slice(0, this.threadsPerSection)
         .map((thread) => ({
           url: program.threadPageUrl?.(thread.url) ?? thread.url,
           ...(thread.startedAt ? { startedAt: thread.startedAt.toISOString() } : {}),
@@ -254,17 +262,33 @@ export class BrightDataForumSource implements SocialSource {
   }
 }
 
-export const brightDataForum: ConnectorDefinition = {
-  platform: forumPlatform,
-  provider: brightDataProvider,
-  /** Bright Data bills a Web Unlocker request that succeeds; a refusal is free. */
-  billableUnit: "request",
-  /** $1.50 per 1,000 on pay-as-you-go, read on 2026-10-30. */
-  pricePerUnitMicros: 1500,
-  /** One thread page is one post. A list page is a request with none. */
-  postsPerUnit: 1,
-  discovery: ["channel"],
-  /** One list and the most threads it may open. */
-  maxUnitsPerQueryPoll: 1 + maxThreadsPerSection,
-  create: (runtime) => new BrightDataForumSource(runtime),
-};
+/**
+ * The connector, opening at most `threadsPerSection` threads a section a poll.
+ * An application whose readers are not paying sets fewer: each is a request.
+ */
+export function createBrightDataForum(
+  options: { threadsPerSection?: number } = {},
+): ConnectorDefinition {
+  const threadsPerSection = options.threadsPerSection ?? maxThreadsPerSection;
+  if (!Number.isInteger(threadsPerSection) || threadsPerSection < 1) {
+    throw new RangeError(
+      `threadsPerSection must be a whole number above zero, not ${threadsPerSection}`,
+    );
+  }
+  return {
+    platform: forumPlatform,
+    provider: brightDataProvider,
+    /** Bright Data bills a Web Unlocker request that succeeds; a refusal is free. */
+    billableUnit: "request",
+    /** $1.50 per 1,000 on pay-as-you-go, read on 2026-10-30. */
+    pricePerUnitMicros: 1500,
+    /** One thread page is one post. A list page is a request with none. */
+    postsPerUnit: 1,
+    discovery: ["channel"],
+    /** One list and the most threads it may open. */
+    maxUnitsPerQueryPoll: 1 + threadsPerSection,
+    create: (runtime) => new BrightDataForumSource(runtime, threadsPerSection),
+  };
+}
+
+export const brightDataForum: ConnectorDefinition = createBrightDataForum();

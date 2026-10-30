@@ -50,6 +50,7 @@ export { apifyProvider, apifyProviderId } from "./providers/apify/provider.js";
 export {
   BrightDataForumSource,
   brightDataForum,
+  createBrightDataForum,
   maxThreadsPerSection,
   threadsPerCall,
   worthOpening,
@@ -63,6 +64,11 @@ export {
   RedditSource,
   toCandidatePost,
 } from "./providers/brightdata/reddit.js";
+export {
+  fetchThroughUnlocker,
+  type UnlockerAnswer,
+  UnlockerError,
+} from "./providers/brightdata/unlocker.js";
 export {
   HarvestApiLinkedInSource,
   harvestApiLinkedIn,

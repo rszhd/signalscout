@@ -4,6 +4,7 @@ import { createLogger } from "../../../logger.js";
 import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
 import {
   BrightDataForumSource,
+  createBrightDataForum,
   maxThreadsPerSection,
   threadsPerCall,
   worthOpening,
@@ -170,6 +171,23 @@ describe("reading a forum section", () => {
       externalId: "meta.discourse.org:416139",
       url: "https://meta.discourse.org/t/topic/416139",
     });
+  });
+});
+
+describe("an application's own limit", () => {
+  it("opens no more threads a section than the application allows, and prices its cap so", async () => {
+    const stub = brightData(
+      { [xenforoList]: captured("xenforo2-list.html") },
+      captured("xenforo2-thread.html"),
+    );
+    const connector = createBrightDataForum({ threadsPerSection: 3 });
+    const source = connector.create(runtimeWith(stub.fetch)) as BrightDataForumSource;
+
+    await walk(source, [xenforoList]);
+
+    expect(stub.asked).toHaveLength(1 + 3);
+    expect(connector.maxUnitsPerQueryPoll).toBe(4);
+    expect(() => createBrightDataForum({ threadsPerSection: 0 })).toThrow(RangeError);
   });
 });
 

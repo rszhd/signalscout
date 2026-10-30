@@ -45,6 +45,7 @@ export const phpbb3: ForumProgram = {
         url: absoluteUrl(link[1], pageUrl),
         title: textOf(link[3] ?? ""),
         startedAt: poster >= 0 ? timeIn(piece.html.slice(poster)) : null,
+        approximateStart: false,
         lastActivityAt: last >= 0 ? timeIn(piece.html.slice(last)) : null,
         pinned: /\b(sticky|announce|global)\b/.test(piece.match[1] ?? ""),
       });

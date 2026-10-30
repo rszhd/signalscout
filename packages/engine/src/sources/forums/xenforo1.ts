@@ -56,11 +56,14 @@ export const xenforo1: ForumProgram = {
       if (!id || !link?.[1]) continue;
       const start = piece.html.indexOf('class="startDate"');
       const last = piece.html.indexOf('class="lastPostInfo"');
+      const startTag =
+        start >= 0 ? piece.html.slice(start).match(/class="DateTime"[^>]*>/)?.[0] : undefined;
       threads.push({
         id,
         url: absoluteUrl(link[1], base),
         title: textOf(link[2] ?? ""),
         startedAt: start >= 0 ? firstTime(piece.html.slice(start), now) : null,
+        approximateStart: startTag !== undefined && !/data-time="\d+"/.test(startTag),
         lastActivityAt: last >= 0 ? firstTime(piece.html.slice(last), now) : null,
         pinned: /\bsticky\b/.test(classes ?? ""),
       });

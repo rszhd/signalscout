@@ -41,6 +41,7 @@ export const smf2: ForumProgram = {
         url: absoluteUrl(link[1], pageUrl),
         title: textOf(link[3] ?? ""),
         startedAt: null,
+        approximateStart: false,
         lastActivityAt: last ? fromEnglishDate(last[1] ?? "", now) : null,
         pinned: /\bsticky/.test(piece.match[1] ?? ""),
       });

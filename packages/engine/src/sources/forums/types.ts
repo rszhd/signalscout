@@ -11,6 +11,12 @@ export interface ForumThreadSummary {
   readonly title: string;
   /** When the thread was started. Null when the list does not say. */
   readonly startedAt: Date | null;
+  /**
+   * True when `startedAt` was read from words: the board's zone is not on the
+   * page, so it can be hours off (vBulletin's list showed 8). A reader widens
+   * its window for these and lets the pipeline drop what it has seen.
+   */
+  readonly approximateStart: boolean;
   /** When its newest post was written. Null when the list does not say. */
   readonly lastActivityAt: Date | null;
   /** Pinned, sticky or an announcement: kept at the top whatever its age. */

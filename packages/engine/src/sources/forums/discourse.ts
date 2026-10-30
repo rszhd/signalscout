@@ -72,6 +72,7 @@ export const discourse: ForumProgram = {
         url: topicUrl(origin, topic),
         title: topic.title,
         startedAt: fromIso(topic.created_at),
+        approximateStart: false,
         lastActivityAt: fromIso(topic.last_posted_at ?? topic.bumped_at ?? undefined),
         pinned: Boolean(topic.pinned || topic.pinned_globally),
       }),

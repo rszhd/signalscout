@@ -100,3 +100,19 @@ carry a member id or a Gravatar hash, and signatures.
   count. New targets: XenForo 2 (MacRumors), vBulletin, Invision and MyBB;
   the last three save their lists only, to write their pickers from. Waiting
   for a key: none is in a local `.env`.
+- 2026-10-30T12:07+08:00 — First Bright Data captures, zone `web_unlocker1`:
+  12 requests in all, inside the free monthly 5,000. XenForo 2.3
+  (MacRumors, iMac) and vBulletin 5 (vBulletin's own forum) came through and
+  are read: XenForo 2 has every time in `data-timestamp`; vBulletin 5 lists
+  its start only in words, which read 8 hours early as UTC against the
+  thread's `<time>`, so list entries now carry `approximateStart`, and
+  `fromEnglishDate` reads "'26" years. Two refusals worth knowing: MyBB's
+  own community answered Bright Data with a "Please refresh to continue"
+  challenge, and invisioncommunity.com was refused by Bright Data itself,
+  "not available for immediate residential (no KYC) access mode in
+  accordance with robots.txt"; full access needs Bright Data's KYC form,
+  the owner's call. Three requests were wasted on old targets when a failed
+  edit was followed by a run. Scrubber additions: vBulletin `/member/<id>-`
+  links, `data-vbnamecard`, avatar file ids, MyBB profile links, and every
+  email address (MacRumors' footer named staff). 34 forum tests; root lint,
+  type check and `pnpm test` (2,646) pass.

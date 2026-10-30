@@ -5,7 +5,9 @@ import { decodeEntities, fromEnglishDate, textOf } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
+import { vbulletin5 } from "./vbulletin5.js";
 import { xenforo1 } from "./xenforo1.js";
+import { xenforo2 } from "./xenforo2.js";
 
 const manifest = JSON.parse(
   readFileSync(new URL("./fixtures/manifest.json", import.meta.url), "utf8"),
@@ -54,6 +56,7 @@ describe("XenForo 1", () => {
       url: "https://forums.digitalpoint.com/threads/hiring-malaysia-based-writer-for-igaming-payment-guides-screenshots.2885650/",
       title: "Hiring Malaysia-Based Writer for iGaming Payment Guides & Screenshots",
       startedAt: new Date("2026-10-27T13:35:10.000Z"),
+      approximateStart: false,
       lastActivityAt: new Date("2026-10-27T13:35:10.000Z"),
       pinned: false,
     });
@@ -61,9 +64,9 @@ describe("XenForo 1", () => {
 
   it("reads an older time from its words, with or without the hour", () => {
     // Shown as "Mar 3, 2011": no data-time, no hour.
-    expect(threads.find((thread) => thread.id === "2110506")?.startedAt).toEqual(
-      new Date("2011-03-03T00:00:00.000Z"),
-    );
+    const old = threads.find((thread) => thread.id === "2110506");
+    expect(old?.startedAt).toEqual(new Date("2011-03-03T00:00:00.000Z"));
+    expect(old?.approximateStart).toBe(true);
   });
 
   it("reads the first post of a thread, without the prefix label", () => {
@@ -86,6 +89,77 @@ describe("XenForo 1", () => {
   });
 });
 
+describe("XenForo 2", () => {
+  const list = page("xenforo2-list");
+  const threads = xenforo2.listThreads(list.html, list.url);
+
+  it("reads every thread with exact times, and marks the pinned ones by their icon", () => {
+    expect(threads).toHaveLength(54);
+    expect(threads.filter((thread) => thread.pinned)).toHaveLength(4);
+    expect(
+      threads.every(
+        (thread) => thread.startedAt && thread.lastActivityAt && !thread.approximateStart,
+      ),
+    ).toBe(true);
+    expect(threads.find((thread) => !thread.pinned)).toEqual({
+      id: "2493064",
+      url: "https://forums.macrumors.com/threads/m6-imac.2493064/",
+      title: "M6 iMac",
+      startedAt: new Date("2026-10-28T18:05:14.000Z"),
+      approximateStart: false,
+      lastActivityAt: new Date("2026-10-30T00:36:35.000Z"),
+      pinned: false,
+    });
+  });
+
+  it("reads the first post of a thread", () => {
+    const thread = page("xenforo2-thread");
+    const read = xenforo2.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "2493064",
+      url: "https://forums.macrumors.com/threads/m6-imac.2493064/",
+      title: "M6 iMac",
+      postedAt: new Date("2026-10-28T18:05:14.000Z"),
+    });
+    expect(read?.text.startsWith("I ordered my M6 iMac this morning")).toBe(true);
+    expect(read?.text).toContain("Anyone getting a later delivery date?");
+  });
+});
+
+describe("vBulletin 5", () => {
+  const list = vbulletin5.listThreads(
+    page("vbulletin5-list").html,
+    page("vbulletin5-list").url,
+    new Date("2026-10-30T04:00:00Z"),
+  );
+
+  it("reads every topic, its exact last activity, and a start in words marked approximate", () => {
+    expect(list).toHaveLength(22);
+    expect(list.filter((thread) => thread.pinned)).toHaveLength(2);
+    expect(list.find((thread) => !thread.pinned)).toEqual({
+      id: "4512751",
+      url: "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations/4512751-keep-getting-error",
+      title: "Keep getting error",
+      // "Tue 13 Oct '26, 3:46pm" in the board's zone; the thread says 23:46 UTC.
+      startedAt: new Date("2026-10-13T15:46:00.000Z"),
+      approximateStart: true,
+      lastActivityAt: new Date("2026-10-29T20:37:58.000Z"),
+      pinned: false,
+    });
+  });
+
+  it("reads the first post and its exact time from the thread", () => {
+    const thread = page("vbulletin5-thread");
+    const read = vbulletin5.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "4512751",
+      title: "Keep getting error",
+      postedAt: new Date("2026-10-13T23:46:55.000Z"),
+    });
+    expect(read?.text).toContain("Database error in vBulletin 5.7.5");
+  });
+});
+
 describe("phpBB 3", () => {
   const list = page("phpbb3-list");
   const threads = phpbb3.listThreads(list.html, list.url);
@@ -104,6 +178,7 @@ describe("phpBB 3", () => {
       url: "https://forums.gentoo.org/viewtopic.php?t=1178757",
       title: "Won't boot past initramfs screen",
       startedAt: new Date("2026-10-11T16:53:57.000Z"),
+      approximateStart: false,
       lastActivityAt: new Date("2026-10-29T01:12:33.000Z"),
       pinned: false,
     });
@@ -147,6 +222,7 @@ describe("Discourse, through its JSON", () => {
       url: "https://meta.discourse.org/t/topic/416139",
       title: "电子邮件服务器设置可以做成随时可以修改的配置吗？",
       startedAt: new Date("2026-10-30T03:13:31.307Z"),
+      approximateStart: false,
       lastActivityAt: new Date("2026-10-30T03:41:36.779Z"),
       pinned: false,
     });
@@ -194,6 +270,7 @@ describe("SMF 2.0", () => {
       url: "https://geekhack.org/index.php?topic=126408.0",
       title: "Drop appears to be closing eventually - How does that impact GH?",
       startedAt: null,
+      approximateStart: false,
       lastActivityAt: new Date("2026-03-16T18:18:45.000Z"),
       pinned: false,
     });
@@ -231,6 +308,8 @@ describe("dates in English words", () => {
     ["October 28, 2026, 11:02:51 PM", "2026-10-28T23:02:51.000Z"],
     ["<strong>Today</strong> at 08:18:14 AM", "2026-10-30T08:18:14.000Z"],
     ["Yesterday at 9:05 pm", "2026-10-29T21:05:00.000Z"],
+    ["Tue 13 Oct '26, 3:46pm", "2026-10-13T15:46:00.000Z"],
+    ["Today, 12:37pm", "2026-10-30T12:37:00.000Z"],
     ["28. Oktober 2026", null],
   ];
   for (const [words, expected] of cases) {

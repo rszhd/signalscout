@@ -51,18 +51,30 @@ const targets = {
   xenforo2: {
     list: "https://forums.macrumors.com/forums/imac.91/?order=post_date&direction=desc",
     thread: (html) => {
-      const item = [...html.matchAll(/<div class="structItem structItem--thread([^"]*)"/g)].find(
-        (match) => !/sticky/.test(match[1]),
-      );
+      // A pinned item carries a sticky status icon, not a class of its own.
+      const items = [...html.matchAll(/<div\s+class="structItem structItem--thread[^"]*"/g)];
+      const item = items.find((match, index) => {
+        const piece = html.slice(match.index, items[index + 1]?.index);
+        return !piece.includes("structItem-status--sticky");
+      });
       const href = item && html.slice(item.index).match(/href="(\/threads\/[^"]+\.\d+\/)"/)?.[1];
       return href && new URL(href, "https://forums.macrumors.com/").toString();
     },
   },
-  vbulletin: { list: "https://forum.vbulletin.com/forum/vbulletin-5-connect" },
-  invision: {
-    list: "https://invisioncommunity.com/forums/forum/497-technical-problems/?sortby=start_date&sortdirection=desc",
+  vbulletin5: {
+    list: "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations",
+    thread: (html) => {
+      const row = [...html.matchAll(/<tr class="topic-item([^"]*)"/g)].find(
+        (match) => !/sticky/.test(match[1]),
+      );
+      return row && html.slice(row.index).match(/<a href="([^"]+)" class="topic-title/)?.[1];
+    },
   },
-  mybb: { list: "https://community.mybb.com/forum-176.html?sortby=started&order=desc" },
+  invision: {
+    list: "https://invisioncommunity.com/forums/forum/543-help-and-support/?sortby=start_date&sortdirection=desc",
+  },
+  // MyBB's own community answered Bright Data with a "Please refresh to
+  // continue" challenge on 2026-10-30; another MyBB forum is needed.
   // Read through its JSON API, which needs no key; the section page is HTML.
   discourse: {
     format: "json",
@@ -115,6 +127,9 @@ const namePatterns = [
   /<a[^>]+href="[^"]*(?:showuser=\d+|\/profile\/\d+-[^"]*)"[^>]*>([^<]{2,60})</g,
   // Flarum and Discourse: /u/<name>.
   /<a[^>]+href="[^"]*\/u\/[^"/]+"[^>]*>([^<]{2,60})</g,
+  // vBulletin 5: /member/<id>-<name>. MyBB: action=profile&uid=<id>, user-<id>.html.
+  /<a[^>]+href="[^"]*\/member\/\d+-[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  /<a[^>]+href="[^"]*(?:action=profile(?:&amp;|&)uid=\d+|user-\d+\.html)[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
 ];
 
 /** Profile addresses keep their shape and lose their id and name. */
@@ -125,6 +140,14 @@ const urlScrubs = [
   [/(showuser=)\d+/g, "$11"],
   [/\/profile\/\d+-[^"/]*/g, "/profile/1-member"],
   [/\/u\/[^"/?#]+/g, "/u/member"],
+  [/\/member\/\d+-[^"/?#\s]+/g, "/member/1-member"],
+  [/(uid=)\d+/g, "$11"],
+  [/user-\d+\.html/g, "user-1.html"],
+  [/(data-userid=")\d+/gi, "$11"],
+  [/(data-vbnamecard=")\d+/g, "$11"],
+  [/(avatar\/avatar)\d+_\d+/g, "$11_1"],
+  // An email address names a person, staff in a footer too.
+  [/[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}/gi, "member@example.com"],
   // Avatars: a Gravatar hash is a hash of the member's email; the others carry their id.
   [/(gravatar\.com\/avatar\/)[0-9a-f]{32}/g, `$1${"0".repeat(32)}`],
   [/(avatar=)\d+_\d+/g, "$11_1"],
@@ -256,11 +279,11 @@ for (const [program, target] of Object.entries(targets)) {
   const list = await fetchPage(target.list);
   const extension = target.format === "json" ? "json" : "html";
   const pages = [["list", target.list, list, extension]];
-  if (target.thread) {
-    const threadUrl = target.thread(list);
-    if (!threadUrl) throw new Error(`${program}: no thread that is not pinned on ${target.list}`);
-    pages.push(["thread", threadUrl, await fetchPage(threadUrl), extension]);
-  }
+  // A picker that finds nothing still leaves the list, to fix the picker from.
+  const threadUrl = target.thread?.(list);
+  if (target.thread && !threadUrl)
+    console.log(`${program}: no thread that is not pinned; the list is saved`);
+  if (threadUrl) pages.push(["thread", threadUrl, await fetchPage(threadUrl), extension]);
   // Only the head: it names the program, and a Discourse body carries every
   // poster's name inside avatar addresses and preloaded JSON.
   if (target.section) {

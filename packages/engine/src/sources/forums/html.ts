@@ -151,14 +151,18 @@ export function fromEnglishDate(text: string, now: Date): Date | null {
     const day = new Date(now.getTime() - (relative.toLowerCase() === "yesterday" ? 86_400_000 : 0));
     return at(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
   }
-  // "25 February 2026", with or without a weekday in front.
-  const dayFirst = words.match(/^(?:[a-z]+,?\s+)?(\d{1,2})\s+([a-z]+)\.?,?\s+(\d{4})/i);
-  if (dayFirst) return at(Number(dayFirst[3]), monthIndex(dayFirst[2] ?? ""), Number(dayFirst[1]));
+  // "'26" is 2026, as vBulletin 5 writes it.
+  const year = (written: string) =>
+    written.length === 4 ? Number(written) : 2000 + Number(written.replace("'", ""));
+  // "25 February 2026" or "13 Oct '26", with or without a weekday in front.
+  const dayFirst = words.match(/^(?:[a-z]+,?\s+)?(\d{1,2})\s+([a-z]+)\.?,?\s+(\d{4}|'\d{2})/i);
+  if (dayFirst)
+    return at(year(dayFirst[3] ?? ""), monthIndex(dayFirst[2] ?? ""), Number(dayFirst[1]));
   // "Oct 27, 2026" and "October 28, 2026", with or without a weekday.
   const monthFirst = words.match(
-    /^(?:[a-z]+,\s+)?([a-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/i,
+    /^(?:[a-z]+,\s+)?([a-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4}|'\d{2})/i,
   );
   if (monthFirst)
-    return at(Number(monthFirst[3]), monthIndex(monthFirst[1] ?? ""), Number(monthFirst[2]));
+    return at(year(monthFirst[3] ?? ""), monthIndex(monthFirst[1] ?? ""), Number(monthFirst[2]));
   return null;
 }

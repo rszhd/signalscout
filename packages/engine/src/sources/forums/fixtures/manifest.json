@@ -52,5 +52,35 @@
     "capturedAt": "2026-10-30T03:50:08.425Z",
     "bytes": 51041,
     "namesScrubbed": 9
+  },
+  "xenforo2-list.html": {
+    "url": "https://forums.macrumors.com/forums/imac.91/?order=post_date&direction=desc",
+    "capturedAt": "2026-10-30T04:03:34.054Z",
+    "bytes": 288860,
+    "namesScrubbed": 71
+  },
+  "invision-list.html": {
+    "url": "https://invisioncommunity.com/forums/forum/543-help-and-support/?sortby=start_date&sortdirection=desc",
+    "capturedAt": "2026-10-30T04:02:39.870Z",
+    "bytes": 252,
+    "namesScrubbed": 0
+  },
+  "xenforo2-thread.html": {
+    "url": "https://forums.macrumors.com/threads/m6-imac.2493064/",
+    "capturedAt": "2026-10-30T04:03:34.064Z",
+    "bytes": 232737,
+    "namesScrubbed": 8
+  },
+  "vbulletin5-list.html": {
+    "url": "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations",
+    "capturedAt": "2026-10-30T04:04:27.861Z",
+    "bytes": 171189,
+    "namesScrubbed": 22
+  },
+  "vbulletin5-thread.html": {
+    "url": "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations/4512751-keep-getting-error",
+    "capturedAt": "2026-10-30T04:04:27.866Z",
+    "bytes": 117343,
+    "namesScrubbed": 7
   }
 }

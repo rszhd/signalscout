@@ -318,3 +318,22 @@ describe("which threads are new", () => {
     ).toBe(false);
   });
 });
+
+describe("a challenge page is a refusal, not a page", () => {
+  it("is read from a challenge's title or script, never a real page's words", async () => {
+    const { refusalIn } = await import("./unlocker.js");
+    expect(refusalIn("<html><head><title>Checking your browser</title></head></html>")).toBe(
+      "the site answered with a challenge page",
+    );
+    expect(refusalIn("<html><head><title>Just a moment...</title></head></html>")).not.toBeNull();
+    expect(
+      refusalIn("<html><head><script>window.POW_CHALLENGE_DATA = {}</script></head></html>"),
+    ).not.toBeNull();
+    // A forum thread that talks about a captcha is still a page.
+    expect(
+      refusalIn(
+        "<html><head><title>Captcha keeps failing on login</title></head><body>help</body></html>",
+      ),
+    ).toBeNull();
+  });
+});

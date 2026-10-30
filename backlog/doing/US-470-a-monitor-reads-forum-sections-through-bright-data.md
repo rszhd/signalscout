@@ -104,3 +104,10 @@ a forum yet.
   at 20 each could open 100 threads. `fetchThroughUnlocker` is exported, so
   an application checks a section's address with the same request.
   12 connector tests; root `pnpm test` (2,666) passes.
+- 2026-10-30T20:24+08:00 — Two local BuyerFinder scans, forums only: of ten
+  suggested sections, two were read, and one gave 8 threads and 2 matches
+  for $0.0135. Of the failures, two were challenge pages logged as "no
+  parser knows this page" (Cloudflare's "Checking your browser" and a
+  proof-of-work script). The unlocker now reads those, by a challenge's
+  title or script only, as a refusal billing nothing, so the log names the
+  real cause. One more test; root `pnpm test` (2,671) passes.

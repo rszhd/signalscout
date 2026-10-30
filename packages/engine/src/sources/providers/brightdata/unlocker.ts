@@ -30,10 +30,25 @@ export type UnlockerAnswer =
 /** Where a refusal answered as a 200 shows itself. */
 function refusalIn(body: string): string | null {
   if (/^(Residential Failed|Proxy Error)/.test(body)) return body.slice(0, 200);
-  if (/Please refresh to continue/.test(body.slice(0, 2000)))
+  // Read from a challenge's title or script only, never the words of a real
+  // page: Cloudflare's "Just a moment…" and "Checking your browser", a
+  // proof-of-work script, and a plain "Please refresh to continue", all seen
+  // through Bright Data on 2026-10-30. A thread titled "Checking your browser
+  // cache…" would be taken for one too; such a title was judged rare enough.
+  const head = body.slice(0, 4000);
+  const title = head.match(/<title[^>]*>([^<]*)</i)?.[1] ?? "";
+  if (
+    /Please refresh to continue/.test(head) ||
+    /^(Just a moment|Checking your browser|Attention Required)/i.test(title.trim()) ||
+    /POW_CHALLENGE|cf-chl-/.test(head)
+  ) {
     return "the site answered with a challenge page";
+  }
   return null;
 }
+
+/** Exported for the tests: the refusals that arrive as a 200. */
+export { refusalIn };
 
 export async function fetchThroughUnlocker(
   runtime: SourceRuntime,

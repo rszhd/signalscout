@@ -30,6 +30,9 @@ export const redactedFields = [
   // matches a key called exactly that and not this one.
   "apiToken",
   "apiSecret",
+  // US-470. Bright Data's Web Unlocker zone is a name, not a secret, but it is
+  // a credential field, and every one is kept out of a log line alike.
+  "unlockerZone",
   "credentials",
   "password",
   "token",

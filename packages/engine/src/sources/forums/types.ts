@@ -31,6 +31,8 @@ export interface ForumThread {
   /** The first post's text, tags removed. */
   readonly text: string;
   readonly postedAt: Date | null;
+  /** True when `postedAt` was read from words, in a zone the page does not name. */
+  readonly approximatePostedAt: boolean;
 }
 
 /**

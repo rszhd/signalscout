@@ -72,6 +72,7 @@ export const phpbb3: ForumProgram = {
       title: textOf(heading[3] ?? ""),
       text: textOf(rest.slice(content, end >= 0 ? content + end : undefined)),
       postedAt: timeIn(rest),
+      approximatePostedAt: false,
     };
   },
 };

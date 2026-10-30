@@ -211,22 +211,22 @@ https://docs.signalscout.run/self-hosting/maintenance
 
 ## Sources
 
-### `BRIGHTDATA_API_KEY`
+### `BRIGHTDATA_API_KEY`, `BRIGHTDATA_UNLOCKER_ZONE`
 
-Default: *empty*
+- `BRIGHTDATA_API_KEY` — default *empty*
+- `BRIGHTDATA_UNLOCKER_ZONE` — default *empty*
 
-Bright Data, for Reddit. **This key buys nothing here now.** US-158 switched
-the Reddit connector that spends it off on 2026-09-17: it bills a record per
-post, about five times what ScrapeCreators or SocialCrawl charge for the same
-subreddit page. The variable stays because the connector still ships and this file
-lists one variable per credential field the build registers. Setting it does
-nothing until somebody deletes `notOffered` from
-`packages/engine/src/sources/providers/brightdata/reddit.ts`.
+Bright Data, for forums. The Web Unlocker fetches a forum's pages past the
+bot check most forums put in front of a plain request, at $1.50 per 1,000
+requests that succeed: one per section a poll, one per new thread. It answers
+only inside a Web Unlocker zone you make in Bright Data's dashboard; put that
+zone's name in BRIGHTDATA_UNLOCKER_ZONE. Without an identity check (KYC) on
+the account, Bright Data refuses sites whose robots.txt asks crawlers away,
+and such a section is skipped with a log line.
 
-The name is Bright Data's, not Reddit's: one key serves every platform we
-fetch through them, so it is set once and rotated once. `REDDIT_API_KEY` was
-the old name and is still read, so an instance that upgrades keeps polling.
-It is going; rename it when you next edit this file.
+The same key fetched Reddit until US-158 switched that connector off on
+2026-09-17: it bills a record per post, about five times what ScrapeCreators
+or SocialCrawl charge. `REDDIT_API_KEY` was the old name and is still read.
 
 ### `SCRAPECREATORS_API_KEY`
 

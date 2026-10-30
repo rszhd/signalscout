@@ -94,6 +94,19 @@ export const searchQuerySchema = z
   });
 
 /**
+ * A query on a platform whose queries are addresses: one `https` page, the
+ * section to read. US-470.
+ */
+export const addressQuerySchema = z
+  .string()
+  .trim()
+  .max(500)
+  .url("a query here is the address of a page, starting with https://")
+  .refine((value) => value.startsWith("https://"), {
+    message: "a query here is the address of a page, starting with https://",
+  });
+
+/**
  * The same rule, plus the ceiling the platform sets.
  *
  * A query is written for somewhere. US-006 measured what happens when it is
@@ -104,6 +117,7 @@ export const searchQuerySchema = z
  * model must obey and a person may bypass is a suggestion with a test.
  */
 export function searchQuerySchemaFor(style: PlatformSearchStyle | undefined) {
+  if (style?.input === "address") return addressQuerySchema;
   const ceiling = style?.maxQueryWords ?? defaultMaxQueryWords;
 
   return searchQuerySchema.refine((value) => wordsIn(value) <= ceiling, {
@@ -150,7 +164,11 @@ export function queryListSchemaFor(platform: PlatformDescriptor) {
     .min(minimumQueries)
     .max(maximumQueries)
     .refine(allDifferent, { message: "each query must be a different way in, not a rewording" })
-    .describe(`Search phrases a person with this problem would type on ${platform.displayName}`);
+    .describe(
+      platform.search?.input === "address"
+        ? `Addresses of ${platform.displayName} sections where a person with this problem asks`
+        : `Search phrases a person with this problem would type on ${platform.displayName}`,
+    );
 }
 
 /**

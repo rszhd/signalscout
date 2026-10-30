@@ -286,12 +286,13 @@ Keep the scope narrow:
 
 **Do not add another social network until Reddit + X reliably produce useful matches.**
 
-**This rule has been crossed four times, each one deliberately and each one on
+**This rule has been crossed five times, each one deliberately and each one on
 the owner's decision.** LinkedIn in US-028, YouTube in US-034, TikTok in US-044
 and Instagram in US-049, all inside 2026-09-05 and 2026-09-06, while the
-condition was still unmet: X had run one poll and collected five verdicts. Each
-exception is recorded in its own ticket rather than being quietly absorbed here.
-The rule stands for the seventh network, and the argument below is unchanged by
+condition was still unmet: X had run one poll and collected five verdicts; and
+forums in US-470 on 2026-10-30, for an application whose customers ask on niche
+forums. Each exception is recorded in its own ticket rather than being quietly
+absorbed here. The rule stands for the eighth network, and the argument below is unchanged by
 having been overruled four times — what those crossings measured is that a
 platform's value depends on the product being sold, which is a reason to be
 slower rather than faster.

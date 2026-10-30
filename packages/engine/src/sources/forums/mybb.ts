@@ -81,6 +81,7 @@ export const mybb: ForumProgram = {
       postedAt: posted
         ? fromEnglishDate(posted.replace(/^[^>]*>/, "").replace(/<$/, ""), now)
         : null,
+      approximatePostedAt: true,
     };
   },
 };

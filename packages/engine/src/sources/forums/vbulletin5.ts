@@ -69,6 +69,7 @@ export const vbulletin5: ForumProgram = {
       title: textOf(heading),
       text: textOf(rest.slice(open, end >= 0 ? end : undefined)),
       postedAt: fromIso(rest.match(/<time itemprop="dateCreated" datetime='([^']+)'/)?.[1]),
+      approximatePostedAt: false,
     };
   },
 };

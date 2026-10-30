@@ -69,6 +69,7 @@ export const bbpress: ForumProgram = {
         html.slice(start + 'class="bbp-topic-content">'.length, end >= 0 ? end : undefined),
       ),
       postedAt: fromIso(metaContent(html, "article:published_time")),
+      approximatePostedAt: false,
     };
   },
 };

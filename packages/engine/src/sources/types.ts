@@ -409,6 +409,12 @@ export interface PlatformSearchStyle {
   readonly maxQueryWords: number;
   readonly note: string;
   readonly hint: string;
+  /**
+   * What one of this platform's queries is. Absent means a phrase. A forum
+   * has no keyword search: its queries are the addresses of the sections it
+   * reads, held to an `https` address rather than a word count. US-470.
+   */
+  readonly input?: "phrase" | "address";
 }
 
 /**

@@ -68,6 +68,7 @@ export const smf2: ForumProgram = {
       title: textOf(subject ?? html.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? ""),
       text: textOf(rest.slice(body, end >= 0 ? body + end : undefined)),
       postedAt: posted ? fromEnglishDate(posted, now) : null,
+      approximatePostedAt: true,
     };
   },
 };

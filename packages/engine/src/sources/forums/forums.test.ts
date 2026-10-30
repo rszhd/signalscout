@@ -291,6 +291,7 @@ describe("SMF 2.0", () => {
       title: "Drop appears to be closing eventually - How does that impact GH?",
       text: "As far as I know Corsair owns drop, and drops owns GeekHack. Drop appears to be closing down operations in the near future. How will that impact GH?",
       postedAt: new Date("2026-02-25T12:03:37.000Z"),
+      approximatePostedAt: true,
     });
   });
 

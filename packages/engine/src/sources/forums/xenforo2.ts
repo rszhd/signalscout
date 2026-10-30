@@ -71,6 +71,7 @@ export const xenforo2: ForumProgram = {
       title: textOf(heading.replace(/<span class="label[^"]*"[^>]*>[\s\S]*?<\/span>/g, "")),
       text: textOf(rest.slice(body + 'class="bbWrapper">'.length, end >= 0 ? end : undefined)),
       postedAt: timestampIn(rest),
+      approximatePostedAt: false,
     };
   },
 };

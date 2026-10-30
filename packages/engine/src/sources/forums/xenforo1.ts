@@ -90,6 +90,9 @@ export const xenforo1: ForumProgram = {
       title: textOf(heading.replace(/<span class="prefix[^"]*">[\s\S]*?<\/span>/, "")),
       text: textOf(body),
       postedAt: description >= 0 ? firstTime(html.slice(description), now) : null,
+      approximatePostedAt:
+        description >= 0 &&
+        !/data-time="\d+"/.test(html.slice(description).match(/class="DateTime"[^>]*>/)?.[0] ?? ""),
     };
   },
 };

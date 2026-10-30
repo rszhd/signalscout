@@ -8,6 +8,13 @@ export {
   fakeSourceId,
 } from "./fake/index.js";
 export {
+  detectForum,
+  type ForumProgram,
+  type ForumThread,
+  type ForumThreadSummary,
+  forumPrograms,
+} from "./forums/index.js";
+export {
   isOffered,
   notOfferedReason,
   offeredConnectors,
@@ -15,6 +22,8 @@ export {
 } from "./offering.js";
 export { maximumPagesPerInput, pagesPerInputFor } from "./pages.js";
 export {
+  forumPlatform,
+  forumPlatformId,
   groupByPlatform,
   instagramPlatform,
   instagramPlatformId,
@@ -38,6 +47,13 @@ export {
   toCandidatePost as toApifyLinkedInCandidatePost,
 } from "./providers/apify/linkedin.js";
 export { apifyProvider, apifyProviderId } from "./providers/apify/provider.js";
+export {
+  BrightDataForumSource,
+  brightDataForum,
+  maxThreadsPerSection,
+  threadsPerCall,
+  worthOpening,
+} from "./providers/brightdata/forum.js";
 export {
   brightDataProvider,
   brightDataProviderId,
@@ -136,6 +152,7 @@ export type {
 export { connectorIdPattern } from "./types.js";
 
 import { apifyLinkedIn } from "./providers/apify/linkedin.js";
+import { brightDataForum } from "./providers/brightdata/forum.js";
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { harvestApiLinkedIn } from "./providers/harvestapi/linkedin.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
@@ -190,4 +207,5 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   socialCrawlTikTok,
   scrapeCreatorsTikTok,
   socialCrawlInstagram,
+  brightDataForum,
 ];

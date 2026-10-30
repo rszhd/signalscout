@@ -239,6 +239,30 @@ export const instagramPlatform: PlatformDescriptor = {
   },
 };
 
+export const forumPlatformId = "forum";
+
+/**
+ * Forums: the old message boards of a niche, read one section at a time.
+ * US-470. A forum has no keyword search a connector can rely on, so its
+ * queries are the addresses of the sections to read, each one's list of
+ * newest threads.
+ */
+export const forumPlatform: PlatformDescriptor = {
+  id: forumPlatformId,
+  displayName: "Forums",
+  search: {
+    input: "address",
+    maxQueryWords: 1,
+    hint:
+      "The address of a forum section, such as https://forum.example.com/forums/watches.12/. " +
+      "Every new thread in it is read.",
+    note:
+      "A forum is read by section, not searched: each query is the full https address of " +
+      "one section of a niche forum where the customer asks for products like this one. " +
+      "Name only sections you know exist; an invented address reads nothing.",
+  },
+};
+
 /** Every platform the schema accepts, for a screen that lists them. */
 export const platforms: readonly PlatformDescriptor[] = [
   redditPlatform,
@@ -247,6 +271,7 @@ export const platforms: readonly PlatformDescriptor[] = [
   youTubePlatform,
   tikTokPlatform,
   instagramPlatform,
+  forumPlatform,
 ];
 
 /** One platform, with every provider a build has for it. */

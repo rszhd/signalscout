@@ -89,6 +89,7 @@ export const discourse: ForumProgram = {
       title: json.title,
       text: textOf(first.cooked),
       postedAt: fromIso(first.created_at),
+      approximatePostedAt: false,
     };
   },
 };

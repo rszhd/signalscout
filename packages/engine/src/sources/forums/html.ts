@@ -54,7 +54,10 @@ const sessionParameters = ["sid", "PHPSESSID", "s"];
  */
 export function absoluteUrl(href: string, base: string): string {
   const url = new URL(decodeEntities(href.trim()), base);
-  for (const name of sessionParameters) url.searchParams.delete(name);
+  // Touched only when present: rewriting the query turns Invision's
+  // `index.php?/topic/1-x/` into `?%2Ftopic%2F1-x%2F=`.
+  for (const name of sessionParameters)
+    if (url.searchParams.has(name)) url.searchParams.delete(name);
   url.hash = "";
   return url.toString();
 }

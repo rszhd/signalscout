@@ -162,3 +162,14 @@ carry a member id or a Gravatar hash, and signatures.
   replaced it. A name that is only digits is now never a name. 50 forum
   tests; root lint, type check and `pnpm test` (2,675) pass. Four requests
   for the two scrubber re-captures.
+- 2026-10-30T22:38+08:00 — The Invision 4 parser tried on the 12 Invision boards of the survey
+  (44 Bright Data requests). Read: LinusTechTips (8 pinned, the thumb-tack
+  check now proven), thesandtrap, superfuture, MyGolfSpy and HousePriceCrash.
+  Two fixes: the title link is the row's first topic link, since
+  `cTopicTitle` is LinusTechTips' own theme; and `absoluteUrl` no longer
+  rewrites a query that holds no session id (`index.php?/topic/…` became
+  `?%2Ftopic%2F…=`). Invision 5 (golfwrx, head-case, stereonet) writes
+  `ipsData__item` rows and needs its own parser. StripersOnline is an older
+  Invision 4 with rows lacking `data-rowid`. PowerForum answered "One
+  moment, please...", a bot check the unlocker does not yet name. ThumperTalk
+  and BassResource were not reached past a category or a refusal.

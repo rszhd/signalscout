@@ -2,11 +2,14 @@
  * Invision Community 4. US-469.
  *
  * Detected by the `ipsApp ipsApp_front` body class together with a topic row
- * or a post's `data-role='commentContent'`; Invision 5 writes neither. A list
- * row is an `ipsDataItem` with `data-rowid="<id>"`, and ends with its
+ * or a post's `data-role='commentContent'`. Invision 5 keeps the body class
+ * but adds `data-ips-hook` to the body tag, and its rows are `ipsData__item`.
+ * A list row is an `ipsDataItem` with `data-rowid="<id>"`, and ends with its
  * last-poster block: the page's last row is followed by sidebar blocks with
- * their own times and badges. Every time is a `<time datetime>` in ISO, in
- * either quote, so nothing here is read from words.
+ * their own times and badges. The title link is the row's first link to a
+ * topic: a theme may wrap it in its own class. Every time is a
+ * `<time datetime>` in ISO, in either quote, so nothing here is read from
+ * words.
  *
  * Sorting by start date (`?sortby=start_date`) is refused for a visitor on
  * the board this was captured from, so a section is read as it comes: by last
@@ -33,10 +36,16 @@ export const invision4: ForumProgram = {
   id: "invision4",
   displayName: "Invision Community 4",
 
-  detect: (html) =>
-    /<body[^>]+class=['"]ipsApp ipsApp_front/.test(html) &&
-    (html.includes('data-controller="forums.front.forum.topicRow"') ||
-      /data-role=['"]commentContent['"]/.test(html)),
+  detect: (html) => {
+    const body = html.match(/<body\b[^>]*>/)?.[0] ?? "";
+    return (
+      /class=['"]ipsApp ipsApp_front/.test(body) &&
+      !body.includes("data-ips-hook") &&
+      // A cloud board adds its own controller after a comma.
+      (html.includes('data-controller="forums.front.forum.topicRow') ||
+        /data-role=['"]commentContent['"]/.test(html))
+    );
+  },
 
   newestThreadsUrl: (sectionUrl) => sectionUrl,
 
@@ -47,7 +56,10 @@ export const invision4: ForumProgram = {
       const lastPoster = piece.html.indexOf("ipsDataItem_lastPoster");
       const end = lastPoster >= 0 ? piece.html.indexOf("</ul>", lastPoster) : -1;
       const row = end >= 0 ? piece.html.slice(0, end) : piece.html;
-      const link = row.match(/cTopicTitle['"]>\s*<a href=['"]([^'"]+)['"][^>]*>([\s\S]*?)<\/a>/);
+      const titleAt = row.indexOf("ipsDataItem_title");
+      const link = row
+        .slice(titleAt >= 0 ? titleAt : 0)
+        .match(/<a href=['"]([^'"]*\/topic\/\d+-[^'"]*)['"][^>]*>([\s\S]*?)<\/a>/);
       if (!id || !link?.[1]) continue;
       const meta = row.indexOf("ipsDataItem_meta");
       threads.push({

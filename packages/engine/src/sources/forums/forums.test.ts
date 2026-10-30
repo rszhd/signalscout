@@ -478,6 +478,21 @@ describe("Invision Community 4", () => {
   });
 });
 
+describe("an address with a path in its query", () => {
+  it("is kept as written when it carries no session id", () => {
+    const list = page("invision4-list");
+    expect(
+      invision4.listThreads(
+        list.html.replaceAll(
+          "https://linustechtips.com/topic/",
+          "https://linustechtips.com/index.php?/topic/",
+        ),
+        list.url,
+      )[0]?.url,
+    ).toBe("https://linustechtips.com/index.php?/topic/1644011-pc-for-cs2/");
+  });
+});
+
 describe("times counted back in words", () => {
   const now = new Date("2026-10-30T07:00:00.000Z");
   it("adds up every unit", () => {

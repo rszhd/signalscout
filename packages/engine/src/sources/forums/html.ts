@@ -154,6 +154,9 @@ export function fromEnglishDate(text: string, now: Date): Date | null {
   // "2026-10-17, 08:57", the numeric order one MyBB board chose.
   const numeric = words.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\b/);
   if (numeric) return at(Number(numeric[1]), Number(numeric[2]) - 1, Number(numeric[3]));
+  // "10-14-2026, 05:51 AM", vBulletin 3/4's default, month first.
+  const american = words.match(/^(\d{1,2})-(\d{1,2})-(\d{4})\b/);
+  if (american) return at(Number(american[3]), Number(american[1]) - 1, Number(american[2]));
   // "'26" is 2026, as vBulletin 5 writes it.
   const year = (written: string) =>
     written.length === 4 ? Number(written) : 2000 + Number(written.replace("'", ""));

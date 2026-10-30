@@ -138,3 +138,15 @@ carry a member id or a Gravatar hash, and signatures.
   first (a category lists no threads) and removed. Scrubber: MyBB
   `avatars/avatar_<uid>`. 42 forum tests; root lint, type check and
   `pnpm test` (2,654) pass. About 30 Bright Data requests used.
+- 2026-10-30T19:48+08:00 — vBulletin 3/4 read (WebHostingTalk, a forum the
+  model named in BuyerFinder's first local forum scan, where all five
+  sections failed: WebHostingTalk and Warrior Forum looked like vBulletin
+  3/4, WebmasterWorld runs its own software, and a Digital Point address was
+  a category with no threads). Warrior Forum turned out to be its own front
+  end. The owner: parsers for popular programs only, never one site's own
+  software. 26 threads, 1 pinned; dates are words, month first, read by
+  `fromEnglishDate` and marked approximate. The scrubber needed three
+  passes: vBulletin's `member.php?u=`, `userid=` and avatar ids; signatures in
+  `<blockquote class="signature">`, which named businesses and sites; and a
+  member menu's "Visit Homepage" link. 46 forum tests; root lint, type check
+  and `pnpm test` (2,670) pass. About 55 Bright Data requests used in all.

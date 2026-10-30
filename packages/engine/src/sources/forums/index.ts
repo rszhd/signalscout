@@ -11,6 +11,7 @@ import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
 import type { ForumProgram } from "./types.js";
+import { vbulletin4 } from "./vbulletin4.js";
 import { vbulletin5 } from "./vbulletin5.js";
 import { xenforo1 } from "./xenforo1.js";
 import { xenforo2 } from "./xenforo2.js";
@@ -24,6 +25,7 @@ export const forumPrograms: readonly ForumProgram[] = [
   phpbb3,
   discourse,
   vbulletin5,
+  vbulletin4,
   smf2,
   bbpress,
   mybb,

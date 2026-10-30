@@ -7,6 +7,7 @@ import { detectForum, forumPrograms } from "./index.js";
 import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
+import { vbulletin4 } from "./vbulletin4.js";
 import { vbulletin5 } from "./vbulletin5.js";
 import { xenforo1 } from "./xenforo1.js";
 import { xenforo2 } from "./xenforo2.js";
@@ -159,6 +160,46 @@ describe("vBulletin 5", () => {
       postedAt: new Date("2026-10-13T23:46:55.000Z"),
     });
     expect(read?.text).toContain("Database error in vBulletin 5.7.5");
+  });
+});
+
+describe("vBulletin 3/4", () => {
+  const list = page("vbulletin4-list");
+  const threads = vbulletin4.listThreads(list.html, list.url);
+
+  it("reads every thread, its times in words, and the pinned one before the list", () => {
+    expect(threads).toHaveLength(26);
+    expect(threads.filter((thread) => thread.pinned)).toHaveLength(1);
+    expect(threads.every((thread) => thread.startedAt && thread.lastActivityAt)).toBe(true);
+    expect(threads.find((thread) => !thread.pinned)).toEqual({
+      id: "1964520",
+      url: "https://www.webhostingtalk.com/showthread.php?t=1964520",
+      title: "Dedicated IP on Shared Servers",
+      // "10-14-2026 05:51 AM": month first, in the board's zone.
+      startedAt: new Date("2026-10-14T05:51:00.000Z"),
+      approximateStart: true,
+      lastActivityAt: new Date("2026-10-18T03:52:00.000Z"),
+      pinned: false,
+    });
+  });
+
+  it("reads the first post, and stops before the replies", () => {
+    const thread = page("vbulletin4-thread");
+    const read = vbulletin4.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "1964520",
+      title: "Dedicated IP on Shared Servers",
+      postedAt: new Date("2026-10-14T05:51:00.000Z"),
+      approximatePostedAt: true,
+    });
+    expect(read?.text.startsWith("I am using reseller hosting.")).toBe(true);
+    expect(read?.text.endsWith("from other resellers on the server?")).toBe(true);
+  });
+
+  it("asks a forum for its threads by start time", () => {
+    expect(vbulletin4.newestThreadsUrl("https://forum.example.com/forumdisplay.php?f=6")).toBe(
+      "https://forum.example.com/forumdisplay.php?f=6&sort=dateline&order=desc",
+    );
   });
 });
 
@@ -403,6 +444,7 @@ describe("dates in English words", () => {
     ["Tue 13 Oct '26, 3:46pm", "2026-10-13T15:46:00.000Z"],
     ["Today, 12:37pm", "2026-10-30T12:37:00.000Z"],
     ["2026-10-17, 08:57", "2026-10-17T08:57:00.000Z"],
+    ["10-14-2026, 05:51 AM", "2026-10-14T05:51:00.000Z"],
     ["28. Oktober 2026", null],
   ];
   for (const [words, expected] of cases) {

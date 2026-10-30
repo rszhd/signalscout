@@ -61,6 +61,16 @@ const targets = {
       return href && new URL(href, "https://forums.macrumors.com/").toString();
     },
   },
+  // WebHostingTalk, one of the forums the model named for a lead-finding tool.
+  vbulletin4: {
+    list: "https://www.webhostingtalk.com/forumdisplay.php?f=6&sort=dateline&order=desc",
+    thread: (html) => {
+      // Pinned threads are in <ol id="stickies">; the rest in <ol id="threads">.
+      const threads = html.indexOf('<ol id="threads"');
+      const id = threads >= 0 && html.slice(threads).match(/id="thread_title_(\d+)"/)?.[1];
+      return id && `https://www.webhostingtalk.com/showthread.php?t=${id}`;
+    },
+  },
   vbulletin5: {
     list: "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations",
     thread: (html) => {
@@ -161,6 +171,8 @@ const namePatterns = [
   /<a[^>]+href="[^"]*(?:showuser=\d+|\/profile\/\d+-[^"]*)"[^>]*>([^<]{2,60})</g,
   // Flarum and Discourse: /u/<name>.
   /<a[^>]+href="[^"]*\/u\/[^"/]+"[^>]*>([^<]{2,60})</g,
+  // vBulletin 3/4: member.php?u=<id>, and the name in a "Started by" title.
+  /<a[^>]+href="[^"]*member\.php\?u=\d+[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
   // vBulletin 5: /member/<id>-<name>. MyBB: action=profile&uid=<id>, user-<id>.html.
   /<a[^>]+href="[^"]*\/member\/\d+-[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
   /<a[^>]+href="[^"]*(?:action=profile(?:&amp;|&)uid=\d+|user-\d+\.html)[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
@@ -181,6 +193,13 @@ const urlScrubs = [
   [/\/profile\/\d+-[^"/]*/g, "/profile/1-member"],
   [/\/u\/[^"/?#]+/g, "/u/member"],
   [/\/member\/\d+-[^"/?#\s]+/g, "/member/1-member"],
+  // vBulletin 3/4: profile, search-by-user and avatar addresses carry the id.
+  [/(member\.php\?u=)\d+/g, "$11"],
+  [/((?:&amp;|&|\?)userid=)\d+/g, "$11"],
+  [/(customavatars\/avatar)\d+_\d+/g, "$11_1"],
+  [/(image\.php\?u=)\d+/g, "$11"],
+  // A member menu's "Visit Homepage": the member's own site.
+  [/<a href="[^"]*"( class="siteicon_homepage")/g, '<a href="https://member.example/"$1'],
   [/(uid=)\d+/g, "$11"],
   [/user-\d+\.html/g, "user-1.html"],
   [/(data-userid=")\d+/gi, "$11"],
@@ -216,10 +235,16 @@ export function scrub(html) {
   }
   // A signature is the member's own words about themselves, often a link to
   // their name elsewhere. The parsers never read it.
-  const out = html.replace(
-    /(<div[^>]*class="[^"]*\bsignature\b[^"]*"[^>]*>)[\s\S]*?(<\/div>)/g,
-    "$1(signature)$2",
-  );
+  // vBulletin 3/4 wraps one in <blockquote class="signature">, around divs.
+  const out = html
+    .replace(
+      /(<blockquote[^>]*class="[^"]*\bsignature\b[^"]*"[^>]*>)[\s\S]*?(<\/blockquote>)/g,
+      "$1(signature)$2",
+    )
+    .replace(
+      /(<div[^>]*class="[^"]*\bsignature\b[^"]*"[^>]*>)[\s\S]*?(<\/div>)/g,
+      "$1(signature)$2",
+    );
   return { html: replaceNames(out, names), names: names.size };
 }
 

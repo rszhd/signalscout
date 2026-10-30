@@ -100,5 +100,17 @@
     "capturedAt": "2026-10-30T07:06:07.236Z",
     "bytes": 51105,
     "namesScrubbed": 3
+  },
+  "vbulletin4-list.html": {
+    "url": "https://www.webhostingtalk.com/forumdisplay.php?f=6&sort=dateline&order=desc",
+    "capturedAt": "2026-10-30T11:46:14.892Z",
+    "bytes": 168111,
+    "namesScrubbed": 39
+  },
+  "vbulletin4-thread.html": {
+    "url": "https://www.webhostingtalk.com/showthread.php?t=1964520",
+    "capturedAt": "2026-10-30T11:46:14.899Z",
+    "bytes": 115731,
+    "namesScrubbed": 10
   }
 }

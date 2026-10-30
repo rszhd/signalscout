@@ -372,9 +372,10 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
    *
    * * the provider reported no cursor, so there is no next page;
    * * this input has had its share of the poll's budget;
-   * * every post on this page is older than `since`. The list is newest
+   * * a post on this page is at or before `since`. The list is newest
    *   first, so the rest of it is older still, and the next page would be
-   *   bought only to be thrown away.
+   *   bought only to be thrown away. Waiting for a page that is old all
+   *   through cost one page more on every poll with anything new. US-468.
    */
   private nextAfter(
     request: SearchRequest,
@@ -384,7 +385,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
     kept: number,
   ): SearchResult["next"] {
     const pages = at.pages + 1;
-    const reachedSince = request.query.since !== undefined && collected.length > 0 && kept === 0;
+    const reachedSince = request.query.since !== undefined && kept < collected.length;
     const exhausted =
       !page.after || pages >= pagesPerInputFor(request, maxPagesPerInput) || reachedSince;
 

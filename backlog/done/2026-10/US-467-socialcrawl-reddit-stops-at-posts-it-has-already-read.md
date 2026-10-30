@@ -49,9 +49,8 @@ pages after it hold only older posts.
 
 ## Notes
 
-The ScrapeCreators connector keeps its own rule ("every post older"), which
-buys one extra page. Changing it is a separate decision: its fixtures were not
-checked for order here.
+The ScrapeCreators connector kept its own rule ("every post older"), which
+buys one extra page. US-468 gave it the same rule as this one.
 
 ## Log
 

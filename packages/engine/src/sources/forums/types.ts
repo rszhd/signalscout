@@ -43,7 +43,8 @@ export interface ForumProgram {
   newestThreadsUrl(sectionUrl: string): string;
   /** Where to fetch a thread for `readThread`. Absent: the thread's own address. */
   threadPageUrl?(threadUrl: string): string;
-  listThreads(page: string, pageUrl: string): ForumThreadSummary[];
+  /** `now` dates a "Today at …" on the page; the fetch time. */
+  listThreads(page: string, pageUrl: string, now?: Date): ForumThreadSummary[];
   /** Null when the page holds no thread this parser can read. */
-  readThread(page: string, pageUrl: string): ForumThread | null;
+  readThread(page: string, pageUrl: string, now?: Date): ForumThread | null;
 }

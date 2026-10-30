@@ -40,5 +40,17 @@
     "capturedAt": "2026-10-30T03:46:56.696Z",
     "bytes": 53462,
     "namesScrubbed": 0
+  },
+  "smf2-list.html": {
+    "url": "https://geekhack.org/index.php?board=64.0;sort=first_post;desc",
+    "capturedAt": "2026-10-30T03:50:08.423Z",
+    "bytes": 85741,
+    "namesScrubbed": 41
+  },
+  "smf2-thread.html": {
+    "url": "https://geekhack.org/index.php?topic=126408.0",
+    "capturedAt": "2026-10-30T03:50:08.425Z",
+    "bytes": 51041,
+    "namesScrubbed": 9
   }
 }

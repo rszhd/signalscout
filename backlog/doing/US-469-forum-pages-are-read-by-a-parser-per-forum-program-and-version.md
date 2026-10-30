@@ -80,3 +80,12 @@ carry a member id or a Gravatar hash, and signatures.
   person's only on a member object; a first version replaced category names
   too. No pinned topic on that list, so pinned is not yet seen on a capture.
   17 forum tests; root lint, type check and `pnpm test` (2,629) pass.
+- 2026-10-30T11:52+08:00 — SMF 2.0.15 read (Geekhack, keyboards board, by
+  first post): 50 topics, 14 pinned, every last-post date; the list shows no
+  start time, so `startedAt` is null and the thread page gives it. SMF writes
+  dates in words in the admin's format, so `fromEnglishDate` now reads them
+  for every program: day or month first, "at" or a comma before the time,
+  12 or 24 hours, "Today" and "Yesterday" from the fetch time, all as UTC;
+  XenForo 1 uses it too. A date in another language comes back null. SMF's
+  session id is not hex, so the scrubber's pattern widened. 28 forum tests;
+  root lint, type check and `pnpm test` (2,640) pass.

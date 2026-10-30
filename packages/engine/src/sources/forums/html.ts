@@ -94,3 +94,71 @@ export function metaContent(html: string, key: string): string | undefined {
   }
   return undefined;
 }
+
+const monthNames = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+
+function monthIndex(word: string): number {
+  const lower = word.toLowerCase();
+  return lower.length >= 3 ? monthNames.findIndex((name) => name.startsWith(lower)) : -1;
+}
+
+/**
+ * A date a forum wrote in English words, read as UTC.
+ *
+ * Forums print dates in a format their admin chose: "Oct 27, 2026 at 6:35 AM"
+ * (XenForo 1), "Wed, 25 February 2026, 12:03:37" (one SMF), "October 28,
+ * 2026, 11:02:51 PM" (SMF's default), and "Today at 08:18:14" or "Yesterday
+ * at …" for recent ones, which are counted from `now`. A visitor with no
+ * account sees the board's own zone, and the page does not name it, so the
+ * result can be some hours off. Null for anything else, a date in another
+ * language too.
+ */
+export function fromEnglishDate(text: string, now: Date): Date | null {
+  const words = decodeEntities(text.replace(/<[^>]+>/g, ""))
+    .replace(/\s+/g, " ")
+    .trim();
+  const time = words.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap]\.?m\.?)?$/i);
+  let hours = 0;
+  let minutes = 0;
+  let seconds = 0;
+  if (time) {
+    const [, h, m, sec, half] = time;
+    hours = Number(h);
+    minutes = Number(m);
+    seconds = Number(sec ?? 0);
+    if (half) hours = (hours % 12) + (/^p/i.test(half) ? 12 : 0);
+  }
+  const at = (year: number, month: number, day: number) => {
+    if (month < 0 || day < 1 || day > 31 || hours > 23 || minutes > 59) return null;
+    return new Date(Date.UTC(year, month, day, hours, minutes, seconds));
+  };
+
+  const relative = words.match(/^(today|yesterday)\b/i)?.[1];
+  if (relative) {
+    const day = new Date(now.getTime() - (relative.toLowerCase() === "yesterday" ? 86_400_000 : 0));
+    return at(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
+  }
+  // "25 February 2026", with or without a weekday in front.
+  const dayFirst = words.match(/^(?:[a-z]+,?\s+)?(\d{1,2})\s+([a-z]+)\.?,?\s+(\d{4})/i);
+  if (dayFirst) return at(Number(dayFirst[3]), monthIndex(dayFirst[2] ?? ""), Number(dayFirst[1]));
+  // "Oct 27, 2026" and "October 28, 2026", with or without a weekday.
+  const monthFirst = words.match(
+    /^(?:[a-z]+,\s+)?([a-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/i,
+  );
+  if (monthFirst)
+    return at(Number(monthFirst[3]), monthIndex(monthFirst[1] ?? ""), Number(monthFirst[2]));
+  return null;
+}

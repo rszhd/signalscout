@@ -53,6 +53,16 @@ const targets = {
       return topic && `https://meta.discourse.org/t/${topic.id}.json`;
     },
   },
+  smf2: {
+    list: "https://geekhack.org/index.php?board=64.0;sort=first_post;desc",
+    thread: (html) => {
+      const cell = [...html.matchAll(/<td class="subject([^"]*)"/g)].find(
+        (match) => !/sticky/.test(match[1]),
+      );
+      const id = cell && html.slice(cell.index).match(/topic=(\d+)\.0/)?.[1];
+      return id && `https://geekhack.org/index.php?topic=${id}.0`;
+    },
+  },
   phpbb3: {
     list: "https://forums.gentoo.org/viewforum.php?f=14&sk=t&sd=d",
     thread: (html) => {
@@ -101,7 +111,7 @@ const urlScrubs = [
   [/(\/avatars\/[a-z]\/)\d+\/\d+/g, "$10/1"],
   [/(class="avatar Av)\d+/g, "$11"],
   // Our own session on the forum, not a person's, but it has no business here.
-  [/([?&;](?:amp;)?(?:sid|PHPSESSID|s)=)[0-9a-f]{20,40}/gi, "$10"],
+  [/([?&;](?:amp;)?(?:sid|PHPSESSID|s)=)[0-9a-z]{20,40}/gi, "$10"],
 ];
 
 const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { discourse } from "./discourse.js";
-import { decodeEntities, textOf } from "./html.js";
+import { decodeEntities, fromEnglishDate, textOf } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
 import { phpbb3 } from "./phpbb3.js";
+import { smf2 } from "./smf2.js";
 import { xenforo1 } from "./xenforo1.js";
 
 const manifest = JSON.parse(
@@ -176,6 +177,67 @@ describe("Discourse, through its JSON", () => {
       "https://forum.example.com/latest.json?order=created",
     );
   });
+});
+
+describe("SMF 2.0", () => {
+  const list = page("smf2-list");
+  const threads = smf2.listThreads(list.html, list.url);
+
+  it("reads every topic and its last post's date, and marks the pinned ones", () => {
+    expect(threads).toHaveLength(50);
+    expect(threads.filter((thread) => thread.pinned)).toHaveLength(14);
+    expect(threads.every((thread) => thread.lastActivityAt)).toBe(true);
+    // SMF 2.0 lists no start time: the thread page says it.
+    expect(threads.every((thread) => thread.startedAt === null)).toBe(true);
+    expect(threads.find((thread) => !thread.pinned)).toEqual({
+      id: "126408",
+      url: "https://geekhack.org/index.php?topic=126408.0",
+      title: "Drop appears to be closing eventually - How does that impact GH?",
+      startedAt: null,
+      lastActivityAt: new Date("2026-03-16T18:18:45.000Z"),
+      pinned: false,
+    });
+  });
+
+  it("drops the session id SMF puts in every link", () => {
+    expect(list.html).toContain("PHPSESSID=");
+    expect(threads.some((thread) => /PHPSESSID/.test(thread.url))).toBe(false);
+  });
+
+  it("reads the first post and the time it was written", () => {
+    const thread = page("smf2-thread");
+    expect(smf2.readThread(thread.html, thread.url)).toEqual({
+      id: "126408",
+      url: "https://geekhack.org/index.php?topic=126408.0",
+      title: "Drop appears to be closing eventually - How does that impact GH?",
+      text: "As far as I know Corsair owns drop, and drops owns GeekHack. Drop appears to be closing down operations in the near future. How will that impact GH?",
+      postedAt: new Date("2026-02-25T12:03:37.000Z"),
+    });
+  });
+
+  it("asks a board for its topics by first post, with SMF's semicolons", () => {
+    expect(smf2.newestThreadsUrl("https://forum.example.com/index.php?board=64.0")).toBe(
+      "https://forum.example.com/index.php?board=64.0;sort=first_post;desc",
+    );
+  });
+});
+
+describe("dates in English words", () => {
+  const now = new Date("2026-10-30T03:00:00.000Z");
+  const cases: [string, string | null][] = [
+    ["Oct 27, 2026 at 6:35 AM", "2026-10-27T06:35:00.000Z"],
+    ["Mar 3, 2011", "2011-03-03T00:00:00.000Z"],
+    ["Wed, 25 February 2026, 12:03:37", "2026-02-25T12:03:37.000Z"],
+    ["October 28, 2026, 11:02:51 PM", "2026-10-28T23:02:51.000Z"],
+    ["<strong>Today</strong> at 08:18:14 AM", "2026-10-30T08:18:14.000Z"],
+    ["Yesterday at 9:05 pm", "2026-10-29T21:05:00.000Z"],
+    ["28. Oktober 2026", null],
+  ];
+  for (const [words, expected] of cases) {
+    it(`reads "${words}"`, () => {
+      expect(fromEnglishDate(words, now)?.toISOString() ?? null).toBe(expected);
+    });
+  }
 });
 
 describe("the HTML helpers", () => {

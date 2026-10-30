@@ -7,13 +7,14 @@
  */
 import { discourse } from "./discourse.js";
 import { phpbb3 } from "./phpbb3.js";
+import { smf2 } from "./smf2.js";
 import type { ForumProgram } from "./types.js";
 import { xenforo1 } from "./xenforo1.js";
 
 export type { ForumProgram, ForumThread, ForumThreadSummary } from "./types.js";
 
 /** Every program read so far, most used first. */
-export const forumPrograms: readonly ForumProgram[] = [xenforo1, phpbb3, discourse];
+export const forumPrograms: readonly ForumProgram[] = [xenforo1, phpbb3, discourse, smf2];
 
 /** The parser for this page, or null when no parser knows it. */
 export function detectForum(html: string): ForumProgram | null {

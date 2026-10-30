@@ -17,6 +17,8 @@
  *
  *   <program>-list.html     the list page, usernames scrubbed
  *   <program>-thread.html   one thread, usernames scrubbed
+ *   <program>-list.json     the same, for a program read through its API
+ *   <program>-section.html  a section page's <head>, for detecting the program
  *   manifest.json           which address produced each file, and when
  */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -39,6 +41,16 @@ const targets = {
       );
       const href = item && html.slice(item.index).match(/href="(threads\/[^"]+\.\d+\/)"/)?.[1];
       return href && new URL(href, "https://forums.digitalpoint.com/").toString();
+    },
+  },
+  // Read through its JSON API, which needs no key; the section page is HTML.
+  discourse: {
+    format: "json",
+    section: "https://meta.discourse.org/c/support/6",
+    list: "https://meta.discourse.org/c/support/6/l/latest.json?order=created",
+    thread: (text) => {
+      const topic = JSON.parse(text).topic_list.topics.find((t) => !t.pinned && !t.pinned_globally);
+      return topic && `https://meta.discourse.org/t/${topic.id}.json`;
     },
   },
   phpbb3: {
@@ -104,10 +116,52 @@ export function scrub(html) {
   }
   // A signature is the member's own words about themselves, often a link to
   // their name elsewhere. The parsers never read it.
-  let out = html.replace(
+  const out = html.replace(
     /(<div[^>]*class="[^"]*\bsignature\b[^"]*"[^>]*>)[\s\S]*?(<\/div>)/g,
     "$1(signature)$2",
   );
+  return { html: replaceNames(out, names), names: names.size };
+}
+
+/** JSON fields that name or picture a member, in Discourse and Flarum. */
+const jsonNameKeys = new Set([
+  "username",
+  "name",
+  "display_username",
+  "last_poster_username",
+  "displayName",
+  "slug_user",
+]);
+const jsonPictureKeys = new Set(["avatar_template", "avatarUrl"]);
+
+/**
+ * The same for a JSON answer: every name field is collected, the member
+ * objects lose their ids and pictures, and then each name is replaced
+ * wherever it appears, a mention inside a post's HTML too.
+ */
+export function scrubJson(text) {
+  const names = new Set();
+  const walk = (value) => {
+    if (Array.isArray(value)) return value.forEach(walk);
+    if (!value || typeof value !== "object") return;
+    const member = "username" in value || "avatar_template" in value;
+    for (const [key, field] of Object.entries(value)) {
+      // "name" is a person's only on a member; a category and a group have one too.
+      const naming = jsonNameKeys.has(key) && (key !== "name" || member);
+      if (naming && typeof field === "string" && field.trim().length >= 2) names.add(field.trim());
+      else if (jsonPictureKeys.has(key) && typeof field === "string")
+        value[key] = "/letter_avatar/member/{size}/1.png";
+      else if (key === "user_id" || (member && key === "id")) value[key] = 1;
+      else walk(field);
+    }
+  };
+  const parsed = JSON.parse(text);
+  walk(parsed);
+  return { html: replaceNames(`${JSON.stringify(parsed, null, 2)}\n`, names), names: names.size };
+}
+
+function replaceNames(text, names) {
+  let out = text;
   let n = 0;
   // Longest first, so "anna" does not cut into "annabel".
   for (const name of [...names].sort((a, b) => b.length - a.length)) {
@@ -127,7 +181,7 @@ export function scrub(html) {
     }
   }
   for (const [pattern, replacement] of urlScrubs) out = out.replace(pattern, replacement);
-  return { html: out, names: names.size };
+  return out;
 }
 
 // ------------------------------------------------------------- capture
@@ -154,13 +208,21 @@ for (const [program, target] of Object.entries(targets)) {
   const threadUrl = target.thread(list);
   if (!threadUrl) throw new Error(`${program}: no thread that is not pinned on ${target.list}`);
   const thread = await fetchPage(threadUrl);
+  const extension = target.format === "json" ? "json" : "html";
+  const pages = [
+    ["list", target.list, list, extension],
+    ["thread", threadUrl, thread, extension],
+  ];
+  // Only the head: it names the program, and a Discourse body carries every
+  // poster's name inside avatar addresses and preloaded JSON.
+  if (target.section) {
+    const page = await fetchPage(target.section);
+    pages.push(["section", target.section, page.slice(0, page.search(/<body[\s>]/)), "html"]);
+  }
 
-  for (const [kind, url, html] of [
-    ["list", target.list, list],
-    ["thread", threadUrl, thread],
-  ]) {
-    const scrubbed = scrub(html);
-    const file = `${program}-${kind}.html`;
+  for (const [kind, url, body, type] of pages) {
+    const scrubbed = type === "json" ? scrubJson(body) : scrub(body);
+    const file = `${program}-${kind}.${type}`;
     writeFileSync(`${here}${file}`, scrubbed.html);
     manifest[file] = {
       url,

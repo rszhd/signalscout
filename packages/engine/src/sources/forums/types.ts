@@ -27,16 +27,23 @@ export interface ForumThread {
   readonly postedAt: Date | null;
 }
 
-/** One program, at one version, that this module can read. */
+/**
+ * One program, at one version, that this module can read.
+ *
+ * A page is the body a fetch returned: HTML for most programs, JSON for the
+ * few read through a public API (Discourse, Flarum).
+ */
 export interface ForumProgram {
   /** Stable, with the version: `xenforo1`, `phpbb3`. */
   readonly id: string;
   readonly displayName: string;
   /** True when this page was written by this program and version. */
-  detect(html: string): boolean;
+  detect(page: string): boolean;
   /** A section's address, asked for its newest threads first. */
   newestThreadsUrl(sectionUrl: string): string;
-  listThreads(html: string, pageUrl: string): ForumThreadSummary[];
+  /** Where to fetch a thread for `readThread`. Absent: the thread's own address. */
+  threadPageUrl?(threadUrl: string): string;
+  listThreads(page: string, pageUrl: string): ForumThreadSummary[];
   /** Null when the page holds no thread this parser can read. */
-  readThread(html: string, pageUrl: string): ForumThread | null;
+  readThread(page: string, pageUrl: string): ForumThread | null;
 }

@@ -5,6 +5,7 @@
  * guessed at: the caller reports it, and that program's parser is the next
  * one to build.
  */
+import { discourse } from "./discourse.js";
 import { phpbb3 } from "./phpbb3.js";
 import type { ForumProgram } from "./types.js";
 import { xenforo1 } from "./xenforo1.js";
@@ -12,7 +13,7 @@ import { xenforo1 } from "./xenforo1.js";
 export type { ForumProgram, ForumThread, ForumThreadSummary } from "./types.js";
 
 /** Every program read so far, most used first. */
-export const forumPrograms: readonly ForumProgram[] = [xenforo1, phpbb3];
+export const forumPrograms: readonly ForumProgram[] = [xenforo1, phpbb3, discourse];
 
 /** The parser for this page, or null when no parser knows it. */
 export function detectForum(html: string): ForumProgram | null {

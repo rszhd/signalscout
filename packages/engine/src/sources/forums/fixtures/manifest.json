@@ -22,5 +22,23 @@
     "capturedAt": "2026-10-30T03:36:14.013Z",
     "bytes": 32126,
     "namesScrubbed": 4
+  },
+  "discourse-list.json": {
+    "url": "https://meta.discourse.org/c/support/6/l/latest.json?order=created",
+    "capturedAt": "2026-10-30T03:46:56.692Z",
+    "bytes": 99846,
+    "namesScrubbed": 87
+  },
+  "discourse-thread.json": {
+    "url": "https://meta.discourse.org/t/416139.json",
+    "capturedAt": "2026-10-30T03:46:56.695Z",
+    "bytes": 22078,
+    "namesScrubbed": 25
+  },
+  "discourse-section.html": {
+    "url": "https://meta.discourse.org/c/support/6",
+    "capturedAt": "2026-10-30T03:46:56.696Z",
+    "bytes": 53462,
+    "namesScrubbed": 0
   }
 }

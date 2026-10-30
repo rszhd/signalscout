@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { discourse } from "./discourse.js";
 import { decodeEntities, textOf } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
 import { phpbb3 } from "./phpbb3.js";
@@ -9,9 +10,9 @@ const manifest = JSON.parse(
   readFileSync(new URL("./fixtures/manifest.json", import.meta.url), "utf8"),
 ) as Record<string, { url: string }>;
 function page(name: string): { html: string; url: string } {
-  const file = `${name}.html`;
-  const entry = manifest[file];
-  if (!entry) throw new Error(`no capture named ${file}`);
+  const file = [`${name}.html`, `${name}.json`].find((candidate) => manifest[candidate]);
+  const entry = file ? manifest[file] : undefined;
+  if (!file || !entry) throw new Error(`no capture named ${name}`);
   return {
     html: readFileSync(new URL(`./fixtures/${file}`, import.meta.url), "utf8"),
     url: entry.url,
@@ -123,6 +124,56 @@ describe("phpBB 3", () => {
   it("asks a forum for its most recently active threads", () => {
     expect(phpbb3.newestThreadsUrl("https://forum.example.com/viewforum.php?f=14")).toBe(
       "https://forum.example.com/viewforum.php?f=14&sk=t&sd=d",
+    );
+  });
+});
+
+describe("Discourse, through its JSON", () => {
+  const list = page("discourse-list");
+  const threads = discourse.listThreads(list.html, list.url);
+
+  it("is detected from a section's HTML head and from its JSON", () => {
+    expect(detectForum(page("discourse-section").html)?.id).toBe("discourse");
+    expect(discourse.detect(list.html)).toBe(true);
+    expect(discourse.detect("{}")).toBe(false);
+  });
+
+  it("reads every topic, with both of its times", () => {
+    expect(threads).toHaveLength(30);
+    expect(threads.every((thread) => thread.startedAt && thread.lastActivityAt)).toBe(true);
+    expect(threads[0]).toEqual({
+      id: "416139",
+      url: "https://meta.discourse.org/t/topic/416139",
+      title: "电子邮件服务器设置可以做成随时可以修改的配置吗？",
+      startedAt: new Date("2026-10-30T03:13:31.307Z"),
+      lastActivityAt: new Date("2026-10-30T03:41:36.779Z"),
+      pinned: false,
+    });
+  });
+
+  it("reads the first post from the topic's JSON", () => {
+    expect(discourse.threadPageUrl?.("https://meta.discourse.org/t/topic/416139")).toBe(
+      "https://meta.discourse.org/t/416139.json",
+    );
+    const thread = page("discourse-thread");
+    const read = discourse.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "416139",
+      url: "https://meta.discourse.org/t/topic/416139",
+      postedAt: new Date("2026-10-30T03:13:31.385Z"),
+    });
+    expect(
+      read?.text.startsWith("I recently ran into a situation where my email service provider"),
+    ).toBe(true);
+    expect(read?.text).not.toMatch(/<p>|<\/p>/);
+  });
+
+  it("asks a category, or the whole site, for its topics by start time", () => {
+    expect(discourse.newestThreadsUrl("https://meta.discourse.org/c/support/6")).toBe(
+      "https://meta.discourse.org/c/support/6/l/latest.json?order=created",
+    );
+    expect(discourse.newestThreadsUrl("https://forum.example.com/")).toBe(
+      "https://forum.example.com/latest.json?order=created",
     );
   });
 });

@@ -71,3 +71,12 @@ carry a member id or a Gravatar hash, and signatures.
   program's markers. 13 tests; root `pnpm typecheck`, `pnpm lint` and
   `pnpm test` (2,625 tests) pass. `biome.json` now skips the HTML fixtures,
   as it skips the JSON ones.
+- 2026-10-30T11:48+08:00 — Discourse read through its JSON (meta.discourse.org,
+  support category, by start time): 30 topics with both times, and the first
+  post of one topic. A program interface gains `threadPageUrl`, where to fetch
+  a thread when that is not its own address. The capture keeps only a
+  Discourse section page's `<head>`: the body carries every poster's name in
+  avatar addresses and preloaded JSON. The JSON scrubber treats `name` as a
+  person's only on a member object; a first version replaced category names
+  too. No pinned topic on that list, so pinned is not yet seen on a capture.
+  17 forum tests; root lint, type check and `pnpm test` (2,629) pass.

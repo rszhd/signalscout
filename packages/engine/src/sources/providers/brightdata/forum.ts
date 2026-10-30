@@ -65,6 +65,16 @@ function decodeCursor(cursor: string): Cursor {
   throw new Error(`forum: cursor "${cursor}" was not issued by this source.`);
 }
 
+/**
+ * What a skipped page was, for its log line: its title and size. A live run on
+ * 2026-10-30 got a page no parser read for a thread whose own page, fetched
+ * again, read fine; without this the log could not say what came back.
+ */
+function pageSummary(body: string): { title: string | null; bytes: number } {
+  const title = body.match(/<title[^>]*>([\s\S]{0,160}?)<\/title>/i)?.[1]?.trim() ?? null;
+  return { title, bytes: body.length };
+}
+
 /** Whether a thread on the list is new enough to open. */
 export function worthOpening(thread: ForumThreadSummary, since: Date | undefined): boolean {
   if (thread.pinned) return false;
@@ -156,7 +166,10 @@ export class BrightDataForumSource implements SocialSource {
       }
       const program = detectForum(answer.body);
       if (!program) {
-        this.runtime.logger.warn({ section }, "forum section skipped: no parser knows this page");
+        this.runtime.logger.warn(
+          { section, page: pageSummary(answer.body) },
+          "forum section skipped: no parser knows this page",
+        );
         return { posts: [], foundBy, unitsConsumed: 1, next: after([]) };
       }
       const chosen = program
@@ -213,7 +226,7 @@ export class BrightDataForumSource implements SocialSource {
       const thread = program?.readThread(answer.body, pending.url, now);
       if (!thread) {
         this.runtime.logger.warn(
-          { thread: pending.url },
+          { thread: pending.url, program: program?.id ?? null, page: pageSummary(answer.body) },
           "forum thread skipped: no parser read it",
         );
         continue;

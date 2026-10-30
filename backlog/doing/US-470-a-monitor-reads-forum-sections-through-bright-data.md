@@ -66,8 +66,9 @@ by version. On the version carrying this, Forums appears among its
 platforms, and it has no Bright Data key; a monitor ticking Forums would be
 refused for the missing key. Flagged, not handled here.
 
-**Not live yet.** Every test replays captured pages through a fake Bright
-Data. No poll has run through the connector against Bright Data itself.
+**Live once, outside the pipeline.** One walk on 2026-10-30 (Log), not a poll
+through the worker; the cost ledger and `source_continuations` have not seen
+a forum yet.
 
 ## Log
 
@@ -89,3 +90,11 @@ Data. No poll has run through the connector against Bright Data itself.
   in lists, an empty `forum` query list on a monitor, Bright Data's two
   fields). AGENTS.md and PLAN.md name the seventh platform and the fifth
   crossing of the rule. Root lint, type check and `pnpm test` (2,665) pass.
+- 2026-10-30T15:40+08:00 — First live walk, from a scratch script through
+  the connector itself: MacRumors' iMac section, `since` 72 hours back.
+  3 requests: the list, then 2 threads. "M6 iMac" came back as a post with
+  its exact time; the other thread's answer was a page no parser read. The
+  same thread, fetched again, read fine, so that first answer was something
+  other than the thread. The skip log lines now carry the page's title and
+  size. A thread lost this way is not retried: a later `since` passes it by.
+  About 40 Bright Data requests used in all.

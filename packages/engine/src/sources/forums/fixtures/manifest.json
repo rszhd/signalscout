@@ -112,5 +112,17 @@
     "capturedAt": "2026-10-30T11:46:14.899Z",
     "bytes": 115731,
     "namesScrubbed": 10
+  },
+  "invision4-list.html": {
+    "url": "https://linustechtips.com/forum/18-new-builds-and-planning/",
+    "capturedAt": "2026-10-30T14:27:14.019Z",
+    "bytes": 168233,
+    "namesScrubbed": 45
+  },
+  "invision4-thread.html": {
+    "url": "https://linustechtips.com/topic/1644011-pc-for-cs2/",
+    "capturedAt": "2026-10-30T14:27:14.068Z",
+    "bytes": 419618,
+    "namesScrubbed": 22
   }
 }

@@ -4,6 +4,7 @@ import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
 import { decodeEntities, fromAgo, fromEnglishDate, textOf } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
+import { invision4 } from "./invision4.js";
 import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
@@ -416,6 +417,63 @@ describe("MyBB, in a board's own theme", () => {
   it("asks a forum for its threads by start time", () => {
     expect(mybb.newestThreadsUrl("https://forum.example.com/forumdisplay.php?fid=164")).toBe(
       "https://forum.example.com/forumdisplay.php?fid=164&sortby=started&order=desc",
+    );
+  });
+});
+
+describe("Invision Community 4", () => {
+  const list = page("invision4-list");
+  const threads = invision4.listThreads(list.html, list.url);
+
+  it("reads every thread with exact times, and stops each row before the sidebar", () => {
+    expect(threads).toHaveLength(25);
+    expect(
+      threads.every(
+        (thread) => thread.startedAt && thread.lastActivityAt && !thread.approximateStart,
+      ),
+    ).toBe(true);
+    // No thread on this page is pinned. The last row is followed by the
+    // sidebar, whose "Featured" badge and times are not the row's.
+    expect(threads.some((thread) => thread.pinned)).toBe(false);
+    expect(threads.at(-1)).toMatchObject({
+      id: "1643366",
+      startedAt: new Date("2026-10-06T05:56:13.000Z"),
+      lastActivityAt: new Date("2026-10-13T12:58:27.000Z"),
+    });
+    expect(threads[0]).toEqual({
+      id: "1644011",
+      url: "https://linustechtips.com/topic/1644011-pc-for-cs2/",
+      title: "PC for CS2",
+      startedAt: new Date("2026-10-28T10:07:35.000Z"),
+      approximateStart: false,
+      lastActivityAt: new Date("2026-10-29T13:54:26.000Z"),
+      pinned: false,
+    });
+  });
+
+  it("decodes a title's entities", () => {
+    expect(threads.find((thread) => thread.id === "1643932")?.title).toBe(
+      "I'm looking to build my first mini ITX rig",
+    );
+  });
+
+  it("reads the first post, and nothing after its content", () => {
+    const thread = page("invision4-thread");
+    const read = invision4.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "1644011",
+      url: "https://linustechtips.com/topic/1644011-pc-for-cs2/",
+      title: "PC for CS2",
+      postedAt: new Date("2026-10-28T10:07:35.000Z"),
+    });
+    expect(read?.text.startsWith("Budget (including currency): 20 000 - 26 000 nok")).toBe(true);
+    expect(read?.text).toContain("is it necessary or worth the jump in price?");
+    expect(read?.text).not.toContain("Link to comment");
+  });
+
+  it("reads a section as it comes, by last activity", () => {
+    expect(invision4.newestThreadsUrl("https://forum.example.com/forum/18-new-builds/")).toBe(
+      "https://forum.example.com/forum/18-new-builds/",
     );
   });
 });

@@ -150,3 +150,15 @@ carry a member id or a Gravatar hash, and signatures.
   `<blockquote class="signature">`, which named businesses and sites; and a
   member menu's "Visit Homepage" link. 46 forum tests; root lint, type check
   and `pnpm test` (2,670) pass. About 55 Bright Data requests used in all.
+- 2026-10-30T22:31+08:00 — Invision Community 4 read (LinusTechTips, new
+  builds), the largest program without a parser in BuyerFinder's survey of
+  287 niche forums: 12 of the 17 there. `?sortby=start_date` is refused for a
+  visitor, so a section is read by last activity. 25 threads, exact ISO
+  times; the page's last row ran into the sidebar and took its "Featured"
+  badge and times until each row stopped at its last-poster block. No pinned
+  thread was on the page, so the thumb-tack check is unproven on a capture.
+  Scrubber: members' uploaded photos, and a `/profile/…/solutions/` link
+  whose text is a count — one count matched "20" in a post's budget and
+  replaced it. A name that is only digits is now never a name. 50 forum
+  tests; root lint, type check and `pnpm test` (2,675) pass. Four requests
+  for the two scrubber re-captures.

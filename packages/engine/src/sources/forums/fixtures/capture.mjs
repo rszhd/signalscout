@@ -80,8 +80,20 @@ const targets = {
       return row && html.slice(row.index).match(/<a href="([^"]+)" class="topic-title/)?.[1];
     },
   },
-  invision: {
-    list: "https://invisioncommunity.com/forums/forum/543-help-and-support/?sortby=start_date&sortdirection=desc",
+  // invisioncommunity.com needs KYC at Bright Data; LinusTechTips runs
+  // Invision Community and passed, and its builds section is buyers asking.
+  invision4: {
+    list: "https://linustechtips.com/forum/18-new-builds-and-planning/",
+    thread: (html) => {
+      const rows = html.split(/<li[^>]+class="ipsDataItem[\s"]/).slice(1);
+      const row = rows.find(
+        (piece) =>
+          !/ipsBadge[^"]*"[^>]*>\s*(?:<[^>]+>\s*)*Pinned|ipsDataItem_pinned|fa-thumb-tack/i.test(
+            piece.slice(0, 3000),
+          ),
+      );
+      return row?.match(/href="(https:\/\/linustechtips\.com\/topic\/\d+-[^"/]+\/)"/)?.[1];
+    },
   },
   // MyBB's own community answered Bright Data with a "Please refresh to
   // continue" challenge on 2026-10-30; Kodi's forum runs MyBB and passed.
@@ -155,30 +167,35 @@ const targets = {
 
 /**
  * Where a forum names a member. Each pattern finds the name in a profile link
+ * (skipping tags inside the link, never past its closing </a>: an
+ * avatar-only link otherwise took the next thread's title for a name)
  * or an attribute; every name found is then replaced everywhere in the page,
  * so a quote ("name said:"), an avatar's alt text and a title all go too.
  * The same name maps to the same pseudonym inside one page, in any letter case.
  */
 const namePatterns = [
   // XenForo: members/<slug>.<id>/, and data-author on posts and quotes.
-  /<a[^>]+href="[^"]*members\/[^"]*\.\d+\/?"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  /<a[^>]+href="[^"]*members\/[^"]*\.\d+\/?"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
   /data-author="([^"]{2,60})"/g,
   // phpBB: memberlist.php?mode=viewprofile&u=<id>.
   /<a[^>]+href="[^"]*memberlist\.php\?mode=viewprofile[^"]*"[^>]*>([^<]{2,60})</g,
   // SMF: action=profile;u=<id>.
   /<a[^>]+href="[^"]*action=profile;u=\d+[^"]*"[^>]*>([^<]{2,60})</g,
-  // Invision: showuser=<id> and /profile/<id>-<name>/.
-  /<a[^>]+href="[^"]*(?:showuser=\d+|\/profile\/\d+-[^"]*)"[^>]*>([^<]{2,60})</g,
+  // Invision: showuser=<id> and /profile/<id>-<name>/, in either quote, the
+  // name between line breaks; and the name a quote carries. The profile link
+  // itself only: /profile/<id>-<name>/solutions/ shows a count.
+  /<a[^>]+href=['"][^'"]*(?:showuser=\d+|\/profile\/\d+-[^'"/]*\/?)['"][^>]*>(?:\s*<(?!\/a\b)[^>]+>)*\s*([^<\s][^<]{1,59}?)\s*</g,
+  /data-ipsquote-username="([^"]{2,60})"/g,
   // Flarum and Discourse: /u/<name>.
   /<a[^>]+href="[^"]*\/u\/[^"/]+"[^>]*>([^<]{2,60})</g,
   // vBulletin 3/4: member.php?u=<id>, and the name in a "Started by" title.
-  /<a[^>]+href="[^"]*member\.php\?u=\d+[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  /<a[^>]+href="[^"]*member\.php\?u=\d+[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
   // vBulletin 5: /member/<id>-<name>. MyBB: action=profile&uid=<id>, user-<id>.html.
-  /<a[^>]+href="[^"]*\/member\/\d+-[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
-  /<a[^>]+href="[^"]*(?:action=profile(?:&amp;|&)uid=\d+|user-\d+\.html)[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  /<a[^>]+href="[^"]*\/member\/\d+-[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
+  /<a[^>]+href="[^"]*(?:action=profile(?:&amp;|&)uid=\d+|user-\d+\.html)[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
   // bbPress: /users/<name>/ links, whose name is also in the address, and the
   // author line. WordPress's profiles live at profiles.wordpress.org/<name>.
-  /<a[^>]+href="[^"]*\/users\/[^"/]+\/?"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  /<a[^>]+href="[^"]*\/users\/[^"/]+\/?"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
   /\/users\/([^"/?#\s]{2,60})\//g,
   /profiles\.wordpress\.org\/([^"/?#\s]{2,60})/g,
   /class="bbp-author-name"[^>]*>([^<]{2,60})</g,
@@ -190,6 +207,7 @@ const urlScrubs = [
   [/(mode=viewprofile(?:&amp;|&)u=)\d+/g, "$11"],
   [/(action=profile;u=)\d+/g, "$11"],
   [/(showuser=)\d+/g, "$11"],
+  [/(data-ipsquote-userid=")\d+/g, "$11"],
   [/\/profile\/\d+-[^"/]*/g, "/profile/1-member"],
   [/\/u\/[^"/?#]+/g, "/u/member"],
   [/\/member\/\d+-[^"/?#\s]+/g, "/member/1-member"],
@@ -219,6 +237,11 @@ const urlScrubs = [
   [/(class="avatar Av)\d+/g, "$11"],
   [/(data-user-id=")\d+/g, "$11"],
   [/(avatar-u)\d+/g, "$11"],
+  // Invision: a member's own photo, in the link to their profile.
+  [
+    /(class="ipsUserPhoto[^"]*"[^>]*>\s*<img src=)(['"])[^'"]*\2/g,
+    "$1$2//member.example/photo.jpg$2",
+  ],
   // Our own session on the forum, not a person's, but it has no business here.
   [/([?&;](?:amp;)?(?:sid|PHPSESSID|s)=)[0-9a-z]{20,40}/gi, "$10"],
 ];
@@ -230,13 +253,19 @@ export function scrub(html) {
   for (const pattern of namePatterns) {
     for (const match of html.matchAll(pattern)) {
       const name = match[1].trim();
-      if (name.length >= 2) names.add(name);
+      // A count is never a name, and replacing one changes a post's numbers.
+      if (name.length >= 2 && !/^[\d\s.,]+$/.test(name)) names.add(name);
     }
   }
   // A signature is the member's own words about themselves, often a link to
   // their name elsewhere. The parsers never read it.
-  // vBulletin 3/4 wraps one in <blockquote class="signature">, around divs.
+  // vBulletin 3/4 wraps one in <blockquote class="signature">, around divs;
+  // Invision in <div data-role="memberSignature"> around one more div.
   const out = html
+    .replace(
+      /(<div data-role="memberSignature"[^>]*>)[\s\S]*?(<\/div>\s*<\/div>)/g,
+      "$1(signature)$2",
+    )
     .replace(
       /(<blockquote[^>]*class="[^"]*\bsignature\b[^"]*"[^>]*>)[\s\S]*?(<\/blockquote>)/g,
       "$1(signature)$2",

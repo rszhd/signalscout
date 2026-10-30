@@ -116,3 +116,15 @@ carry a member id or a Gravatar hash, and signatures.
   links, `data-vbnamecard`, avatar file ids, MyBB profile links, and every
   email address (MacRumors' footer named staff). 34 forum tests; root lint,
   type check and `pnpm test` (2,646) pass.
+- 2026-10-30T15:01+08:00 — bbPress read (wordpress.org support, How-to and
+  Troubleshooting): 33 topics, 3 pinned; the list has no start time and its
+  freshness is "15 hours, 10 minutes ago", read by a new `fromAgo` with no
+  zone to guess; the topic page's `article:published_time` is exact. Flarum's
+  API was refused by Bright Data like Invision (no KYC, robots.txt), and the
+  capture stopped without saving. Scrubber additions: bbPress `/users/<name>/`
+  links and their names, the author line, `user-id-<n>` row classes,
+  profiles.wordpress.org, and 64-digit Gravatar hashes. A server path in the
+  captured post's own text, `/bernatu/www/`, may hold part of its writer's
+  account name; no general rule reaches it and the page is not edited by
+  hand. About 22 Bright Data requests used so far. 38 forum tests; root
+  lint, type check and `pnpm test` (2,650) pass.

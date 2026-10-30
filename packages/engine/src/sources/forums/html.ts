@@ -166,3 +166,32 @@ export function fromEnglishDate(text: string, now: Date): Date | null {
     return at(year(monthFirst[3] ?? ""), monthIndex(monthFirst[1] ?? ""), Number(monthFirst[2]));
   return null;
 }
+
+const agoUnits: Record<string, number> = {
+  second: 1_000,
+  minute: 60_000,
+  hour: 3_600_000,
+  day: 86_400_000,
+  week: 604_800_000,
+  month: 2_592_000_000,
+  year: 31_536_000_000,
+};
+
+/**
+ * "15 hours, 9 minutes ago", counted back from `now`. Unlike a date in words
+ * it needs no zone, so it is exact to its smallest unit. Months are 30 days
+ * and years 365. Null when the words are not that shape.
+ */
+export function fromAgo(text: string, now: Date): Date | null {
+  const words = decodeEntities(text.replace(/<[^>]+>/g, ""))
+    .trim()
+    .toLowerCase();
+  if (!words.endsWith("ago")) return null;
+  let total = 0;
+  for (const [, count, unit] of words.matchAll(
+    /(\d+)\s+(second|minute|hour|day|week|month|year)s?/g,
+  )) {
+    total += Number(count) * (agoUnits[unit ?? ""] ?? 0);
+  }
+  return total > 0 ? new Date(now.getTime() - total) : null;
+}

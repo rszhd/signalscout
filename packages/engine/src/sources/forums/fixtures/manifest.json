@@ -76,5 +76,17 @@
     "capturedAt": "2026-10-30T04:04:27.866Z",
     "bytes": 117343,
     "namesScrubbed": 7
+  },
+  "bbpress-list.html": {
+    "url": "https://wordpress.org/support/forum/how-to-and-troubleshooting/",
+    "capturedAt": "2026-10-30T06:59:17.767Z",
+    "bytes": 213463,
+    "namesScrubbed": 56
+  },
+  "bbpress-thread.html": {
+    "url": "https://wordpress.org/support/topic/wordpress-http-500-error-website-and-admin-login-unavailable/",
+    "capturedAt": "2026-10-30T06:59:17.776Z",
+    "bytes": 187468,
+    "namesScrubbed": 3
   }
 }

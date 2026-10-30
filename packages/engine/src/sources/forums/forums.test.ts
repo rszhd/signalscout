@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
-import { decodeEntities, fromEnglishDate, textOf } from "./html.js";
+import { decodeEntities, fromAgo, fromEnglishDate, textOf } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
@@ -11,7 +12,7 @@ import { xenforo2 } from "./xenforo2.js";
 
 const manifest = JSON.parse(
   readFileSync(new URL("./fixtures/manifest.json", import.meta.url), "utf8"),
-) as Record<string, { url: string }>;
+) as Record<string, { url: string; capturedAt: string }>;
 function page(name: string): { html: string; url: string } {
   const file = [`${name}.html`, `${name}.json`].find((candidate) => manifest[candidate]);
   const entry = file ? manifest[file] : undefined;
@@ -296,6 +297,55 @@ describe("SMF 2.0", () => {
     expect(smf2.newestThreadsUrl("https://forum.example.com/index.php?board=64.0")).toBe(
       "https://forum.example.com/index.php?board=64.0;sort=first_post;desc",
     );
+  });
+});
+
+describe("bbPress", () => {
+  const list = page("bbpress-list");
+  // "Ago" is counted from when the page was fetched.
+  const captured = new Date(manifest["bbpress-list.html"]?.capturedAt ?? "");
+  const threads = bbpress.listThreads(list.html, list.url, captured);
+
+  it("reads every topic, its freshness counted back from the fetch, and the pinned ones", () => {
+    expect(threads).toHaveLength(33);
+    expect(threads.filter((thread) => thread.pinned)).toHaveLength(3);
+    expect(threads.every((thread) => thread.lastActivityAt && thread.startedAt === null)).toBe(
+      true,
+    );
+    expect(threads.find((thread) => !thread.pinned)).toEqual({
+      id: "19058414",
+      url: "https://wordpress.org/support/topic/wordpress-http-500-error-website-and-admin-login-unavailable/",
+      title: "WordPress HTTP 500 Error \u2013 Website and Admin Login Unavailable",
+      startedAt: null,
+      approximateStart: false,
+      // "15 hours, 10 minutes ago"; its title says October 29, 2026 at 3:48 pm.
+      lastActivityAt: new Date("2026-10-29T15:49:17.767Z"),
+      pinned: false,
+    });
+  });
+
+  it("reads the first post and its exact start from the topic page", () => {
+    const thread = page("bbpress-thread");
+    const read = bbpress.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "19058414",
+      title: "WordPress HTTP 500 Error \u2013 Website and Admin Login Unavailable",
+      postedAt: new Date("2026-10-29T09:16:45.000Z"),
+    });
+    expect(read?.text.startsWith("Hello everyone,")).toBe(true);
+    expect(read?.text.endsWith("[ log in to see the link]")).toBe(true);
+  });
+});
+
+describe("times counted back in words", () => {
+  const now = new Date("2026-10-30T07:00:00.000Z");
+  it("adds up every unit", () => {
+    expect(fromAgo("15 hours, 9 minutes ago", now)).toEqual(new Date("2026-10-29T15:51:00.000Z"));
+    expect(fromAgo("1 day, 2 hours ago", now)).toEqual(new Date("2026-10-29T05:00:00.000Z"));
+  });
+  it("is null for anything else", () => {
+    expect(fromAgo("October 29, 2026 at 3:48 pm", now)).toBeNull();
+    expect(fromAgo("just now", now)).toBeNull();
   });
 });
 

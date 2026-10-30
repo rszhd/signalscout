@@ -85,6 +85,28 @@ const targets = {
       return topic && `https://meta.discourse.org/t/${topic.id}.json`;
     },
   },
+  // WordPress's own support forums run bbPress.
+  bbpress: {
+    list: "https://wordpress.org/support/forum/how-to-and-troubleshooting/",
+    thread: (html) => {
+      const item = [...html.matchAll(/<ul id="bbp-topic-\d+"[^>]*class="([^"]*)"/g)].find(
+        (match) => !/sticky/.test(match[1]),
+      );
+      return (
+        item && html.slice(item.index).match(/class="bbp-topic-permalink" href="([^"]+)"/)?.[1]
+      );
+    },
+  },
+  // Read through its JSON API, which needs no key; the section page is HTML.
+  flarum: {
+    format: "json",
+    section: "https://discuss.flarum.org/t/support",
+    list: "https://discuss.flarum.org/api/discussions?filter%5Btag%5D=support&sort=-createdAt",
+    thread: (text) => {
+      const discussion = JSON.parse(text).data.find((d) => !d.attributes.isSticky);
+      return discussion && `https://discuss.flarum.org/api/discussions/${discussion.id}`;
+    },
+  },
   smf2: {
     list: "https://geekhack.org/index.php?board=64.0;sort=first_post;desc",
     thread: (html) => {
@@ -130,6 +152,12 @@ const namePatterns = [
   // vBulletin 5: /member/<id>-<name>. MyBB: action=profile&uid=<id>, user-<id>.html.
   /<a[^>]+href="[^"]*\/member\/\d+-[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
   /<a[^>]+href="[^"]*(?:action=profile(?:&amp;|&)uid=\d+|user-\d+\.html)[^"]*"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  // bbPress: /users/<name>/ links, whose name is also in the address, and the
+  // author line. WordPress's profiles live at profiles.wordpress.org/<name>.
+  /<a[^>]+href="[^"]*\/users\/[^"/]+\/?"[^>]*>(?:<[^>]+>)*([^<]{2,60})</g,
+  /\/users\/([^"/?#\s]{2,60})\//g,
+  /profiles\.wordpress\.org\/([^"/?#\s]{2,60})/g,
+  /class="bbp-author-name"[^>]*>([^<]{2,60})</g,
 ];
 
 /** Profile addresses keep their shape and lose their id and name. */
@@ -145,11 +173,14 @@ const urlScrubs = [
   [/user-\d+\.html/g, "user-1.html"],
   [/(data-userid=")\d+/gi, "$11"],
   [/(data-vbnamecard=")\d+/g, "$11"],
+  // bbPress names a topic's author in the row's classes.
+  [/\buser-id-\d+/g, "user-id-1"],
   [/(avatar\/avatar)\d+_\d+/g, "$11_1"],
   // An email address names a person, staff in a footer too.
   [/[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}/gi, "member@example.com"],
   // Avatars: a Gravatar hash is a hash of the member's email; the others carry their id.
-  [/(gravatar\.com\/avatar\/)[0-9a-f]{32}/g, `$1${"0".repeat(32)}`],
+  // MD5 (32) or SHA-256 (64).
+  [/(gravatar\.com\/avatar\/)[0-9a-f]{32,64}/g, `$1${"0".repeat(32)}`],
   [/(avatar=)\d+_\d+/g, "$11_1"],
   [/(\/avatars\/[a-z]\/)\d+\/\d+/g, "$10/1"],
   [/(class="avatar Av)\d+/g, "$11"],
@@ -185,7 +216,6 @@ const jsonNameKeys = new Set([
   "display_username",
   "last_poster_username",
   "displayName",
-  "slug_user",
 ]);
 const jsonPictureKeys = new Set(["avatar_template", "avatarUrl"]);
 
@@ -200,9 +230,12 @@ export function scrubJson(text) {
     if (Array.isArray(value)) return value.forEach(walk);
     if (!value || typeof value !== "object") return;
     const member = "username" in value || "avatar_template" in value;
+    // Flarum: a user, or a link to one, is {"type": "users", "id": "123"}.
+    if (value.type === "users" && "id" in value) value.id = "1";
     for (const [key, field] of Object.entries(value)) {
-      // "name" is a person's only on a member; a category and a group have one too.
-      const naming = jsonNameKeys.has(key) && (key !== "name" || member);
+      // "name" is a person's only on a member; a category and a group have one
+      // too. A Flarum member's "slug" is their username.
+      const naming = jsonNameKeys.has(key) ? key !== "name" || member : member && key === "slug";
       if (naming && typeof field === "string" && field.trim().length >= 2) names.add(field.trim());
       else if (jsonPictureKeys.has(key) && typeof field === "string")
         value[key] = "/letter_avatar/member/{size}/1.png";

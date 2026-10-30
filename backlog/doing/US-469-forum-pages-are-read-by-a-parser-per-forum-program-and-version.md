@@ -89,3 +89,14 @@ carry a member id or a Gravatar hash, and signatures.
   XenForo 1 uses it too. A date in another language comes back null. SMF's
   session id is not hex, so the scrubber's pattern widened. 28 forum tests;
   root lint, type check and `pnpm test` (2,640) pass.
+- 2026-10-30T11:55+08:00 — Plain requests stop here. MacRumors (XenForo 2.3)
+  answered a browser-like Python request but gave Node's fetch a 403, and
+  Head-Fi served its own bot challenge; trying other clients or headers to
+  pass a check is not done here. The owner: "lets do everything using
+  BrightData". The capture script now fetches only through Bright Data's Web
+  Unlocker (`POST https://api.brightdata.com/request`, `{zone, url, format:
+  "raw"}`, read from its docs), with `BRIGHTDATA_API_KEY` and
+  `BRIGHTDATA_UNLOCKER_ZONE` from the environment, and prints its request
+  count. New targets: XenForo 2 (MacRumors), vBulletin, Invision and MyBB;
+  the last three save their lists only, to write their pickers from. Waiting
+  for a key: none is in a local `.env`.

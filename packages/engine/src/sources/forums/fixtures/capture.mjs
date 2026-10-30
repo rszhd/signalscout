@@ -6,12 +6,18 @@
  * written. For each forum program and version this saves one "newest threads"
  * list, sorted by start date, and the first thread on it that is not pinned.
  *
- * It reads public pages with a plain request and spends nothing. A forum
- * behind a bot check needs a provider that passes it; that capture comes with
- * the provider's connector.
+ * Every page is fetched through Bright Data's Web Unlocker, the provider the
+ * forum connector will use, so a capture sees what the connector will see:
+ * most forums put a bot check in front of a plain request. The key and the
+ * zone come from the environment, never the command line:
  *
- *     node packages/engine/src/sources/forums/fixtures/capture.mjs
- *     node packages/engine/src/sources/forums/fixtures/capture.mjs --only=phpbb3
+ *     node --env-file=<a .env with BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE> \
+ *       packages/engine/src/sources/forums/fixtures/capture.mjs [--only=phpbb3]
+ *
+ * Bright Data bills each successful request, $1.50 per 1,000 on
+ * pay-as-you-go with 5,000 free a month (October 2026); a full run is two or
+ * three requests per program. A program whose thread picker is not written
+ * yet saves its list only, to write the picker from.
  *
  * What it writes, into this folder:
  *
@@ -25,8 +31,6 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
-const browser =
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
 
 /**
  * One public forum per program and version, and the first thread on its list
@@ -43,6 +47,22 @@ const targets = {
       return href && new URL(href, "https://forums.digitalpoint.com/").toString();
     },
   },
+  // Behind a bot check for a plain request: their pickers come from the lists.
+  xenforo2: {
+    list: "https://forums.macrumors.com/forums/imac.91/?order=post_date&direction=desc",
+    thread: (html) => {
+      const item = [...html.matchAll(/<div class="structItem structItem--thread([^"]*)"/g)].find(
+        (match) => !/sticky/.test(match[1]),
+      );
+      const href = item && html.slice(item.index).match(/href="(\/threads\/[^"]+\.\d+\/)"/)?.[1];
+      return href && new URL(href, "https://forums.macrumors.com/").toString();
+    },
+  },
+  vbulletin: { list: "https://forum.vbulletin.com/forum/vbulletin-5-connect" },
+  invision: {
+    list: "https://invisioncommunity.com/forums/forum/497-technical-problems/?sortby=start_date&sortdirection=desc",
+  },
+  mybb: { list: "https://community.mybb.com/forum-176.html?sortby=started&order=desc" },
   // Read through its JSON API, which needs no key; the section page is HTML.
   discourse: {
     format: "json",
@@ -110,6 +130,8 @@ const urlScrubs = [
   [/(avatar=)\d+_\d+/g, "$11_1"],
   [/(\/avatars\/[a-z]\/)\d+\/\d+/g, "$10/1"],
   [/(class="avatar Av)\d+/g, "$11"],
+  [/(data-user-id=")\d+/g, "$11"],
+  [/(avatar-u)\d+/g, "$11"],
   // Our own session on the forum, not a person's, but it has no business here.
   [/([?&;](?:amp;)?(?:sid|PHPSESSID|s)=)[0-9a-z]{20,40}/gi, "$10"],
 ];
@@ -196,11 +218,28 @@ function replaceNames(text, names) {
 
 // ------------------------------------------------------------- capture
 
+const apiKey = process.env.BRIGHTDATA_API_KEY?.trim();
+const zone = process.env.BRIGHTDATA_UNLOCKER_ZONE?.trim();
+if (!apiKey || !zone) {
+  throw new Error(
+    "Set BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE in the environment (see the header).",
+  );
+}
+let requests = 0;
+
 async function fetchPage(url) {
-  const response = await fetch(url, { headers: { "User-Agent": browser }, redirect: "follow" });
-  const html = await response.text();
-  if (!response.ok) throw new Error(`${url} answered ${response.status}`);
-  return html;
+  requests += 1;
+  const response = await fetch("https://api.brightdata.com/request", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({ zone, url, format: "raw" }),
+  });
+  const body = await response.text();
+  if (!response.ok)
+    throw new Error(
+      `${url} answered ${response.status} through Bright Data: ${body.slice(0, 200)}`,
+    );
+  return body;
 }
 
 const only = process.argv.find((arg) => arg.startsWith("--only="))?.slice(7);
@@ -215,14 +254,13 @@ try {
 for (const [program, target] of Object.entries(targets)) {
   if (only && only !== program) continue;
   const list = await fetchPage(target.list);
-  const threadUrl = target.thread(list);
-  if (!threadUrl) throw new Error(`${program}: no thread that is not pinned on ${target.list}`);
-  const thread = await fetchPage(threadUrl);
   const extension = target.format === "json" ? "json" : "html";
-  const pages = [
-    ["list", target.list, list, extension],
-    ["thread", threadUrl, thread, extension],
-  ];
+  const pages = [["list", target.list, list, extension]];
+  if (target.thread) {
+    const threadUrl = target.thread(list);
+    if (!threadUrl) throw new Error(`${program}: no thread that is not pinned on ${target.list}`);
+    pages.push(["thread", threadUrl, await fetchPage(threadUrl), extension]);
+  }
   // Only the head: it names the program, and a Discourse body carries every
   // poster's name inside avatar addresses and preloaded JSON.
   if (target.section) {
@@ -245,3 +283,6 @@ for (const [program, target] of Object.entries(targets)) {
 }
 
 writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+console.log(
+  `${requests} Bright Data requests, about $${((requests * 1.5) / 1000).toFixed(4)} at the list price`,
+);

@@ -4,6 +4,7 @@ import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
 import { decodeEntities, fromAgo, fromEnglishDate, textOf } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
+import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
 import { vbulletin5 } from "./vbulletin5.js";
@@ -337,6 +338,46 @@ describe("bbPress", () => {
   });
 });
 
+describe("MyBB, in a board's own theme", () => {
+  const list = page("mybb-list");
+  const threads = mybb.listThreads(list.html, list.url);
+
+  it("reads every thread, with pinned ones from the row before each title", () => {
+    expect(threads).toHaveLength(20);
+    expect(threads.filter((thread) => thread.pinned)).toHaveLength(5);
+    expect(threads.every((thread) => thread.lastActivityAt)).toBe(true);
+    expect(threads.find((thread) => !thread.pinned)).toEqual({
+      id: "389074",
+      url: "https://forum.kodi.tv/showthread.php?tid=389074",
+      title: "Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo",
+      // "2026-10-17, 08:57" in the board's zone.
+      startedAt: new Date("2026-10-17T08:57:00.000Z"),
+      approximateStart: true,
+      lastActivityAt: new Date("2026-10-17T15:56:00.000Z"),
+      pinned: false,
+    });
+  });
+
+  it("reads the first post, with the thread id from the address", () => {
+    const thread = page("mybb-thread");
+    const read = mybb.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "389074",
+      url: "https://forum.kodi.tv/showthread.php?tid=389074",
+      title: "Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo",
+      postedAt: new Date("2026-10-17T08:57:00.000Z"),
+    });
+    expect(read?.text.startsWith("Kodi 21.2")).toBe(true);
+    expect(read?.text.endsWith("Thanks in advance.")).toBe(true);
+  });
+
+  it("asks a forum for its threads by start time", () => {
+    expect(mybb.newestThreadsUrl("https://forum.example.com/forumdisplay.php?fid=164")).toBe(
+      "https://forum.example.com/forumdisplay.php?fid=164&sortby=started&order=desc",
+    );
+  });
+});
+
 describe("times counted back in words", () => {
   const now = new Date("2026-10-30T07:00:00.000Z");
   it("adds up every unit", () => {
@@ -360,6 +401,7 @@ describe("dates in English words", () => {
     ["Yesterday at 9:05 pm", "2026-10-29T21:05:00.000Z"],
     ["Tue 13 Oct '26, 3:46pm", "2026-10-13T15:46:00.000Z"],
     ["Today, 12:37pm", "2026-10-30T12:37:00.000Z"],
+    ["2026-10-17, 08:57", "2026-10-17T08:57:00.000Z"],
     ["28. Oktober 2026", null],
   ];
   for (const [words, expected] of cases) {

@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="alternate" type="application/rss+xml" title="Latest Threads (RSS 2.0)" href="https://forum.kodi.tv/syndication.php" />
+<link rel="alternate" type="application/atom+xml" title="Latest Threads (Atom 1.0)" href="https://forum.kodi.tv/syndication.php?type=atom1.0" />
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="https://forum.kodi.tv/vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://forum.kodi.tv/vendor/google/css/opensans.css"> 
+<link rel="stylesheet" href="https://forum.kodi.tv/vendor/bootstrap/css/font-awesome.min.css">
+
+<script src="https://forum.kodi.tv/jscripts/jquery.js?ver=1823" type="dd81a7f6beb7af56e10d4edf-text/javascript"></script>
+<script src="https://forum.kodi.tv/vendor/bootstrap/js/bootstrap.min.js" type="dd81a7f6beb7af56e10d4edf-text/javascript"></script>
+<script src="https://forum.kodi.tv/jscripts/jquery.plugins.min.js?ver=1821" type="dd81a7f6beb7af56e10d4edf-text/javascript"></script>
+<script src="https://forum.kodi.tv/jscripts/general.js?ver=1827" type="dd81a7f6beb7af56e10d4edf-text/javascript"></script>
+
+<script src="https://forum.kodi.tv/kodi/theme/js/theme.js?20230424-0955" type="dd81a7f6beb7af56e10d4edf-text/javascript"></script>
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/theme6/css3.min.css?t=1765794963" />
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/theme6/star_ratings.min.css?t=1765794963" />
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/theme6/showthread.min.css?t=1765794963" />
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/theme6/global.min.css?t=1765794963" />
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/theme6/alerts.min.css?t=1765794963" />
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/theme6/mentionme.min.css?t=1765794963" />
+<!-- UNREADPOSTS_CSS -->
+
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+<!--
+	lang.unknown_error = "An unknown error has occurred.";
+	lang.confirm_title = "Please Confirm";
+	lang.expcol_collapse = "[-]";
+	lang.expcol_expand = "[+]";
+	lang.select2_match = "One result is available, press enter to select it.";
+	lang.select2_matches = "{1} results are available, use up and down arrow keys to navigate.";
+	lang.select2_nomatches = "No matches found";
+	lang.select2_inputtooshort_single = "Please enter one or more character";
+	lang.select2_inputtooshort_plural = "Please enter {1} or more characters";
+	lang.select2_inputtoolong_single = "Please delete one character";
+	lang.select2_inputtoolong_plural = "Please delete {1} characters";
+	lang.select2_selectiontoobig_single = "You can only select one item";
+	lang.select2_selectiontoobig_plural = "You can only select {1} items";
+	lang.select2_loadmore = "Loading more results&hellip;";
+	lang.select2_searching = "Searching&hellip;";
+
+	var templates = {
+		modal: '<div class=\"modal\">\
+	<div style=\"overflow-y: auto; max-height: 400px;\">\
+		<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\" class=\"tborder\">\
+			<tr>\
+				<td class=\"thead\"><strong>__title__</strong></td>\
+			</tr>\
+			<tr>\
+				<td class=\"trow1\">__message__</td>\
+			</tr>\
+			<tr>\
+				<td class=\"tfoot\">\
+					<div style=\"text-align: center\" class=\"modal_buttons\">__buttons__</div>\
+				</td>\
+			</tr>\
+		</table>\
+	</div>\
+</div>',
+		modal_button: '<input type=\"submit\" class=\"button\" value=\"__title__\"/>&nbsp;'
+	};
+	var cookieDomain = "";
+	var cookiePath = "/";
+	var cookiePrefix = "";
+	var cookieSecureFlag = "1";
+	var deleteevent_confirm = "Are you sure you want to delete this event?";
+	var removeattach_confirm = "Are you sure you want to remove the selected attachment from this post?";
+	var loading_text = 'Loading. <br />Please Wait&hellip;';
+	var saving_changes = 'Saving changes&hellip;';
+	var use_xmlhttprequest = "1";
+	var my_post_key = "9210dbb4d5df95996aa2ea20711dd587";
+	var rootpath = "https://forum.kodi.tv";
+	var imagepath = "https://forum.kodi.tv/kodi/theme/images";
+  	var yes_confirm = "Yes";
+	var no_confirm = "No";
+	var MyBBEditor = null;
+	var spinner_image = "https://forum.kodi.tv/kodi/theme/images/spinner.gif";
+	var spinner = "<img src='" + spinner_image +"' alt='' />";
+	var modal_zindex = 9999;
+// -->
+</script>
+
+
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+<!--
+	var quickdelete_confirm = "Are you sure you want to delete this post?";
+	var quickrestore_confirm = "Are you sure you want to restore this post?";
+	var allowEditReason = "1";
+	var thread_deleted = "0";
+	var visible_replies = "3";
+	lang.save_changes = "Save Changes";
+	lang.cancel_edit = "Cancel Edit";
+	lang.quick_edit_update_error = "There was an error editing your reply:";
+	lang.quick_reply_post_error = "There was an error posting your reply:";
+	lang.quick_delete_error = "There was an error deleting your reply:";
+	lang.quick_delete_success = "The post was deleted successfully.";
+	lang.quick_delete_thread_success = "The thread was deleted successfully.";
+	lang.quick_restore_error = "There was an error restoring your reply:";
+	lang.quick_restore_success = "The post was restored successfully.";
+	lang.editreason = "Edit Reason";
+	lang.post_deleted_error = "You can not perform this action to a deleted post.";
+	lang.softdelete_thread = "Soft Delete Thread";
+	lang.restore_thread = "Restore Thread";
+// -->
+</script>
+<!-- jeditable (jquery) -->
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/report.js?ver=1820"></script>
+<script src="https://forum.kodi.tv/jscripts/jeditable/jeditable.min.js" type="dd81a7f6beb7af56e10d4edf-text/javascript"></script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/thread.js?ver=1838"></script>
+<link type="text/css" rel="stylesheet" href="https://forum.kodi.tv/cache/themes/prism.css" /></head>
+<body>
+
+<div id="header" class="navbar-fixed-top">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header pull-right">
+				<div class="nav navbar-text navbar-right">
+					<div class="usersection">
+						
+<div class="welcome-guest">
+	<a href="https://forum.kodi.tv/member.php?action=login" onclick="if (!window.__cfRLUnblockHandlers) return false; $('#quick_login').modal({ fadeDuration: 250, keepelement: true }); return false;" class="btn btn-xs btn-login" data-cf-modified-dd81a7f6beb7af56e10d4edf-="">Login</a>
+	<a href="https://forum.kodi.tv/member.php?action=register" class="btn btn-xs btn-register">Register</a>
+</div>
+
+<div class="modal" id="quick_login" style="display: none;">
+	<form method="post" class="form-horizontal" action="https://forum.kodi.tv/member.php">
+		<input name="action" type="hidden" value="do_login" />
+		<input name="url" type="hidden" value="" />
+		<input name="quick_login" type="hidden" value="1" />
+		<input name="my_post_key" type="hidden" value="9210dbb4d5df95996aa2ea20711dd587" />
+		<div class="welcometitle">
+			<h1 style="line-height: 50px;">Login at Kodi Home</h1>
+		</div>
+		<div class="row mx-0 my_top">
+		<div class="col-md-6 welcomebox">
+			<p><img src="https://forum.kodi.tv/kodi/theme/images/logobw.png" alt="Kodi Logo" /></p>
+			<strong>Welcome to Kodi Community Forum!</strong> <br />Please login using the form on the right.<br /><br />
+			<strong>Not our member yet? What are you waiting for?</strong><br /><br />
+			<p><a href="https://forum.kodi.tv/member.php?action=register" class="btn btn-register"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;Register</a></p>
+		</div>
+		<div class="col-md-6 border-left">
+		
+<div class="welcomelogin">                           
+	<div class="input-group">
+		<span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
+		<input id="quick_login_username" class="form-control" name="quick_username" value="" placeholder="Username" type="text" required="required">                                        
+	</div>
+	<div class="input-group my_top">
+		<span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+		<input id="quick_login_password" class="form-control" name="quick_password" placeholder="Password" type="password"  required="required">
+	</div>
+	<div class="checkbox my_top"> 
+		<label for="quick_login_remember">
+			<input name="quick_remember" id="quick_login_remember" type="checkbox" value="yes" checked="checked" />
+			Remember me
+		</label>
+	</div>
+	<div class="my_top">
+		<button type="submit" class="btn btn-login btn-block" value="Login" tabindex="3" style="opacity: 1;">
+			<i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Login
+		</button>
+	</div>
+	<a class="my_top btn btn-primary btn-sm btn-block" href="https://forum.kodi.tv/member.php?action=lostpw">Lost password</a>
+</div>
+
+			</div>
+		</div>
+	</form>
+</div>
+
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+	$("#quick_login input[name='url']").val($(location).attr('href'));
+</script>
+
+					</div>
+				</div>
+			</div>
+			<div class="navbar-header">
+				<button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle pull-left">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<div class="logo">
+					<a href="https://forum.kodi.tv" title="Kodi Community Forum"><img src="https://forum.kodi.tv/kodi/theme/images/logo.png" alt="KODI media center"></a>
+				</div>
+			</div>
+
+			<div id="navbarCollapse" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="https://kodi.tv/blog" target="_blank" title="News">News</a></li>
+					<li><a href="https://kodi.wiki/" target="_blank" title="Wiki">Wiki</a></li>
+					<li><a href="https://github.com/xbmc/xbmc" target="_blank" title="Code">Code</a></li>
+					<li><a href="https://github.com/xbmc/xbmc/issues" target="_blank" title="Bug Tracker">Bug Tracker</a></li>
+					<li><a href="https://kodi.tv/download" target="_blank" title="Download">Download</a></li>
+					<li><a class="visible-xs visible-sm" href="https://kodi.tv/contribute/donate" target="_blank" title="Donate">Donate</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	
+	<div class="breadcrumb-navi container-fluid">
+			<div class="breadcrumb-nav row">
+				<div class="col-xs-9 col-md-7 col-lg-8">
+<div class="crumbs">
+					<a class="home" href="https://forum.kodi.tv/index.php"><i class="fa fa-home homei"></i></a>
+					
+<span class="crust inactivecrumb" itemtype="http://schema.org/breadcrumb" itemscope="">
+	<a href="forumdisplay.php?fid=33" class="crumb" itemprop="url">
+		<span itemprop="title">Support</span>
+	</a>
+</span>
+
+<span class="crust inactivecrumb" itemtype="http://schema.org/breadcrumb" itemscope="">
+	<a href="forumdisplay.php?fid=111" class="crumb" itemprop="url">
+		<span itemprop="title">General Support</span>
+	</a>
+</span>
+
+<span class="crust inactivecrumb" itemtype="http://schema.org/breadcrumb" itemscope="">
+	<a href="forumdisplay.php?fid=164" class="crumb" itemprop="url">
+		<span itemprop="title">Android</span>
+	</a>
+</span>
+
+					
+<span class="crust activecrumb">
+	<a href="showthread.php?tid=389074" class="crumb" itemprop="url">
+		Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo
+	</a>
+</span>
+
+</div>
+				</div>
+				<div class="col-xs-3 col-md-5 col-lg-4 nav-icons text-right">
+<div class="quick-nav">
+<a class="ease-all" href="/search.php?action=unreads" title="view unread posts"><i class="fa fa-eye"></i></a>
+<a class="ease-all" href="/search.php?action=getdaily" title="view todays posts"><i class="fa fa-calendar"></i></a>
+</div>
+					<ul class="hidden-xs hidden-sm">
+						<li><a class="ease-all tt btn-icon" href="https://www.facebook.com/XBMC/" target="_blank" title="Like Our Page on Facebook"><i class="fa fa-facebook"></i></a></li>
+						<li><a class="ease-all tt btn-icon" href="https://twitter.com/KodiTV" target="_blank" title="Follow us on Twitter"><i class="fa fa-twitter"></i></a></li>
+						<li><a class="ease-all tt btn-icon" href="https://www.youtube.com/user/teamxbmc" target="_blank" title="View our Youtube Channel"><i class="fa fa-youtube"></i></a></li>
+						<li><a class="ease-all tt btn-icon" href="https://github.com/xbmc/xbmc" target="_blank" title="Source code"><i class="fa fa-github"></i></a></li>
+						<li><a class="ease-all tt btn-icon" href="https://forum.kodi.tv/syndication.php" target="_blank" title="Subscribe to Our Feed"><i class="fa fa-rss"></i></a></li>
+						<li><a class="ease-all tt" href="https://kodi.tv/contribute/donate" target="_blank" title="Donate">Donate</a></li>
+					</ul>
+				</div>
+			</div>
+	</div>
+
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+$(document).ready(function() {
+    var barwidth = $('.crumbs').outerWidth() - 80;
+    var activewidth = $('.activecrumb').outerWidth();
+    var inactive = crumbsWidth();
+    var mininactivewidth = 80;
+    inactivecount = inactive[0];
+    inactivewidth = inactive[1];
+    if (inactivewidth + activewidth > barwidth) {
+        if (inactivecount * mininactivewidth + activewidth > barwidth) {
+            activewidth = barwidth - inactivecount * mininactivewidth;
+            if (activewidth < 0) {
+                activewidth = 0;
+            }
+            $('.activecrumb').css("maxWidth", activewidth);
+        }
+        var newinactive = (barwidth - activewidth) / inactivecount;
+        $('.inactivecrumb').css("maxWidth", newinactive);
+    }
+    function crumbsWidth() {
+      var count = 0;
+      var width = 0;
+      $('.crumbs .inactivecrumb').each(function() {
+        count += 1;
+        width += $(this).outerWidth();
+      });
+      return [count, width];
+    }
+});
+</script>
+
+	<div class="scrolltotop">
+		<i class="fa fa-angle-up" aria-hidden="true"></i>
+	</div>
+</div>
+
+<div id="main-container">
+		<main>
+			<div class="container-fluid box-shadow-top" id="content">
+				<div id="wrapperindex">
+					<!-- BAM -->
+<style>
+	.bam_announcement {
+		border: 0;
+		border-radius: 0;
+		color: white;
+		font-weight: 700
+	}
+
+	.bam_announcement.yellow {
+		background: #e28d41;
+	}
+
+	.bam_announcement.green {
+		background: #16cc70;
+	}
+
+	.bam_announcement.orange {
+		background: #f58f10;
+	}
+
+	.bam_announcement.blue {
+		background: var(--color-brand);
+		color: var(--color-brand-contrast);
+	}
+
+	.bam_announcement.red {
+		background: #d9534f;
+	}
+
+	.bam_announcement.magenta {
+		background: #ff64a4;
+	}
+
+	.bam_announcement.silver {
+		background: #e9eaea;
+	}
+
+
+	.bam_date {
+		color: #636161;
+		font-size: 0.78em;
+		margin-left: 6px;
+	}	
+
+	.close_bam_announcement {
+		float:right;
+		display:inline-block;
+		padding-right: 2px;
+		padding-left: 2px;
+		margin-right: 6px;
+		font-weight: bold;
+		cursor: pointer; // KODI change
+	}
+	
+	.close_bam_announcement:hover {
+		float:right;
+		display:inline-block;
+		color:#000;
+	}
+
+	.bam_nodismiss {
+		display: none !important; 
+	}
+
+	.bam_slidedown {
+		display: none;
+	}
+
+	.bam_round {
+		-webkit-border-radius: 20px;
+		-moz-border-radius: 20px;
+		border-radius: 20px;
+	}
+	
+	.test {
+background: blue;
+border: 1px solid black;
+color: yellow;
+font-weight: bold;
+}
+</style>
+	
+	<!-- Don't remove this. Needed for handling announcement dismissals. --> 
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+		$(document).ready(function(){
+			$('.bam_slidedown').delay(100).slideDown(325);
+		});	
+		// Allow me to give credit. This was great:  https://lifeofadesigner.com/javascript/hide-dismissed-notifications-with-jquery-and-cookies
+	
+	$(document).ready(function () {
+		if (GetCookie("dismissed-notifications")) {
+			$(GetCookie("dismissed-notifications")).hide();
+		}
+		$(".dismiss-notification").click(function () {
+			var alertId = $(this).closest(".bam-unsticky").attr("id"); 
+			var dismissedNotifications = GetCookie("dismissed-notifications") + ",#" + alertId; 
+			$(this).closest(".bam-unsticky").fadeOut("slow"); 
+			SetCookie("dismissed-notifications",dismissedNotifications.replace("null,","")) //update cookie
+		});
+
+		// Same as above, but close only. Don't set a cookie. 
+		$(".bam-close-notification").click(function () {
+			var alertId = $(this).closest(".bam-unsticky").attr("id"); 
+			var dismissedNotifications = GetCookie("dismissed-notifications") + ",#" + alertId; 
+			$(this).closest(".bam-unsticky").fadeOut("slow"); 
+		});
+
+	function SetCookie(sName, sValue) {
+		// KODI adjustment - don't  use cookies if possible
+		if (typeof (Storage) !== 'undefined') {
+            var data = localStorage.setItem(sName, sValue);
+		} else {
+		  var date = new Date();
+		  date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+		  document.cookie = sName + "=" + escape(sValue) + ("; expires=" + date.toUTCString()); 
+		}
+	}
+
+	function GetCookie(sName) {
+		// KODI adjustment - don't  use cookies if possible
+		if (typeof (Storage) !== 'undefined') {
+            return localStorage.getItem(sName);
+        }
+		var aCookie = document.cookie.split("; ");
+		for (var i=0; i < aCookie.length; i++) {
+			var aCrumb = aCookie[i].split("=");
+			if (sName == aCrumb[0]) 
+				return unescape(aCrumb[1]);
+		}
+		return null;
+	}
+	});
+</script>
+<div class="bam_wrapper"><div class="bam_announcements bam_slidedown"></div></div>
+<!-- /BAM -->
+					     
+ 
+
+
+
+
+
+	<div class="row" style="padding-bottom:10px;">
+		<div class="col-md-6">
+			
+		</div>
+		<div class="col-md-6">
+			<span class="pull-right" style="margin-left:5px"></span>
+			<span class="pull-right" style="margin-left:5px">
+<form action="search.php" method="post" class="form-inline d-inline-block">
+	<input type="hidden" name="action" value="thread" />
+	<input type="hidden" name="tid" value="389074" />
+	<div class="input-group">
+	<input type="text" name="keywords" class="form-control" placeholder="Search this thread"/>
+		<span class="input-group-btn">
+<input type="submit" class="btn btn-sm btn-primary" value="Go">
+</span>
+	</div>
+</form>
+</span>
+			<span class="pull-right hidden-md hidden-sm hidden-xs"></span>
+		</div>	
+	</div>
+	<div class="panel">
+		<div class="thead-dark">
+			<span class="fname"><strong>Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo</strong></span>
+			<span class="pull-right text-right" style="padding: .4%;font-size: 15px;"><a href="usercp.php?action=addsubscription&amp;tid=389074&amp;my_post_key=9210dbb4d5df95996aa2ea20711dd587"><span class="addsubscription"><i title="Subscribe to this thread" class="tt fa fa-bell"></i></span></a></span>
+		</div>
+  		<div class="panel-body panel-no-padding" id="posts_container">
+			<div id="posts">
+				
+
+<a class="anchor" name="pid3313756" id="pid3313756"></a>
+<div class="post classic " style="" id="post_3313756">
+	<div class="post_author scaleimages">
+		
+<div class="hidden-xs author_avatar">
+<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/images/default_avatar.png" alt="" width="70" height="70" /></a>
+</div>
+
+		<div class="hidden-xs author_information col-sm-2">
+			<strong><span class="largetext"><a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1">member1</a></span></strong> 
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+			<span class="smalltext">
+				Member<br />
+				<br />
+				
+			</span>
+		</div>
+		<div class=" hidden-xs author_statistics">
+			
+	Posts: 96<br />
+<!-- Threads: 39<br /> -->
+Joined: Oct 2005
+
+<br />Reputation: 
+<a href="reputation.php?uid=1"><strong class="reputation_neutral">0</strong></a>
+
+
+
+		</div>
+		<div class="visible-xs">
+			<div style="float:left;">
+				<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/images/default_avatar.png" alt="" width="70" height="70" /></a>
+			</div>
+			<div style="float:right;">
+				<a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1">member1</a>
+				
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+				<span class="smalltext">Member</span><br />
+				<span class="smalltext">Posts: 96</span>
+			</div>
+		</div>
+	</div>
+	<div class="post_content col-sm-10" style="position:static;">
+		<div class="post_head">
+			
+<div class="float_right" style="vertical-align: top">
+<!-- IS_UNREAD --><strong><a href="showthread.php?tid=389074&amp;pid=3313756#pid3313756" class="tt" title="Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo">#1</a></strong>
+
+</div>
+
+			
+			<span class="post_date">
+				2026-10-17, 08:57 <span class="post_edit" id="edited_by_3313756"></span>
+			</span>
+			
+		</div>
+		<div class="post_body scaleimages" id="pid_3313756">
+			Kodi 21.2<br />
+<br />
+Fresh install, set up to play atmos mkv files. All working in Atmos. Did not check flac playback<br />
+<br />
+Changed to Aeon Nox. 5.1 flac playing as stereo. Atmos still good.<br />
+Advanced view in Audio missing.<br />
+Changed back to Estuary, Advanced view in Audio missing.<br />
+Navigated to logging and went in to settings by that route. Advanced view in Audio is back:-)<br />
+However 5.1 flac still playing in stereo. 5.1.2 Atmos playing on all channels.<br />
+<br />
+Log file lodged.<br />
+<br />
+<br />
+<a href="https://paste.kodi.tv/ecovenamem.kodi" target="_blank"  rel="noopener" class="mycode_url">https://paste.kodi.tv/ecovenamem.kodi</a><br />
+<br />
+Thanks in advance.
+		</div>
+    
+		
+		<div class="post_meta" id="post_meta_3313756">
+			
+<div class="rin-qc" style="display: none;" id="qr_pid_3313756"><span>Reply</span></div>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+	$(document).ready(function() {
+		quick_quote(3313756,'member1',1792220262);
+	});
+</script>
+
+		</div>
+	</div>
+	<div style="" id="tyl_3313756">
+		
+	</div>
+	<div class="post_controls">
+		<div class="postbit_buttons author_buttons float_left">
+				
+<a href="search.php?action=finduser&amp;uid=1" title="Find all posts by this user" class="tt postbit_find"><span>Find</span></a>
+
+		</div>
+		<div class="postbit_buttons post_management_buttons float_right">
+			
+<a href="newreply.php?tid=389074" title="Reply" class="tt postbit_quote postbit_mirage"><span>Reply</span></a>
+
+		</div>
+	</div>
+	<div id="edit_post_3313756_popup" class="popup_menu1" style="display: none;">
+		<div class="popup_item_container">
+			<a href="javascript:;" class="popup_item quick_edit_button" id="quick_edit_post_3313756">Quick Edit</a>
+		</div>
+		<div class="popup_item_container">
+			<a href="editpost.php?pid=3313756" class="popup_item">Full Edit</a>
+		</div>
+	</div>   
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+// <!--
+	if(use_xmlhttprequest == "1")
+	{
+		$("#edit_post_3313756").popupMenu();
+	}
+// -->
+</script>
+</div>
+
+
+<a class="anchor" name="pid3313765" id="pid3313765"></a>
+<div class="post classic " style="" id="post_3313765">
+	<div class="post_author scaleimages">
+		
+<div class="hidden-xs author_avatar">
+<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/images/default_avatar.png" alt="" width="70" height="70" /></a>
+</div>
+
+		<div class="hidden-xs author_information col-sm-2">
+			<strong><span class="largetext"><a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1">member2</a></span></strong> 
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+			<span class="smalltext">
+				Fan<br />
+				<br />
+				
+			</span>
+		</div>
+		<div class=" hidden-xs author_statistics">
+			
+	Posts: 637<br />
+<!-- Threads: 9<br /> -->
+Joined: Apr 2015
+
+<br />Reputation: 
+<a href="reputation.php?uid=1"><strong class="reputation_positive">59</strong></a>
+
+
+
+		</div>
+		<div class="visible-xs">
+			<div style="float:left;">
+				<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/images/default_avatar.png" alt="" width="70" height="70" /></a>
+			</div>
+			<div style="float:right;">
+				<a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1">member2</a>
+				
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+				<span class="smalltext">Fan</span><br />
+				<span class="smalltext">Posts: 637</span>
+			</div>
+		</div>
+	</div>
+	<div class="post_content col-sm-10" style="position:static;">
+		<div class="post_head">
+			
+<div class="float_right" style="vertical-align: top">
+<!-- IS_UNREAD --><strong><a href="showthread.php?tid=389074&amp;pid=3313765#pid3313765" class="tt" title="RE: Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo">#2</a></strong>
+
+</div>
+
+			
+			<span class="post_date">
+				2026-10-17, 11:04 <span class="post_edit" id="edited_by_3313765"></span>
+			</span>
+			
+		</div>
+		<div class="post_body scaleimages" id="pid_3313765">
+			FLAC cannot be bitstreamed, so Kodi is probably converting it to PCM stereo.<br />
+<br />
+You could try setting the number of channels in the audio configuration to 2.0 (don't ask me why <img src="https://forum.kodi.tv/images/smilies/smile.png" alt="Smile" title="Smile" class="smilie smilie_1" />) and then enable Dolby digital (AC3) transcoding under passthrough.
+		</div>
+    
+		
+		<div class="post_meta" id="post_meta_3313765">
+			
+<div class="rin-qc" style="display: none;" id="qr_pid_3313765"><span>Reply</span></div>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+	$(document).ready(function() {
+		quick_quote(3313765,'member2',1792227887);
+	});
+</script>
+
+		</div>
+	</div>
+	<div style="" id="tyl_3313765">
+		
+	</div>
+	<div class="post_controls">
+		<div class="postbit_buttons author_buttons float_left">
+				
+<a href="search.php?action=finduser&amp;uid=1" title="Find all posts by this user" class="tt postbit_find"><span>Find</span></a>
+
+		</div>
+		<div class="postbit_buttons post_management_buttons float_right">
+			
+<a href="newreply.php?tid=389074" title="Reply" class="tt postbit_quote postbit_mirage"><span>Reply</span></a>
+
+		</div>
+	</div>
+	<div id="edit_post_3313765_popup" class="popup_menu1" style="display: none;">
+		<div class="popup_item_container">
+			<a href="javascript:;" class="popup_item quick_edit_button" id="quick_edit_post_3313765">Quick Edit</a>
+		</div>
+		<div class="popup_item_container">
+			<a href="editpost.php?pid=3313765" class="popup_item">Full Edit</a>
+		</div>
+	</div>   
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+// <!--
+	if(use_xmlhttprequest == "1")
+	{
+		$("#edit_post_3313765").popupMenu();
+	}
+// -->
+</script>
+</div>
+
+
+<a class="anchor" name="pid3313777" id="pid3313777"></a>
+<div class="post classic " style="" id="post_3313777">
+	<div class="post_author scaleimages">
+		
+<div class="hidden-xs author_avatar">
+<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/images/default_avatar.png" alt="" width="70" height="70" /></a>
+</div>
+
+		<div class="hidden-xs author_information col-sm-2">
+			<strong><span class="largetext"><a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1">member1</a></span></strong> 
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+			<span class="smalltext">
+				Member<br />
+				<br />
+				
+			</span>
+		</div>
+		<div class=" hidden-xs author_statistics">
+			
+	Posts: 96<br />
+<!-- Threads: 39<br /> -->
+Joined: Oct 2005
+
+<br />Reputation: 
+<a href="reputation.php?uid=1"><strong class="reputation_neutral">0</strong></a>
+
+
+
+		</div>
+		<div class="visible-xs">
+			<div style="float:left;">
+				<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/images/default_avatar.png" alt="" width="70" height="70" /></a>
+			</div>
+			<div style="float:right;">
+				<a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1">member1</a>
+				
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+				<span class="smalltext">Member</span><br />
+				<span class="smalltext">Posts: 96</span>
+			</div>
+		</div>
+	</div>
+	<div class="post_content col-sm-10" style="position:static;">
+		<div class="post_head">
+			
+<div class="float_right" style="vertical-align: top">
+<!-- IS_UNREAD --><strong><a href="showthread.php?tid=389074&amp;pid=3313777#pid3313777" class="tt" title="RE: Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo">#3</a></strong>
+
+</div>
+
+			
+			<span class="post_date">
+				2026-10-17, 12:21 <span class="post_edit" id="edited_by_3313777"></span>
+			</span>
+			
+		</div>
+		<div class="post_body scaleimages" id="pid_3313777">
+			I would have thought that after unflaccing the compressed file PCM is what you get.
+		</div>
+    
+		
+		<div class="post_meta" id="post_meta_3313777">
+			
+<div class="rin-qc" style="display: none;" id="qr_pid_3313777"><span>Reply</span></div>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+	$(document).ready(function() {
+		quick_quote(3313777,'member1',1792232516);
+	});
+</script>
+
+		</div>
+	</div>
+	<div style="" id="tyl_3313777">
+		
+	</div>
+	<div class="post_controls">
+		<div class="postbit_buttons author_buttons float_left">
+				
+<a href="search.php?action=finduser&amp;uid=1" title="Find all posts by this user" class="tt postbit_find"><span>Find</span></a>
+
+		</div>
+		<div class="postbit_buttons post_management_buttons float_right">
+			
+<a href="newreply.php?tid=389074" title="Reply" class="tt postbit_quote postbit_mirage"><span>Reply</span></a>
+
+		</div>
+	</div>
+	<div id="edit_post_3313777_popup" class="popup_menu1" style="display: none;">
+		<div class="popup_item_container">
+			<a href="javascript:;" class="popup_item quick_edit_button" id="quick_edit_post_3313777">Quick Edit</a>
+		</div>
+		<div class="popup_item_container">
+			<a href="editpost.php?pid=3313777" class="popup_item">Full Edit</a>
+		</div>
+	</div>   
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+// <!--
+	if(use_xmlhttprequest == "1")
+	{
+		$("#edit_post_3313777").popupMenu();
+	}
+// -->
+</script>
+</div>
+
+
+<a class="anchor" name="pid3313801" id="pid3313801"></a>
+<div class="post classic " style="" id="post_3313801">
+	<div class="post_author scaleimages">
+		
+<div class="hidden-xs author_avatar">
+<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/uploads/avatars/avatar_1.jpg?dateline=1458749697" alt="" width="56" height="70" /></a>
+</div>
+
+		<div class="hidden-xs author_information col-sm-2">
+			<strong><span class="largetext"><a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1"><strong>member3</strong></a></span></strong> 
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+			<span class="smalltext">
+				Team-Kodi Developer<br />
+				
+				
+			</span>
+		</div>
+		<div class=" hidden-xs author_statistics">
+			
+	Posts: 23,823<br />
+<!-- Threads: 17<br /> -->
+Joined: Aug 2011
+
+<br />Reputation: 
+<a href="reputation.php?uid=1"><strong class="reputation_positive">1,145</strong></a>
+
+
+
+		</div>
+		<div class="visible-xs">
+			<div style="float:left;">
+				<a href="member.php?action=profile&amp;uid=1"><img src="https://forum.kodi.tv/uploads/avatars/avatar_1.jpg?dateline=1458749697" alt="" width="56" height="70" /></a>
+			</div>
+			<div style="float:right;">
+				<a href="https://forum.kodi.tv/member.php?action=profile&amp;uid=1"><strong>member3</strong></a>
+				
+<span class="buddy_offline" title="Offline"><i class="fa fa-user"></i></span>
+<br />
+				<span class="smalltext">Team-Kodi Developer</span><br />
+				<span class="smalltext">Posts: 23,823</span>
+			</div>
+		</div>
+	</div>
+	<div class="post_content col-sm-10" style="position:static;">
+		<div class="post_head">
+			
+<div class="float_right" style="vertical-align: top">
+<!-- IS_UNREAD --><strong><a href="showthread.php?tid=389074&amp;pid=3313801#pid3313801" class="tt" title="RE: Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo">#4</a></strong>
+
+</div>
+
+			
+			<span class="post_date">
+				2026-10-17, 15:56 <span class="post_edit" id="edited_by_3313801"></span>
+			</span>
+			
+		</div>
+		<div class="post_body scaleimages" id="pid_3313801">
+			For PCM playback, you need to configure the amount of speakers in kodi's gui to the proper layout, while bitstream does not care about that setting. Kodi will decode multi-channel flac to float and output it as PCM format, but i will adjust to the configuration you gave it. Some device (AVR, etc.) cannot cope with multi channel PCM, for those the above mentioned AC3 Transcode path is the workaround.
+		</div>
+    
+		
+<div class="signature scaleimages">(signature)</div>
+</div>
+
+		<div class="post_meta" id="post_meta_3313801">
+			
+<div class="rin-qc" style="display: none;" id="qr_pid_3313801"><span>Reply</span></div>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+	$(document).ready(function() {
+		quick_quote(3313801,'member3',1792245388);
+	});
+</script>
+
+		</div>
+	</div>
+	<div style="" id="tyl_3313801">
+		
+	</div>
+	<div class="post_controls">
+		<div class="postbit_buttons author_buttons float_left">
+				
+<a href="http://github.com/member3" target="_blank" rel="noopener" title="Visit this user's website" class="tt postbit_website hidden-xs"><span>Website</span></a>
+
+<a href="search.php?action=finduser&amp;uid=1" title="Find all posts by this user" class="tt postbit_find"><span>Find</span></a>
+
+		</div>
+		<div class="postbit_buttons post_management_buttons float_right">
+			
+<a href="newreply.php?tid=389074" title="Reply" class="tt postbit_quote postbit_mirage"><span>Reply</span></a>
+
+		</div>
+	</div>
+	<div id="edit_post_3313801_popup" class="popup_menu1" style="display: none;">
+		<div class="popup_item_container">
+			<a href="javascript:;" class="popup_item quick_edit_button" id="quick_edit_post_3313801">Quick Edit</a>
+		</div>
+		<div class="popup_item_container">
+			<a href="editpost.php?pid=3313801" class="popup_item">Full Edit</a>
+		</div>
+	</div>   
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+// <!--
+	if(use_xmlhttprequest == "1")
+	{
+		$("#edit_post_3313801").popupMenu();
+	}
+// -->
+</script>
+</div>
+
+			</div>
+		</div>
+	</div>
+	</div>
+	<div class="row" style="padding-bottom:10px">
+		<div class="col-md-6">
+			
+		</div>
+		<div class="col-md-6">
+			<span class="pull-right" style="margin-left:5px"></span>
+			<span class="pull-right" style="margin-left:5px">
+<form action="search.php" method="post" class="form-inline d-inline-block">
+	<input type="hidden" name="action" value="thread" />
+	<input type="hidden" name="tid" value="389074" />
+	<div class="input-group">
+	<input type="text" name="keywords" class="form-control" placeholder="Search this thread"/>
+		<span class="input-group-btn">
+<input type="submit" class="btn btn-sm btn-primary" value="Go">
+</span>
+	</div>
+</form>
+</span>
+			<span class="pull-right"></span>
+		</div>	
+	</div>
+
+	<div class="float_left">
+	   
+	</div>
+	<br class="clear" />
+	
+	
+	
+
+	<div class="row my_top my_bottom">
+	<div class="col-md-6">
+		<ul class="thread_tools">
+			
+<li class="printable"><a href="printthread.php?tid=389074">View a Printable Version</a></li>
+
+			
+			<li class="subscription_add"><a href="usercp.php?action=addsubscription&amp;tid=389074&amp;my_post_key=9210dbb4d5df95996aa2ea20711dd587">Subscribe to this thread</a></li>
+			
+		</ul>
+	</div>
+	<div class="col-md-6 text-right">
+		
+		
+	</div>
+	</div>
+
+	
+	
+     </div>
+   </div>
+</main>
+
+<div class="contacts">
+	<div class="row">
+		<div class="col-sm-12 columns">
+			<div class="row padding-top">
+				<div class="col-sm-3 columns">
+					<a href="https://forum.kodi.tv/index.php"><i class="fa fa-home"></i> Home</a>
+				</div>
+				<div class="col-sm-3 columns">
+					<a href="https://forum.kodi.tv/search.php"><i class="fa fa-search"></i> Search</a>
+				</div>
+				<div class="col-sm-3 columns">
+					<a href="https://forum.kodi.tv/misc.php?action=help"><i class="fa fa-support"></i> Help</a>
+				</div>
+				<div class="col-sm-3 columns">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="tfoot" style="margin:0; padding: 10px;">
+	<span class="smalltext">
+		<a class="btn btn-xs" href="member.php?action=logout&amp;logoutkey=" title="Logout"><i class="fa fa-power-off flinks"></i> Logout</a>
+		<a class="btn btn-xs" href="misc.php?action=markread" title="Mark Read"><i class="fa fa-check-square flinks"></i> Mark Read</a>
+		
+<a class="btn btn-xs" href="showteam.php" title=""><i class="fa fa-font-awesome flinks"></i> Team</a>
+
+		<a class="btn btn-xs" href="stats.php" title=""><i class="fa fa-bar-chart flinks"></i> Forum Stats</a>
+		<a class="btn btn-xs" href="https://forum.kodi.tv/memberlist.php" title="Members"><i class="fa fa-users"></i> Members</a>
+		<a class="btn btn-xs" href="https://forum.kodi.tv/misc.php?action=help" title="Help"><i class="fa fa-support"></i> Help</a>
+	</span>
+</div>
+
+<footer class="footer">
+	<div class="overlay">
+		<div class="footerlinks">
+			<div class="footer-left">
+				<h3><img src="https://forum.kodi.tv/kodi/theme/images/logo.png" alt="Kodi Logo" style="height: 50px;" /></h3>
+				<p class="footer-links">
+					<a href="https://kodi.tv/about/" target="_blank" rel="noopener" title="About Us">About Us</a> | 
+					<a href="https://kodi.tv/about/contact/" target="_blank" rel="noopener" title="Contact Us">Contact Us</a> | 
+                    <a href="https://kodi.tv/about/privacy-policy/" target="_blank" rel="noopener" title="Privacy">Privacy</a>
+				</p>
+				<div class="footer-icons">
+					<ul>
+						<li><a class="ease-all tt" href="https://www.facebook.com/XBMC/" target="_blank" rel="noopener" title="Like Our Page on Facebook"><i class="fa fa-facebook"></i></a></li>
+						<li><a class="ease-all tt" href="https://twitter.com/KodiTV" target="_blank" rel="noopener" title="Follow us on Twitter"><i class="fa fa-twitter"></i></a></li>
+						<li><a class="ease-all tt" href="https://www.youtube.com/user/teamxbmc" target="_blank" rel="noopener" title="View our Youtube Channel"><i class="fa fa-youtube"></i></a></li>
+						<li><a class="ease-all tt" href="https://github.com/xbmc/xbmc" target="_blank" rel="noopener" title="Source code"><i class="fa fa-github"></i></a></li>
+						<li><a class="ease-all tt" href="https://forum.kodi.tv/syndication.php" target="_blank" title="Subscribe to Our Feed"><i class="fa fa-rss"></i></a></li>
+						<li><a class="ease-all tt donate" href="https://kodi.tv/contribute/donate" target="_blank" rel="noopener" title="Donate">Donate</a></li>
+					</ul>
+				</div>
+				
+				<p class="footer-company-name">Theme by Mishar DESIGN, modded by Team Kodi<br/>
+				© 2026 Kodi Foundation<br/>
+				<!-- MyBB is free software developed and maintained by a volunteer community.
+					It would be much appreciated by the MyBB Group if you left the full copyright and "powered by" notice intact,
+					to show your support for MyBB.  If you choose to remove or modify the copyright below,
+					you may be refused support on the MyBB Community Forums.
+
+					This is free software, support us and we'll support you. -->
+				Powered By <a href="https://mybb.com" target="_blank" rel="noopener">MyBB</a>, &copy; 2002-2026 <a href="https://mybb.com" target="_blank" rel="noopener">MyBB Group</a>.
+				<!-- End powered by -->
+				</p>
+			</div>
+
+			<div class="footer-center">
+				<h3>Quick Links</h3>
+				<ul>
+					<li><a href="https://forum.kodi.tv/search.php?action=getnew">View New Posts</a></li>
+					<li><a href="https://forum.kodi.tv/archive/index.php?thread-389074.html">Lite (Archive) Mode</a></li>
+					<li><a href="https://kodi.wiki/view/Forum%20rules" rel="noopener">Forum Rules</a></li>
+				</ul>
+			</div>
+			<div class="footer-sponsor">
+				<h3>Sponsors</h3>
+				<ul>
+					<li><a href="https://www.acquia.com/" rel="noopener">Acquia</a></li>
+					<li><a href="http://www.bytemark.co.uk/r/xbmc" rel="noopener">Bytemark</a></li>
+					<li><a href="http://www.flirc.tv/" rel="noopener">FLIRC</a></li>
+				</ul>
+			</div>
+			<div class="footer-right">
+				<h3>About Kodi</h3>
+				<p class="footer-company-about">Kodi is a free and open source media player application developed by the XBMC Foundation, a non-profit technology consortium.<br><br>Kodi is available for multiple operating-systems and hardware platforms, featuring a 10-foot user interface for use with televisions and remote controls. It allows users to play and view most videos, music, podcasts, and other digital media files from local and network storage media and the internet.</p>
+			</div>
+		</div>
+	</div>
+</footer>
+
+<div class="footer-bottom">
+	<ul class="footer-menu">
+		<li class="menu-item"><a href="https://kodi.tv/about/" target="_blank" rel="noopener" title="About Us">About Us</a></li>
+		<li class="menu-item"><a href="https://kodi.tv/about/contact/" target="_blank" rel="noopener" title="Contact Us">Contact Us</a></li>
+		<li class="menu-item"><a href="https://kodi.tv/about/privacy-policy/" target="_blank" rel="noopener" title="Privacy">Privacy</a></li>
+	</ul>
+</div>
+
+<!-- The following piece of code allows MyBB to run scheduled tasks. DO NOT REMOVE -->
+<!--img src="https://forum.kodi.tv/task.php" width="1" height="1" alt=""-->
+<!-- End task image code --><!-- UNREADPOSTS_CSS --><!-- UNREADPOSTS_JS -->
+
+</div>
+
+
+<!-- MentionMe Autocomplete Scripts -->
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/Caret.js/jquery.caret.min.js"></script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/MentionMe/autocomplete.min.js"></script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+<!--
+	MentionMe.autoComplete.setup({
+		lang: {
+			instructions: 'type a user name',
+		},
+		maxLength: '20',
+		maxItems: '5',
+		minWidth: '120',
+		tid: '389074',
+		fullText: '0',
+		showAvatars: '0',
+		imageDirectory: 'https://forum.kodi.tv/kodi/theme/images',
+		lockSelection: '1',
+		defaultAvatar: 'images/default_avatar.png'
+	});
+// -->
+</script>
+<div id="mentionme_master_popup" class="mentionme_popup hidden">
+	<div class="mentionme_spinner">
+		<img src="images/spinner.gif" />
+		<span></span>
+	</div>
+	<div class="mentionme_popup_input_container">
+		<input class="mentionme_popup_input" type="text" autocomplete="off" />
+	</div>
+	<div class="mentionme_popup_body"></div>
+</div>
+
+
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+RinEditor = {
+	"Video URL:": "Video URL:",
+	"Video Type:": "Video Type:",
+	"Insert": "Insert",
+	"Description (optional):": "Description (optional):",
+	"Enter the image URL:": "Enter the image URL:",
+	"Enter URL:": "Enter URL:",
+	"Dailymotion": "Dailymotion",
+	"MetaCafe": "MetaCafe",
+	"Mixer": "Mixer",
+	"Vimeo": "Vimeo",
+	"Youtube": "Youtube",
+	"Facebook": "Facebook",
+	"LiveLeak": "LiveLeak",
+	"Twitch": "Twitch",
+	"Insert a video": "Insert a video",
+	"More": "More",
+	"Restore": "Restore",
+	"Uploading": " images are uploading...",
+	"Fail": "Failed to upload:",
+	"Wrote": "Wrote:",
+	"Quote": "Quote:"
+};
+var dropdownsmiliesurl = ["https://forum.kodi.tv/images/smilies/dont-know.png","https://forum.kodi.tv/images/smilies/sleepy.png","https://forum.kodi.tv/images/smilies/question.png","https://forum.kodi.tv/images/smilies/rotfl.png","https://forum.kodi.tv/images/smilies/angry.png","https://forum.kodi.tv/images/smilies/laugh.png","https://forum.kodi.tv/images/smilies/confused.png","https://forum.kodi.tv/images/smilies/angel.png","https://forum.kodi.tv/images/smilies/blush.png","https://forum.kodi.tv/images/smilies/smile.png","https://forum.kodi.tv/images/smilies/wink.png","https://forum.kodi.tv/images/smilies/cool.png","https://forum.kodi.tv/images/smilies/grin.png","https://forum.kodi.tv/images/smilies/razz.png","https://forum.kodi.tv/images/smilies/eyeroll.png","https://forum.kodi.tv/images/smilies/yes4lo.gif","https://forum.kodi.tv/images/smilies/frown.png","https://forum.kodi.tv/images/smilies/oo7dt.gif","https://forum.kodi.tv/images/smilies/in-love.png","https://forum.kodi.tv/images/smilies/devil.png","https://forum.kodi.tv/images/smilies/shock.png","https://forum.kodi.tv/images/smilies/frown3qg.gif","https://forum.kodi.tv/images/smilies/eek4wd.gif","https://forum.kodi.tv/images/smilies/no6xn.gif","https://forum.kodi.tv/images/smilies/nathan.png","https://forum.kodi.tv/images/smilies/music.png",],
+dropdownsmiliesdes = [":-/",":sleepy:",":huh:",":rofl:",":angry:",":laugh:",":s",":angel:",":blush:",":)",";)",":cool:",":D",":P",":rolleyes:",":nod:",":(",":oo:",":love:",":devil:",":shocked:",":stare:",":eek:",":no:",":nathan:",":music:",],
+dropdownsmiliesname = ["Undecided","Sleepy","Huh","Rofl","Angry","Laugh","Confused","Angel","Blush","Smile","Wink","Cool","Big Grin","Tongue","Rolleyes","Nod","Sad","Oo","Love","Devil","Shocked","Stare","Eek","No","Nathan","Music",],
+dropdownsmiliesurlmore = [],
+dropdownsmiliesdesmore = [],
+dropdownsmiliesnamemore = [],
+smileydirectory = 'https://forum.kodi.tv/images/smilies/',
+rinsmileysc = '0',
+rinstartupmode = 'wysiwyg',
+rinmobsms = '1',
+rinlanguage = 'en',
+rinheight = '200',
+rinrmvbut = 'Subscript,Superscript,PasteText,PasteFromWord,PHP,Font,php,code',
+extrabut = 'Inline',
+extrabutdesc = 'Syntax',
+rinautosave = 'autosave',
+rinautosavemsg = 'statusbar',
+rinvbquote = 0,
+rinskin = 'rin-kodi',
+rinimgur = '97d85ec8bfe6d5f',
+seltext = '1',
+partialmode = '0',
+rin_img_resize = '0',
+content_url = 'https://forum.kodi.tv/jscripts/rin/editor/contents.css?ver=1.2.4';
+</script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/rin/editor/rineditor.js?ver=1.2.4"></script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/rin/editor/ckeditor.js?ver=1.2.4"></script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/rin/editor/adapters/jquery.js?ver=1.2.4"></script>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/rin/editor/thread.quickquote.js?ver=1.2.4"></script>
+<link rel="stylesheet" href="https://forum.kodi.tv/jscripts/rin/editor/quickquote.css?ver=1.2.4" type="text/css" />
+
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+$('#message, #signature').ckeditor();
+
+($.fn.on || $.fn.live).call($(document), 'click', '.quick_edit_button', function () {
+	ed_id = $(this).attr('id');
+	var pid = ed_id.replace( /[^0-9]/g, '');
+	if (typeof CKEDITOR.instances['quickedit_'+pid] !== "undefined") {
+		CKEDITOR.instances['quickedit_'+pid].destroy;
+	}
+	setTimeout(function() {
+		CKEDITOR.replace( 'quickedit_'+pid );
+		if (CKEDITOR.instances['quickedit_'+pid]) {
+			setTimeout(function() {
+				CKEDITOR.instances['quickedit_'+pid].focus();
+			},1000);
+		}
+		offset = $('#quickedit_'+pid).offset().top - 60;
+		setTimeout(function() {
+			$('html, body').animate({
+				scrollTop: offset
+			}, 700);
+			setTimeout(function() {
+			  $('#pid_'+pid).find('button[type="submit"]').attr( 'id', 'quicksub_'+pid );
+			},200);
+		},200);
+	},400);
+});
+
+($.fn.on || $.fn.live).call($(document), 'click', 'button[id*="quicksub_"]', function () {
+	ed_id = $(this).attr('id');
+	var pid = ed_id.replace( /[^0-9]/g, '');
+
+	CKEDITOR.instances['quickedit_'+pid].destroy();
+});
+
+/**********************************
+ * Thread compatibility functions *
+ **********************************/
+if(typeof Thread !== 'undefined')
+{
+	var quickReplyFunc = Thread.quickReply,
+	quickReplyDoneFunc = Thread.quickReplyDone;
+	Thread.quickReply = function(e) {
+		if(typeof CKEDITOR !== 'undefined') {
+			CKEDITOR.instances['message'].updateElement();
+			$('form[id*="quick_reply_form"]').bind('reset', function() {
+				CKEDITOR.instances['message'].setData('');
+				$('#message').val('');
+			});
+		}
+
+		return quickReplyFunc.call(this, e);
+	};
+
+	Thread.quickReplyDone = function(e) {
+		if(typeof CKEDITOR !== 'undefined' && typeof automentionck === "function") {
+			setTimeout(function() {
+				if (CKEDITOR.instances['message'].mode == 'wysiwyg') {
+					$('.atwho-container').remove();
+					automentionck( $(CKEDITOR.instances['message'].document.getBody().$) );
+				}
+			},300);
+		}
+
+		return quickReplyDoneFunc.call(this, e);
+	};
+
+	Thread.multiQuotedLoaded = function(request) {
+		if(typeof CKEDITOR !== 'undefined') {
+			var json = $.parseJSON(request.responseText);
+			if(typeof json == 'object')
+			{
+				if(json.hasOwnProperty("errors"))
+				{
+					$.each(json.errors, function(i, message)
+					{
+						$.jGrowl(lang.post_fetch_error + ' ' + message);
+					});
+					return false;
+				}
+			}
+				MyBBEditor.insertText(json.message,'','','','quote');
+		}
+
+		Thread.clearMultiQuoted();
+		$('#quickreply_multiquote').hide();
+		$('#quoted_ids').val('all');
+	};
+};
+</script>
+
+	<script type="dd81a7f6beb7af56e10d4edf-text/javascript">
+		var thread_deleted = "0";
+		if(thread_deleted == "1")
+		{
+			$("#quick_reply_form, .new_reply_button, .thread_tools, .inline_rating").hide();
+			$("#moderator_options_selector option.option_mirage").attr("disabled","disabled");
+		}
+	</script>
+<div itemscope itemtype="https://schema.org/AggregateRating" style="display:none !important;"><div><span itemprop="itemReviewed">Kodi playing Atmos 5.1.2 fine, but 5.1 Flac is stereo</span><span itemprop="ratingValue"></span><span itemprop="ratingCount">0</span></div></div>
+<script type="dd81a7f6beb7af56e10d4edf-text/javascript" src="https://forum.kodi.tv/jscripts/prism.js"></script><script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="dd81a7f6beb7af56e10d4edf-|49" defer></script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a528934cbc350f63',t:'MTc5MzM0Mzk2Ng=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a528934cbc350f63',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

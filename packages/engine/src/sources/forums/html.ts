@@ -151,6 +151,9 @@ export function fromEnglishDate(text: string, now: Date): Date | null {
     const day = new Date(now.getTime() - (relative.toLowerCase() === "yesterday" ? 86_400_000 : 0));
     return at(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
   }
+  // "2026-10-17, 08:57", the numeric order one MyBB board chose.
+  const numeric = words.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\b/);
+  if (numeric) return at(Number(numeric[1]), Number(numeric[2]) - 1, Number(numeric[3]));
   // "'26" is 2026, as vBulletin 5 writes it.
   const year = (written: string) =>
     written.length === 4 ? Number(written) : 2000 + Number(written.replace("'", ""));

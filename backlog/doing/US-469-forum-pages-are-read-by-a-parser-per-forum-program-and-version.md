@@ -128,3 +128,13 @@ carry a member id or a Gravatar hash, and signatures.
   account name; no general rule reaches it and the page is not edited by
   hand. About 22 Bright Data requests used so far. 38 forum tests; root
   lint, type check and `pnpm test` (2,650) pass.
+- 2026-10-30T15:08+08:00 — MyBB read on Kodi's forum (Android support,
+  sorted by start), which Bright Data passed where MyBB's own community
+  did not. Kodi restyles MyBB into `<div>` rows; the parser keys on two
+  template markers both themes keep, the title's `id="tid_<id>"` and the
+  row's `forumdisplay_sticky`/`forumdisplay_regular`. 20 threads, 5 pinned;
+  dates are words ("2026-10-17, 08:57"), so starts are approximate and
+  `fromEnglishDate` reads year-month-day. Two category pages were captured
+  first (a category lists no threads) and removed. Scrubber: MyBB
+  `avatars/avatar_<uid>`. 42 forum tests; root lint, type check and
+  `pnpm test` (2,654) pass. About 30 Bright Data requests used.

@@ -7,6 +7,7 @@
  */
 import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
+import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
 import type { ForumProgram } from "./types.js";
@@ -25,6 +26,7 @@ export const forumPrograms: readonly ForumProgram[] = [
   vbulletin5,
   smf2,
   bbpress,
+  mybb,
 ];
 
 /** The parser for this page, or null when no parser knows it. */

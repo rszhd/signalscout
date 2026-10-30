@@ -74,7 +74,19 @@ const targets = {
     list: "https://invisioncommunity.com/forums/forum/543-help-and-support/?sortby=start_date&sortdirection=desc",
   },
   // MyBB's own community answered Bright Data with a "Please refresh to
-  // continue" challenge on 2026-10-30; another MyBB forum is needed.
+  // continue" challenge on 2026-10-30; Kodi's forum runs MyBB and passed.
+  mybb: {
+    list: "https://forum.kodi.tv/forumdisplay.php?fid=164&sortby=started&order=desc",
+    thread: (html) => {
+      // The title's span keeps its id in every theme; the row before it says
+      // whether it is pinned (forumdisplay_sticky) or not (forumdisplay_regular).
+      const span = [...html.matchAll(/id="tid_(\d+)"/g)].find((match) => {
+        const before = html.slice(Math.max(0, match.index - 3000), match.index);
+        return [...before.matchAll(/forumdisplay_(sticky|regular)/g)].pop()?.[1] === "regular";
+      });
+      return span && `https://forum.kodi.tv/showthread.php?tid=${span[1]}`;
+    },
+  },
   // Read through its JSON API, which needs no key; the section page is HTML.
   discourse: {
     format: "json",
@@ -173,6 +185,8 @@ const urlScrubs = [
   [/user-\d+\.html/g, "user-1.html"],
   [/(data-userid=")\d+/gi, "$11"],
   [/(data-vbnamecard=")\d+/g, "$11"],
+  // MyBB: uploads/avatars/avatar_<uid>.jpg.
+  [/(avatars\/avatar_)\d+/g, "$11"],
   // bbPress names a topic's author in the row's classes.
   [/\buser-id-\d+/g, "user-id-1"],
   [/(avatar\/avatar)\d+_\d+/g, "$11_1"],

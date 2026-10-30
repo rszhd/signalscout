@@ -88,5 +88,17 @@
     "capturedAt": "2026-10-30T06:59:17.776Z",
     "bytes": 187468,
     "namesScrubbed": 3
+  },
+  "mybb-list.html": {
+    "url": "https://forum.kodi.tv/forumdisplay.php?fid=164&sortby=started&order=desc",
+    "capturedAt": "2026-10-30T07:06:07.231Z",
+    "bytes": 73680,
+    "namesScrubbed": 23
+  },
+  "mybb-thread.html": {
+    "url": "https://forum.kodi.tv/showthread.php?tid=389074",
+    "capturedAt": "2026-10-30T07:06:07.236Z",
+    "bytes": 51105,
+    "namesScrubbed": 3
   }
 }

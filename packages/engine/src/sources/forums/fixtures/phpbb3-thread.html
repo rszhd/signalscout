@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-gb">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Won't boot past initramfs screen - Gentoo Forums</title>
+
+	<link rel="alternate" type="application/atom+xml" title="Feed - Gentoo Forums" href="/app.php/feed?sid=0">			<link rel="alternate" type="application/atom+xml" title="Feed - New Topics" href="/app.php/feed/topics?sid=0">		<link rel="alternate" type="application/atom+xml" title="Feed - Forum - Installing Gentoo" href="/app.php/feed/forum/14?sid=0">	<link rel="alternate" type="application/atom+xml" title="Feed - Topic - Won't boot past initramfs screen" href="/app.php/feed/topic/1178757?sid=0">	
+	<link rel="canonical" href="https://forums.gentoo.org/viewtopic.php?t=1178757">
+
+<!--
+	phpBB style name: Gentoo Light
+	Based on style:   prosilver (this is the default phpBB3 style)
+	Based on style:   Gentoo phpBB 2 (Derived from subSilver by Kyle Manna)
+	Original author:  Tom Beddard ( http://www.subBlue.com/ )
+	Modified by:      Gentoo ( https://www.gentoo.org/ )
+-->
+
+<link href="./assets/css/font-awesome.min.css?assets_version=27" rel="stylesheet">
+<link href="./styles/gentoo-20xx/theme/stylesheet.css?assets_version=27" rel="stylesheet">
+<link href="./styles/gentoo-20xx/theme/en/stylesheet.css?assets_version=27" rel="stylesheet">
+
+
+
+
+<!--[if lte IE 9]>
+	<link href="./styles/gentoo-20xx/theme/tweaks.css?assets_version=27" rel="stylesheet">
+<![endif]-->
+
+
+
+
+
+</head>
+<body id="phpbb" class="nojs notouch section-viewtopic ltr ">
+
+
+<div id="header-wide">
+	<a id="top" class="top-anchor" accesskey="t"></a>
+	<div id="page-header">
+		<div class="headerbar" role="banner">
+					<div class="inner">
+
+			<div id="site-description" class="site-description">
+		<a id="logo" class="logo" href="./index.php?sid=0" title="Board index">
+					<span class="site_logo"></span>
+				</a>
+				<span class="site-label">Forums</span>
+				<!--<h1>Gentoo Forums</h1>
+				<p>Welcome to Gentoo Forums, the mailing-list alternative.</p>-->
+				<p class="skiplink"><a href="#start_here">Skip to content</a></p>
+			</div>
+
+									
+			</div>
+					</div>
+	</div>
+</div>
+				<div class="navbar" role="navigation">
+	<div class="inner">
+
+	<div class="nav-main-wrapper">
+	<ul id="nav-main" class="nav-main linklist" role="menubar">
+
+		<li id="quick-links" class="quick-links dropdown-container responsive-menu hidden" data-skip-responsive="true">
+			<a href="#" class="dropdown-trigger">
+				<i class="icon fa-bars fa-fw" aria-hidden="true"></i><span>Quick links</span>
+			</a>
+			<div class="dropdown">
+				<div class="pointer"><div class="pointer-inner"></div></div>
+				<ul class="dropdown-contents" role="menu">
+					
+					
+										<li class="separator"></li>
+
+									</ul>
+			</div>
+		</li>
+
+				<li data-skip-responsive="true">
+			<a href="/app.php/help/faq?sid=0" rel="help" title="Frequently Asked Questions" role="menuitem">
+				<i class="icon fa-question-circle fa-fw" aria-hidden="true"></i><span>FAQ</span>
+			</a>
+		</li>
+						
+			<li class="rightside"  data-skip-responsive="true">
+			<a href="./ucp.php?mode=login&amp;redirect=viewtopic.php%3Ft%3D1178757&amp;sid=0" title="Login" accesskey="x" role="menuitem">
+				<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>Login</span>
+			</a>
+		</li>
+					<li class="rightside" data-skip-responsive="true">
+				<a href="./ucp.php?mode=register&amp;sid=0" role="menuitem">
+					<i class="icon fa-pencil-square-o  fa-fw" aria-hidden="true"></i><span>Register</span>
+				</a>
+			</li>
+						</ul>
+	</div>
+
+	<div class="nav-breadcrumbs-wrapper">
+	<ul id="nav-breadcrumbs" class="nav-breadcrumbs linklist navlinks" role="menubar">
+				
+		
+		<li class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">
+
+			
+							<span class="crumb" itemtype="https://schema.org/ListItem" itemprop="itemListElement" itemscope><a itemprop="item" href="./index.php?sid=0" accesskey="h" data-navbar-reference="index"><i class="icon fa-home fa-fw"></i><span itemprop="name">Board index</span></a><meta itemprop="position" content="1" /></span>
+
+											
+								<span class="crumb" itemtype="https://schema.org/ListItem" itemprop="itemListElement" itemscope data-forum-id="70"><a itemprop="item" href="./viewforum.php?f=70&amp;sid=0"><span itemprop="name">Assistance</span></a><meta itemprop="position" content="2" /></span>
+															
+								<span class="crumb" itemtype="https://schema.org/ListItem" itemprop="itemListElement" itemscope data-forum-id="14"><a itemprop="item" href="./viewforum.php?f=14&amp;sid=0"><span itemprop="name">Installing Gentoo</span></a><meta itemprop="position" content="3" /></span>
+							
+					</li>
+
+		
+			</ul>
+	</div>
+
+	</div>
+</div>
+
+<div id="wrap" class="wrap">
+
+	
+	<a id="start_here" class="anchor"></a>
+	<div id="page-body" class="page-body" role="main">
+		
+		
+</div> <!-- End Wrap -->
+
+<h2 class="topic-title"><a href="./viewtopic.php?t=1178757&amp;sid=0">Won't boot past initramfs screen</a></h2>
+<!-- NOTE: remove the style="display: none" when you want to have the forum description on the topic body -->
+<div style="display: none !important;">Having problems with the <a href="https://wiki.gentoo.org/wiki/Handbook:Main_Page" class="postlink">Gentoo Handbook</a>?  If you're still working your way through it, or just need some info before you start your install, this is the place.  All other questions go elsewhere.<br /></div>
+
+
+<div class="action-bar bar-top">
+	
+			<a href="./posting.php?mode=reply&amp;t=1178757&amp;sid=0" class="button" title="Post a reply">
+							<span>Post Reply</span> <i class="icon fa-reply fa-fw" aria-hidden="true"></i>
+					</a>
+	
+			
+	
+			<div class="pagination">
+			6 posts
+							&bull; Page <strong>1</strong> of <strong>1</strong>
+					</div>
+		</div>
+
+
+
+
+<div id="topic-header">
+	<div class="inner">
+		<div class="post has-profile">
+			<div class="postprofile topic-header-author">Author</div>
+				<div class="postbody topic-header-title inner">Message</div>
+			</div>
+		</div>
+	</div>
+
+			<div id="p8894441" class="post has-profile bg2">
+		<div class="inner">
+
+		<dl class="postprofile" id="profile8894441">
+			<dt class="has-profile-rank no-avatar">
+								<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member2</a>							</dt>
+
+						<dd class="profile-rank">n00b<br /><img src="./images/ranks/rank_rect_0.gif" alt="n00b" title="n00b" /></dd>			
+				<div class="avatar-container">
+																			</div>
+
+		<dd class="profile-posts"><strong>Posts:</strong> <a href="./search.php?author_id=446543&amp;sr=posts&amp;sid=0">4</a></dd>		<dd class="profile-joined"><strong>Joined:</strong> Mon Dec 15, 2025 9:03 pm</dd>		
+		
+						
+						
+		</dl>
+
+		<div class="postbody">
+						<div id="post_content8894441">
+
+					<h3 class="first">
+						<a href="./viewtopic.php?p=8894441&amp;sid=0#p8894441">Won't boot past initramfs screen</a>
+		</h3>
+
+													<ul class="post-buttons">
+																																									<li>
+							<a href="./posting.php?mode=quote&amp;p=8894441&amp;sid=0" title="Reply with quote" class="button button-icon-only">
+								<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span class="sr-only">Quote</span>
+							</a>
+						</li>
+														</ul>
+							
+						<p class="author">
+									<a class="unread" href="./viewtopic.php?p=8894441&amp;sid=0#p8894441" title="Post">
+						<i class="icon fa-file fa-fw icon-lightgray icon-md" aria-hidden="true"></i><span class="sr-only">Post</span>
+					</a>
+								<span class="responsive-hide">by <strong><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member2</a></strong> &raquo; </span><time datetime="2026-10-11T16:53:57+00:00">Sun Oct 11, 2026 4:53 pm</time>
+			</p>
+			
+			
+			
+			
+			<div class="content">I can't get past the boot screen where it says "Loading initramfs". What could the problem be? I can hit the capslock so its not a kernel panic. I tried adding 'nomodeset' to the "linux ..." directive  in 'e' of Grub. But nope!<br>
+<a href="https://www.limitsite.com/images/pics%20share/PXL_20261011_160911970.MP.jpg" class="postlink">https://www.limitsite.com/images/pics%2 ... 970.MP.jpg</a>  <img class="smilies" src="./images/smilies/icon_idea.gif" width="15" height="15" alt=":idea:" title="Idea"></div>
+
+			
+			
+									
+						
+										
+						</div>
+
+		</div>
+
+				<div class="back2top">
+						<a href="#top" class="top" title="Top">
+				<i class="icon fa-chevron-circle-up fa-fw icon-gray" aria-hidden="true"></i>
+				<span class="sr-only">Top</span>
+			</a>
+					</div>
+		
+		</div>
+	</div>
+
+				<div id="p8894452" class="post has-profile bg1">
+		<div class="inner">
+
+		<dl class="postprofile" id="profile8894452">
+			<dt class="has-profile-rank has-avatar">
+								<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member3</a>							</dt>
+
+						<dd class="profile-rank">Advocate<br /><img src="./images/ranks/rank-G-1-advocate.gif" alt="Advocate" title="Advocate" /></dd>			
+				<div class="avatar-container">
+																<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="avatar"><img class="avatar" src="./images/avatars/gallery/Star Wars/movie_star_wars_storm_trooper.gif" width="64" height="64" alt="User avatar" /></a>														</div>
+
+		<dd class="profile-posts"><strong>Posts:</strong> <a href="./search.php?author_id=422845&amp;sr=posts&amp;sid=0">2476</a></dd>		<dd class="profile-joined"><strong>Joined:</strong> Fri Sep 10, 2021 8:37 pm</dd>		
+		
+											<dd class="profile-custom-field profile-phpbb_location"><strong>Location:</strong> Richmond Hill, Canada</dd>
+							
+						
+		</dl>
+
+		<div class="postbody">
+						<div id="post_content8894452">
+
+					<h3 >
+						<a href="./viewtopic.php?p=8894452&amp;sid=0#p8894452">Re: Won't boot past initramfs screen</a>
+		</h3>
+
+													<ul class="post-buttons">
+																																									<li>
+							<a href="./posting.php?mode=quote&amp;p=8894452&amp;sid=0" title="Reply with quote" class="button button-icon-only">
+								<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span class="sr-only">Quote</span>
+							</a>
+						</li>
+														</ul>
+							
+						<p class="author">
+									<a class="unread" href="./viewtopic.php?p=8894452&amp;sid=0#p8894452" title="Post">
+						<i class="icon fa-file fa-fw icon-lightgray icon-md" aria-hidden="true"></i><span class="sr-only">Post</span>
+					</a>
+								<span class="responsive-hide">by <strong><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member3</a></strong> &raquo; </span><time datetime="2026-10-11T17:14:26+00:00">Sun Oct 11, 2026 5:14 pm</time>
+			</p>
+			
+			
+			
+			
+			<div class="content">this usually indicate a display driver issue.<br>
+<br>
+However since you believe you kernel actually booted, have you examine if network is function? or if ssh can connect and login?</div>
+
+			
+			
+									
+						
+										
+						</div>
+
+		</div>
+
+				<div class="back2top">
+						<a href="#top" class="top" title="Top">
+				<i class="icon fa-chevron-circle-up fa-fw icon-gray" aria-hidden="true"></i>
+				<span class="sr-only">Top</span>
+			</a>
+					</div>
+		
+		</div>
+	</div>
+
+				<div id="p8894455" class="post has-profile bg2">
+		<div class="inner">
+
+		<dl class="postprofile" id="profile8894455">
+			<dt class="has-profile-rank no-avatar">
+								<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member2</a>							</dt>
+
+						<dd class="profile-rank">n00b<br /><img src="./images/ranks/rank_rect_0.gif" alt="n00b" title="n00b" /></dd>			
+				<div class="avatar-container">
+																			</div>
+
+		<dd class="profile-posts"><strong>Posts:</strong> <a href="./search.php?author_id=446543&amp;sr=posts&amp;sid=0">4</a></dd>		<dd class="profile-joined"><strong>Joined:</strong> Mon Dec 15, 2025 9:03 pm</dd>		
+		
+						
+						
+		</dl>
+
+		<div class="postbody">
+						<div id="post_content8894455">
+
+					<h3 >
+						<a href="./viewtopic.php?p=8894455&amp;sid=0#p8894455">Re: Won't boot past initramfs screen</a>
+		</h3>
+
+													<ul class="post-buttons">
+																																									<li>
+							<a href="./posting.php?mode=quote&amp;p=8894455&amp;sid=0" title="Reply with quote" class="button button-icon-only">
+								<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span class="sr-only">Quote</span>
+							</a>
+						</li>
+														</ul>
+							
+						<p class="author">
+									<a class="unread" href="./viewtopic.php?p=8894455&amp;sid=0#p8894455" title="Post">
+						<i class="icon fa-file fa-fw icon-lightgray icon-md" aria-hidden="true"></i><span class="sr-only">Post</span>
+					</a>
+								<span class="responsive-hide">by <strong><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member2</a></strong> &raquo; </span><time datetime="2026-10-11T17:32:07+00:00">Sun Oct 11, 2026 5:32 pm</time>
+			</p>
+			
+			
+			
+			
+			<div class="content"><blockquote cite="./viewtopic.php?p=8894452&amp;sid=0#p8894452"><div><cite><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0">member3</a> wrote: <a href="./viewtopic.php?p=8894452&amp;sid=0#p8894452" aria-label="View quoted post" data-post-id="8894452" onclick="if(document.getElementById(hash.substr(1)))href=hash"><i class="icon fa-arrow-circle-up fa-fw" aria-hidden="true"></i></a><span class="responsive-hide">Sun Oct 11, 2026 5:14 pm</span></cite>
+this usually indicate a display driver issue.<br>
+<br>
+However since you believe you kernel actually booted, have you examine if network is function? or if ssh can connect and login?
+</div></blockquote>
+
+hi. nope, i have  a laptop with wireless, but its not configured to connect to anything at boot. I have to use X windows, like the Gentoo LiveUSB, to access the network widget.</div>
+
+			
+			
+									
+						
+										
+						</div>
+
+		</div>
+
+				<div class="back2top">
+						<a href="#top" class="top" title="Top">
+				<i class="icon fa-chevron-circle-up fa-fw icon-gray" aria-hidden="true"></i>
+				<span class="sr-only">Top</span>
+			</a>
+					</div>
+		
+		</div>
+	</div>
+
+				<div id="p8894456" class="post has-profile bg1">
+		<div class="inner">
+
+		<dl class="postprofile" id="profile8894456">
+			<dt class="has-profile-rank has-avatar">
+								<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member3</a>							</dt>
+
+						<dd class="profile-rank">Advocate<br /><img src="./images/ranks/rank-G-1-advocate.gif" alt="Advocate" title="Advocate" /></dd>			
+				<div class="avatar-container">
+																<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="avatar"><img class="avatar" src="./images/avatars/gallery/Star Wars/movie_star_wars_storm_trooper.gif" width="64" height="64" alt="User avatar" /></a>														</div>
+
+		<dd class="profile-posts"><strong>Posts:</strong> <a href="./search.php?author_id=422845&amp;sr=posts&amp;sid=0">2476</a></dd>		<dd class="profile-joined"><strong>Joined:</strong> Fri Sep 10, 2021 8:37 pm</dd>		
+		
+											<dd class="profile-custom-field profile-phpbb_location"><strong>Location:</strong> Richmond Hill, Canada</dd>
+							
+						
+		</dl>
+
+		<div class="postbody">
+						<div id="post_content8894456">
+
+					<h3 >
+						<a href="./viewtopic.php?p=8894456&amp;sid=0#p8894456">Re: Won't boot past initramfs screen</a>
+		</h3>
+
+													<ul class="post-buttons">
+																																									<li>
+							<a href="./posting.php?mode=quote&amp;p=8894456&amp;sid=0" title="Reply with quote" class="button button-icon-only">
+								<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span class="sr-only">Quote</span>
+							</a>
+						</li>
+														</ul>
+							
+						<p class="author">
+									<a class="unread" href="./viewtopic.php?p=8894456&amp;sid=0#p8894456" title="Post">
+						<i class="icon fa-file fa-fw icon-lightgray icon-md" aria-hidden="true"></i><span class="sr-only">Post</span>
+					</a>
+								<span class="responsive-hide">by <strong><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member3</a></strong> &raquo; </span><time datetime="2026-10-11T17:45:40+00:00">Sun Oct 11, 2026 5:45 pm</time>
+			</p>
+			
+			
+			
+			
+			<div class="content"><blockquote cite="./viewtopic.php?p=8894455&amp;sid=0#p8894455"><div><cite><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0">member2</a> wrote: <a href="./viewtopic.php?p=8894455&amp;sid=0#p8894455" aria-label="View quoted post" data-post-id="8894455" onclick="if(document.getElementById(hash.substr(1)))href=hash"><i class="icon fa-arrow-circle-up fa-fw" aria-hidden="true"></i></a><span class="responsive-hide">Sun Oct 11, 2026 5:32 pm</span></cite>
+<blockquote cite="./viewtopic.php?p=8894452&amp;sid=0#p8894452"><div><cite><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0">member3</a> wrote: <a href="./viewtopic.php?p=8894452&amp;sid=0#p8894452" aria-label="View quoted post" data-post-id="8894452" onclick="if(document.getElementById(hash.substr(1)))href=hash"><i class="icon fa-arrow-circle-up fa-fw" aria-hidden="true"></i></a><span class="responsive-hide">Sun Oct 11, 2026 5:14 pm</span></cite>
+this usually indicate a display driver issue.<br>
+<br>
+However since you believe you kernel actually booted, have you examine if network is function? or if ssh can connect and login?
+</div></blockquote>
+
+hi. nope, i have  a laptop with wireless, but its not configured to connect to anything at boot. I have to use X windows, like the Gentoo LiveUSB, to access the network widget.
+</div></blockquote>
+
+So I presume under Gentoo LiveUSB you can have working display system. I am no expert on display system work but I suggest you boot up with Gentoo LiveUSB and chroot in to your gentoo on storage then share your .config file and do a <div class="codebox"><p>Code: <a href="#" onclick="selectCode(this); return false;">Select all</a></p><pre><code>lspci -nnk</code></pre></div> share the output, I am sure some other will be able to base on that to give you further instructions on what else need to be done.</div>
+
+			
+			
+									
+						
+										
+						</div>
+
+		</div>
+
+				<div class="back2top">
+						<a href="#top" class="top" title="Top">
+				<i class="icon fa-chevron-circle-up fa-fw icon-gray" aria-hidden="true"></i>
+				<span class="sr-only">Top</span>
+			</a>
+					</div>
+		
+		</div>
+	</div>
+
+				<div id="p8894464" class="post has-profile bg2">
+		<div class="inner">
+
+		<dl class="postprofile" id="profile8894464">
+			<dt class="has-profile-rank no-avatar">
+								<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" style="color: #ff6633;" class="username-coloured">member1</a>							</dt>
+
+						<dd class="profile-rank">Administrator<br /><img src="./images/ranks/rank-admin.gif" alt="Administrator" title="Administrator" /></dd>			
+				<div class="avatar-container">
+																			</div>
+
+		<dd class="profile-posts"><strong>Posts:</strong> <a href="./search.php?author_id=149344&amp;sr=posts&amp;sid=0">7139</a></dd>		<dd class="profile-joined"><strong>Joined:</strong> Tue Oct 17, 2006 5:11 pm</dd>		
+		
+											<dd class="profile-custom-field profile-phpbb_location"><strong>Location:</strong> Bavaria</dd>
+							
+						
+		</dl>
+
+		<div class="postbody">
+						<div id="post_content8894464">
+
+					<h3 >
+						<a href="./viewtopic.php?p=8894464&amp;sid=0#p8894464">Re: Won't boot past initramfs screen</a>
+		</h3>
+
+													<ul class="post-buttons">
+																																									<li>
+							<a href="./posting.php?mode=quote&amp;p=8894464&amp;sid=0" title="Reply with quote" class="button button-icon-only">
+								<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span class="sr-only">Quote</span>
+							</a>
+						</li>
+														</ul>
+							
+						<p class="author">
+									<a class="unread" href="./viewtopic.php?p=8894464&amp;sid=0#p8894464" title="Post">
+						<i class="icon fa-file fa-fw icon-lightgray icon-md" aria-hidden="true"></i><span class="sr-only">Post</span>
+					</a>
+								<span class="responsive-hide">by <strong><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" style="color: #ff6633;" class="username-coloured">member1</a></strong> &raquo; </span><time datetime="2026-10-11T18:20:25+00:00">Sun Oct 11, 2026 6:20 pm</time>
+			</p>
+			
+			
+			
+			
+			<div class="content"><blockquote cite="./viewtopic.php?p=8894441&amp;sid=0#p8894441"><div><cite><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0">member2</a> wrote: <a href="./viewtopic.php?p=8894441&amp;sid=0#p8894441" aria-label="View quoted post" data-post-id="8894441" onclick="if(document.getElementById(hash.substr(1)))href=hash"><i class="icon fa-arrow-circle-up fa-fw" aria-hidden="true"></i></a><span class="responsive-hide">Sun Oct 11, 2026 4:53 pm</span></cite>
+I can't get past the boot screen where it says "Loading initramfs". What could the problem be? 
+</div></blockquote>
+Do you use a manually configered kernel?<br>
+If yes, please check this:<br>
+<a href="https://wiki.gentoo.org/wiki/User:member1/Tutorials/Manual_Configuring_Kernel_Version_6.18#Framebuffer_Device_and_Console" class="postlink">https://wiki.gentoo.org/wiki/User:member1 ... nd_Console</a></div>
+
+			
+			
+									
+						
+							<div id="sig8894464" class="signature">(signature)</div>			
+						</div>
+
+		</div>
+
+				<div class="back2top">
+						<a href="#top" class="top" title="Top">
+				<i class="icon fa-chevron-circle-up fa-fw icon-gray" aria-hidden="true"></i>
+				<span class="sr-only">Top</span>
+			</a>
+					</div>
+		
+		</div>
+	</div>
+
+				<div id="p8895367" class="post has-profile bg1">
+		<div class="inner">
+
+		<dl class="postprofile" id="profile8895367">
+			<dt class="has-profile-rank has-avatar">
+								<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member4</a>							</dt>
+
+						<dd class="profile-rank">n00b<br /><img src="./images/ranks/rank_rect_0.gif" alt="n00b" title="n00b" /></dd>			
+				<div class="avatar-container">
+																<a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="avatar"><img class="avatar" src="./download/file.php?avatar=1_1.jpeg" width="720" height="720" alt="User avatar" /></a>														</div>
+
+		<dd class="profile-posts"><strong>Posts:</strong> <a href="./search.php?author_id=452402&amp;sr=posts&amp;sid=0">4</a></dd>		<dd class="profile-joined"><strong>Joined:</strong> Mon Oct 19, 2026 7:28 pm</dd>		
+		
+						
+						
+		</dl>
+
+		<div class="postbody">
+						<div id="post_content8895367">
+
+					<h3 >
+						<a href="./viewtopic.php?p=8895367&amp;sid=0#p8895367">Re: Won't boot past initramfs screen</a>
+		</h3>
+
+													<ul class="post-buttons">
+																																									<li>
+							<a href="./posting.php?mode=quote&amp;p=8895367&amp;sid=0" title="Reply with quote" class="button button-icon-only">
+								<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span class="sr-only">Quote</span>
+							</a>
+						</li>
+														</ul>
+							
+						<p class="author">
+									<a class="unread" href="./viewtopic.php?p=8895367&amp;sid=0#p8895367" title="Post">
+						<i class="icon fa-file fa-fw icon-lightgray icon-md" aria-hidden="true"></i><span class="sr-only">Post</span>
+					</a>
+								<span class="responsive-hide">by <strong><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0" class="username">member4</a></strong> &raquo; </span><time datetime="2026-10-29T01:12:33+00:00">Thu Oct 29, 2026 1:12 am</time>
+			</p>
+			
+			
+			
+			
+			<div class="content"><blockquote cite="./viewtopic.php?p=8894441&amp;sid=0#p8894441"><div><cite><a href="./memberlist.php?mode=viewprofile&amp;u=1&amp;sid=0">member2</a> wrote: <a href="./viewtopic.php?p=8894441&amp;sid=0#p8894441" aria-label="View quoted post" data-post-id="8894441" onclick="if(document.getElementById(hash.substr(1)))href=hash"><i class="icon fa-arrow-circle-up fa-fw" aria-hidden="true"></i></a><span class="responsive-hide">Sun Oct 11, 2026 4:53 pm</span></cite>
+I can't get past the boot screen where it says "Loading initramfs". What could the problem be? I can hit the capslock so its not a kernel panic. I tried adding 'nomodeset' to the "linux ..." directive  in 'e' of Grub. But nope!<br>
+<a href="https://www.limitsite.com/images/pics%20share/PXL_20261011_160911970.MP.jpg" class="postlink">https://www.limitsite.com/images/pics%2 ... 970.MP.jpg</a>  <img class="smilies" src="./images/smilies/icon_idea.gif" width="15" height="15" alt=":idea:" title="Idea">
+</div></blockquote>
+
+How did you generate your initramfs? Does the LiveGUI work if you use nomodeset with it?<br>
+<br>
+If you use dracut (especially with full disk encryption), then a common issue is that you forgot to add your GPU driver kernel module into dracut's add_drivers, e.g.
+<div class="codebox"><p>Code: <a href="#" onclick="selectCode(this); return false;">Select all</a></p><pre><code>add_drivers+=" i915 "</code></pre></div>
+(i915 is for intel GPUs, check your lsmod output and figure out which module you need, then regenerate your initramfs.)<br>
+Dracut's documentation is a bit confusing, so I ran into the same issue before.</div>
+
+			
+			
+									
+						
+							<div id="sig8895367" class="signature">(signature)</div>			
+						</div>
+
+		</div>
+
+				<div class="back2top">
+						<a href="#top" class="top" title="Top">
+				<i class="icon fa-chevron-circle-up fa-fw icon-gray" aria-hidden="true"></i>
+				<span class="sr-only">Top</span>
+			</a>
+					</div>
+		
+		</div>
+	</div>
+
+	
+
+	<div class="action-bar bar-bottom">
+	
+			<a href="./posting.php?mode=reply&amp;t=1178757&amp;sid=0" class="button" title="Post a reply">
+							<span>Post Reply</span> <i class="icon fa-reply fa-fw" aria-hidden="true"></i>
+					</a>
+		
+	
+			<form method="post" action="./viewtopic.php?t=1178757&amp;sid=0">
+		<div class="dropdown-container dropdown-container-left dropdown-button-control sort-tools">
+	<span title="Display and sorting options" class="button button-secondary dropdown-trigger dropdown-select">
+		<i class="icon fa-sort-amount-asc fa-fw" aria-hidden="true"></i>
+		<span class="caret"><i class="icon fa-sort-down fa-fw" aria-hidden="true"></i></span>
+	</span>
+	<div class="dropdown hidden">
+		<div class="pointer"><div class="pointer-inner"></div></div>
+		<div class="dropdown-contents">
+			<fieldset class="display-options">
+							<label>Display: <select name="st" id="st"><option value="0" selected="selected">All posts</option><option value="1">1 day</option><option value="7">7 days</option><option value="14">2 weeks</option><option value="30">1 month</option><option value="90">3 months</option><option value="180">6 months</option><option value="365">1 year</option></select></label>
+								<label>Sort by: <select name="sk" id="sk"><option value="a">Author</option><option value="t" selected="selected">Post time</option><option value="s">Subject</option></select></label>
+				<label>Direction: <select name="sd" id="sd"><option value="a" selected="selected">Ascending</option><option value="d">Descending</option></select></label>
+								<hr class="dashed" />
+				<input type="submit" class="button2" name="sort" value="Go" />
+						</fieldset>
+		</div>
+	</div>
+</div>
+		</form>
+	
+	
+	
+			<div class="pagination">
+			6 posts
+							&bull; Page <strong>1</strong> of <strong>1</strong>
+					</div>
+	</div>
+
+
+<div class="action-bar actions-jump">
+		<p class="jumpbox-return">
+		<a href="./viewforum.php?f=14&amp;sid=0" class="left-box arrow-left" accesskey="r">
+			<i class="icon fa-angle-left fa-fw icon-black" aria-hidden="true"></i><span>Return to “Installing Gentoo”</span>
+		</a>
+	</p>
+	
+		<div class="jumpbox dropdown-container dropdown-container-right dropdown-up dropdown-left dropdown-button-control" id="jumpbox">
+			<span title="Jump to" class="button button-secondary dropdown-trigger dropdown-select">
+				<span>Jump to</span>
+				<span class="caret"><i class="icon fa-sort-down fa-fw" aria-hidden="true"></i></span>
+			</span>
+		<div class="dropdown">
+			<div class="pointer"><div class="pointer-inner"></div></div>
+			<ul class="dropdown-contents">
+																				<li><a href="./viewforum.php?f=70&amp;sid=0" class="jumpbox-cat-link"> <span> Assistance</span></a></li>
+																<li><a href="./viewforum.php?f=16&amp;sid=0" class="jumpbox-sub-link"><span class="spacer"></span> <span>&#8627; &nbsp; News &amp; Announcements</span></a></li>
+																<li><a href="./viewforum.php?f=14&amp;sid=0" class="jumpbox-sub-link"><span class="spacer"></span> <span>&#8627; &nbsp; Installing Gentoo</span></a></li>
+											</ul>
+		</div>
+	</div>
+
+	</div>
+
+
+
+
+			</div>
+
+
+<div id="page-footer" class="page-footer" role="contentinfo">
+	<div class="navbar" role="navigation">
+	<div class="inner">
+
+	<ul id="nav-footer" class="nav-footer linklist" role="menubar">
+		<li class="breadcrumbs">
+									<span class="crumb"><a href="./index.php?sid=0" data-navbar-reference="index"><i class="icon fa-home fa-fw" aria-hidden="true"></i><span>Board index</span></a></span>					</li>
+		
+				<li class="rightside">All times are <span title="UTC">UTC</span></li>
+							<li class="rightside">
+				<a href="/app.php/user/delete_cookies?sid=0" data-ajax="true" data-refresh="true" role="menuitem">
+					<i class="icon fa-trash fa-fw" aria-hidden="true"></i><span>Delete cookies</span>
+				</a>
+			</li>
+														</ul>
+
+	</div>
+</div>
+
+	<div class="copyright">
+				<p class="footer-row">
+                       <span class="footer-copyright text-strong">© 2001–2026 Gentoo Authors</span>
+                       <br />
+                       <span class="footer-copyright">Gentoo is a trademark of the Gentoo Foundation, Inc. and of Förderverein Gentoo e.V.</span>
+                       <br />
+                       <span class="footer-copyright">The contents of this document, unless otherwise expressly stated, are licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license">CC-BY-SA-4.0</a> license.
+                       <br />
+                       <span class="footer-copyright">The <a href="https://www.gentoo.org/inside-gentoo/foundation/name-logo-guidelines.html">Gentoo Name and Logo Usage Guidelines</a> apply.</span>
+		</p>
+		<p class="footer-row">
+			<span class="footer-copyright">Powered by <a href="https://www.phpbb.com/">phpBB</a>&reg; Forum Software &copy; phpBB Limited</span>
+		</p>
+						<p class="footer-row">
+			<a class="footer-link" href="https://wiki.gentoo.org/wiki/Foundation:Privacy_Policy" title="Privacy Policy" role="menuitem">
+				<span class="footer-link-text">Privacy Policy</span>
+			</a>
+		</p>
+					</div>
+
+	<div id="darkenwrapper" class="darkenwrapper" data-ajax-error-title="AJAX error" data-ajax-error-text="Something went wrong when processing your request." data-ajax-error-text-abort="User aborted request." data-ajax-error-text-timeout="Your request timed out; please try again." data-ajax-error-text-parsererror="Something went wrong with the request and the server returned an invalid reply.">
+		<div id="darken" class="darken">&nbsp;</div>
+	</div>
+
+	<div id="phpbb_alert" class="phpbb_alert" data-l-err="Error" data-l-timeout-processing-req="Request timed out.">
+		<a href="#" class="alert_close">
+			<i class="icon fa-times-circle fa-fw" aria-hidden="true"></i>
+		</a>
+		<h3 class="alert_title">&nbsp;</h3><p class="alert_text"></p>
+	</div>
+	<div id="phpbb_confirm" class="phpbb_alert">
+		<a href="#" class="alert_close">
+			<i class="icon fa-times-circle fa-fw" aria-hidden="true"></i>
+		</a>
+		<div class="alert_text"></div>
+	</div>
+</div>
+
+</div>
+
+<div>
+	<a id="bottom" class="anchor" accesskey="z"></a>
+	</div>
+
+<script src="./assets/javascript/jquery-3.7.1.min.js?assets_version=27"></script>
+<script src="./assets/javascript/core.js?assets_version=27"></script>
+
+
+
+<script src="./styles/prosilver/template/forum_fn.js?assets_version=27"></script>
+<script src="./styles/prosilver/template/ajax.js?assets_version=27"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "xenforo1-list.html": {
+    "url": "https://forums.digitalpoint.com/forums/content-creation.102/?order=post_date&direction=desc",
+    "capturedAt": "2026-10-30T03:36:11.130Z",
+    "bytes": 139869,
+    "namesScrubbed": 36
+  },
+  "xenforo1-thread.html": {
+    "url": "https://forums.digitalpoint.com/threads/hiring-malaysia-based-writer-for-igaming-payment-guides-screenshots.2885650/",
+    "capturedAt": "2026-10-30T03:36:11.132Z",
+    "bytes": 38601,
+    "namesScrubbed": 1
+  },
+  "phpbb3-list.html": {
+    "url": "https://forums.gentoo.org/viewforum.php?f=14&sk=t&sd=d",
+    "capturedAt": "2026-10-30T03:36:14.013Z",
+    "bytes": 107910,
+    "namesScrubbed": 61
+  },
+  "phpbb3-thread.html": {
+    "url": "https://forums.gentoo.org/viewtopic.php?t=1178757",
+    "capturedAt": "2026-10-30T03:36:14.013Z",
+    "bytes": 32126,
+    "namesScrubbed": 4
+  }
+}

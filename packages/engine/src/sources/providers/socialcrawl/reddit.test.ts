@@ -334,6 +334,70 @@ describe("paging", () => {
   });
 });
 
+describe("a poll after the first one", () => {
+  // search-keyword holds 25 posts from 2026-09-03T18:18 to 2026-09-06T03:22,
+  // newest first.
+  const inside = new Date("2026-09-05T00:00:00.000Z");
+  const beforePage = new Date("2026-09-01T00:00:00.000Z");
+
+  it("stops an input on the page that reaches posts it has already read", async () => {
+    const { fetch: fetchStub } = socialCrawl([keywordSearch]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.search(request({ queries: ["flaky tests"], since: inside }));
+
+    expect(result.next.status).toBe("done");
+    // The new posts on that page still come back, and only those.
+    expect(result.posts.length).toBeGreaterThan(0);
+    expect(result.posts.length).toBeLessThan(itemsOf(keywordSearch).length);
+    expect(result.posts.every((post) => post.postedAt > inside)).toBe(true);
+  });
+
+  it("goes on to the next input, not to the next page", async () => {
+    const { fetch: fetchStub, calls } = socialCrawl([keywordSearch]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const first = await source.search(request({ queries: ["first", "second"], since: inside }));
+    if (first.next.status !== "ready") throw new Error("expected the second input");
+    await source.search(
+      request({ queries: ["first", "second"], since: inside }, { cursor: first.next.cursor }),
+    );
+
+    expect(calls[1]?.url).toContain("query=second");
+    expect(calls[1]?.url).not.toContain("cursor=");
+  });
+
+  it("reads the next page while every post is newer than the last read", async () => {
+    const { fetch: fetchStub } = socialCrawl([keywordSearch]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.search(request({ queries: ["flaky tests"], since: beforePage }));
+
+    expect(result.next.status).toBe("ready");
+    expect(result.posts).toHaveLength(itemsOf(keywordSearch).length);
+  });
+
+  it("counts a post at the exact time of the last read as read", async () => {
+    const newest = new Date("2026-09-06T03:22:49.000Z");
+    const { fetch: fetchStub } = socialCrawl([keywordSearch]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.search(request({ queries: ["flaky tests"], since: newest }));
+
+    expect(result.posts).toEqual([]);
+    expect(result.next.status).toBe("done");
+  });
+
+  it("reads to the cap when there is no last read", async () => {
+    const { fetch: fetchStub } = socialCrawl([keywordSearch]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.search(request({ queries: ["flaky tests"] }));
+
+    expect(result.next.status).toBe("ready");
+  });
+});
+
 describe("a key the provider refuses", () => {
   it("is a refusal a person can act on, not a thrown error", async () => {
     const { fetch: fetchStub } = socialCrawl([credentialsRejected]);

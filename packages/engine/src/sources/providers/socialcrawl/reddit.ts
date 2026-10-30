@@ -260,12 +260,21 @@ export class SocialCrawlRedditSource implements SocialSource {
       (post) => !request.query.since || post.postedAt > request.query.since,
     );
     const posts = request.limit === undefined ? wanted : wanted.slice(0, request.limit);
+    // Every endpoint here is asked for `sort: "new"`, and every captured page
+    // is newest first. So a page that holds a post the last walk already
+    // covered ends this input: the pages after it are older still. US-467.
+    const reachedSince = wanted.length < collected.length;
 
     return {
       posts,
       foundBy: input.foundBy,
       unitsConsumed: page.creditsUsed,
-      next: this.nextAfter(request.query, start, page, pagesPerInputFor(request, maxPagesPerInput)),
+      next: this.nextAfter(
+        request.query,
+        start,
+        page,
+        reachedSince ? 0 : pagesPerInputFor(request, maxPagesPerInput),
+      ),
     };
   }
 

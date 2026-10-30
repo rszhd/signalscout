@@ -2,10 +2,11 @@
 
 # Done
 
-260 finished.
+261 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| US-467 | [SocialCrawl's Reddit connector stops at posts it has already read](done/2026-10/US-467-socialcrawl-reddit-stops-at-posts-it-has-already-read.md) | feature | shipped | 2026-10 |
 | US-459 | [The docs site shows SignalScout Cloud only](done/2026-10/US-459-the-docs-site-shows-signalscout-cloud-only.md) | chore | shipped | 2026-10 |
 | US-449 | [Intent means wanting a product, not asking for advice](done/2026-10/US-449-intent-means-wanting-a-product-not-asking-for-advice.md) | feature | shipped | 2026-10 |
 | BUG-437 | [One reason over 160 characters refuses a whole classification](done/2026-09/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | shipped | 2026-09 |

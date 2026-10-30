@@ -262,6 +262,13 @@ async function fetchPage(url) {
     throw new Error(
       `${url} answered ${response.status} through Bright Data: ${body.slice(0, 200)}`,
     );
+  // Both arrived as 200s on 2026-10-30 and one was saved as a forum page:
+  // Bright Data's own refusal (no KYC), and a site's "Please refresh" check.
+  if (
+    /^(Residential Failed|Proxy Error)/.test(body) ||
+    /Please refresh to continue/.test(body.slice(0, 2000))
+  )
+    throw new Error(`${url} was not passed through Bright Data: ${body.slice(0, 200)}`);
   return body;
 }
 

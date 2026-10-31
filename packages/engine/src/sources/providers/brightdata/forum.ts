@@ -90,12 +90,71 @@ export interface ForumOptions {
   readonly onPage?: (event: ForumPageEvent) => void;
 }
 
-interface Fetched {
+/** One page, how it came, and the Bright Data units it is counted as. */
+export interface FetchedPage {
   readonly answer:
     | { readonly ok: true; readonly body: string }
     | { readonly ok: false; readonly reason: string };
   readonly via: ForumFetcher;
   readonly units: number;
+}
+
+/** Pages one after another, sharing a browser until `close`. */
+export interface ForumPageFetcher {
+  fetch(url: string): Promise<FetchedPage>;
+  close(): Promise<void>;
+}
+
+/**
+ * Bright Data first, unless the application sends the forum to the browser,
+ * and the browser when Bright Data brings back no page. A browser starts at
+ * the first page that needs one and serves every later page until `close`,
+ * which a caller must reach, an error included: a browser bills until it is
+ * stopped. Bright Data's own errors (a refused key, a rate limit) are thrown;
+ * the browser's are a page lost.
+ */
+export function openForumFetcher(
+  runtime: SourceRuntime,
+  unlocker: SourceCredentials,
+  options: Pick<ForumOptions, "browser" | "fetcherFor">,
+  signal?: AbortSignal,
+): ForumPageFetcher {
+  const browser =
+    options.browser && hasBrowserCredentials(options.browser.credentials)
+      ? options.browser
+      : undefined;
+  let pages: PageBrowser | null = null;
+  return {
+    async fetch(url) {
+      if (!browser || options.fetcherFor?.(hostOf(url)) !== "browser") {
+        const answer = await fetchThroughUnlocker(runtime, unlocker, url, signal);
+        if (answer.ok || !browser) return { answer, via: "unlocker", units: answer.ok ? 1 : 0 };
+        runtime.logger.info(
+          { url, reason: answer.reason },
+          "forum page refused through Bright Data; reading it through the browser",
+        );
+      }
+      pages ??= (browser.open ?? openBrowserUse)(runtime, browser.credentials, signal);
+      const before = pages.started;
+      try {
+        const answer = await pages.read(url);
+        return { answer, via: "browser", units: 1 + (pages.started - before) };
+      } catch (error) {
+        // Browser Use out of credit, or a browser that stopped answering: this
+        // page is lost, the rest of the poll is not.
+        runtime.logger.error({ url, err: error }, "forum page not read through the browser");
+        return {
+          answer: { ok: false, reason: (error as Error).message },
+          via: "browser",
+          units: pages.started - before,
+        };
+      }
+    },
+    async close() {
+      await pages?.close();
+      pages = null;
+    },
+  };
 }
 
 interface Pending {
@@ -200,28 +259,24 @@ export class BrightDataForumSource implements SocialSource {
 
   async search(request: SearchRequest): Promise<SearchResult> {
     // One browser for the whole call, started only if a page needs it.
-    let pages: PageBrowser | null = null;
-    const browser = this.browser
-      ? () => {
-          pages ??= (this.browser?.open ?? openBrowserUse)(
-            this.runtime,
-            this.browser?.credentials ?? {},
-            request.signal,
-          );
-          return pages;
-        }
-      : null;
+    const fetcher = openForumFetcher(
+      this.runtime,
+      request.credentials,
+      { ...(this.browser ? { browser: this.browser } : {}), ...this.fetcherFor() },
+      request.signal,
+    );
     try {
-      return await this.walk(request, browser);
+      return await this.walk(request, fetcher);
     } finally {
-      await (pages as PageBrowser | null)?.close();
+      await fetcher.close();
     }
   }
 
-  private async walk(
-    request: SearchRequest,
-    browser: (() => PageBrowser) | null,
-  ): Promise<SearchResult> {
+  private fetcherFor(): Pick<ForumOptions, "fetcherFor"> {
+    return this.options.fetcherFor ? { fetcherFor: this.options.fetcherFor } : {};
+  }
+
+  private async walk(request: SearchRequest, fetcher: ForumPageFetcher): Promise<SearchResult> {
     const sections = request.query.queries;
     const at = request.cursor === undefined ? { index: 0 } : decodeCursor(request.cursor);
     const section = sections[at.index];
@@ -240,7 +295,7 @@ export class BrightDataForumSource implements SocialSource {
     try {
       if (at.pending) {
         const batch = at.pending.slice(0, threadsPerCall);
-        const { posts, units } = await this.open(batch, request, browser);
+        const { posts, units } = await this.open(batch, request, fetcher);
         return {
           posts,
           foundBy,
@@ -249,7 +304,7 @@ export class BrightDataForumSource implements SocialSource {
         };
       }
 
-      const { answer, via, units } = await this.fetch(section, request, browser);
+      const { answer, via, units } = await fetcher.fetch(section);
       const event = { host: hostOf(section), url: section, page: "section" as const, via, units };
       if (!answer.ok) {
         this.runtime.logger.warn(
@@ -295,45 +350,6 @@ export class BrightDataForumSource implements SocialSource {
     }
   }
 
-  /**
-   * One page: Bright Data first, unless the application sends this forum to
-   * the browser, and the browser when Bright Data brings back no page.
-   */
-  private async fetch(
-    url: string,
-    request: SearchRequest,
-    browser: (() => PageBrowser) | null,
-  ): Promise<Fetched> {
-    if (!browser || this.options.fetcherFor?.(hostOf(url)) !== "browser") {
-      const answer = await fetchThroughUnlocker(
-        this.runtime,
-        request.credentials,
-        url,
-        request.signal,
-      );
-      if (answer.ok || !browser) return { answer, via: "unlocker", units: answer.ok ? 1 : 0 };
-      this.runtime.logger.info(
-        { url, reason: answer.reason },
-        "forum page refused through Bright Data; reading it through the browser",
-      );
-    }
-    const pages = browser();
-    const before = pages.started;
-    try {
-      const answer = await pages.read(url);
-      return { answer, via: "browser", units: 1 + (pages.started - before) };
-    } catch (error) {
-      // Browser Use out of credit, or a browser that stopped answering: this
-      // page is lost, the rest of the poll is not.
-      this.runtime.logger.error({ url, err: error }, "forum page not read through the browser");
-      return {
-        answer: { ok: false, reason: (error as Error).message },
-        via: "browser",
-        units: pages.started - before,
-      };
-    }
-  }
-
   private tell(event: ForumPageEvent): void {
     try {
       this.options.onPage?.(event);
@@ -346,14 +362,14 @@ export class BrightDataForumSource implements SocialSource {
   private async open(
     batch: readonly Pending[],
     request: SearchRequest,
-    browser: (() => PageBrowser) | null,
+    fetcher: ForumPageFetcher,
   ): Promise<{ posts: CandidatePost[]; units: number }> {
     const now = this.runtime.now();
     const since = request.query.since;
     const posts: CandidatePost[] = [];
     let units = 0;
     for (const pending of batch) {
-      const fetched = await this.fetch(pending.url, request, browser);
+      const fetched = await fetcher.fetch(pending.url);
       units += fetched.units;
       const { answer, via } = fetched;
       const event = {

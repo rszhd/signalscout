@@ -51,10 +51,13 @@ export {
   BrightDataForumSource,
   brightDataForum,
   createBrightDataForum,
+  type FetchedPage,
   type ForumFetcher,
   type ForumOptions,
   type ForumPageEvent,
+  type ForumPageFetcher,
   maxThreadsPerSection,
+  openForumFetcher,
   threadsPerCall,
   worthOpening,
 } from "./providers/brightdata/forum.js";

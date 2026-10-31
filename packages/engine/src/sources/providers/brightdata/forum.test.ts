@@ -8,6 +8,7 @@ import {
   createBrightDataForum,
   type ForumPageEvent,
   maxThreadsPerSection,
+  openForumFetcher,
   threadsPerCall,
   worthOpening,
 } from "./forum.js";
@@ -501,6 +502,24 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
       "Bright Data refused the API key.",
     );
     expect(browser.read).toHaveLength(1);
+    expect(browser.calls()).toEqual({ opened: 1, closed: 1 });
+  });
+
+  it("serves an application's own pages, one browser until it is closed", async () => {
+    const other = "https://forums.macrumors.com/forums/imac.91/";
+    const stub = brightData({ [xenforoList]: challenge, [other]: challenge });
+    const browser = fakeBrowser({ [xenforoList]: "list", [other]: "other" });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+    });
+
+    const first = await fetcher.fetch(xenforoList);
+    const second = await fetcher.fetch(other);
+    await fetcher.close();
+
+    expect([first.via, second.via]).toEqual(["browser", "browser"]);
+    // The browser's start is counted once, on the page that started it.
+    expect([first.units, second.units]).toEqual([2, 1]);
     expect(browser.calls()).toEqual({ opened: 1, closed: 1 });
   });
 

@@ -10,7 +10,7 @@
  * the newest-threads list is the most recently active one. Each row still
  * says when its thread started.
  */
-import { absoluteUrl, fromIso, piecesAt, textOf } from "./html.js";
+import { absoluteUrl, fromIso, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
 const timeIn = (html: string) => fromIso(html.match(/<time datetime="([^"]+)"/)?.[1]);
@@ -24,12 +24,7 @@ export const phpbb3: ForumProgram = {
     /<time datetime=/.test(html) &&
     (/class="topictitle"/.test(html) || /class="post has-profile/.test(html)),
 
-  newestThreadsUrl(sectionUrl) {
-    const url = new URL(sectionUrl);
-    url.searchParams.set("sk", "t");
-    url.searchParams.set("sd", "d");
-    return url.toString();
-  },
+  newestThreadsUrl: (sectionUrl) => withParameters(sectionUrl, { sk: "t", sd: "d" }),
 
   listThreads(html, pageUrl) {
     const threads: ForumThreadSummary[] = [];

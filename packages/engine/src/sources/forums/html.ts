@@ -62,6 +62,24 @@ export function absoluteUrl(href: string, base: string): string {
   return url.toString();
 }
 
+/**
+ * The address with these parameters set, the rest of its query untouched.
+ * `URLSearchParams` writes the whole query again, and a vBulletin address
+ * such as `forumdisplay.php?4-Power-Tools` came back as `?4-Power-Tools=`.
+ */
+export function withParameters(address: string, parameters: Record<string, string>): string {
+  const url = new URL(address);
+  const kept = url.search
+    .slice(1)
+    .split("&")
+    .filter((pair) => pair !== "" && !(decodeURIComponent(pair.split("=")[0] ?? "") in parameters));
+  const added = Object.entries(parameters).map(
+    ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+  );
+  url.search = `?${[...kept, ...added].join("&")}`;
+  return url.toString();
+}
+
 /** A Unix time in seconds, as forums write it in `data-time`. */
 export function fromUnixSeconds(value: string | undefined): Date | null {
   if (!value || !/^\d{9,11}$/.test(value)) return null;

@@ -10,7 +10,7 @@
  * default theme shows no start at all. A thread page has no canonical link,
  * so its id comes from the address or the reply link.
  */
-import { absoluteUrl, fromEnglishDate, piecesAt, textOf } from "./html.js";
+import { absoluteUrl, fromEnglishDate, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
 /** The last text before `end` in `html` that reads as a date. */
@@ -31,12 +31,8 @@ export const mybb: ForumProgram = {
     (/id="tid_\d+"/.test(html) && /forumdisplay_(sticky|regular)/.test(html)) ||
     (/class="post_body[^"]*" id="pid_\d+"/.test(html) && /showthread\.php\?tid=/.test(html)),
 
-  newestThreadsUrl(sectionUrl) {
-    const url = new URL(sectionUrl);
-    url.searchParams.set("sortby", "started");
-    url.searchParams.set("order", "desc");
-    return url.toString();
-  },
+  newestThreadsUrl: (sectionUrl) =>
+    withParameters(sectionUrl, { sortby: "started", order: "desc" }),
 
   listThreads(html, pageUrl, now = new Date()) {
     const threads: ForumThreadSummary[] = [];

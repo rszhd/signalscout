@@ -8,7 +8,7 @@
  * nothing here is read from words. The markup writes `<div  class=` with two
  * spaces on some boards, so every pattern allows any space.
  */
-import { absoluteUrl, fromUnixSeconds, piecesAt, textOf } from "./html.js";
+import { absoluteUrl, fromUnixSeconds, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
 const timestampIn = (html: string) => fromUnixSeconds(html.match(/data-timestamp="(\d+)"/)?.[1]);
@@ -19,12 +19,8 @@ export const xenforo2: ForumProgram = {
 
   detect: (html) => /<html[^>]+id="XF"/.test(html),
 
-  newestThreadsUrl(sectionUrl) {
-    const url = new URL(sectionUrl);
-    url.searchParams.set("order", "post_date");
-    url.searchParams.set("direction", "desc");
-    return url.toString();
-  },
+  newestThreadsUrl: (sectionUrl) =>
+    withParameters(sectionUrl, { order: "post_date", direction: "desc" }),
 
   listThreads(html, pageUrl) {
     const threads: ForumThreadSummary[] = [];

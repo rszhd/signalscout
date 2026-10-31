@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
-import { decodeEntities, fromAgo, fromEnglishDate, textOf } from "./html.js";
+import { decodeEntities, fromAgo, fromEnglishDate, textOf, withParameters } from "./html.js";
 import { detectForum, forumPrograms } from "./index.js";
 import { invision4 } from "./invision4.js";
 import { mybb } from "./mybb.js";
@@ -474,6 +474,20 @@ describe("Invision Community 4", () => {
   it("reads a section as it comes, by last activity", () => {
     expect(invision4.newestThreadsUrl("https://forum.example.com/forum/18-new-builds/")).toBe(
       "https://forum.example.com/forum/18-new-builds/",
+    );
+  });
+});
+
+describe("a newest-threads address keeps the query it came with", () => {
+  it("leaves a vBulletin address of words as written", () => {
+    expect(
+      vbulletin4.newestThreadsUrl("https://www.sawmillcreek.org/forumdisplay.php?4-Power-Tools"),
+    ).toBe("https://www.sawmillcreek.org/forumdisplay.php?4-Power-Tools&sort=dateline&order=desc");
+  });
+
+  it("replaces a parameter it sets rather than adding it twice", () => {
+    expect(withParameters("https://f.example/viewforum.php?f=2&sk=a", { sk: "t", sd: "d" })).toBe(
+      "https://f.example/viewforum.php?f=2&sk=t&sd=d",
     );
   });
 });

@@ -8,7 +8,7 @@
  * ("10-14-2026, 05:51 AM"), in the board's zone, so starts are approximate.
  * `sort=dateline` lists by start time.
  */
-import { absoluteUrl, fromEnglishDate, piecesAt, textOf } from "./html.js";
+import { absoluteUrl, fromEnglishDate, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
 export const vbulletin4: ForumProgram = {
@@ -19,12 +19,7 @@ export const vbulletin4: ForumProgram = {
     (/id="thread_title_\d+"/.test(html) && /showthread\.php\?/.test(html)) ||
     (/id="post_message_\d+"/.test(html) && /showthread\.php\?/.test(html)),
 
-  newestThreadsUrl(sectionUrl) {
-    const url = new URL(sectionUrl);
-    url.searchParams.set("sort", "dateline");
-    url.searchParams.set("order", "desc");
-    return url.toString();
-  },
+  newestThreadsUrl: (sectionUrl) => withParameters(sectionUrl, { sort: "dateline", order: "desc" }),
 
   listThreads(html, pageUrl, now = new Date()) {
     // Pinned threads come before the regular list.

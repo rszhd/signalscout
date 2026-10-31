@@ -168,6 +168,11 @@ const targets = {
       return id && `https://geekhack.org/index.php?topic=${id}.0`;
     },
   },
+  // VerticalScope's XenForo 2 theme ("California"): one thread, through the
+  // browser (`--via=browser --pages=thread`); Bright Data meets a bot check.
+  "xenforo2-california": {
+    threadPage: "https://www.lumberjocks.com/threads/pen-turning-problem.367057/",
+  },
   // US-478: forums no parser reads, which name a feed that holds the posts.
   // Their home page and feed only: `--pages=index` and `--pages=feed`.
   "nofeedparser-vanilla": {
@@ -234,6 +239,9 @@ const namePatterns = [
   // Vanilla: /profile/<name>, the name in the address. Invision's
   // /profile/<id>-<name> starts with a digit and has its own pattern above.
   /\/profile\/([A-Za-z][^"'/?#\s]{1,59})["']/g,
+  // VerticalScope's theme: the author's name in a span and in an avatar's label.
+  /<span class="username[^"]*"[^>]*>(?:<(?!\/span\b)[^>]+>)*([^<]{2,60})</g,
+  /aria-label="Profile photo for ([^"]{2,60}) user"/g,
   // Feeds: RSS's <dc:creator> and <author>, Atom's <author><name>.
   /<dc:creator>(?:<!\[CDATA\[)?([^<\]]{2,60})/g,
   /<author>(?:[^<(]*\()?([^<)]{2,60})\)?<\/author>/g,
@@ -394,17 +402,51 @@ function replaceNames(text, names) {
 
 // ------------------------------------------------------------- capture
 
+// `--via=browser`: through Browser Use's cloud browser on our own proxy
+// (US-471), for a site Bright Data cannot pass. It needs the engine built
+// (`pnpm --filter @signalscout/engine build`) and the browser's settings:
+// BROWSER_USE_API_KEY, PROXY_HOST, PROXY_PORT, PROXY_USERNAME, PROXY_PASSWORD,
+// and PROXY_SESSION=port for a proxy that keeps an address per port.
+const viaBrowser = process.argv.includes("--via=browser");
 const apiKey = process.env.BRIGHTDATA_API_KEY?.trim();
 const zone = process.env.BRIGHTDATA_UNLOCKER_ZONE?.trim();
-if (!apiKey || !zone) {
+if (!viaBrowser && (!apiKey || !zone)) {
   throw new Error(
     "Set BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE in the environment (see the header).",
   );
 }
 let requests = 0;
 
+let browserPages = null;
+
+async function fetchThroughBrowser(url) {
+  if (!browserPages) {
+    const engine = new URL("../../../../dist/", import.meta.url);
+    const { createLogger, createSourceRuntime } = await import(new URL("index.js", engine).href);
+    const { openBrowserUse } = await import(
+      new URL("sources/providers/browseruse/pages.js", engine).href
+    );
+    const env = process.env;
+    browserPages = openBrowserUse(
+      createSourceRuntime({ logger: createLogger({ level: "warn", name: "capture" }) }),
+      {
+        apiKey: env.BROWSER_USE_API_KEY,
+        proxyHost: env.PROXY_HOST,
+        proxyPort: env.PROXY_PORT,
+        proxyUsername: env.PROXY_USERNAME,
+        proxyPassword: env.PROXY_PASSWORD,
+        proxySession: env.PROXY_SESSION || "password",
+      },
+    );
+  }
+  const answer = await browserPages.read(url);
+  if (!answer.ok) throw new Error(`${url} was not read through the browser: ${answer.reason}`);
+  return answer.body;
+}
+
 async function fetchPage(url) {
   requests += 1;
+  if (viaBrowser) return fetchThroughBrowser(url);
   const response = await fetch("https://api.brightdata.com/request", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
@@ -438,8 +480,9 @@ try {
 
 for (const [program, target] of Object.entries(targets)) {
   if (only && only !== program) continue;
-  if (pagesOnly === "index" || pagesOnly === "feed") {
-    const url = target[pagesOnly];
+  if (pagesOnly === "index" || pagesOnly === "feed" || pagesOnly === "thread") {
+    // `thread`: a target's fixed thread page, for a theme a list cannot reach.
+    const url = pagesOnly === "thread" ? target.threadPage : target[pagesOnly];
     // One forum's refusal leaves the others to fetch.
     try {
       if (url)
@@ -487,6 +530,10 @@ async function save(program, pages) {
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
+// A browser bills until it is stopped.
+await browserPages?.close();
 console.log(
-  `${requests} Bright Data requests, about $${((requests * 1.5) / 1000).toFixed(4)} at the list price`,
+  viaBrowser
+    ? `${requests} pages through the browser`
+    : `${requests} Bright Data requests, about $${((requests * 1.5) / 1000).toFixed(4)} at the list price`,
 );

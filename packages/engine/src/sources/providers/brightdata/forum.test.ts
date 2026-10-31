@@ -2,7 +2,13 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../../../logger.js";
 import { readFeed } from "../../forums/index.js";
-import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
+import type {
+  CompleteRequest,
+  CompleteResult,
+  SearchRequest,
+  SearchResult,
+  SourceRuntime,
+} from "../../types.js";
 import type { OpenPageBrowser } from "../browseruse/pages.js";
 import {
   BrightDataForumSource,
@@ -314,6 +320,16 @@ describe("reading a forum's newest-threads feed", () => {
   });
 });
 
+/** Each result one call gives, in order. */
+async function completeAll(
+  source: BrightDataForumSource,
+  request: CompleteRequest,
+): Promise<CompleteResult[]> {
+  const results: CompleteResult[] = [];
+  for await (const result of source.completePosts(request)) results.push(result);
+  return results;
+}
+
 describe("completing a partial post", () => {
   const thread = "https://forums.macrumors.com/threads/m6-imac.2493064/";
 
@@ -321,7 +337,7 @@ describe("completing a partial post", () => {
     const stub = brightData({ [thread]: captured("xenforo2-thread.html") });
     const source = new BrightDataForumSource(runtimeWith(stub.fetch));
 
-    const result = await source.completePost({ url: thread, credentials });
+    const [result] = await completeAll(source, { posts: [{ url: thread }], credentials });
 
     expect(result).toMatchObject({
       status: "complete",
@@ -339,9 +355,8 @@ describe("completing a partial post", () => {
     const stub = brightData({ [thread]: captured("xenforo2-thread.html") });
     const source = new BrightDataForumSource(runtimeWith(stub.fetch));
 
-    const result = await source.completePost({
-      url: thread,
-      since: new Date("2026-10-29T00:00:00.000Z"),
+    const [result] = await completeAll(source, {
+      posts: [{ url: thread, since: new Date("2026-10-29T00:00:00.000Z") }],
       credentials,
     });
 
@@ -353,10 +368,35 @@ describe("completing a partial post", () => {
     const stub = brightData({ [thread]: refused });
     const source = new BrightDataForumSource(runtimeWith(stub.fetch));
 
-    expect(await source.completePost({ url: thread, credentials })).toMatchObject({
+    const [result] = await completeAll(source, { posts: [{ url: thread }], credentials });
+
+    expect(result).toMatchObject({
       status: "unread",
       unitsConsumed: 0,
     });
+  });
+
+  it("reads several posts through one browser, then stops it", async () => {
+    const addresses = [
+      thread,
+      "https://forums.macrumors.com/threads/m6-imac.2493064/page-2",
+      "https://forums.macrumors.com/threads/m6-imac.2493064/page-3",
+    ];
+    const stub = brightData({});
+    const browser = fakeBrowser({}, captured("xenforo2-thread.html"));
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: browserCredentials, open: browser.open },
+      fetcherFor: (host) => (host === "forums.macrumors.com" ? "browser" : undefined),
+    });
+
+    const results = await completeAll(source, {
+      posts: addresses.map((url) => ({ url })),
+      credentials,
+    });
+
+    expect(results.map((result) => result.status)).toEqual(["complete", "complete", "complete"]);
+    expect(browser.read).toEqual(addresses);
+    expect(browser.calls()).toEqual({ opened: 1, closed: 1 });
   });
 });
 

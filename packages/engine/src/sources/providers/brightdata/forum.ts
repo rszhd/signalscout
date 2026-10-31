@@ -525,10 +525,11 @@ export class BrightDataForumSource implements SocialSource {
   }
 
   /**
-   * A partial post from a feed that cuts its text, whole: its thread's page.
-   * US-476. One browser at most, stopped before this returns.
+   * The partial posts from a feed that cuts its text, whole: each thread's
+   * page. US-476, BUG-480. One fetcher for the call, so one browser at most,
+   * stopped when the call ends, even if the consumer stops early.
    */
-  async completePost(request: CompleteRequest): Promise<CompleteResult> {
+  async *completePosts(request: CompleteRequest): AsyncIterable<CompleteResult> {
     const fetcher = openForumFetcher(
       this.runtime,
       request.credentials,
@@ -536,11 +537,9 @@ export class BrightDataForumSource implements SocialSource {
       request.signal,
     );
     try {
-      return await this.readThreadPage(
-        { url: request.url, approximate: false },
-        request.since,
-        fetcher,
-      );
+      for (const post of request.posts) {
+        yield await this.readThreadPage({ url: post.url, approximate: false }, post.since, fetcher);
+      }
     } finally {
       await fetcher.close();
     }

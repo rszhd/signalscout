@@ -178,7 +178,7 @@ export interface CandidatePost {
   /**
    * Set when `text` is a cut the platform gave, not the whole post: a forum
    * feed that shortens each item. US-476. The pre-filter and triage judge it
-   * as it is, and `SocialSource.completePost` reads the whole for a post
+   * as it is, and `SocialSource.completePosts` reads the whole for the posts
    * they keep, so a page is bought only for a post worth scoring.
    *
    * `since` is the poll's window: the feed dates an item by its newest reply,
@@ -635,17 +635,23 @@ export interface SocialSource extends ConnectorDescriptor {
    */
   fetchReplies?(request: ReplyRequest): Promise<ReplyResult>;
   /**
-   * The whole of one partial post (`CandidatePost.partial`), from its own
-   * page. US-476. Absent: this connector never gives a partial post.
+   * Read the posts in full (`CandidatePost.partial`) from their own pages.
+   * US-476. Absent: this connector never gives a partial post.
+   *
+   * One call reads its posts through one fetcher, so it starts one browser at
+   * most and stops it when the call ends. It yields one result per post, in the
+   * order given.
    */
-  completePost?(request: CompleteRequest): Promise<CompleteResult>;
+  completePosts?(request: CompleteRequest): AsyncIterable<CompleteResult>;
 }
 
-/** One partial post to read in full. */
+/** The partial posts to read in full, in the order their results come back. */
 export interface CompleteRequest {
-  readonly url: string;
-  /** The `since` the post came with (`CandidatePost.partial`). */
-  readonly since?: Date;
+  readonly posts: readonly {
+    readonly url: string;
+    /** The `since` the post came with (`CandidatePost.partial`). */
+    readonly since?: Date;
+  }[];
   readonly credentials: SourceCredentials;
   readonly signal?: AbortSignal;
 }

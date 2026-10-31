@@ -4,10 +4,13 @@
  */
 import { readFileSync } from "node:fs";
 import {
+  type CompleteRequest,
+  type ConnectorDefinition,
   createBrightDataForum,
   createLogger,
   createSourceRegistry,
   createSourceRuntime,
+  type SocialSource,
 } from "@signalscout/engine";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -41,14 +44,14 @@ afterAll(async () => {
 });
 
 /** A step over a Bright Data that answers `page` for every address, and what it sent on. */
-function harness(page: string) {
+function harness(page: string, definition?: ConnectorDefinition) {
   const asked: string[] = [];
   const fetch: typeof globalThis.fetch = async (_endpoint, init) => {
     asked.push((JSON.parse(String(init?.body)) as { url: string }).url);
     return new Response(page, { status: 200 });
   };
   const registry = createSourceRegistry({
-    definitions: [createBrightDataForum()],
+    definitions: [definition ?? createBrightDataForum()],
     runtime: createSourceRuntime({ fetch, logger }),
   });
   const step = createCompleteStep({
@@ -65,6 +68,48 @@ function harness(page: string) {
   const run = (monitorId: string, postIds: string[]) =>
     step({ monitorId, postIds, walkId: "walk-1" }, { db, boss, logger } as StepContext);
   return { asked, sent, run };
+}
+
+/** A forum connector that records each completion call, whole. */
+function recordingConnector(calls: CompleteRequest[]): ConnectorDefinition {
+  const platform = { id: "forum", displayName: "Forum" };
+  const provider = {
+    id: "brightdata",
+    displayName: "Bright Data",
+    credentialFields: [{ name: "apiKey", label: "API key", secret: true }],
+  };
+  const descriptor = {
+    platform,
+    provider,
+    billableUnit: "page",
+    pricePerUnitMicros: 1_500,
+    maxUnitsPerQueryPoll: 20,
+  };
+  return {
+    ...descriptor,
+    create: (): SocialSource => ({
+      ...descriptor,
+      validateCredentials: async () => ({ valid: true }),
+      search: async () => {
+        throw new Error("the complete step does not search");
+      },
+      completePosts: async function* (request) {
+        calls.push(request);
+        for (const post of request.posts) {
+          yield {
+            status: "complete" as const,
+            post: {
+              externalId: post.url,
+              url: post.url,
+              text: "the whole post",
+              postedAt: new Date("2026-10-28T18:05:14.000Z"),
+            },
+            unitsConsumed: 1,
+          };
+        }
+      },
+    }),
+  };
 }
 
 async function forumMonitor(): Promise<string> {
@@ -188,5 +233,19 @@ describe("completing the partial posts the filter kept", () => {
 
     expect(asked).toEqual([]);
     expect(sent[0]?.payload.postIds).toEqual([id]);
+  });
+
+  it("reads two partial posts of one source in one call", async () => {
+    const monitorId = await forumMonitor();
+    const first = await insertPost("forums.macrumors.com:2493064-a", {});
+    const second = await insertPost("forums.macrumors.com:2493064-b", {});
+    const calls: CompleteRequest[] = [];
+    const { sent, run } = harness(threadPage, recordingConnector(calls));
+
+    await run(monitorId, [first, second]);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.posts.map((post) => post.url)).toEqual([thread, thread]);
+    expect(sent[0]?.payload.postIds).toEqual([first, second]);
   });
 });

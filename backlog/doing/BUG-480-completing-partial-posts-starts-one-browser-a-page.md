@@ -19,11 +19,17 @@ adds its wait. Seen on a local rockler.com scan on 2026-10-31.
 
 ## Acceptance
 
-- [ ] A connector completes several partial posts in one call that shares
+- [x] A connector completes several partial posts in one call that shares
       one page fetcher, so one browser at most for the call, stopped when it
       ends.
-- [ ] The complete step makes one such call per source in a job, and records
+- [x] The complete step makes one such call per source in a job, and records
       each post's units and result as before, with the same 20-page cap.
-- [ ] A test shows 3 partial posts read through one browser start.
+- [x] A test shows 3 partial posts read through one browser start.
 
 ## Log
+- 2026-11-01T00:53+08:00 — Built by DeepSeek Flash through opencode from a
+  brief, reviewed and checked here. `completePost` is now `completePosts`,
+  an async iterable over one fetcher, closed when the iteration ends; the
+  complete step groups the first 20 partial posts by source and makes one
+  call per source. Never released, so the old method is gone. 71 tests in
+  the connector and the step pass. Not yet run live.

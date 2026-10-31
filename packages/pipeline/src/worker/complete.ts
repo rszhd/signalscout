@@ -87,50 +87,65 @@ export function createCompleteStep({
     let read = 0;
     let units = 0;
 
+    const bySource = new Map<string, typeof partial>();
     for (const post of partial.slice(0, maxCompletionsPerJob)) {
-      const connector = await connectorFor(post.source);
-      const credentials = connector?.completePost
+      const group = bySource.get(post.source);
+      if (group) group.push(post);
+      else bySource.set(post.source, [post]);
+    }
+
+    for (const [source, group] of bySource) {
+      const connector = await connectorFor(source);
+      const credentials = connector?.completePosts
         ? await credentialsFor(connector, monitor.userId)
         : null;
-      if (!connector?.completePost || !credentials) continue;
+      if (!connector?.completePosts || !credentials) continue;
 
-      const result = await connector.completePost({
-        url: post.url,
-        ...(post.since ? { since: post.since } : {}),
+      let at = 0;
+      for await (const result of connector.completePosts({
+        posts: group.map((post) => ({
+          url: post.url,
+          ...(post.since ? { since: post.since } : {}),
+        })),
         credentials,
-      });
-      units += result.unitsConsumed;
-      if (result.unitsConsumed > 0) {
-        await recordSourceUsage(db, {
-          userId: monitor.userId,
-          monitorId,
-          source: post.source as Source,
-          provider: connector.provider.id as Provider,
-          units: result.unitsConsumed,
-          pricePerUnitMicros: connector.pricePerUnitMicros,
-        });
-      }
+      })) {
+        const post = group[at];
+        at += 1;
+        if (!post) break;
 
-      if (result.status !== "complete") {
-        if (result.status === "old") old.push(post.id);
-        else
-          logger.warn(
-            { monitorId, url: post.url, reason: result.reason },
-            "a partial post goes on as it is",
-          );
-        continue;
+        units += result.unitsConsumed;
+        if (result.unitsConsumed > 0) {
+          await recordSourceUsage(db, {
+            userId: monitor.userId,
+            monitorId,
+            source: source as Source,
+            provider: connector.provider.id as Provider,
+            units: result.unitsConsumed,
+            pricePerUnitMicros: connector.pricePerUnitMicros,
+          });
+        }
+
+        if (result.status !== "complete") {
+          if (result.status === "old") old.push(post.id);
+          else
+            logger.warn(
+              { monitorId, url: post.url, reason: result.reason },
+              "a partial post goes on as it is",
+            );
+          continue;
+        }
+        read += 1;
+        await db
+          .update(posts)
+          .set({
+            title: result.post.title ?? null,
+            excerpt: result.post.text.slice(0, excerptLength),
+            postedAt: result.post.postedAt,
+            textPartial: false,
+            partialSince: null,
+          })
+          .where(eq(posts.id, post.id));
       }
-      read += 1;
-      await db
-        .update(posts)
-        .set({
-          title: result.post.title ?? null,
-          excerpt: result.post.text.slice(0, excerptLength),
-          postedAt: result.post.postedAt,
-          textPartial: false,
-          partialSince: null,
-        })
-        .where(eq(posts.id, post.id));
     }
 
     if (old.length > 0)

@@ -313,6 +313,33 @@ describe("Discourse, through its JSON", () => {
     expect(read?.text).not.toMatch(/<p>|<\/p>/);
   });
 
+  it("keeps a forum's folder in its topics' addresses", () => {
+    const list = page("discourse-list");
+    const inFolder = "https://www.sitepoint.com/community/latest.json?order=created";
+    const [first] = discourse.listThreads(list.html, inFolder);
+    expect(first?.url).toMatch(/^https:\/\/www\.sitepoint\.com\/community\/t\/[^/]+\/\d+$/);
+    expect(discourse.threadPageUrl?.("https://www.sitepoint.com/community/t/topic/416139")).toBe(
+      "https://www.sitepoint.com/community/t/416139.json",
+    );
+    const thread = page("discourse-thread");
+    expect(
+      discourse.readThread(thread.html, "https://www.sitepoint.com/community/t/416139.json")?.url,
+    ).toBe("https://www.sitepoint.com/community/t/topic/416139");
+  });
+
+  it("reads topics a browser showed as text, escaped inside a <pre>", () => {
+    const list = page("discourse-list");
+    const escaped = list.html
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+    const shown = `<html><head><meta name="color-scheme" content="light dark"><meta charset="utf-8"></head><body><pre>${escaped}</pre></body></html>`;
+    expect(discourse.detect(shown)).toBe(true);
+    expect(discourse.listThreads(shown, list.url)).toEqual(
+      discourse.listThreads(list.html, list.url),
+    );
+  });
+
   it("asks a category, or the whole site, for its topics by start time", () => {
     expect(discourse.newestThreadsUrl("https://meta.discourse.org/c/support/6")).toBe(
       "https://meta.discourse.org/c/support/6/l/latest.json?order=created",
@@ -570,6 +597,42 @@ describe("a forum's home page and its feed", () => {
       "https://meta.discourse.org/latest.json?order=created",
     );
   });
+
+  it("takes Discourse's newest topics from the folder it lives in", () => {
+    const head = page("discourse-folder-index");
+    expect(detectForumIndex(head.html)?.id).toBe("discourse");
+    expect(forumFeedFrom(head.html, head.url)?.feedUrl).toBe(
+      "https://www.sitepoint.com/community/latest.json?order=created",
+    );
+    // The address comes from the page, not from the one it was read at.
+    expect(
+      discourse.feedUrl?.(head.html, "https://www.sitepoint.com/community/c/javascript/5"),
+    ).toBe("https://www.sitepoint.com/community/latest.json?order=created");
+  });
+
+  // BUG-483: home pages with no section rows, which name their version.
+  for (const [name, id, feed] of [
+    [
+      "vbulletin3-index",
+      "vbulletin4",
+      "https://www.acousticguitarforum.com/forums/external.php?type=RSS2",
+    ],
+    [
+      "vbulletin5-widgets-index",
+      "vbulletin5",
+      "https://pitmaster.amazingribs.com/external?type=rss2",
+    ],
+  ] as const) {
+    it(`names ${id} from ${name}, and its feed`, () => {
+      const home = page(name);
+      expect(
+        forumPrograms
+          .filter((other) => other.detect(home.html) || other.detectIndex?.(home.html))
+          .map((other) => other.id),
+      ).toEqual([id]);
+      expect(forumFeedFrom(home.html, home.url)?.feedUrl).toBe(feed);
+    });
+  }
 
   it("never takes another program's list or thread for its home page", () => {
     for (const program of forumPrograms) {

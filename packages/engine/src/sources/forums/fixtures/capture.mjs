@@ -173,6 +173,20 @@ const targets = {
   "xenforo2-california": {
     threadPage: "https://www.lumberjocks.com/threads/pen-turning-problem.367057/",
   },
+  // BUG-483: home pages `detectIndex` missed, `--pages=index`: vBulletin 3,
+  // which has no `forumbit_post` rows, and a vBulletin 5 home page of widgets.
+  vbulletin3: {
+    index: "https://www.acousticguitarforum.com/forums/",
+  },
+  "vbulletin5-widgets": {
+    index: "https://pitmaster.amazingribs.com/",
+  },
+  // BUG-482: a Discourse forum in a folder, `--pages=index`. Only the head:
+  // the body carries every poster's name.
+  "discourse-folder": {
+    index: "https://www.sitepoint.com/community/",
+    headOnly: true,
+  },
   // US-478: forums no parser reads, which name a feed that holds the posts.
   // Their home page and feed only: `--pages=index` and `--pages=feed`.
   "nofeedparser-vanilla": {
@@ -224,6 +238,8 @@ const namePatterns = [
   /<a[^>]+href="[^"]*\/u\/[^"/]+"[^>]*>([^<]{2,60})</g,
   // vBulletin 3/4: member.php?u=<id>, and the name in a "Started by" title.
   /<a[^>]+href="[^"]*member\.php\?u=\d+[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
+  // vBulletin 3: a home page's "Last Post" names its poster by search, not id.
+  /<a[^>]+href="[^"]*member\.php\?find=lastposter[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
   // vBulletin 5: /member/<id>-<name>. MyBB: action=profile&uid=<id>, user-<id>.html.
   /<a[^>]+href="[^"]*\/member\/\d+-[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
   /<a[^>]+href="[^"]*(?:action=profile(?:&amp;|&)uid=\d+|user-\d+\.html)[^"]*"[^>]*>(?:<(?!\/a\b)[^>]+>)*([^<]{2,60})</g,
@@ -485,10 +501,11 @@ for (const [program, target] of Object.entries(targets)) {
     const url = pagesOnly === "thread" ? target.threadPage : target[pagesOnly];
     // One forum's refusal leaves the others to fetch.
     try {
-      if (url)
-        await save(program, [
-          [pagesOnly, url, await fetchPage(url), pagesOnly === "feed" ? "xml" : "html"],
-        ]);
+      if (url) {
+        const page = await fetchPage(url);
+        const body = target.headOnly ? page.slice(0, page.search(/<body[\s>]/)) : page;
+        await save(program, [[pagesOnly, url, body, pagesOnly === "feed" ? "xml" : "html"]]);
+      }
     } catch (error) {
       console.log(`${program}: ${error.message}`);
     }

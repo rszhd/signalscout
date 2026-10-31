@@ -30,6 +30,12 @@ export type UnlockerAnswer =
 /** Where a refusal answered as a 200 shows itself. */
 function refusalIn(body: string): string | null {
   if (/^(Residential Failed|Proxy Error)/.test(body)) return body.slice(0, 200);
+  // Bright Data at times answers a 200 with nothing in it, for a page that
+  // comes back whole when asked again; a browser shows a page that never
+  // loaded the same way. Taken as a page, it loses the forum. BUG-481.
+  if (/^\s*(?:<html><head><\/head><body><\/body><\/html>)?\s*$/.test(body)) {
+    return "the site answered with an empty page";
+  }
   // Read from a challenge's title or script only, never the words of a real
   // page: Cloudflare's "Just a moment…" and "Checking your browser", a
   // proof-of-work script, and a plain "Please refresh to continue", all seen

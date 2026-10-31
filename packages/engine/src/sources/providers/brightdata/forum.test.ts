@@ -558,6 +558,14 @@ describe("a challenge page is a refusal, not a page", () => {
     expect(
       refusalIn("<html><head><script>window.POW_CHALLENGE_DATA = {}</script></head></html>"),
     ).not.toBeNull();
+    // An empty answer, or a browser's page with nothing in it (BUG-481).
+    expect(refusalIn("")).toBe("the site answered with an empty page");
+    expect(refusalIn("  \n")).toBe("the site answered with an empty page");
+    expect(refusalIn("<html><head></head><body></body></html>")).toBe(
+      "the site answered with an empty page",
+    );
+    // A real page with little in it is still a page.
+    expect(refusalIn("<html><head></head><body>ok</body></html>")).toBeNull();
     // A forum thread that talks about a captcha is still a page.
     expect(
       refusalIn(
@@ -697,6 +705,32 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
     expect(page.answer.ok).toBe(true);
     expect(page.via).toBe("unlocker");
     expect(page.units).toBe(2);
+  });
+
+  it("reads through the browser a page Bright Data answers empty", async () => {
+    const stub = brightData({ [xenforoList]: "" });
+    const browser = fakeBrowser({ [xenforoList]: captured("xenforo2-list.html") });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+    });
+
+    const page = await fetcher.fetch(xenforoList);
+    await fetcher.close();
+
+    expect(stub.asked.map((call) => call.url)).toEqual([xenforoList]);
+    expect(page.answer.ok).toBe(true);
+    expect(page.via).toBe("browser");
+    expect(browser.read).toEqual([xenforoList]);
+  });
+
+  it("calls an empty page a refusal when no browser is set", async () => {
+    const stub = brightData({ [xenforoList]: "<html><head></head><body></body></html>" });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {});
+
+    const page = await fetcher.fetch(xenforoList);
+
+    expect(page.answer).toEqual({ ok: false, reason: "the site answered with an empty page" });
+    expect(page.units).toBe(0);
   });
 
   it("asks Bright Data once when it goes first and the browser reads the page", async () => {

@@ -2,10 +2,13 @@
 
 # Done
 
-267 finished.
+270 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-483 | [vBulletin 3 and 5 home pages are not detected](done/2026-11/BUG-483-vbulletin-3-and-5-home-pages-are-not-detected.md) | bug | shipped | 2026-11 |
+| BUG-482 | [Discourse in a subfolder gets the site root's feed](done/2026-11/BUG-482-discourse-in-a-subfolder-gets-the-site-root-s-feed.md) | bug | shipped | 2026-11 |
+| BUG-481 | [An empty page from Bright Data loses the forum](done/2026-11/BUG-481-an-empty-page-from-bright-data-loses-the-forum.md) | bug | shipped | 2026-11 |
 | BUG-480 | [Completing partial posts starts one browser a page](done/2026-11/BUG-480-completing-partial-posts-starts-one-browser-a-page.md) | bug | shipped | 2026-11 |
 | BUG-479 | [XenForo 2 threads in VerticalScope's theme are not read](done/2026-11/BUG-479-xenforo-2-threads-in-verticalscope-s-theme-are-not-read.md) | bug | shipped | 2026-11 |
 | BUG-475 | [The pre-filter drops forum posts for missing address words](done/2026-10/BUG-475-the-pre-filter-drops-forum-posts-for-missing-address-words.md) | bug | shipped | 2026-10 |

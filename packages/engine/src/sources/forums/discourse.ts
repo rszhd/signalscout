@@ -6,6 +6,7 @@
  * section's newest topics are `<category>/l/latest.json?order=created`; a
  * topic is `/t/<id>.json`, whose first post is `post_stream.posts[0]`.
  */
+import { unwrapped } from "./feeds.js";
 import { fromIso, textOf } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
@@ -28,14 +29,24 @@ interface Post {
 
 function parse(page: string): unknown {
   try {
-    return JSON.parse(page) as unknown;
+    // A browser shows JSON inside its own text view.
+    return JSON.parse(unwrapped(page)) as unknown;
   } catch {
     return null;
   }
 }
 
-const topicUrl = (origin: string, topic: { id: number; slug: string }) =>
-  `${origin}/t/${encodeURIComponent(topic.slug)}/${topic.id}`;
+const topicUrl = (root: string, topic: { id: number; slug: string }) =>
+  `${root}/t/${encodeURIComponent(topic.slug)}/${topic.id}`;
+
+/**
+ * The forum's own address from one of its pages' addresses: a forum may live
+ * in a folder (`/community`) of a site whose root is something else. BUG-482.
+ */
+function forumRoot(pageUrl: string): string {
+  const url = new URL(pageUrl);
+  return url.origin + url.pathname.replace(/\/(?:latest\.json|c\/|t\/).*$|\/+$/, "");
+}
 
 export const discourse: ForumProgram = {
   id: "discourse",
@@ -43,7 +54,7 @@ export const discourse: ForumProgram = {
 
   detect(page) {
     if (/<meta name="generator" content="Discourse/.test(page)) return true;
-    if (!page.trimStart().startsWith("{")) return false;
+    if (!unwrapped(page).trimStart().startsWith("{")) return false;
     const json = parse(page) as { topic_list?: unknown; post_stream?: unknown } | null;
     return Boolean(json && (json.topic_list || json.post_stream));
   },
@@ -59,17 +70,17 @@ export const discourse: ForumProgram = {
   threadPageUrl(threadUrl) {
     const url = new URL(threadUrl);
     const id = url.pathname.match(/\/t\/(?:[^/]+\/)?(\d+)/)?.[1];
-    return id ? `${url.origin}/t/${id}.json` : threadUrl;
+    return id ? `${forumRoot(threadUrl)}/t/${id}.json` : threadUrl;
   },
 
   listThreads(page, pageUrl) {
     const topics =
       (parse(page) as { topic_list?: { topics?: Topic[] } } | null)?.topic_list?.topics ?? [];
-    const { origin } = new URL(pageUrl);
+    const root = forumRoot(pageUrl);
     return topics.map(
       (topic): ForumThreadSummary => ({
         id: String(topic.id),
-        url: topicUrl(origin, topic),
+        url: topicUrl(root, topic),
         title: topic.title,
         startedAt: fromIso(topic.created_at),
         approximateStart: false,
@@ -85,7 +96,7 @@ export const discourse: ForumProgram = {
     if (!json?.id || !first) return null;
     return {
       id: String(json.id),
-      url: topicUrl(new URL(pageUrl).origin, json),
+      url: topicUrl(forumRoot(pageUrl), json),
       title: json.title,
       text: textOf(first.cooked),
       postedAt: fromIso(first.created_at),
@@ -93,6 +104,11 @@ export const discourse: ForumProgram = {
     };
   },
 
-  // Its newest topics as JSON, which `listThreads` reads: a section at the root.
-  feedUrl: (_page, homeUrl) => new URL("/latest.json?order=created", homeUrl).toString(),
+  // Its newest topics as JSON, which `listThreads` reads, under the address
+  // the page names in `data-base-url`, folder and host included: the address
+  // asked for may have redirected to the forum's own host. BUG-482.
+  feedUrl: (page, homeUrl) => {
+    const named = page.match(/data-base-url="(https?:\/\/[^"]+)"/)?.[1];
+    return `${(named ?? forumRoot(homeUrl)).replace(/\/+$/, "")}/latest.json?order=created`;
+  },
 };

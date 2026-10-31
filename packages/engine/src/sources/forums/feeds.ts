@@ -57,11 +57,11 @@ function threadAddress(href: string, pageUrl: string): string {
  * keeps the source whole in one element; and as Chrome's text view, the
  * source escaped once inside a `<pre>`.
  */
-function unwrapped(body: string): string {
+export function unwrapped(body: string): string {
   const viewer = body.indexOf('<div id="webkit-xml-viewer-source-xml">');
   if (viewer >= 0) return body.slice(viewer + 39);
   const text = body.match(
-    /^\s*<html><head><meta name="color-scheme"[^>]*><\/head><body><pre[^>]*>([\s\S]*)<\/pre>/,
+    /^\s*<html><head><meta name="color-scheme"[^>]*>(?:<meta[^>]*>)*<\/head><body><pre[^>]*>([\s\S]*)<\/pre>/,
   );
   return text?.[1] !== undefined ? decodeEntities(text[1]) : body;
 }

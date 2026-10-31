@@ -256,5 +256,23 @@
     "capturedAt": "2026-10-31T15:50:06.669Z",
     "bytes": 423969,
     "namesScrubbed": 36
+  },
+  "vbulletin3-index.html": {
+    "url": "https://www.acousticguitarforum.com/forums/",
+    "capturedAt": "2026-10-31T17:51:09.217Z",
+    "bytes": 432683,
+    "namesScrubbed": 34
+  },
+  "vbulletin5-widgets-index.html": {
+    "url": "https://pitmaster.amazingribs.com/",
+    "capturedAt": "2026-10-31T17:50:10.567Z",
+    "bytes": 67834,
+    "namesScrubbed": 1
+  },
+  "discourse-folder-index.html": {
+    "url": "https://www.sitepoint.com/community/",
+    "capturedAt": "2026-10-31T17:50:13.625Z",
+    "bytes": 30735,
+    "namesScrubbed": 0
   }
 }

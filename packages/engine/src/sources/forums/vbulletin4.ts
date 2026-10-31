@@ -79,8 +79,11 @@ export const vbulletin4: ForumProgram = {
     };
   },
 
+  // vBulletin 3 has no `forumbit_post` rows, but names its version. BUG-483.
   detectIndex: (html) =>
-    /class="forumbit_(?:no)?post/.test(html) && /forumdisplay\.php\?/.test(html),
+    (/class="forumbit_(?:no)?post/.test(html) ||
+      /vBulletin(?:&reg;|®)?(?: Version)? [34]\.\d/.test(html)) &&
+    /forumdisplay\.php\?/.test(html),
 
   feedUrl: (html, homeUrl) =>
     feedFrom(html, homeUrl, (url) => vbulletin4.isFeed?.(url) ?? false, "external.php?type=RSS2"),

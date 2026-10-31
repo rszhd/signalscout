@@ -75,8 +75,11 @@ export const vbulletin5: ForumProgram = {
     };
   },
 
+  // A home page built from widgets lists no sections, but names its version.
+  // BUG-483.
   detectIndex: (html) =>
-    /<body[^>]+id="vb-page-body"/.test(html) && /class="forum-title"/.test(html),
+    /<body[^>]+id="vb-page-body"/.test(html) &&
+    (/class="forum-title"/.test(html) || /<meta name="generator" content="vBulletin 5/.test(html)),
 
   // The whole forum's: a feed with a `nodeid` is one channel's.
   feedUrl: (html, homeUrl) =>

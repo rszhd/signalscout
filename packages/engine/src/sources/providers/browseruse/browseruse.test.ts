@@ -212,6 +212,21 @@ describe("a tab of the cloud browser", () => {
     });
   });
 
+  it("waits out a page that is still empty, and refuses one that stays empty", async () => {
+    const empty = "<html><head></head><body></body></html>";
+    chromium([empty, forumPage]);
+    const tab = await CdpTab.open("wss://cdp.example/b1", runtimeWith());
+    expect(await tab.read("https://watchuseek.com/")).toEqual({ ok: true, body: forumPage });
+
+    chromium(Array.from({ length: 20 }, () => empty));
+    const stays = await CdpTab.open("wss://cdp.example/b1", runtimeWith());
+    expect(await stays.read("https://watchuseek.com/")).toEqual({
+      ok: false,
+      reason: "the site answered with an empty page",
+      connection: false,
+    });
+  });
+
   it("waits out a navigation, and calls a failed proxy a connection error", async () => {
     chromium([]);
     const empty = await CdpTab.open("wss://x", runtimeWith());

@@ -274,5 +274,65 @@
     "capturedAt": "2026-10-31T17:50:13.625Z",
     "bytes": 30735,
     "namesScrubbed": 0
+  },
+  "invision4-stream-stream.html": {
+    "url": "https://linustechtips.com/discover/",
+    "capturedAt": "2026-10-31T18:45:32.150Z",
+    "bytes": 138885,
+    "namesScrubbed": 30
+  },
+  "invision4-stream-stream2.html": {
+    "url": "https://linustechtips.com/discover/?before=1793468592",
+    "capturedAt": "2026-10-31T18:45:32.169Z",
+    "bytes": 139574,
+    "namesScrubbed": 27
+  },
+  "invision5-stream.html": {
+    "url": "https://forums.golfwrx.com/discover/",
+    "capturedAt": "2026-10-31T18:46:28.920Z",
+    "bytes": 223738,
+    "namesScrubbed": 35
+  },
+  "invision5-stream2.html": {
+    "url": "https://forums.golfwrx.com/discover/?before=1793469636",
+    "capturedAt": "2026-10-31T18:46:28.944Z",
+    "bytes": 216654,
+    "namesScrubbed": 42
+  },
+  "invision5-thread.html": {
+    "url": "https://forums.golfwrx.com/topic/2113624-lab-vnz/",
+    "capturedAt": "2026-10-31T18:46:28.961Z",
+    "bytes": 253660,
+    "namesScrubbed": 15
+  },
+  "invision5-index.html": {
+    "url": "https://forums.golfwrx.com/",
+    "capturedAt": "2026-10-31T18:46:28.994Z",
+    "bytes": 292344,
+    "namesScrubbed": 44
+  },
+  "invision5-folder-index.html": {
+    "url": "https://www.stereonet.com/forums/",
+    "capturedAt": "2026-10-31T18:45:55.681Z",
+    "bytes": 349060,
+    "namesScrubbed": 61
+  },
+  "invision4-stream-topics-stream.html": {
+    "url": "https://forum.mygolfspy.com/discover/",
+    "capturedAt": "2026-10-31T18:49:13.501Z",
+    "bytes": 203072,
+    "namesScrubbed": 33
+  },
+  "invision4-stream-topics-stream2.html": {
+    "url": "https://forum.mygolfspy.com/discover/?before=1793463303",
+    "capturedAt": "2026-10-31T18:49:13.523Z",
+    "bytes": 214562,
+    "namesScrubbed": 39
+  },
+  "invision4-stream-topics-thread.html": {
+    "url": "https://forum.mygolfspy.com/topic/76730-the-drinks-thread/",
+    "capturedAt": "2026-10-31T18:49:13.531Z",
+    "bytes": 124653,
+    "namesScrubbed": 13
   }
 }

@@ -66,3 +66,14 @@ reader exists (`invision4.ts`); Invision 5 has no reader at all.
   Data refused it without KYC; its `/discover/` pages opened.
 
 ## Log
+- 2026-11-01T02:50+08:00 — Owner set the page cap: 5 stream pages a poll.
+  Fixtures captured through the browser (`--pages=stream`): LinusTechTips
+  (Invision 4, replies only on both pages), MyGolfSpy (Invision 4, 1 and 3
+  new topics, and a thread), GolfWRX (Invision 5, 1 and 5 new topics, a
+  thread, its home page), StereoNET's home page (Invision 5 in `/forums/`).
+  About 23 browser pages over four runs, under $0.03: GolfWRX once came
+  back cut after its head, and two scrubber gaps were fixed and captured
+  again (a photo-only profile link, a mention turned into text, and a
+  member-named photo file in JSON-LD). New-topic rule: an item's status
+  line names one member (`data-ipshover` links), a reply's names two; it
+  agreed with the words "posted a topic" on all 142 topic items.

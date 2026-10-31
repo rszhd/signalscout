@@ -170,6 +170,26 @@ const targets = {
   },
   // VerticalScope's XenForo 2 theme ("California"): one thread, through the
   // browser (`--via=browser --pages=thread`); Bright Data meets a bot check.
+  // US-485: Invision's activity stream, its older page (`?before=`), and a
+  // new topic from it, through the browser (`--via=browser --pages=stream`);
+  // Bright Data met a bot check on it. Invision 5 also has its home page, and
+  // a board in a folder its home page alone.
+  // Replies only on both pages: a busy board's hour.
+  "invision4-stream": {
+    stream: "https://linustechtips.com/discover/",
+  },
+  "invision4-stream-topics": {
+    stream: "https://forum.mygolfspy.com/discover/",
+    streamThread: true,
+  },
+  invision5: {
+    stream: "https://forums.golfwrx.com/discover/",
+    index: "https://forums.golfwrx.com/",
+    streamThread: true,
+  },
+  "invision5-folder": {
+    index: "https://www.stereonet.com/forums/",
+  },
   "xenforo2-california": {
     threadPage: "https://www.lumberjocks.com/threads/pen-turning-problem.367057/",
   },
@@ -234,6 +254,9 @@ const namePatterns = [
   // itself only: /profile/<id>-<name>/solutions/ shows a count.
   /<a[^>]+href=['"][^'"]*(?:showuser=\d+|\/profile\/\d+-[^'"/]*\/?)['"][^>]*>(?:\s*<(?!\/a\b)[^>]+>)*\s*([^<\s][^<]{1,59}?)\s*</g,
   /data-ipsquote-username="([^"]{2,60})"/g,
+  // Invision's photo-only link (a status update has no name link): the name
+  // is the photo's alt text alone.
+  /class="ipsUserPhoto[^"]*"[^>]*>\s*<img[^>]*alt="([^"]{2,60})"/g,
   // Flarum and Discourse: /u/<name>.
   /<a[^>]+href="[^"]*\/u\/[^"/]+"[^>]*>([^<]{2,60})</g,
   // vBulletin 3/4: member.php?u=<id>, and the name in a "Started by" title.
@@ -305,6 +328,8 @@ const urlScrubs = [
     /(class="ipsUserPhoto[^"]*"[^>]*>\s*<img src=)(['"])[^'"]*\2/g,
     "$1$2//member.example/photo.jpg$2",
   ],
+  // Invision names an uploaded photo after its member, in the page's JSON-LD too.
+  [/(monthly_\d{4}_\d{2}\/)[^"'\s/\\]+_avatar(?=\.)/g, "$1member_avatar"],
   // A member who introduces themselves names themselves: "I'm <name> from",
   // "<name> here from". Only that place: the word may be a common one too.
   [
@@ -350,7 +375,13 @@ export function scrub(html, pageUrl) {
       /(<div[^>]*class="[^"]*\bsignature\b[^"]*"[^>]*>)[\s\S]*?(<\/div>)/g,
       "$1(signature)$2",
     );
-  return { html: replaceNames(out, names), names: names.size };
+  // A mention a snippet turned into text: "@name". Scripts and styles keep
+  // theirs, where "@type" and "@media" are code.
+  const mentions = replaceNames(out, names).replace(
+    /(<(script|style)\b[\s\S]*?<\/\2>)|(?<=[\s>(])@[A-Za-z][\w.-]{1,59}/g,
+    (_match, block) => block ?? "@member",
+  );
+  return { html: mentions, names: names.size };
 }
 
 /** JSON fields that name or picture a member, in Discourse and Flarum. */
@@ -496,6 +527,22 @@ try {
 
 for (const [program, target] of Object.entries(targets)) {
   if (only && only !== program) continue;
+  if (pagesOnly === "stream") {
+    if (!target.stream) continue;
+    const first = await fetchPage(target.stream);
+    const pages = [["stream", target.stream, first, "html"]];
+    const older = olderStreamPage(first, target.stream);
+    if (older) pages.push(["stream2", older, await fetchPage(older), "html"]);
+    else console.log(`${program}: no older page named on the stream`);
+    if (target.streamThread) {
+      const topic = pages.map(([, , page]) => newTopicIn(page)).find(Boolean);
+      if (topic) pages.push(["thread", topic, await fetchPage(topic), "html"]);
+      else console.log(`${program}: no new topic on either stream page`);
+    }
+    if (target.index) pages.push(["index", target.index, await fetchPage(target.index), "html"]);
+    await save(program, pages);
+    continue;
+  }
   if (pagesOnly === "index" || pagesOnly === "feed" || pagesOnly === "thread") {
     // `thread`: a target's fixed thread page, for a theme a list cannot reach.
     const url = pagesOnly === "thread" ? target.threadPage : target[pagesOnly];
@@ -528,6 +575,30 @@ for (const [program, target] of Object.entries(targets)) {
   if (target.index) pages.push(["index", target.index, await fetchPage(target.index), "html"]);
   if (target.feed) pages.push(["feed", target.feed, await fetchPage(target.feed), "xml"]);
   await save(program, pages);
+}
+
+/**
+ * The stream's "Load more": its address with `?before=` the last item's
+ * time, read from Invision's own stream script on 2026-11-01.
+ */
+function olderStreamPage(html, pageUrl) {
+  const base = html.match(/data-streamurl="([^"]+)"/)?.[1] ?? pageUrl;
+  const times = [...html.matchAll(/data-role="activityItem"[^>]*data-timestamp="(\d+)"/g)];
+  const last = times.at(-1)?.[1];
+  return last && `${base.split("?")[0]}?before=${last}`;
+}
+
+/** A topic the stream says was started: one member in the item's status line, not two. */
+function newTopicIn(html) {
+  for (const item of html.split(/(?=<li[^>]*data-role="activityItem")/).slice(1)) {
+    const status = item.match(
+      /(?:ipsStreamItem_status|ipsStreamItem__summary)[\s\S]*?<\/(?:p|div)>/,
+    )?.[0];
+    // The item's first topic link is its title's: a theme may use <h3>.
+    const link = item.match(/href="([^"]*\/topic\/\d+-[^"?]*)/)?.[1];
+    if (status && link && (status.match(/<a [^>]*data-ipshover/g) ?? []).length === 1) return link;
+  }
+  return undefined;
 }
 
 async function save(program, pages) {

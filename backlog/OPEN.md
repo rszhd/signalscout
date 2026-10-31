@@ -2,7 +2,7 @@
 
 # Open tickets
 
-84 open — 16 doing, 59 todo, 9 parked (7 p1, 60 p2, 17 p3).
+85 open — 16 doing, 60 todo, 9 parked (7 p1, 61 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -72,6 +72,7 @@
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-341 | [The boot check opens every stored secret](todo/BUG-341-the-boot-check-opens-every-stored-secret.md) | bug | todo | 2026-09-23T10:05+08:00 |
 | p2 | BUG-428 | [Committed fixtures carry numeric account ids](todo/BUG-428-committed-fixtures-carry-numeric-account-ids.md) | bug | todo | 2026-09-26T02:59+08:00 |
+| p2 | BUG-484 | [A Bright Data 5xx answer skips the browser](todo/BUG-484-a-bright-data-5xx-skips-the-browser.md) | bug | todo | 2026-11-01T02:27+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |

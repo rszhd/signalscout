@@ -226,5 +226,29 @@
     "capturedAt": "2026-10-31T04:08:17.280Z",
     "bytes": 20353,
     "namesScrubbed": 9
+  },
+  "nofeedparser-vanilla-index.html": {
+    "url": "https://lowendtalk.com/",
+    "capturedAt": "2026-10-31T11:30:12.952Z",
+    "bytes": 239145,
+    "namesScrubbed": 163
+  },
+  "nofeedparser-mumsnet-index.html": {
+    "url": "https://www.mumsnet.com/talk",
+    "capturedAt": "2026-10-31T11:29:12.020Z",
+    "bytes": 285342,
+    "namesScrubbed": 0
+  },
+  "nofeedparser-vanilla-feed.xml": {
+    "url": "https://lowendtalk.com/discussions/feed.rss",
+    "capturedAt": "2026-10-31T11:29:53.937Z",
+    "bytes": 354594,
+    "namesScrubbed": 101
+  },
+  "nofeedparser-mumsnet-feed.xml": {
+    "url": "https://www.mumsnet.com/talk/feed",
+    "capturedAt": "2026-10-31T11:29:18.098Z",
+    "bytes": 74662,
+    "namesScrubbed": 0
   }
 }

@@ -168,6 +168,16 @@ const targets = {
       return id && `https://geekhack.org/index.php?topic=${id}.0`;
     },
   },
+  // US-478: forums no parser reads, which name a feed that holds the posts.
+  // Their home page and feed only: `--pages=index` and `--pages=feed`.
+  "nofeedparser-vanilla": {
+    index: "https://lowendtalk.com/",
+    feed: "https://lowendtalk.com/discussions/feed.rss",
+  },
+  "nofeedparser-mumsnet": {
+    index: "https://www.mumsnet.com/talk",
+    feed: "https://www.mumsnet.com/talk/feed",
+  },
   phpbb3: {
     feed: "https://forums.gentoo.org/app.php/feed/topics",
     index: "https://forums.gentoo.org/",
@@ -221,6 +231,9 @@ const namePatterns = [
   // A thread title that names its author, "My desk PC - by <name>", in a
   // last-post line on an index page.
   / - by ([^<\s]{2,40})\s*<\/a>/g,
+  // Vanilla: /profile/<name>, the name in the address. Invision's
+  // /profile/<id>-<name> starts with a digit and has its own pattern above.
+  /\/profile\/([A-Za-z][^"'/?#\s]{1,59})["']/g,
   // Feeds: RSS's <dc:creator> and <author>, Atom's <author><name>.
   /<dc:creator>(?:<!\[CDATA\[)?([^<\]]{2,60})/g,
   /<author>(?:[^<(]*\()?([^<)]{2,60})\)?<\/author>/g,
@@ -275,6 +288,8 @@ const urlScrubs = [
     "$1Member",
   ],
   [/\b[A-Z][a-z]{2,}( here from )/g, "Member$1"],
+  // Vanilla: a member's own photo.
+  [/(uploads\/userpics\/)\d+\/[A-Za-z0-9]+(\.[a-z]+)/g, "$10/member$2"],
   // Our own session on the forum, not a person's, but it has no business here.
   [/([?&;](?:amp;)?(?:sid|PHPSESSID|s)=)[0-9a-z]{20,40}/gi, "$10"],
 ];

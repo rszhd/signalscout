@@ -6,7 +6,7 @@ priority: p2
 created: 2026-10-31T15:30+08:00
 parent: US-473
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -91,4 +91,12 @@ Changing what reaches triage is a scoring change: the
   made partial again: the conflict keeps the stored words. 2,735 tests pass.
   Not yet run live. BuyerFinder's `LOOKOUT_FORUM_THREAD_PAGES` now caps only
   section reads; the complete step's 20 caps a feed's pages.
-
+- 2026-10-31T18:47+08:00 — Run live, locally, on BuyerFinder (leupold.com,
+  forums only, scoring on the Claude bridge). Two XenForo 2 feeds kept (Long
+  Range Hunting, The High Road; three forums had no parser). The poll read
+  the 2 feeds in 3 seconds and gave 45 posts; the embedding stage kept 41
+  and triage 17; the complete step read 11 thread pages: 8 posts read whole,
+  3 dropped as `old_thread`, none left partial. 14 posts scored, 1 match
+  (66, a recommendation request on The High Road). 13 requests for the poll
+  and its pages, against 83 for four feeds' thread pages in the last scan
+  before this change.

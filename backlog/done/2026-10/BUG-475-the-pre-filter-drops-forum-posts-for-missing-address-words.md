@@ -6,7 +6,7 @@ priority: p1
 created: 2026-10-31T14:30+08:00
 parent: US-470
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -31,3 +31,5 @@ The forum platform has not reached an npm release, so no published monitor
 was filtered this way.
 
 ## Log
+- 2026-10-31T18:47+08:00 — Live: the last local scan's keyword stage dropped
+  none of 45 forum posts; the embedding stage and triage did the judging.

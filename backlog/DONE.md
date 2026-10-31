@@ -2,10 +2,13 @@
 
 # Done
 
-262 finished.
+265 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-475 | [The pre-filter drops forum posts for missing address words](done/2026-10/BUG-475-the-pre-filter-drops-forum-posts-for-missing-address-words.md) | bug | shipped | 2026-10 |
+| US-476 | [A forum thread page is read only for a post that passed the filters](done/2026-10/US-476-a-forum-thread-page-is-read-only-for-a-post-that-passed-the-filters.md) | feature | shipped | 2026-10 |
+| US-473 | [A monitor reads a whole forum through its newest-threads feed](done/2026-10/US-473-a-monitor-reads-a-whole-forum-through-its-newest-threads-feed.md) | feature | shipped | 2026-10 |
 | US-468 | [ScrapeCreators' Reddit connector stops on the first page that reaches posts it has read](done/2026-10/US-468-scrapecreators-reddit-stops-on-the-first-page-that-reaches-read-posts.md) | feature | shipped | 2026-10 |
 | US-467 | [SocialCrawl's Reddit connector stops at posts it has already read](done/2026-10/US-467-socialcrawl-reddit-stops-at-posts-it-has-already-read.md) | feature | shipped | 2026-10 |
 | US-459 | [The docs site shows SignalScout Cloud only](done/2026-10/US-459-the-docs-site-shows-signalscout-cloud-only.md) | chore | shipped | 2026-10 |

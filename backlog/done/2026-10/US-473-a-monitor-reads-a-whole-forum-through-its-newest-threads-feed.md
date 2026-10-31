@@ -6,7 +6,7 @@ priority: p2
 created: 2026-10-31T12:04+08:00
 parent: US-470
 area: sources
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -97,4 +97,6 @@ its activity page met a bot check, so it waits for the browser fallback.
   builds and introductions, not optics purchases. All 20 of The High Road's
   thread pages were skipped: XenForo 2's reader took a thread id from
   `/threads/` only, and the board writes `index.php?threads/`. Fixed.
-
+- 2026-10-31T18:47+08:00 — Polled live through feeds in four local scans,
+  the last with US-476: a feed is one request, and The High Road's
+  `index.php?` feed and threads now read.

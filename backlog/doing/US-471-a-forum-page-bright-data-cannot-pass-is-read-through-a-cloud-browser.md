@@ -114,3 +114,14 @@ version; nothing there sets its key.
   WebSocket, so the engine takes no browser library. PowerForum's "One
   moment, please" page now counts as a bot check. 2,690 tests; root lint and
   type check pass. The live poll is next.
+- 2026-10-31T09:35+08:00 — Live poll of three bot-check sections (WatchUSeek dive watches,
+  HVAC-Talk controls, Mothering's pregnancy forum), three threads each.
+  Bright Data refused each with its challenge page, and each went to the
+  browser. Every page failed with `net::ERR_TUNNEL_CONNECTION_FAILED`: the
+  Evomi trial had used its data, and a direct request through the proxy
+  answered 402 Payment Required. What ran live: six browsers started and
+  stopped within three seconds each, the DevTools connection, the navigation
+  error, and the retry in a new browser. Cost $0.002 at Browser Use. A page
+  read through the browser is still unproven; the poll runs again once the
+  proxy has a balance. Also: `openForumFetcher` is now the fetch both the
+  connector and an application's own section check use.

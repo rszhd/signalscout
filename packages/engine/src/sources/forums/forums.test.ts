@@ -139,6 +139,19 @@ describe("XenForo 2", () => {
     expect(read?.text.startsWith("I ordered my M6 iMac this morning")).toBe(true);
     expect(read?.text).toContain("Anyone getting a later delivery date?");
   });
+
+  it("reads the first post in VerticalScope's California theme", () => {
+    const thread = page("xenforo2-california-thread");
+    const read = xenforo2.readThread(thread.html, thread.url);
+    expect(read).toMatchObject({
+      id: "367057",
+      url: "https://www.lumberjocks.com/threads/pen-turning-problem.367057/",
+      title: "Pen turning problem",
+      postedAt: new Date("2026-10-31T00:45:34.000Z"),
+      approximatePostedAt: false,
+    });
+    expect(read?.text.startsWith("Almost completed my Jr. Gentlemen's II pen")).toBe(true);
+  });
 });
 
 describe("vBulletin 5", () => {

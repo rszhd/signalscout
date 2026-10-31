@@ -7,10 +7,14 @@
  * than a class. Every time is a `<time data-timestamp>` in Unix seconds, so
  * nothing here is read from words. The markup writes `<div  class=` with two
  * spaces on some boards, so every pattern allows any space.
+ *
+ * VerticalScope's "California" theme keeps `<html id="XF">` but moves the
+ * title, the first post and its time to markers of its own; `readThread`
+ * falls back to them. BUG-479.
  */
 
 import { feedFrom, forumFolder, isXenForoFeed } from "./feeds.js";
-import { absoluteUrl, fromUnixSeconds, piecesAt, textOf, withParameters } from "./html.js";
+import { absoluteUrl, fromIso, fromUnixSeconds, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
 const timestampIn = (html: string) => fromUnixSeconds(html.match(/data-timestamp="(\d+)"/)?.[1]);
@@ -56,20 +60,24 @@ export const xenforo2: ForumProgram = {
     const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1] ?? pageUrl;
     // `/threads/…`, or `index.php?threads/…` on a board without short addresses.
     const id = canonical.match(/[/?]threads\/[^/]*?\.(\d+)\//)?.[1];
-    const heading = html.match(/<h1 class="p-title-value">([\s\S]*?)<\/h1>/)?.[1];
-    const post = html.search(/<article class="message[^"]*message--post/);
+    const heading =
+      html.match(/<h1 class="p-title-value">([\s\S]*?)<\/h1>/)?.[1] ??
+      html.match(/<h1 class="MessageCard__thread-title"[^>]*>([\s\S]*?)<\/h1>/)?.[1];
+    const plainPost = html.search(/<article class="message[^"]*message--post/);
+    const post = plainPost >= 0 ? plainPost : html.search(/<article[^>]*qid="post-text"/);
     if (!id || heading === undefined || post < 0) return null;
     const rest = html.slice(post);
     const body = rest.indexOf('class="bbWrapper">');
     if (body < 0) return null;
     const end = rest.indexOf('<div class="js-selectToQuoteEnd"', body);
+    const californiaTime = rest.match(/<time\b[^>]*qid="post-date-time"[^>]*>/)?.[0];
     return {
       id,
       url: absoluteUrl(canonical, pageUrl),
       // A prefix ("Buying") is a label inside the heading, not the title.
       title: textOf(heading.replace(/<span class="label[^"]*"[^>]*>[\s\S]*?<\/span>/g, "")),
       text: textOf(rest.slice(body + 'class="bbWrapper">'.length, end >= 0 ? end : undefined)),
-      postedAt: timestampIn(rest),
+      postedAt: timestampIn(rest) ?? fromIso(californiaTime?.match(/datetime="([^"]+)"/)?.[1]),
       approximatePostedAt: false,
     };
   },

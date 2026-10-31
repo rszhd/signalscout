@@ -22,11 +22,11 @@ the forums the survey found (Woodworking Talk too).
 
 ## Acceptance
 
-- [ ] `xenforo2.readThread` reads `xenforo2-california-thread.html`: id
+- [x] `xenforo2.readThread` reads `xenforo2-california-thread.html`: id
       367057, the title, the first post's text, and its time from the ISO
       `datetime`, not approximate.
-- [ ] The plain XenForo 2 thread reads as before.
-- [ ] No test fetches.
+- [x] The plain XenForo 2 thread reads as before.
+- [x] No test fetches.
 
 ## Notes
 
@@ -34,3 +34,9 @@ The capture is `xenforo2-california-thread.html` (4c1e18a). The first post
 appears twice in it; the first copy is the one read.
 
 ## Log
+- 2026-11-01T00:51+08:00 — Built by DeepSeek Flash through opencode from a
+  brief, reviewed and checked here. `readThread` falls back to the theme's
+  heading, its `qid="post-text"` article and the first `qid="post-date-time"`
+  ISO time; the capture has no `data-timestamp`, so the plain path never
+  answers for it. 86 forum tests pass. Close after a live scan reads a
+  LumberJocks thread.

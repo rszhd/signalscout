@@ -76,4 +76,6 @@ Changing what reaches triage is a scoring change: the
   24 of 51 posts pass on the cut text: 24 thread pages instead of 79. Two
   matches are a small sample; the owner decides whether this difference is
   accepted. Script and results: `forum-survey/partial-triage.jsonl`.
+- 2026-10-31T17:09+08:00 — The owner accepted the difference for now, and
+  asked for the comparison again on a larger sample later: US-477.
 

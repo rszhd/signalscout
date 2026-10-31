@@ -9,17 +9,23 @@ import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
 import { advertisedFeeds } from "./feeds.js";
 import { invision4 } from "./invision4.js";
+import { invision5 } from "./invision5.js";
 import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
-import type { ForumProgram } from "./types.js";
+import type { ForumProgram, ForumStream } from "./types.js";
 import { vbulletin4 } from "./vbulletin4.js";
 import { vbulletin5 } from "./vbulletin5.js";
 import { xenforo1 } from "./xenforo1.js";
 import { xenforo2 } from "./xenforo2.js";
 
 export { type FeedItem, isReply, readFeed } from "./feeds.js";
-export type { ForumProgram, ForumThread, ForumThreadSummary } from "./types.js";
+export type {
+  ForumProgram,
+  ForumStream,
+  ForumThread,
+  ForumThreadSummary,
+} from "./types.js";
 
 /** Every program read so far, most used first. */
 export const forumPrograms: readonly ForumProgram[] = [
@@ -33,6 +39,7 @@ export const forumPrograms: readonly ForumProgram[] = [
   bbpress,
   mybb,
   invision4,
+  invision5,
 ];
 
 /** The parser for this page, or null when no parser knows it. */
@@ -48,6 +55,22 @@ export function detectForumIndex(html: string): ForumProgram | null {
   return (
     forumPrograms.find((program) => program.detect(html) || program.detectIndex?.(html)) ?? null
   );
+}
+
+/**
+ * The program whose activity stream this page is, with what it read. The
+ * stream holds new topics among replies, which `detectForum` cannot tell
+ * apart from a thread page. US-485.
+ */
+export function readForumStream(
+  page: string,
+  pageUrl: string,
+): { program: ForumProgram; stream: ForumStream } | null {
+  for (const program of forumPrograms) {
+    const stream = program.readStream?.(page, pageUrl);
+    if (stream) return { program, stream };
+  }
+  return null;
 }
 
 /** A host without its `www.`, so `www.f.example` and `f.example` are one site. */

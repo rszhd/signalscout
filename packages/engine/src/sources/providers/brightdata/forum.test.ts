@@ -14,6 +14,7 @@ import {
   BrightDataForumSource,
   createBrightDataForum,
   type ForumPageEvent,
+  maxStreamPagesPerPoll,
   maxThreadsPerSection,
   openForumFetcher,
   threadsPerCall,
@@ -320,6 +321,132 @@ describe("reading a forum's newest-threads feed", () => {
   });
 });
 
+describe("reading a forum's activity stream", () => {
+  const stream = manifest["invision5-stream.html"]?.url ?? "";
+  const older = "https://forums.golfwrx.com/discover/?before=1793469636";
+  const thread = "https://forums.golfwrx.com/topic/2113624-lab-vnz/";
+  const beyond = "https://forums.golfwrx.com/discover/?before=1793467164";
+  const refused = "Residential Failed (bad_endpoint): Requested site is not available";
+  const pages = {
+    [stream]: captured("invision5-stream.html"),
+    [older]: captured("invision5-stream2.html"),
+    [beyond]: refused,
+  };
+  const since = "2026-10-31T17:15:00.000Z";
+  const newTopics = [
+    "forums.golfwrx.com:2113624",
+    "forums.golfwrx.com:2113623",
+    "forums.golfwrx.com:2113622",
+    "forums.golfwrx.com:2113621",
+    "forums.golfwrx.com:2113620",
+    "forums.golfwrx.com:2113619",
+  ];
+
+  it("reads page 1, then its older page, and gives both pages' new topics", async () => {
+    const stub = brightData(pages);
+    const events: ForumPageEvent[] = [];
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      onPage: (event) => events.push(event),
+    });
+
+    const results = await walk(source, [stream], since);
+
+    expect(stub.asked.slice(0, 2).map((call) => call.url)).toEqual([stream, older]);
+    const posts = results.flatMap((result) => result.posts);
+    expect(posts.map((post) => post.externalId)).toEqual(newTopics);
+    for (const post of posts) {
+      expect(post.partial).toEqual({ since: new Date(since) });
+      expect(post.url.startsWith("https://forums.golfwrx.com/topic/")).toBe(true);
+    }
+    expect(
+      events
+        .filter((event) => event.outcome === "read" && event.page === "feed")
+        .map((event) => event.posts),
+    ).toEqual([1, 5]);
+  });
+
+  it("stops at the stream page cap, page one or page two", async () => {
+    const one = brightData(pages);
+    const first = new BrightDataForumSource(runtimeWith(one.fetch), { streamPagesPerPoll: 1 });
+    expect((await walk(first, [stream], since)).flatMap((result) => result.posts)).toHaveLength(1);
+    expect(one.asked.map((call) => call.url)).toEqual([stream]);
+
+    const two = brightData(pages);
+    const second = new BrightDataForumSource(runtimeWith(two.fetch), { streamPagesPerPoll: 2 });
+    expect((await walk(second, [stream], since)).flatMap((result) => result.posts)).toHaveLength(6);
+    expect(two.asked.map((call) => call.url)).toEqual([stream, older]);
+  });
+
+  it("reads one page when there is no window yet", async () => {
+    const stub = brightData(pages);
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const posts = (await walk(source, [stream])).flatMap((result) => result.posts);
+
+    expect(stub.asked.map((call) => call.url)).toEqual([stream]);
+    expect(posts.map((post) => post.externalId)).toEqual(["forums.golfwrx.com:2113624"]);
+    expect(posts[0]?.partial).toEqual({});
+  });
+
+  it("asks for no older page when the window is newer than the page's oldest item", async () => {
+    const stub = brightData(pages);
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const posts = (await walk(source, [stream], "2026-10-31T18:20:00.000Z")).flatMap(
+      (result) => result.posts,
+    );
+
+    expect(stub.asked.map((call) => call.url)).toEqual([stream]);
+    expect(posts.map((post) => post.externalId)).toEqual(["forums.golfwrx.com:2113624"]);
+    expect(posts[0]?.partial).toEqual({ since: new Date("2026-10-31T18:20:00.000Z") });
+  });
+
+  it("decodes a cursor written before the stream had an older page", async () => {
+    const stub = brightData(pages);
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+    const cursor = Buffer.from(JSON.stringify({ index: 0 })).toString("base64url");
+
+    const result = await source.search(request([stream], undefined, cursor));
+
+    expect(stub.asked.map((call) => call.url)).toEqual([stream]);
+    expect(result.posts.map((post) => post.externalId)).toEqual(["forums.golfwrx.com:2113624"]);
+  });
+
+  it("completes an Invision 5 stream topic from its thread page", async () => {
+    const stub = brightData({ [thread]: captured("invision5-thread.html") });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const [result] = await completeAll(source, { posts: [{ url: thread }], credentials });
+
+    expect(result).toMatchObject({
+      status: "complete",
+      unitsConsumed: 1,
+      post: {
+        externalId: "forums.golfwrx.com:2113624",
+        title: "LAB VNZ",
+        text: expect.stringContaining("34in. Heavy would be OK."),
+        postedAt: new Date("2026-10-31T18:26:08.000Z"),
+      },
+    });
+  });
+
+  it("allows for the stream pages in its worst case", () => {
+    expect(maxStreamPagesPerPoll).toBe(5);
+    expect(
+      createBrightDataForum({ threadsPerSection: 1, streamPagesPerPoll: 5 }).maxUnitsPerQueryPoll,
+    ).toBe(5);
+    expect(
+      createBrightDataForum({
+        threadsPerSection: 1,
+        streamPagesPerPoll: 5,
+        browser: { credentials: browserCredentials },
+      }).maxUnitsPerQueryPoll,
+    ).toBe(15);
+    expect(() => createBrightDataForum({ streamPagesPerPoll: 0 })).toThrow(RangeError);
+    expect(() => createBrightDataForum({ streamPagesPerPoll: 1.5 })).toThrow(RangeError);
+  });
+});
+
 /** Each result one call gives, in order. */
 async function completeAll(
   source: BrightDataForumSource,
@@ -412,7 +539,8 @@ describe("an application's own limit", () => {
     await walk(source, [xenforoList]);
 
     expect(stub.asked).toHaveLength(1 + 3);
-    expect(connector.maxUnitsPerQueryPoll).toBe(4);
+    // The default stream path's five pages are the larger worst case.
+    expect(connector.maxUnitsPerQueryPoll).toBe(5);
     expect(() => createBrightDataForum({ threadsPerSection: 0 })).toThrow(RangeError);
   });
 });

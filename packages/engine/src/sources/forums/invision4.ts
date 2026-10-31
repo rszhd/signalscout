@@ -14,23 +14,20 @@
  * Sorting by start date (`?sortby=start_date`) is refused for a visitor on
  * the board this was captured from, so a section is read as it comes: by last
  * activity, which still puts every new thread on the first page.
+ *
+ * A whole forum is read through its activity stream (`/discover/`), which
+ * `invision-stream.ts` reads for both versions (US-485).
  */
-import { absoluteUrl, fromIso, piecesAt, textOf } from "./html.js";
+import { absoluteUrl, divContent, fromIso, piecesAt, textOf } from "./html.js";
+import {
+  invisionFeedThreadId,
+  invisionFeedUrl,
+  invisionIsFeed,
+  readInvisionStream,
+} from "./invision-stream.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
 const timeIn = (html: string) => fromIso(html.match(/<time datetime=['"]([^'"]+)['"]/)?.[1]);
-
-/** The inside of the element whose opening tag ends at `from`, nested divs and all. */
-function divContent(html: string, from: number): string {
-  let depth = 1;
-  const tags = /<(\/?)div\b[^>]*>/gi;
-  tags.lastIndex = from;
-  for (let tag = tags.exec(html); tag; tag = tags.exec(html)) {
-    depth += tag[1] ? -1 : 1;
-    if (depth === 0) return html.slice(from, tag.index);
-  }
-  return html.slice(from);
-}
 
 export const invision4: ForumProgram = {
   id: "invision4",
@@ -97,7 +94,21 @@ export const invision4: ForumProgram = {
     };
   },
 
-  // No feed: Invision publishes one only when the board's owner makes it.
+  // A status update on the stream carries `data-role=commentContent`, so
+  // `detect` can name this program on a stream page. The connector reads the
+  // stream before it asks `detectForum`, and this reader says whether the page
+  // is one.
+  readStream(html, pageUrl) {
+    const body = html.match(/<body\b[^>]*>/)?.[0] ?? "";
+    if (!/class=['"]ipsApp ipsApp_front/.test(body) || body.includes("data-ips-hook")) return null;
+    return readInvisionStream(html, pageUrl, 4);
+  },
+
+  feedUrl: invisionFeedUrl,
+  isFeed: invisionIsFeed,
+  feedText: "cut",
+  feedThreadId: invisionFeedThreadId,
+
   detectIndex: (html) => {
     const body = html.match(/<body\b[^>]*>/)?.[0] ?? "";
     return (

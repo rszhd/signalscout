@@ -12,8 +12,10 @@ import {
   forumPrograms,
   isReply,
   readFeed,
+  readForumStream,
 } from "./index.js";
 import { invision4 } from "./invision4.js";
+import { invision5 } from "./invision5.js";
 import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
 import { smf2 } from "./smf2.js";
@@ -40,8 +42,11 @@ const xenforoListUrl = manifest["xenforo2-list.html"]?.url ?? "";
 describe("which parser reads a page", () => {
   it("names the program and version of each captured page", () => {
     for (const program of forumPrograms) {
-      expect(detectForum(page(`${program.id}-list`).html)?.id).toBe(program.id);
-      expect(detectForum(page(`${program.id}-thread`).html)?.id).toBe(program.id);
+      // Invision 5 has a thread and a stream, but no section-list capture.
+      if (manifest[`${program.id}-list.html`])
+        expect(detectForum(page(`${program.id}-list`).html)?.id).toBe(program.id);
+      if (manifest[`${program.id}-thread.html`])
+        expect(detectForum(page(`${program.id}-thread`).html)?.id).toBe(program.id);
     }
   });
 
@@ -51,6 +56,7 @@ describe("which parser reads a page", () => {
 
   it("is never two parsers at once", () => {
     for (const program of forumPrograms) {
+      if (!manifest[`${program.id}-list.html`]) continue;
       const html = page(`${program.id}-list`).html;
       expect(forumPrograms.filter((other) => other.detect(html)).map((other) => other.id)).toEqual([
         program.id,
@@ -529,8 +535,189 @@ describe("Invision Community 4", () => {
   });
 });
 
+describe("Invision Community's activity stream", () => {
+  interface StreamCase {
+    readonly name: string;
+    readonly program: "invision4" | "invision5";
+    readonly activityItems: number;
+    readonly oldest: number;
+    readonly olderUrl: string;
+    readonly topics: readonly { readonly url: string; readonly at: number }[];
+  }
+
+  const cases: readonly StreamCase[] = [
+    {
+      name: "invision4-stream-stream",
+      program: "invision4",
+      activityItems: 28,
+      oldest: 1793468592,
+      olderUrl: "https://linustechtips.com/discover/?before=1793468592",
+      topics: [],
+    },
+    {
+      name: "invision4-stream-stream2",
+      program: "invision4",
+      activityItems: 28,
+      oldest: 1793464082,
+      olderUrl: "https://linustechtips.com/discover/?before=1793464082",
+      topics: [],
+    },
+    {
+      name: "invision4-stream-topics-stream",
+      program: "invision4",
+      activityItems: 25,
+      oldest: 1793463303,
+      olderUrl: "https://forum.mygolfspy.com/discover/?before=1793463303",
+      topics: [
+        {
+          url: "https://forum.mygolfspy.com/topic/76730-the-drinks-thread/",
+          at: 1793466148,
+        },
+      ],
+    },
+    {
+      name: "invision4-stream-topics-stream2",
+      program: "invision4",
+      activityItems: 25,
+      oldest: 1793448872,
+      olderUrl: "https://forum.mygolfspy.com/discover/?before=1793448872",
+      topics: [
+        {
+          url: "https://forum.mygolfspy.com/topic/76729-slow-start-to-rounds/",
+          at: 1793462295,
+        },
+        {
+          url: "https://forum.mygolfspy.com/topic/76728-dimple-pattern-website/",
+          at: 1793460865,
+        },
+        {
+          url: "https://forum.mygolfspy.com/topic/76727-ask-echo-soundless-20-cart-bag-review/",
+          at: 1793456335,
+        },
+      ],
+    },
+    {
+      name: "invision5-stream",
+      program: "invision5",
+      activityItems: 26,
+      oldest: 1793469636,
+      olderUrl: "https://forums.golfwrx.com/discover/?before=1793469636",
+      topics: [{ url: "https://forums.golfwrx.com/topic/2113624-lab-vnz/", at: 1793471168 }],
+    },
+    {
+      name: "invision5-stream2",
+      program: "invision5",
+      activityItems: 29,
+      oldest: 1793467164,
+      olderUrl: "https://forums.golfwrx.com/discover/?before=1793467164",
+      topics: [
+        {
+          url: "https://forums.golfwrx.com/topic/2113623-ventus-red-tr-7-s-fairway-shaft-140/",
+          at: 1793469536,
+        },
+        {
+          url: "https://forums.golfwrx.com/topic/2113622-maltby-tsw-wedge-heads-505460-80/",
+          at: 1793468325,
+        },
+        {
+          url: "https://forums.golfwrx.com/topic/2113621-oakley-prizm-snow-sapphire-iridium-for-golf-prescription/",
+          at: 1793468150,
+        },
+        {
+          url: "https://forums.golfwrx.com/topic/2113620-taylormade-qi10-9-wood/",
+          at: 1793467963,
+        },
+        {
+          url: "https://forums.golfwrx.com/topic/2113619-wtb-r7-quad-or-quantum-mini/",
+          at: 1793467164,
+        },
+      ],
+    },
+  ];
+
+  for (const expected of cases) {
+    it(`reads only the new topics of ${expected.name}, its oldest time and older page`, () => {
+      const stream = page(expected.name);
+      expect((stream.html.match(/data-role="activityItem"/g) ?? []).length).toBe(
+        expected.activityItems,
+      );
+      const read = readForumStream(stream.html, stream.url);
+      expect(read?.program.id).toBe(expected.program);
+      expect(
+        read?.stream.items.map((item) => ({
+          url: item.url,
+          publishedAt: item.publishedAt?.getTime(),
+        })),
+      ).toEqual(expected.topics.map((topic) => ({ url: topic.url, publishedAt: topic.at * 1000 })));
+      expect(read?.stream.olderUrl).toBe(expected.olderUrl);
+      expect(read?.stream.oldest?.getTime()).toBe(expected.oldest * 1000);
+    });
+  }
+
+  it("is no other program's page", () => {
+    for (const expected of cases) {
+      const stream = page(expected.name);
+      const others = forumPrograms.filter(
+        (program) => program.id !== expected.program && program.detect(stream.html),
+      );
+      expect(others.map((program) => program.id)).toEqual([]);
+    }
+  });
+
+  it("is not read as a stream when it is a list or a thread", () => {
+    for (const program of forumPrograms) {
+      for (const kind of ["list", "thread"]) {
+        if (!manifest[`${program.id}-${kind}.html`]) continue;
+        const captured = page(`${program.id}-${kind}`);
+        expect(readForumStream(captured.html, captured.url)).toBeNull();
+      }
+    }
+  });
+
+  it("knows a stream address and the topic id in it", () => {
+    expect(invision5.isFeed?.("https://forums.golfwrx.com/discover/?before=1")).toBe(true);
+    expect(invision4.isFeed?.("https://linustechtips.com/discover/")).toBe(true);
+    expect(invision5.feedThreadId?.("https://forums.golfwrx.com/topic/2113624-lab-vnz/")).toBe(
+      "2113624",
+    );
+    expect(invision5.feedUrl?.("<html></html>", "https://www.stereonet.com/forums/")).toBe(
+      "https://www.stereonet.com/forums/discover/",
+    );
+  });
+
+  it("reads the thread a new topic's cut text points at", () => {
+    const four = page("invision4-stream-topics-thread");
+    expect(invision4.readThread(four.html, four.url)).toMatchObject({
+      id: "76730",
+      title: "The Drinks Thread",
+      postedAt: new Date("2026-10-31T17:02:28.000Z"),
+    });
+    const five = page("invision5-thread");
+    const read = invision5.readThread(five.html, five.url);
+    expect(read).toMatchObject({
+      id: "2113624",
+      title: "LAB VNZ",
+      postedAt: new Date("2026-10-31T18:26:08.000Z"),
+    });
+    expect(read?.text.startsWith("34in. Heavy would be OK.")).toBe(true);
+  });
+
+  it("takes each Invision home page's stream address", () => {
+    for (const [name, program, feed] of [
+      ["invision4-index", "invision4", "https://linustechtips.com/discover/"],
+      ["invision5-index", "invision5", "https://forums.golfwrx.com/discover/"],
+      ["invision5-folder-index", "invision5", "https://www.stereonet.com/forums/discover/"],
+    ] as const) {
+      const home = page(name);
+      const found = forumFeedFrom(home.html, home.url);
+      expect(found?.program?.id).toBe(program);
+      expect(found?.feedUrl).toBe(feed);
+    }
+  });
+});
+
 describe("a forum's home page and its feed", () => {
-  // The feed each captured home page leads to. Invision publishes none.
+  // The feed each captured home page leads to. An Invision feed is its stream.
   const feeds: Record<string, string | null> = {
     xenforo2: "https://forums.macrumors.com/forums/-/index.rss",
     xenforo1: "https://forums.digitalpoint.com/forums/-/index.rss",
@@ -540,7 +727,8 @@ describe("a forum's home page and its feed", () => {
     smf2: "https://geekhack.org/index.php?action=.xml;type=rss2;sa=news",
     bbpress: "https://wordpress.org/support/topics/feed/",
     mybb: "https://forum.kodi.tv/syndication.php",
-    invision4: null,
+    invision4: "https://linustechtips.com/discover/",
+    invision5: "https://forums.golfwrx.com/discover/",
   };
 
   for (const [id, feed] of Object.entries(feeds)) {
@@ -637,6 +825,7 @@ describe("a forum's home page and its feed", () => {
   it("never takes another program's list or thread for its home page", () => {
     for (const program of forumPrograms) {
       for (const kind of ["list", "thread"]) {
+        if (!manifest[`${program.id}-${kind}.html`]) continue;
         const html = page(`${program.id}-${kind}`).html;
         const others = forumPrograms.filter(
           (other) => other !== program && other.detectIndex?.(html),

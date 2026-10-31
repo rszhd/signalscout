@@ -1,6 +1,7 @@
 /**
  * What a forum parser reads from a page, whatever program wrote it. US-469.
  */
+import type { FeedItem } from "./feeds.js";
 
 /** One thread on a "newest threads" list. */
 export interface ForumThreadSummary {
@@ -21,6 +22,16 @@ export interface ForumThreadSummary {
   readonly lastActivityAt: Date | null;
   /** Pinned, sticky or an announcement: kept at the top whatever its age. */
   readonly pinned: boolean;
+}
+
+/** A forum's activity stream, read a page at a time. US-485. */
+export interface ForumStream {
+  /** The new topics the page shows, in page order. Replies are dropped. */
+  readonly items: readonly FeedItem[];
+  /** The "Load more" address, or null on a page with no activity item. */
+  readonly olderUrl: string | null;
+  /** The oldest activity time on the page, replies included. */
+  readonly oldest: Date | null;
 }
 
 /** One thread's opening post. */
@@ -55,6 +66,11 @@ export interface ForumProgram {
   listThreads(page: string, pageUrl: string, now?: Date): ForumThreadSummary[];
   /** Null when the page holds no thread this parser can read. */
   readThread(page: string, pageUrl: string, now?: Date): ForumThread | null;
+  /**
+   * The new topics on this program's activity stream, or null when the page is
+   * not its stream. US-485.
+   */
+  readStream?(page: string, pageUrl: string): ForumStream | null;
   /**
    * True when this page is the forum's home page, which `detect` does not
    * know: it looks for markup a list or a thread writes. US-473.

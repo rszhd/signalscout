@@ -45,6 +45,21 @@ export function textOf(html: string): string {
     .trim();
 }
 
+/**
+ * The inside of a `<div>` whose opening tag ends at `from`, nested divs and
+ * all. It is how a parser cuts an element out without a DOM.
+ */
+export function divContent(html: string, from: number): string {
+  let depth = 1;
+  const tags = /<(\/?)div\b[^>]*>/gi;
+  tags.lastIndex = from;
+  for (let tag = tags.exec(html); tag; tag = tags.exec(html)) {
+    depth += tag[1] ? -1 : 1;
+    if (depth === 0) return html.slice(from, tag.index);
+  }
+  return html.slice(from);
+}
+
 /** Session parameters a forum adds to its links for a visitor with no cookie. */
 const sessionParameters = ["sid", "PHPSESSID", "s"];
 

@@ -28,9 +28,19 @@
  * every section. Where the program's feed holds the first post, its new items
  * are the posts and nothing else is fetched; where it cuts the text, they are
  * the threads to open, as a section's are. Replies are never posts.
+ *
+ * A forum with no feed may instead be read through its activity stream
+ * (US-485). New topics are partial posts; a poll asks for older pages with
+ * `?before=` until it passes `since` or reads `streamPagesPerPoll` pages.
  */
 import type { FeedItem } from "../../forums/feeds.js";
-import { detectForum, feedProgramFor, isReply, readFeed } from "../../forums/index.js";
+import {
+  detectForum,
+  feedProgramFor,
+  isReply,
+  readFeed,
+  readForumStream,
+} from "../../forums/index.js";
 import type { ForumProgram, ForumThreadSummary } from "../../forums/types.js";
 import { forumPlatform } from "../../platforms.js";
 import type {
@@ -57,6 +67,8 @@ export const threadsPerCall = 5;
  * own (`createBrightDataForum`): the cost cap's figure too.
  */
 export const maxThreadsPerSection = 20;
+/** Stream pages one poll may read, unless the application sets its own. */
+export const maxStreamPagesPerPoll = 5;
 /** How far back a start read from words is trusted to be early. */
 const wordsMarginMs = 86_400_000;
 
@@ -84,6 +96,8 @@ export interface ForumPageEvent {
 export interface ForumOptions {
   /** Threads one section may open in one poll. */
   readonly threadsPerSection?: number;
+  /** Pages one poll may read from a forum's activity stream. */
+  readonly streamPagesPerPoll?: number;
   /**
    * Browser Use's key and a proxy's host, port, user and password. Without
    * the proxy the browser is never used: its own costs ten times more.
@@ -197,6 +211,8 @@ interface Cursor {
   readonly index: number;
   /** Threads chosen from that section's list, not yet opened. */
   readonly pending?: readonly Pending[];
+  /** The stream's older page to read next, and the pages read so far. */
+  readonly older?: { readonly url: string; readonly pages: number };
 }
 
 function encodeCursor(cursor: Cursor): string {
@@ -245,6 +261,7 @@ export class BrightDataForumSource implements SocialSource {
   readonly discovery = brightDataForum.discovery;
   readonly maxUnitsPerQueryPoll: number;
   private readonly threadsPerSection: number;
+  private readonly streamPagesPerPoll: number;
   private readonly browser: ForumOptions["browser"] | undefined;
 
   constructor(
@@ -252,7 +269,12 @@ export class BrightDataForumSource implements SocialSource {
     private readonly options: ForumOptions = {},
   ) {
     this.threadsPerSection = options.threadsPerSection ?? maxThreadsPerSection;
-    this.maxUnitsPerQueryPoll = maxUnitsFor(this.threadsPerSection, Boolean(options.browser));
+    this.streamPagesPerPoll = options.streamPagesPerPoll ?? maxStreamPagesPerPoll;
+    this.maxUnitsPerQueryPoll = maxUnitsFor(
+      this.threadsPerSection,
+      Boolean(options.browser),
+      this.streamPagesPerPoll,
+    );
     if (options.browser && !hasBrowserCredentials(options.browser.credentials)) {
       runtime.logger.warn(
         "forum browser fallback off: it needs a Browser Use key and a proxy's host, port, user and password",
@@ -333,19 +355,21 @@ export class BrightDataForumSource implements SocialSource {
         };
       }
 
-      const { answer, via, units } = await fetcher.fetch(section);
-      const event = { host: hostOf(section), url: section, page: "section" as const, via, units };
+      const address = at.older?.url ?? section;
+      const page = at.older ? ("feed" as const) : ("section" as const);
+      const { answer, via, units } = await fetcher.fetch(address);
+      const event = { host: hostOf(address), url: address, page, via, units };
       if (!answer.ok) {
         this.runtime.logger.warn(
-          { section, via, reason: answer.reason },
+          { section: address, via, reason: answer.reason },
           "forum section skipped: no page came back",
         );
         this.tell({ ...event, outcome: "refused", program: null, reason: answer.reason });
         return { posts: [], foundBy, unitsConsumed: units, next: after([]) };
       }
-      const feed = readFeed(answer.body, section);
+      const feed = readFeed(answer.body, address);
       if (feed) {
-        const read = this.fromFeed(feed, section, request.query.since);
+        const read = this.fromFeed(feed, address, request.query.since);
         this.tell({
           ...event,
           page: "feed",
@@ -356,17 +380,59 @@ export class BrightDataForumSource implements SocialSource {
         });
         return { posts: read.posts, foundBy, unitsConsumed: units, next: after(read.chosen) };
       }
+      // A stream page may look like a thread page to `detectForum`, because a
+      // status update carries `data-role=commentContent`. Ask the stream first.
+      const streamed = readForumStream(answer.body, address);
+      if (streamed) {
+        const read = this.fromFeed(
+          streamed.stream.items,
+          address,
+          request.query.since,
+          streamed.program,
+        );
+        this.tell({
+          ...event,
+          page: "feed",
+          outcome: "read",
+          program: read.program,
+          threads: read.chosen.length,
+          posts: read.posts.length,
+        });
+        const pagesRead = (at.older?.pages ?? 0) + 1;
+        const since = request.query.since;
+        if (
+          since &&
+          streamed.stream.olderUrl &&
+          streamed.stream.oldest &&
+          streamed.stream.oldest.getTime() > since.getTime() &&
+          pagesRead < this.streamPagesPerPoll
+        ) {
+          return {
+            posts: read.posts,
+            foundBy,
+            unitsConsumed: units,
+            next: {
+              status: "ready",
+              cursor: encodeCursor({
+                index: at.index,
+                older: { url: streamed.stream.olderUrl, pages: pagesRead },
+              }),
+            },
+          };
+        }
+        return { posts: read.posts, foundBy, unitsConsumed: units, next: after([]) };
+      }
       const program = detectForum(answer.body);
       if (!program) {
         this.runtime.logger.warn(
-          { section, via, page: pageSummary(answer.body) },
+          { section: address, via, page: pageSummary(answer.body) },
           "forum section skipped: no parser knows this page",
         );
         this.tell({ ...event, outcome: "unparsed", program: null });
         return { posts: [], foundBy, unitsConsumed: units, next: after([]) };
       }
       const chosen = program
-        .listThreads(answer.body, section, this.runtime.now())
+        .listThreads(answer.body, address, this.runtime.now())
         .filter((thread) => worthOpening(thread, request.query.since))
         .slice(0, this.threadsPerSection)
         .map((thread) => ({
@@ -397,8 +463,9 @@ export class BrightDataForumSource implements SocialSource {
     feed: readonly FeedItem[],
     address: string,
     since: Date | undefined,
+    known?: ForumProgram,
   ): { posts: CandidatePost[]; chosen: Pending[]; program: string | null } {
-    const program = feedProgramFor(address);
+    const program = known ?? feedProgramFor(address);
     const fresh = feed.filter(
       (item) =>
         !isReply(item) &&
@@ -575,12 +642,18 @@ function feedPost(
 }
 
 /**
- * One list and the most threads it may open; with the browser, each page may
- * be read twice (a retry) and each call may start a browser.
+ * The worst case of the list path and the stream path. With the browser each
+ * page may be read twice (a retry) and each call may start a browser.
  */
-function maxUnitsFor(threadsPerSection: number, browser: boolean): number {
+function maxUnitsFor(
+  threadsPerSection: number,
+  browser: boolean,
+  streamPagesPerPoll: number,
+): number {
   const pages = 1 + threadsPerSection;
-  return browser ? 2 * pages + 1 + Math.ceil(threadsPerSection / threadsPerCall) : pages;
+  const list = browser ? 2 * pages + 1 + Math.ceil(threadsPerSection / threadsPerCall) : pages;
+  const stream = browser ? 3 * streamPagesPerPoll : streamPagesPerPoll;
+  return Math.max(list, stream);
 }
 
 /**
@@ -594,6 +667,12 @@ export function createBrightDataForum(options: ForumOptions = {}): ConnectorDefi
       `threadsPerSection must be a whole number above zero, not ${threadsPerSection}`,
     );
   }
+  const streamPagesPerPoll = options.streamPagesPerPoll ?? maxStreamPagesPerPoll;
+  if (!Number.isInteger(streamPagesPerPoll) || streamPagesPerPoll < 1) {
+    throw new RangeError(
+      `streamPagesPerPoll must be a whole number above zero, not ${streamPagesPerPoll}`,
+    );
+  }
   return {
     platform: forumPlatform,
     provider: brightDataProvider,
@@ -604,8 +683,13 @@ export function createBrightDataForum(options: ForumOptions = {}): ConnectorDefi
     /** One thread page is one post. A list page is a request with none. */
     postsPerUnit: 1,
     discovery: ["channel"],
-    maxUnitsPerQueryPoll: maxUnitsFor(threadsPerSection, Boolean(options.browser)),
-    create: (runtime) => new BrightDataForumSource(runtime, { ...options, threadsPerSection }),
+    maxUnitsPerQueryPoll: maxUnitsFor(
+      threadsPerSection,
+      Boolean(options.browser),
+      streamPagesPerPoll,
+    ),
+    create: (runtime) =>
+      new BrightDataForumSource(runtime, { ...options, threadsPerSection, streamPagesPerPoll }),
   };
 }
 

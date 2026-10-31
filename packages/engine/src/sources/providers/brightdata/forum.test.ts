@@ -2,9 +2,11 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../../../logger.js";
 import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
+import type { OpenPageBrowser } from "../browseruse/pages.js";
 import {
   BrightDataForumSource,
   createBrightDataForum,
+  type ForumPageEvent,
   maxThreadsPerSection,
   threadsPerCall,
   worthOpening,
@@ -327,6 +329,9 @@ describe("a challenge page is a refusal, not a page", () => {
     );
     expect(refusalIn("<html><head><title>Just a moment...</title></head></html>")).not.toBeNull();
     expect(
+      refusalIn("<html><head><title>One moment, please...</title></head></html>"),
+    ).not.toBeNull();
+    expect(
       refusalIn("<html><head><script>window.POW_CHALLENGE_DATA = {}</script></head></html>"),
     ).not.toBeNull();
     // A forum thread that talks about a captcha is still a page.
@@ -337,3 +342,180 @@ describe("a challenge page is a refusal, not a page", () => {
     ).toBeNull();
   });
 });
+
+const browserCredentials = {
+  apiKey: "bu-key",
+  proxyHost: "proxy.example",
+  proxyPort: "1000",
+  proxyUsername: "user",
+  proxyPassword: "secret_country-US",
+};
+const challenge = "<html><head><title>Just a moment...</title></head><body></body></html>";
+
+/**
+ * A cloud browser that answers from captured pages: `pages` maps an address to
+ * a body, `threads` answers every other address. It counts what a real one
+ * bills: browsers started, pages read, and whether it was stopped.
+ */
+function fakeBrowser(pages: Record<string, string>, threads?: string) {
+  const read: string[] = [];
+  let opened = 0;
+  let closed = 0;
+  const open: OpenPageBrowser = () => {
+    opened += 1;
+    let started = 0;
+    return {
+      get started() {
+        return started;
+      },
+      async read(url) {
+        if (started === 0) started = 1;
+        read.push(url);
+        const body = pages[url] ?? threads;
+        if (body === "throw") throw new Error("Browser Use answered 402");
+        return body === undefined
+          ? { ok: false, reason: "not captured", connection: false }
+          : { ok: true, body };
+      },
+      async close() {
+        closed += 1;
+      },
+    };
+  };
+  return {
+    open,
+    read,
+    calls: () => ({ opened, closed }),
+  };
+}
+
+describe("a page Bright Data cannot pass, read through the cloud browser", () => {
+  it("reads the section and its threads through the browser, one browser a call", async () => {
+    const stub = brightData({ [xenforoList]: challenge }, challenge);
+    const browser = fakeBrowser(
+      { [xenforoList]: captured("xenforo2-list.html") },
+      captured("xenforo2-thread.html"),
+    );
+    const events: ForumPageEvent[] = [];
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: browserCredentials, open: browser.open },
+      onPage: (event) => events.push(event),
+    });
+
+    const results = await walk(source, [xenforoList], "2026-10-28T18:00:00.000Z");
+
+    expect(results.flatMap((result) => result.posts).map((post) => post.externalId)).toEqual([
+      "forums.macrumors.com:2493064",
+    ]);
+    // Bright Data asked first each time; the browser read what it refused.
+    expect(stub.asked.map((call) => call.url)).toEqual(browser.read);
+    // A page, and the browser the call started: one unit each.
+    expect(results.map((result) => result.unitsConsumed)).toEqual([2, 2]);
+    expect(browser.calls()).toEqual({ opened: 2, closed: 2 });
+    expect(
+      events.map(({ page, via, outcome, program }) => ({ page, via, outcome, program })),
+    ).toEqual([
+      { page: "section", via: "browser", outcome: "read", program: "xenforo2" },
+      { page: "thread", via: "browser", outcome: "read", program: "xenforo2" },
+    ]);
+    expect(events[0]).toMatchObject({ host: "forums.macrumors.com", threads: 1, units: 2 });
+  });
+
+  it("skips Bright Data for a forum the application sends to the browser", async () => {
+    const stub = brightData({});
+    const browser = fakeBrowser({ [xenforoList]: captured("xenforo2-list.html") });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: browserCredentials, open: browser.open },
+      fetcherFor: (host) => (host === "forums.macrumors.com" ? "browser" : undefined),
+    });
+
+    await source.search(request([xenforoList], "2026-10-30T06:00:00.000Z"));
+
+    expect(stub.asked).toEqual([]);
+    expect(browser.read).toEqual([xenforoList]);
+  });
+
+  it("starts no browser while Bright Data passes", async () => {
+    const stub = brightData({ [xenforoList]: captured("xenforo2-list.html") });
+    const browser = fakeBrowser({});
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: browserCredentials, open: browser.open },
+    });
+
+    const result = await source.search(request([xenforoList], "2026-10-30T06:00:00.000Z"));
+
+    expect(result.unitsConsumed).toBe(1);
+    expect(browser.read).toEqual([]);
+    expect(browser.calls().closed).toBe(0);
+  });
+
+  it("never uses the browser without a proxy: its own costs ten times more", async () => {
+    const stub = brightData({ [xenforoList]: challenge });
+    const browser = fakeBrowser({ [xenforoList]: captured("xenforo2-list.html") });
+    const { proxyHost: _proxy, ...withoutProxy } = browserCredentials;
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: withoutProxy, open: browser.open },
+    });
+
+    const result = await source.search(request([xenforoList]));
+
+    expect(browser.read).toEqual([]);
+    expect(result.unitsConsumed).toBe(0);
+    expect(result.next).toEqual({ status: "done" });
+  });
+
+  it("skips a page the browser fails on, keeps the poll, and still stops the browser", async () => {
+    const stub = brightData({ [xenforoList]: challenge });
+    const browser = fakeBrowser({ [xenforoList]: "throw" });
+    const events: ForumPageEvent[] = [];
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: browserCredentials, open: browser.open },
+      onPage: (event) => {
+        events.push(event);
+        throw new Error("a broken handler is not the poll's problem");
+      },
+    });
+
+    const result = await source.search(request([xenforoList]));
+
+    expect(result.next).toEqual({ status: "done" });
+    expect(browser.calls()).toEqual({ opened: 1, closed: 1 });
+    expect(events).toMatchObject([{ via: "browser", outcome: "refused" }]);
+  });
+
+  it("stops the browser when the call fails for another reason", async () => {
+    const browser = fakeBrowser({}, captured("xenforo2-thread.html"));
+    const failing: typeof globalThis.fetch = async () => new Response("no", { status: 401 });
+    let asked = 0;
+    const source = new BrightDataForumSource(runtimeWith(failing), {
+      browser: { credentials: browserCredentials, open: browser.open },
+      // The first thread to the browser, the second to Bright Data, which refuses the key.
+      fetcherFor: () => (asked++ === 0 ? "browser" : undefined),
+    });
+    const pending = encodeForTest([
+      { url: "https://forums.macrumors.com/threads/m6-imac.2493064/", approximate: false },
+      { url: "https://forums.macrumors.com/threads/other.1/", approximate: false },
+    ]);
+
+    await expect(source.search(request([xenforoList], undefined, pending))).rejects.toThrow(
+      "Bright Data refused the API key.",
+    );
+    expect(browser.read).toHaveLength(1);
+    expect(browser.calls()).toEqual({ opened: 1, closed: 1 });
+  });
+
+  it("allows for a retry and a browser in its worst case", () => {
+    expect(createBrightDataForum({ threadsPerSection: 8 }).maxUnitsPerQueryPoll).toBe(9);
+    expect(
+      createBrightDataForum({
+        threadsPerSection: 8,
+        browser: { credentials: browserCredentials },
+      }).maxUnitsPerQueryPoll,
+    ).toBe(2 * 9 + 1 + 2);
+  });
+});
+
+/** A cursor holding threads still to open, as the source writes one. */
+function encodeForTest(pending: { url: string; approximate: boolean }[]): string {
+  return Buffer.from(JSON.stringify({ index: 0, pending })).toString("base64url");
+}

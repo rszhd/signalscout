@@ -2,7 +2,7 @@
 
 # Open tickets
 
-82 open — 14 doing, 59 todo, 9 parked (7 p1, 58 p2, 17 p3).
+82 open — 15 doing, 58 todo, 9 parked (7 p1, 58 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -23,6 +23,7 @@
 | p2 | US-448 | [gpt-6.1-sol is priced](doing/US-448-gpt-6-1-sol-is-priced.md) | feature | doing | 2026-10-02T09:24+08:00 |
 | p2 | US-469 | [Forum pages are read by a parser per forum program and version](doing/US-469-forum-pages-are-read-by-a-parser-per-forum-program-and-version.md) | feature | doing | 2026-10-30T11:36+08:00 |
 | p2 | US-470 | [A monitor reads forum sections through Bright Data](doing/US-470-a-monitor-reads-forum-sections-through-bright-data.md) | feature | doing | 2026-10-30T15:28+08:00 |
+| p2 | US-471 | [A forum page Bright Data cannot pass is read through a cloud browser](doing/US-471-a-forum-page-bright-data-cannot-pass-is-read-through-a-cloud-browser.md) | feature | doing | 2026-10-31T09:06+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
@@ -64,7 +65,6 @@
 | p2 | US-422 | [A phrase that hits the page limit says so](todo/US-422-a-phrase-that-hits-the-page-limit-says-so.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-423 | [A monitor is told what each platform returns](todo/US-423-a-monitor-is-told-what-each-platform-returns.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-425 | [Instagram comments are read at a cheaper provider](todo/US-425-instagram-comments-are-read-at-a-cheaper-provider.md) | spike | todo | 2026-09-26T02:32+08:00 |
-| p2 | US-471 | [A forum page Bright Data cannot pass is read through a cloud browser](todo/US-471-a-forum-page-bright-data-cannot-pass-is-read-through-a-cloud-browser.md) | feature | todo | 2026-10-31T09:06+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |

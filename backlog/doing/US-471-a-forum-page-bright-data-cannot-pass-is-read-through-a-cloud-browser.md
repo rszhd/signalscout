@@ -39,22 +39,27 @@ the 243 forums Bright Data reads.
 
 ## Acceptance
 
-- [ ] Browser Use is a provider: an API key, and a proxy's host, port, user
-      and password. Its credential check does not open a browser.
-- [ ] The forum connector takes a second page fetcher. When Bright Data
+- [x] The application hands the forum connector Browser Use's key and a
+      proxy's host, port, user and password. Browser Use is not a provider in
+      the registry, so nothing is stored and no screen changes.
+- [x] The forum connector takes a second page fetcher. When Bright Data
       answers with a bot check or a refusal, the same address goes to the
       browser; any other answer does not.
-- [ ] Without a proxy, the browser is never used, and a log line says why.
-- [ ] One browser reads every page of one call, and is stopped at the end of
+- [x] An application may send a forum, by host, straight to the browser.
+- [x] Without a proxy, the browser is never used, and a log line says why.
+- [x] One browser reads every page of one call, and is stopped at the end of
       the call, on an error too. A browser left running bills by the minute.
-- [ ] A proxy connection error is retried once, through a new session id.
-- [ ] A page still showing a bot check after 25 seconds is skipped with a log
+- [x] A proxy connection error is retried once, in a new browser with a new
+      session id.
+- [x] A page still showing a bot check after 25 seconds is skipped with a log
       line, as Bright Data's refusal is.
-- [ ] Each page through the browser is recorded at its cost: Browser Use's
-      figure for the browser and the proxy, and the proxy provider's price a
-      GB for the bytes. The cost cap counts it before the call.
-- [ ] A site's `alert()` cannot end a read.
-- [ ] Tests replay captured pages through a fake browser; no test opens one.
+- [x] A browser page counts one Bright Data unit, and each browser started
+      one more, so the cost cap counts it before the call. A failure of the
+      browser skips the page and never stops the poll.
+- [x] Every page fetched is told to the application: host, section or
+      thread, fetcher, outcome, program and units.
+- [x] A site's `alert()` cannot end a read.
+- [x] Tests replay captured pages through a fake browser; no test opens one.
 - [ ] One live poll of three bot-check sections, measured: pages, bytes on
       the proxy's own count, Browser Use's cost, and the balance before and
       after.
@@ -98,3 +103,14 @@ The engine has no such dependency yet; a smaller CDP client may do.
 version; nothing there sets its key.
 
 ## Log
+- 2026-10-31T09:18+08:00 — Built. Two changes from the ticket as written. Browser Use is not a
+  registry provider: a provider is stored per account and shown on the
+  connections screen, and the only user is an application that holds the
+  key itself, as BuyerFinder holds SocialCrawl's for its Reddit fallback.
+  And a browser page is counted in Bright Data units, one a page and one a
+  browser started, not at Browser Use's own figure, which settles minutes
+  after the browser stops. The measured cost, $0.001 a page, is below one
+  unit. The browser is driven over the DevTools protocol through Node's own
+  WebSocket, so the engine takes no browser library. PowerForum's "One
+  moment, please" page now counts as a bot check. 2,690 tests; root lint and
+  type check pass. The live poll is next.

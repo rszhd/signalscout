@@ -14,6 +14,14 @@
  * thread's own time decides again once it is open. A page no parser knows is
  * skipped and logged with its address. One list page a poll: hourly polls
  * rarely bring more new threads than a page holds.
+ *
+ * A page Bright Data cannot pass, a bot check or a refusal, is read again
+ * through Browser Use's cloud browser when the application hands its
+ * credentials over with a proxy of its own (US-471). One browser serves a
+ * call and is stopped when the call ends. A browser page is counted as one
+ * Bright Data unit, and each browser started as one more: the measured cost
+ * was below that, and Browser Use's own figure settles too late to read here.
+ * A failure of the browser skips the page; it never stops the poll.
  */
 import { detectForum } from "../../forums/index.js";
 import type { ForumThreadSummary } from "../../forums/types.js";
@@ -28,6 +36,8 @@ import type {
   SourceCredentials,
   SourceRuntime,
 } from "../../types.js";
+import { hasBrowserCredentials } from "../browseruse/cloud.js";
+import { type OpenPageBrowser, openBrowserUse, type PageBrowser } from "../browseruse/pages.js";
 import { brightDataProvider } from "./provider.js";
 import { fetchThroughUnlocker, UnlockerError } from "./unlocker.js";
 
@@ -40,6 +50,53 @@ export const threadsPerCall = 5;
 export const maxThreadsPerSection = 20;
 /** How far back a start read from words is trusted to be early. */
 const wordsMarginMs = 86_400_000;
+
+/** How a page is fetched: Bright Data's unlocker, or the cloud browser. */
+export type ForumFetcher = "unlocker" | "browser";
+
+/** One page fetched, for an application that keeps numbers per forum. */
+export interface ForumPageEvent {
+  readonly host: string;
+  readonly url: string;
+  readonly page: "section" | "thread";
+  readonly via: ForumFetcher;
+  /** Read: a parser read it. Unparsed: a page no parser reads. Refused: no page. */
+  readonly outcome: "read" | "unparsed" | "refused";
+  readonly program: string | null;
+  /** Threads the section's list chose to open, on a section read. */
+  readonly threads?: number;
+  readonly units: number;
+  readonly reason?: string;
+}
+
+export interface ForumOptions {
+  /** Threads one section may open in one poll. */
+  readonly threadsPerSection?: number;
+  /**
+   * Browser Use's key and a proxy's host, port, user and password. Without
+   * the proxy the browser is never used: its own costs ten times more.
+   */
+  readonly browser?: {
+    readonly credentials: SourceCredentials;
+    /** For tests: a browser that answers from captured pages. */
+    readonly open?: OpenPageBrowser;
+  };
+  /**
+   * The application's choice for a forum, by host: "browser" skips Bright
+   * Data for a forum known to stop it. Absent: Bright Data first.
+   */
+  readonly fetcherFor?: (host: string) => ForumFetcher | undefined;
+  /** Told of every page fetched. A throw here is logged and ignored. */
+  readonly onPage?: (event: ForumPageEvent) => void;
+}
+
+interface Fetched {
+  readonly answer:
+    | { readonly ok: true; readonly body: string }
+    | { readonly ok: false; readonly reason: string };
+  readonly via: ForumFetcher;
+  readonly units: number;
+}
 
 interface Pending {
   readonly url: string;
@@ -99,12 +156,22 @@ export class BrightDataForumSource implements SocialSource {
   readonly postsPerUnit = brightDataForum.postsPerUnit;
   readonly discovery = brightDataForum.discovery;
   readonly maxUnitsPerQueryPoll: number;
+  private readonly threadsPerSection: number;
+  private readonly browser: ForumOptions["browser"] | undefined;
 
   constructor(
     private readonly runtime: SourceRuntime,
-    private readonly threadsPerSection = maxThreadsPerSection,
+    private readonly options: ForumOptions = {},
   ) {
-    this.maxUnitsPerQueryPoll = 1 + threadsPerSection;
+    this.threadsPerSection = options.threadsPerSection ?? maxThreadsPerSection;
+    this.maxUnitsPerQueryPoll = maxUnitsFor(this.threadsPerSection, Boolean(options.browser));
+    if (options.browser && !hasBrowserCredentials(options.browser.credentials)) {
+      runtime.logger.warn(
+        "forum browser fallback off: it needs a Browser Use key and a proxy's host, port, user and password",
+      );
+    } else {
+      this.browser = options.browser;
+    }
   }
 
   async validateCredentials(credentials: SourceCredentials): Promise<CredentialCheck> {
@@ -132,6 +199,29 @@ export class BrightDataForumSource implements SocialSource {
   }
 
   async search(request: SearchRequest): Promise<SearchResult> {
+    // One browser for the whole call, started only if a page needs it.
+    let pages: PageBrowser | null = null;
+    const browser = this.browser
+      ? () => {
+          pages ??= (this.browser?.open ?? openBrowserUse)(
+            this.runtime,
+            this.browser?.credentials ?? {},
+            request.signal,
+          );
+          return pages;
+        }
+      : null;
+    try {
+      return await this.walk(request, browser);
+    } finally {
+      await (pages as PageBrowser | null)?.close();
+    }
+  }
+
+  private async walk(
+    request: SearchRequest,
+    browser: (() => PageBrowser) | null,
+  ): Promise<SearchResult> {
     const sections = request.query.queries;
     const at = request.cursor === undefined ? { index: 0 } : decodeCursor(request.cursor);
     const section = sections[at.index];
@@ -150,7 +240,7 @@ export class BrightDataForumSource implements SocialSource {
     try {
       if (at.pending) {
         const batch = at.pending.slice(0, threadsPerCall);
-        const { posts, units } = await this.open(batch, request);
+        const { posts, units } = await this.open(batch, request, browser);
         return {
           posts,
           foundBy,
@@ -159,26 +249,24 @@ export class BrightDataForumSource implements SocialSource {
         };
       }
 
-      const answer = await fetchThroughUnlocker(
-        this.runtime,
-        request.credentials,
-        section,
-        request.signal,
-      );
+      const { answer, via, units } = await this.fetch(section, request, browser);
+      const event = { host: hostOf(section), url: section, page: "section" as const, via, units };
       if (!answer.ok) {
         this.runtime.logger.warn(
-          { section, reason: answer.reason },
-          "forum section skipped: not passed through Bright Data",
+          { section, via, reason: answer.reason },
+          "forum section skipped: no page came back",
         );
-        return { posts: [], foundBy, unitsConsumed: 0, next: after([]) };
+        this.tell({ ...event, outcome: "refused", program: null, reason: answer.reason });
+        return { posts: [], foundBy, unitsConsumed: units, next: after([]) };
       }
       const program = detectForum(answer.body);
       if (!program) {
         this.runtime.logger.warn(
-          { section, page: pageSummary(answer.body) },
+          { section, via, page: pageSummary(answer.body) },
           "forum section skipped: no parser knows this page",
         );
-        return { posts: [], foundBy, unitsConsumed: 1, next: after([]) };
+        this.tell({ ...event, outcome: "unparsed", program: null });
+        return { posts: [], foundBy, unitsConsumed: units, next: after([]) };
       }
       const chosen = program
         .listThreads(answer.body, section, this.runtime.now())
@@ -189,7 +277,8 @@ export class BrightDataForumSource implements SocialSource {
           ...(thread.startedAt ? { startedAt: thread.startedAt.toISOString() } : {}),
           approximate: thread.approximateStart,
         }));
-      return { posts: [], foundBy, unitsConsumed: 1, next: after(chosen) };
+      this.tell({ ...event, outcome: "read", program: program.id, threads: chosen.length });
+      return { posts: [], foundBy, unitsConsumed: units, next: after(chosen) };
     } catch (error) {
       if (error instanceof UnlockerError && error.kind === "rateLimit") {
         return {
@@ -206,39 +295,98 @@ export class BrightDataForumSource implements SocialSource {
     }
   }
 
+  /**
+   * One page: Bright Data first, unless the application sends this forum to
+   * the browser, and the browser when Bright Data brings back no page.
+   */
+  private async fetch(
+    url: string,
+    request: SearchRequest,
+    browser: (() => PageBrowser) | null,
+  ): Promise<Fetched> {
+    if (!browser || this.options.fetcherFor?.(hostOf(url)) !== "browser") {
+      const answer = await fetchThroughUnlocker(
+        this.runtime,
+        request.credentials,
+        url,
+        request.signal,
+      );
+      if (answer.ok || !browser) return { answer, via: "unlocker", units: answer.ok ? 1 : 0 };
+      this.runtime.logger.info(
+        { url, reason: answer.reason },
+        "forum page refused through Bright Data; reading it through the browser",
+      );
+    }
+    const pages = browser();
+    const before = pages.started;
+    try {
+      const answer = await pages.read(url);
+      return { answer, via: "browser", units: 1 + (pages.started - before) };
+    } catch (error) {
+      // Browser Use out of credit, or a browser that stopped answering: this
+      // page is lost, the rest of the poll is not.
+      this.runtime.logger.error({ url, err: error }, "forum page not read through the browser");
+      return {
+        answer: { ok: false, reason: (error as Error).message },
+        via: "browser",
+        units: pages.started - before,
+      };
+    }
+  }
+
+  private tell(event: ForumPageEvent): void {
+    try {
+      this.options.onPage?.(event);
+    } catch (error) {
+      this.runtime.logger.error({ err: error }, "forum page event handler failed");
+    }
+  }
+
   /** Open each thread, keep the ones whose own time is new enough. */
   private async open(
     batch: readonly Pending[],
     request: SearchRequest,
+    browser: (() => PageBrowser) | null,
   ): Promise<{ posts: CandidatePost[]; units: number }> {
     const now = this.runtime.now();
     const since = request.query.since;
     const posts: CandidatePost[] = [];
     let units = 0;
     for (const pending of batch) {
-      const answer = await fetchThroughUnlocker(
-        this.runtime,
-        request.credentials,
-        pending.url,
-        request.signal,
-      );
+      const fetched = await this.fetch(pending.url, request, browser);
+      units += fetched.units;
+      const { answer, via } = fetched;
+      const event = {
+        host: hostOf(pending.url),
+        url: pending.url,
+        page: "thread" as const,
+        via,
+        units: fetched.units,
+      };
       if (!answer.ok) {
         this.runtime.logger.warn(
-          { thread: pending.url, reason: answer.reason },
-          "forum thread skipped: not passed through Bright Data",
+          { thread: pending.url, via, reason: answer.reason },
+          "forum thread skipped: no page came back",
         );
+        this.tell({ ...event, outcome: "refused", program: null, reason: answer.reason });
         continue;
       }
-      units += 1;
       const program = detectForum(answer.body);
       const thread = program?.readThread(answer.body, pending.url, now);
       if (!thread) {
         this.runtime.logger.warn(
-          { thread: pending.url, program: program?.id ?? null, page: pageSummary(answer.body) },
+          {
+            thread: pending.url,
+            via,
+            program: program?.id ?? null,
+            page: pageSummary(answer.body),
+          },
           "forum thread skipped: no parser read it",
         );
+        this.tell({ ...event, outcome: "unparsed", program: program?.id ?? null });
         continue;
       }
+      this.tell({ ...event, outcome: "read", program: program?.id ?? null });
       const startedAt = thread.postedAt ?? (pending.startedAt ? new Date(pending.startedAt) : null);
       const approximate = thread.postedAt
         ? thread.approximatePostedAt
@@ -262,13 +410,22 @@ export class BrightDataForumSource implements SocialSource {
   }
 }
 
+const hostOf = (url: string) => new URL(url).hostname;
+
+/**
+ * One list and the most threads it may open; with the browser, each page may
+ * be read twice (a retry) and each call may start a browser.
+ */
+function maxUnitsFor(threadsPerSection: number, browser: boolean): number {
+  const pages = 1 + threadsPerSection;
+  return browser ? 2 * pages + 1 + Math.ceil(threadsPerSection / threadsPerCall) : pages;
+}
+
 /**
  * The connector, opening at most `threadsPerSection` threads a section a poll.
  * An application whose readers are not paying sets fewer: each is a request.
  */
-export function createBrightDataForum(
-  options: { threadsPerSection?: number } = {},
-): ConnectorDefinition {
+export function createBrightDataForum(options: ForumOptions = {}): ConnectorDefinition {
   const threadsPerSection = options.threadsPerSection ?? maxThreadsPerSection;
   if (!Number.isInteger(threadsPerSection) || threadsPerSection < 1) {
     throw new RangeError(
@@ -285,9 +442,8 @@ export function createBrightDataForum(
     /** One thread page is one post. A list page is a request with none. */
     postsPerUnit: 1,
     discovery: ["channel"],
-    /** One list and the most threads it may open. */
-    maxUnitsPerQueryPoll: 1 + threadsPerSection,
-    create: (runtime) => new BrightDataForumSource(runtime, threadsPerSection),
+    maxUnitsPerQueryPoll: maxUnitsFor(threadsPerSection, Boolean(options.browser)),
+    create: (runtime) => new BrightDataForumSource(runtime, { ...options, threadsPerSection }),
   };
 }
 

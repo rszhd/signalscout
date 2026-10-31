@@ -51,6 +51,9 @@ export {
   BrightDataForumSource,
   brightDataForum,
   createBrightDataForum,
+  type ForumFetcher,
+  type ForumOptions,
+  type ForumPageEvent,
   maxThreadsPerSection,
   threadsPerCall,
   worthOpening,
@@ -69,6 +72,8 @@ export {
   type UnlockerAnswer,
   UnlockerError,
 } from "./providers/brightdata/unlocker.js";
+export { BrowserUseError, hasBrowserCredentials } from "./providers/browseruse/cloud.js";
+export type { OpenPageBrowser, PageBrowser } from "./providers/browseruse/pages.js";
 export {
   HarvestApiLinkedInSource,
   harvestApiLinkedIn,

@@ -6,6 +6,7 @@ priority: p2
 created: 2026-11-01T02:27+08:00
 parent: US-473
 area: pipeline
+resolution: shipped
 ---
 
 ## Context
@@ -27,14 +28,14 @@ this ticket.
 
 ## Acceptance
 
-- [ ] With the browser set and Bright Data first, a Bright Data 5xx is read
+- [x] With the browser set and Bright Data first, a Bright Data 5xx is read
       through the browser.
-- [ ] With the browser first, a browser failure followed by a Bright Data
+- [x] With the browser first, a browser failure followed by a Bright Data
       5xx loses that page only; the call goes on and returns its other pages.
-- [ ] Without the browser, a Bright Data 5xx is a refusal of that page, not
+- [x] Without the browser, a Bright Data 5xx is a refusal of that page, not
       a thrown error.
-- [ ] A 401, 402, 403, 400 or 429 is still thrown as today.
-- [ ] Tests show each case.
+- [x] A 401, 402, 403, 400 or 429 is still thrown as today.
+- [x] Tests show each case.
 
 ## Notes
 
@@ -44,3 +45,10 @@ Recheck output: `forum-survey/feed-survey/recheck3.log` and `recheck4.log`
 beside the repositories.
 
 ## Log
+- 2026-11-01T03:09+08:00 — The forum page fetcher reads Bright Data through
+  `unlockerPage`, which turns a 5xx into a refusal of that page: the browser
+  is tried after it, and without a browser the poll goes on to its next
+  page. Other answers still throw (a 404 too: the ticket names 5xx only).
+  The credential check calls Bright Data directly, so an outage there is not
+  read as a bad key. Six tests; with the change undone, the four behaviour
+  tests fail. 2,782 tests pass. Not seen live: a 5xx cannot be asked for.

@@ -978,3 +978,89 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
 function encodeForTest(pending: { url: string; approximate: boolean }[]): string {
   return Buffer.from(JSON.stringify({ index: 0, pending })).toString("base64url");
 }
+
+describe("a Bright Data 5xx refuses that page only", () => {
+  const phpbbList = manifest["phpbb3-list.html"]?.url ?? "";
+
+  it("reads the page through the browser when Bright Data goes first", async () => {
+    const stub = brightData({ [xenforoList]: { status: 502, body: "bad gateway" } });
+    const browser = fakeBrowser({ [xenforoList]: captured("xenforo2-list.html") });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+    });
+
+    const page = await fetcher.fetch(xenforoList);
+    await fetcher.close();
+
+    expect(page.answer.ok).toBe(true);
+    expect(page.via).toBe("browser");
+    expect(browser.read).toEqual([xenforoList]);
+  });
+
+  it("loses only that page when the browser went first and failed", async () => {
+    const stub = brightData({ [xenforoList]: { status: 504, body: "timeout" } });
+    const browser = fakeBrowser({ [xenforoList]: "throw" });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+      fetcherFor: () => "browser",
+    });
+
+    const page = await fetcher.fetch(xenforoList);
+    await fetcher.close();
+
+    expect(page.answer).toEqual({ ok: false, reason: "Bright Data answered 504." });
+    expect(page.via).toBe("unlocker");
+    // The browser started; the failed Bright Data request is not billed.
+    expect(page.units).toBe(1);
+  });
+
+  it("is a refusal, billing nothing, when no browser is set", async () => {
+    const stub = brightData({ [xenforoList]: { status: 500, body: "error" } });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {});
+
+    const page = await fetcher.fetch(xenforoList);
+
+    expect(page.answer).toEqual({ ok: false, reason: "Bright Data answered 500." });
+    expect(page.units).toBe(0);
+  });
+
+  it("still throws a refused key, an empty balance, a bad request, a rate limit and a 404", async () => {
+    for (const [status, kind] of [
+      [401, "credentials"],
+      [403, "credentials"],
+      [402, "balance"],
+      [400, "input"],
+      [429, "rateLimit"],
+      [404, "provider"],
+    ] as const) {
+      const stub = brightData({ [xenforoList]: { status, body: "no" } });
+      const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {});
+      await expect(fetcher.fetch(xenforoList)).rejects.toMatchObject({ kind, httpStatus: status });
+    }
+  });
+
+  it("keeps the poll going: the next section is read", async () => {
+    const stub = brightData({
+      [xenforoList]: { status: 503, body: "unavailable" },
+      [phpbbList]: captured("phpbb3-list.html"),
+    });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const results = await walk(source, [xenforoList, phpbbList], "2026-10-29T07:00:00.000Z");
+
+    expect(results[0]?.posts).toEqual([]);
+    expect(results[0]?.unitsConsumed).toBe(0);
+    expect(results[0]?.next.status).toBe("ready");
+    expect(stub.asked.map((call) => call.url).slice(0, 2)).toEqual([xenforoList, phpbbList]);
+  });
+
+  it("is still an error in the credential check: an outage is not a bad key", async () => {
+    const stub = brightData({}, undefined);
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    await expect(source.validateCredentials(credentials)).rejects.toMatchObject({
+      kind: "provider",
+      httpStatus: 500,
+    });
+  });
+});

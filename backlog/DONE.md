@@ -2,10 +2,11 @@
 
 # Done
 
-271 finished.
+272 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-484 | [A Bright Data 5xx answer skips the browser](done/2026-11/BUG-484-a-bright-data-5xx-skips-the-browser.md) | bug | shipped | 2026-11 |
 | BUG-483 | [vBulletin 3 and 5 home pages are not detected](done/2026-11/BUG-483-vbulletin-3-and-5-home-pages-are-not-detected.md) | bug | shipped | 2026-11 |
 | BUG-482 | [Discourse in a subfolder gets the site root's feed](done/2026-11/BUG-482-discourse-in-a-subfolder-gets-the-site-root-s-feed.md) | bug | shipped | 2026-11 |
 | BUG-481 | [An empty page from Bright Data loses the forum](done/2026-11/BUG-481-an-empty-page-from-bright-data-loses-the-forum.md) | bug | shipped | 2026-11 |

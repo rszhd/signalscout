@@ -137,8 +137,9 @@ export interface ForumPageFetcher {
  * a Bright Data refusal, Bright Data after a browser failure. A browser starts at the first page that needs one and serves
  * every later page until `close`, which a caller must reach, an error
  * included: a browser bills until it is stopped. Bright Data's own errors (a
- * refused key, a rate limit) are thrown; a browser failure loses the page only
- * when the browser was the fallback.
+ * refused key, a rate limit) are thrown, except a 5xx, which refuses that page
+ * alone (BUG-484); a browser failure loses the page only when the browser
+ * was the fallback.
  */
 export function openForumFetcher(
   runtime: SourceRuntime,
@@ -154,12 +155,12 @@ export function openForumFetcher(
   return {
     async fetch(url) {
       if (!browser) {
-        const answer = await fetchThroughUnlocker(runtime, unlocker, url, signal);
+        const answer = await unlockerPage(runtime, unlocker, url, signal);
         return { answer, via: "unlocker", units: answer.ok ? 1 : 0 };
       }
       const browserFirst = options.fetcherFor?.(hostOf(url)) === "browser";
       if (!browserFirst) {
-        const answer = await fetchThroughUnlocker(runtime, unlocker, url, signal);
+        const answer = await unlockerPage(runtime, unlocker, url, signal);
         if (answer.ok) return { answer, via: "unlocker", units: 1 };
         runtime.logger.info(
           { url, reason: answer.reason },
@@ -186,7 +187,7 @@ export function openForumFetcher(
         { url, reason: answer.reason },
         "forum page not read through the browser; reading it through Bright Data",
       );
-      const fallback = await fetchThroughUnlocker(runtime, unlocker, url, signal);
+      const fallback = await unlockerPage(runtime, unlocker, url, signal);
       return {
         answer: fallback,
         via: "unlocker",
@@ -198,6 +199,28 @@ export function openForumFetcher(
       pages = null;
     },
   };
+}
+
+/**
+ * One page through Bright Data, its 5xx a refusal of this page: the poll's
+ * other pages, and the browser, can still be tried. A refused key, an empty
+ * balance, a bad request and a rate limit are still thrown. The credential
+ * check calls Bright Data directly, so an outage there is never a bad key.
+ */
+async function unlockerPage(
+  runtime: SourceRuntime,
+  unlocker: SourceCredentials,
+  url: string,
+  signal?: AbortSignal,
+): Promise<FetchedPage["answer"]> {
+  try {
+    return await fetchThroughUnlocker(runtime, unlocker, url, signal);
+  } catch (error) {
+    if (!(error instanceof UnlockerError) || error.kind !== "provider" || error.httpStatus < 500)
+      throw error;
+    runtime.logger.warn({ url, reason: error.message }, "forum page failed at Bright Data");
+    return { ok: false, reason: error.message };
+  }
 }
 
 interface Pending {

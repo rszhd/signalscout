@@ -541,6 +541,16 @@ describe("a forum's home page and its feed", () => {
     });
   });
 
+  it("passes over a feed on another host, and takes one on the same site", () => {
+    const magazine =
+      '<html><head><link rel="alternate" type="application/rss+xml" href="https://www.finewoodworking.com/feed"></head></html>';
+    expect(forumFeedFrom(magazine, "https://forums.finewoodworking.com/")).toBeNull();
+    expect(forumFeedFrom(magazine, "https://finewoodworking.com/")).toEqual({
+      program: null,
+      feedUrl: "https://www.finewoodworking.com/feed",
+    });
+  });
+
   it("takes Discourse's newest topics from its root", () => {
     const head = page("discourse-section");
     expect(forumFeedFrom(head.html, head.url)?.feedUrl).toBe(

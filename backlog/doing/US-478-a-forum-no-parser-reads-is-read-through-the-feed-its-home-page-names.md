@@ -41,6 +41,8 @@ that feed with no parser: its items are the posts as the feed gives them.
 - [x] A known program's feed reads as before.
 - [x] Tests on the captured LowEndTalk and Mumsnet home pages and feeds;
       no test fetches.
+- [x] A feed on another site than the home page is passed over: a forum's
+      home page may name its owner's feed (`www.` aside, the host must match).
 
 ## Notes
 
@@ -61,4 +63,8 @@ in (its `checkForums`).
   claims gives its items as posts, the address as the id. 2,740 tests pass.
   Not yet run live; BuyerFinder's `checkForums` still drops a forum with no
   program until it takes this.
-
+- 2026-11-01T00:48+08:00 — A local rockler.com scan kept
+  forums.finewoodworking.com, whose home page names the magazine's
+  www.finewoodworking.com feed: 10 articles, 0 matches. `forumFeedFrom` now
+  takes a feed with no program only on the home page's own site, `www.`
+  aside.

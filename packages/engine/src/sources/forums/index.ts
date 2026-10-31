@@ -50,9 +50,14 @@ export function detectForumIndex(html: string): ForumProgram | null {
   );
 }
 
+/** A host without its `www.`, so `www.f.example` and `f.example` are one site. */
+const siteOf = (url: string) => new URL(url).hostname.replace(/^www\./, "");
+
 /**
  * A forum's program and its newest-threads feed, from its home page. A page no
- * program knows still gives a feed, unless the only feed it names is comments.
+ * program knows still gives a feed, unless the only feed it names is comments
+ * or on another host: forums.finewoodworking.com names the magazine's
+ * www.finewoodworking.com feed, articles and no threads. US-478.
  */
 export function forumFeedFrom(
   html: string,
@@ -61,7 +66,9 @@ export function forumFeedFrom(
   const program = detectForumIndex(html);
   if (program) return { program, feedUrl: program.feedUrl?.(html, homeUrl) ?? null };
   const feedUrl =
-    advertisedFeeds(html, homeUrl).find((url) => !/comments/i.test(new URL(url).pathname)) ?? null;
+    advertisedFeeds(html, homeUrl).find(
+      (url) => !/comments/i.test(new URL(url).pathname) && siteOf(url) === siteOf(homeUrl),
+    ) ?? null;
   return feedUrl ? { program: null, feedUrl } : null;
 }
 

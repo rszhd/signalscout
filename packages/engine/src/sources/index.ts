@@ -9,10 +9,16 @@ export {
 } from "./fake/index.js";
 export {
   detectForum,
+  detectForumIndex,
+  type FeedItem,
   type ForumProgram,
   type ForumThread,
   type ForumThreadSummary,
+  feedProgramFor,
+  forumFeedFrom,
   forumPrograms,
+  isReply,
+  readFeed,
 } from "./forums/index.js";
 export {
   isOffered,

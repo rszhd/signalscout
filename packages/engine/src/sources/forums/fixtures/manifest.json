@@ -124,5 +124,107 @@
     "capturedAt": "2026-10-30T14:27:14.068Z",
     "bytes": 419618,
     "namesScrubbed": 22
+  },
+  "xenforo1-index.html": {
+    "url": "https://forums.digitalpoint.com/",
+    "capturedAt": "2026-10-31T03:38:52.359Z",
+    "bytes": 129793,
+    "namesScrubbed": 40
+  },
+  "xenforo2-index.html": {
+    "url": "https://forums.macrumors.com/",
+    "capturedAt": "2026-10-31T03:39:10.575Z",
+    "bytes": 287521,
+    "namesScrubbed": 85
+  },
+  "vbulletin4-index.html": {
+    "url": "https://www.webhostingtalk.com/",
+    "capturedAt": "2026-10-31T03:40:06.458Z",
+    "bytes": 189791,
+    "namesScrubbed": 38
+  },
+  "vbulletin5-index.html": {
+    "url": "https://forum.vbulletin.com/",
+    "capturedAt": "2026-10-31T03:40:14.373Z",
+    "bytes": 191421,
+    "namesScrubbed": 19
+  },
+  "invision4-index.html": {
+    "url": "https://linustechtips.com/",
+    "capturedAt": "2026-10-31T03:46:26.832Z",
+    "bytes": 185509,
+    "namesScrubbed": 46
+  },
+  "mybb-index.html": {
+    "url": "https://forum.kodi.tv/",
+    "capturedAt": "2026-10-31T03:40:27.718Z",
+    "bytes": 106746,
+    "namesScrubbed": 21
+  },
+  "bbpress-index.html": {
+    "url": "https://wordpress.org/support/forums/",
+    "capturedAt": "2026-10-31T03:41:18.115Z",
+    "bytes": 183126,
+    "namesScrubbed": 0
+  },
+  "smf2-index.html": {
+    "url": "https://geekhack.org/index.php",
+    "capturedAt": "2026-10-31T03:41:22.029Z",
+    "bytes": 58520,
+    "namesScrubbed": 40
+  },
+  "phpbb3-index.html": {
+    "url": "https://forums.gentoo.org/",
+    "capturedAt": "2026-10-31T03:41:27.721Z",
+    "bytes": 13712,
+    "namesScrubbed": 3
+  },
+  "xenforo1-feed.xml": {
+    "url": "https://forums.digitalpoint.com/forums/-/index.rss",
+    "capturedAt": "2026-10-31T04:08:40.367Z",
+    "bytes": 58126,
+    "namesScrubbed": 49
+  },
+  "xenforo2-feed.xml": {
+    "url": "https://forums.macrumors.com/forums/-/index.rss",
+    "capturedAt": "2026-10-31T04:12:23.524Z",
+    "bytes": 72282,
+    "namesScrubbed": 37
+  },
+  "vbulletin4-feed.xml": {
+    "url": "https://www.webhostingtalk.com/external.php?type=RSS2",
+    "capturedAt": "2026-10-31T04:12:50.925Z",
+    "bytes": 66716,
+    "namesScrubbed": 12
+  },
+  "vbulletin5-feed.xml": {
+    "url": "https://forum.vbulletin.com/external?type=rss2",
+    "capturedAt": "2026-10-31T04:07:55.538Z",
+    "bytes": 158915,
+    "namesScrubbed": 20
+  },
+  "mybb-feed.xml": {
+    "url": "https://forum.kodi.tv/syndication.php",
+    "capturedAt": "2026-10-31T04:08:01.517Z",
+    "bytes": 85923,
+    "namesScrubbed": 15
+  },
+  "bbpress-feed.xml": {
+    "url": "https://wordpress.org/support/topics/feed/",
+    "capturedAt": "2026-10-31T04:12:26.156Z",
+    "bytes": 18347,
+    "namesScrubbed": 8
+  },
+  "smf2-feed.xml": {
+    "url": "https://geekhack.org/index.php?action=.xml;type=rss2;sa=news",
+    "capturedAt": "2026-10-31T04:08:07.938Z",
+    "bytes": 5586,
+    "namesScrubbed": 0
+  },
+  "phpbb3-feed.xml": {
+    "url": "https://forums.gentoo.org/app.php/feed/topics",
+    "capturedAt": "2026-10-31T04:08:17.280Z",
+    "bytes": 20353,
+    "namesScrubbed": 9
   }
 }

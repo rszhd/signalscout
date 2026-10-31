@@ -7,6 +7,8 @@
  * older one is a `<span class="DateTime">` in words, in its title or its
  * text, read by `fromEnglishDate`.
  */
+
+import { feedFrom, forumFolder, isXenForoFeed } from "./feeds.js";
 import {
   absoluteUrl,
   fromEnglishDate,
@@ -92,4 +94,14 @@ export const xenforo1: ForumProgram = {
         !/data-time="\d+"/.test(html.slice(description).match(/class="DateTime"[^>]*>/)?.[0] ?? ""),
     };
   },
+
+  // XenForo 1 writes the same address; this program's `isFeed` names it.
+  feedUrl: (html, homeUrl) =>
+    feedFrom(
+      html,
+      homeUrl,
+      isXenForoFeed,
+      /\/forums\/$/.test(forumFolder(homeUrl)) ? "-/index.rss" : "forums/-/index.rss",
+    ),
+  feedText: "cut",
 };

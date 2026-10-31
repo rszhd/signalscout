@@ -2,8 +2,17 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
+import { forumFolder } from "./feeds.js";
 import { decodeEntities, fromAgo, fromEnglishDate, textOf, withParameters } from "./html.js";
-import { detectForum, forumPrograms } from "./index.js";
+import {
+  detectForum,
+  detectForumIndex,
+  feedProgramFor,
+  forumFeedFrom,
+  forumPrograms,
+  isReply,
+  readFeed,
+} from "./index.js";
 import { invision4 } from "./invision4.js";
 import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
@@ -25,6 +34,8 @@ function page(name: string): { html: string; url: string } {
     url: entry.url,
   };
 }
+
+const xenforoListUrl = manifest["xenforo2-list.html"]?.url ?? "";
 
 describe("which parser reads a page", () => {
   it("names the program and version of each captured page", () => {
@@ -475,6 +486,144 @@ describe("Invision Community 4", () => {
     expect(invision4.newestThreadsUrl("https://forum.example.com/forum/18-new-builds/")).toBe(
       "https://forum.example.com/forum/18-new-builds/",
     );
+  });
+});
+
+describe("a forum's home page and its feed", () => {
+  // The feed each captured home page leads to. Invision publishes none.
+  const feeds: Record<string, string | null> = {
+    xenforo2: "https://forums.macrumors.com/forums/-/index.rss",
+    xenforo1: "https://forums.digitalpoint.com/forums/-/index.rss",
+    phpbb3: "https://forums.gentoo.org/app.php/feed/topics",
+    vbulletin5: "https://forum.vbulletin.com/external?type=rss2",
+    vbulletin4: "https://www.webhostingtalk.com/external.php?type=RSS2",
+    smf2: "https://geekhack.org/index.php?action=.xml;type=rss2;sa=news",
+    bbpress: "https://wordpress.org/support/topics/feed/",
+    mybb: "https://forum.kodi.tv/syndication.php",
+    invision4: null,
+  };
+
+  for (const [id, feed] of Object.entries(feeds)) {
+    it(`names ${id} from its home page, and its feed`, () => {
+      const home = page(`${id}-index`);
+      expect(detectForumIndex(home.html)?.id).toBe(id);
+      expect(
+        forumPrograms
+          .filter((other) => other.detect(home.html) || other.detectIndex?.(home.html))
+          .map((other) => other.id),
+      ).toEqual([id]);
+      expect(forumFeedFrom(home.html, home.url)?.feedUrl ?? null).toBe(feed);
+    });
+  }
+
+  it("takes Discourse's newest topics from its root", () => {
+    const head = page("discourse-section");
+    expect(forumFeedFrom(head.html, head.url)?.feedUrl).toBe(
+      "https://meta.discourse.org/latest.json?order=created",
+    );
+  });
+
+  it("never takes another program's list or thread for its home page", () => {
+    for (const program of forumPrograms) {
+      for (const kind of ["list", "thread"]) {
+        const html = page(`${program.id}-${kind}`).html;
+        const others = forumPrograms.filter(
+          (other) => other !== program && other.detectIndex?.(html),
+        );
+        expect(others.map((other) => other.id)).toEqual([]);
+      }
+    }
+  });
+
+  it("builds the usual address beside the home page when the page names none", () => {
+    expect(xenforo2.feedUrl?.("<html></html>", "https://example.com/community/")).toBe(
+      "https://example.com/community/forums/-/index.rss",
+    );
+    expect(xenforo2.feedUrl?.("<html></html>", "https://example.com/forums/")).toBe(
+      "https://example.com/forums/-/index.rss",
+    );
+    expect(forumFolder("https://example.com/board/index.php?sid=1")).toBe(
+      "https://example.com/board/",
+    );
+  });
+});
+
+describe("reading a feed", () => {
+  // Items in each captured feed: the feed's own length, set by the forum.
+  const counts: Record<string, number> = {
+    xenforo2: 50,
+    xenforo1: 50,
+    phpbb3: 10,
+    vbulletin5: 30,
+    vbulletin4: 15,
+    smf2: 5,
+    bbpress: 10,
+    mybb: 15,
+  };
+
+  for (const [id, count] of Object.entries(counts)) {
+    it(`reads every item of ${id}'s feed, each on the forum's host, with a title and a time`, () => {
+      const feed = manifest[`${id}-feed.xml`];
+      const items = readFeed(
+        readFileSync(new URL(`./fixtures/${id}-feed.xml`, import.meta.url), "utf8"),
+        feed?.url ?? "",
+      );
+      expect(items).toHaveLength(count);
+      const host = new URL(feed?.url ?? "").hostname;
+      for (const item of items ?? []) {
+        expect(new URL(item.url).hostname).toBe(host);
+        expect(item.title).not.toBe("");
+        expect(item.publishedAt).toBeInstanceOf(Date);
+        expect(item.text).not.toBe("");
+      }
+    });
+  }
+
+  it("knows each feed's program by its address", () => {
+    for (const id of Object.keys(counts)) {
+      // XenForo 1 and 2 write one address; the reading is the same.
+      expect(feedProgramFor(manifest[`${id}-feed.xml`]?.url ?? "")?.id).toBe(
+        id === "xenforo1" ? "xenforo2" : id,
+      );
+    }
+  });
+
+  it("reads a feed a browser showed, and opens a thread rather than its newest post", () => {
+    // Bright Data answered WebHostingTalk's feed with Chrome's XML viewer.
+    const feed = manifest["vbulletin4-feed.xml"];
+    const items = readFeed(
+      readFileSync(new URL("./fixtures/vbulletin4-feed.xml", import.meta.url), "utf8"),
+      feed?.url ?? "",
+    );
+    expect(items?.[0]?.url).toBe("https://www.webhostingtalk.com/showthread.php?t=1965154");
+  });
+
+  it("reads a title that mixes CDATA with escaped text, and a post's HTML as text", () => {
+    const items = readFeed(
+      `<rss version="2.0"><channel><item><title><![CDATA[[IC]]>&#093;<![CDATA[ Keycaps]]></title>
+      <link>https://f.example/index.php?topic=1.0</link><pubDate>Thu, 29 Oct 2026 08:44:53 GMT</pubDate>
+      <description>&lt;p&gt;Which &lt;b&gt;switches&lt;/b&gt;?&lt;/p&gt;</description></item></channel></rss>`,
+      "https://f.example/index.php?action=.xml;type=rss2;sa=news",
+    );
+    expect(items).toEqual([
+      {
+        url: "https://f.example/index.php?topic=1.0",
+        title: "[IC] Keycaps",
+        publishedAt: new Date("2026-10-29T08:44:53.000Z"),
+        text: "Which switches ?",
+      },
+    ]);
+  });
+
+  it("says a page is not a feed", () => {
+    expect(readFeed(page("xenforo2-list").html, xenforoListUrl)).toBeNull();
+  });
+
+  it("knows a reply by its title", () => {
+    const item = { url: "https://f.example/t/1", publishedAt: null, text: "" };
+    expect(isReply({ ...item, title: "Re: Which mower?" })).toBe(true);
+    expect(isReply({ ...item, title: "Reply To: Which mower?" })).toBe(true);
+    expect(isReply({ ...item, title: "Which mower? Read replies" })).toBe(false);
   });
 });
 

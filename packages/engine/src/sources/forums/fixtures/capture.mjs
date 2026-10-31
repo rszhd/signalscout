@@ -12,7 +12,7 @@
  * zone come from the environment, never the command line:
  *
  *     node --env-file=<a .env with BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE> \
- *       packages/engine/src/sources/forums/fixtures/capture.mjs [--only=phpbb3]
+ *       packages/engine/src/sources/forums/fixtures/capture.mjs [--only=phpbb3] [--pages=index]
  *
  * Bright Data bills each successful request, $1.50 per 1,000 on
  * pay-as-you-go with 5,000 free a month (October 2026); a full run is two or
@@ -25,6 +25,8 @@
  *   <program>-thread.html   one thread, usernames scrubbed
  *   <program>-list.json     the same, for a program read through its API
  *   <program>-section.html  a section page's <head>, for detecting the program
+ *   <program>-index.html    the forum's home page, names scrubbed (US-473)
+ *   <program>-feed.xml      its newest-threads feed, names scrubbed (US-473)
  *   manifest.json           which address produced each file, and when
  */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -38,6 +40,8 @@ const here = fileURLToPath(new URL(".", import.meta.url));
  */
 const targets = {
   xenforo1: {
+    feed: "https://forums.digitalpoint.com/forums/-/index.rss",
+    index: "https://forums.digitalpoint.com/",
     list: "https://forums.digitalpoint.com/forums/content-creation.102/?order=post_date&direction=desc",
     thread: (html) => {
       const item = [...html.matchAll(/<li id="thread-(\d+)" class="([^"]*)"/g)].find(
@@ -49,6 +53,8 @@ const targets = {
   },
   // Behind a bot check for a plain request: their pickers come from the lists.
   xenforo2: {
+    feed: "https://forums.macrumors.com/forums/-/index.rss",
+    index: "https://forums.macrumors.com/",
     list: "https://forums.macrumors.com/forums/imac.91/?order=post_date&direction=desc",
     thread: (html) => {
       // A pinned item carries a sticky status icon, not a class of its own.
@@ -63,6 +69,8 @@ const targets = {
   },
   // WebHostingTalk, one of the forums the model named for a lead-finding tool.
   vbulletin4: {
+    feed: "https://www.webhostingtalk.com/external.php?type=RSS2",
+    index: "https://www.webhostingtalk.com/",
     list: "https://www.webhostingtalk.com/forumdisplay.php?f=6&sort=dateline&order=desc",
     thread: (html) => {
       // Pinned threads are in <ol id="stickies">; the rest in <ol id="threads">.
@@ -72,6 +80,8 @@ const targets = {
     },
   },
   vbulletin5: {
+    feed: "https://forum.vbulletin.com/external?type=rss2",
+    index: "https://forum.vbulletin.com/",
     list: "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations",
     thread: (html) => {
       const row = [...html.matchAll(/<tr class="topic-item([^"]*)"/g)].find(
@@ -83,6 +93,7 @@ const targets = {
   // invisioncommunity.com needs KYC at Bright Data; LinusTechTips runs
   // Invision Community and passed, and its builds section is buyers asking.
   invision4: {
+    index: "https://linustechtips.com/",
     list: "https://linustechtips.com/forum/18-new-builds-and-planning/",
     thread: (html) => {
       const rows = html.split(/<li[^>]+class="ipsDataItem[\s"]/).slice(1);
@@ -98,6 +109,8 @@ const targets = {
   // MyBB's own community answered Bright Data with a "Please refresh to
   // continue" challenge on 2026-10-30; Kodi's forum runs MyBB and passed.
   mybb: {
+    feed: "https://forum.kodi.tv/syndication.php",
+    index: "https://forum.kodi.tv/",
     list: "https://forum.kodi.tv/forumdisplay.php?fid=164&sortby=started&order=desc",
     thread: (html) => {
       // The title's span keeps its id in every theme; the row before it says
@@ -121,6 +134,8 @@ const targets = {
   },
   // WordPress's own support forums run bbPress.
   bbpress: {
+    feed: "https://wordpress.org/support/topics/feed/",
+    index: "https://wordpress.org/support/forums/",
     list: "https://wordpress.org/support/forum/how-to-and-troubleshooting/",
     thread: (html) => {
       const item = [...html.matchAll(/<ul id="bbp-topic-\d+"[^>]*class="([^"]*)"/g)].find(
@@ -142,6 +157,8 @@ const targets = {
     },
   },
   smf2: {
+    feed: "https://geekhack.org/index.php?action=.xml;type=rss2;sa=news",
+    index: "https://geekhack.org/index.php",
     list: "https://geekhack.org/index.php?board=64.0;sort=first_post;desc",
     thread: (html) => {
       const cell = [...html.matchAll(/<td class="subject([^"]*)"/g)].find(
@@ -152,6 +169,8 @@ const targets = {
     },
   },
   phpbb3: {
+    feed: "https://forums.gentoo.org/app.php/feed/topics",
+    index: "https://forums.gentoo.org/",
     list: "https://forums.gentoo.org/viewforum.php?f=14&sk=t&sd=d",
     thread: (html) => {
       const row = [...html.matchAll(/<li class="row [^"]*"/g)].find(
@@ -199,6 +218,13 @@ const namePatterns = [
   /\/users\/([^"/?#\s]{2,60})\//g,
   /profiles\.wordpress\.org\/([^"/?#\s]{2,60})/g,
   /class="bbp-author-name"[^>]*>([^<]{2,60})</g,
+  // A thread title that names its author, "My desk PC - by <name>", in a
+  // last-post line on an index page.
+  / - by ([^<\s]{2,40})\s*<\/a>/g,
+  // Feeds: RSS's <dc:creator> and <author>, Atom's <author><name>.
+  /<dc:creator>(?:<!\[CDATA\[)?([^<\]]{2,60})/g,
+  /<author>(?:[^<(]*\()?([^<)]{2,60})\)?<\/author>/g,
+  /<author>\s*<name>(?:<!\[CDATA\[)?([^<\]]{2,60})/g,
 ];
 
 /** Profile addresses keep their shape and lose their id and name. */
@@ -242,19 +268,30 @@ const urlScrubs = [
     /(class="ipsUserPhoto[^"]*"[^>]*>\s*<img src=)(['"])[^'"]*\2/g,
     "$1$2//member.example/photo.jpg$2",
   ],
+  // A member who introduces themselves names themselves: "I'm <name> from",
+  // "<name> here from". Only that place: the word may be a common one too.
+  [
+    /\b(I am |I'm |I&#0?39;m |I’m |[Mm]y name is )[A-Z][a-z]{2,}(?: [A-Z][a-z]{2,})?(?=[,.!]| and | from | here)/g,
+    "$1Member",
+  ],
+  [/\b[A-Z][a-z]{2,}( here from )/g, "Member$1"],
   // Our own session on the forum, not a person's, but it has no business here.
   [/([?&;](?:amp;)?(?:sid|PHPSESSID|s)=)[0-9a-z]{20,40}/gi, "$10"],
 ];
 
 const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-export function scrub(html) {
+export function scrub(html, pageUrl) {
+  // The site's own account ("MacRumors" on forums.macrumors.com) names the
+  // site, not a person; replacing it would change every address on the page.
+  const ownLabels = pageUrl ? new URL(pageUrl).hostname.toLowerCase().split(".") : [];
   const names = new Set();
   for (const pattern of namePatterns) {
     for (const match of html.matchAll(pattern)) {
       const name = match[1].trim();
       // A count is never a name, and replacing one changes a post's numbers.
-      if (name.length >= 2 && !/^[\d\s.,]+$/.test(name)) names.add(name);
+      if (name.length >= 2 && !/^[\d\s.,]+$/.test(name) && !ownLabels.includes(name.toLowerCase()))
+        names.add(name);
     }
   }
   // A signature is the member's own words about themselves, often a link to
@@ -374,6 +411,8 @@ async function fetchPage(url) {
 }
 
 const only = process.argv.find((arg) => arg.startsWith("--only="))?.slice(7);
+// One kind of page: `--pages=index` or `--pages=feed` fetches those alone.
+const pagesOnly = process.argv.find((arg) => arg.startsWith("--pages="))?.slice(8);
 const manifestPath = `${here}manifest.json`;
 let manifest = {};
 try {
@@ -384,6 +423,19 @@ try {
 
 for (const [program, target] of Object.entries(targets)) {
   if (only && only !== program) continue;
+  if (pagesOnly === "index" || pagesOnly === "feed") {
+    const url = target[pagesOnly];
+    // One forum's refusal leaves the others to fetch.
+    try {
+      if (url)
+        await save(program, [
+          [pagesOnly, url, await fetchPage(url), pagesOnly === "feed" ? "xml" : "html"],
+        ]);
+    } catch (error) {
+      console.log(`${program}: ${error.message}`);
+    }
+    continue;
+  }
   const list = await fetchPage(target.list);
   const extension = target.format === "json" ? "json" : "html";
   const pages = [["list", target.list, list, extension]];
@@ -398,9 +450,14 @@ for (const [program, target] of Object.entries(targets)) {
     const page = await fetchPage(target.section);
     pages.push(["section", target.section, page.slice(0, page.search(/<body[\s>]/)), "html"]);
   }
+  if (target.index) pages.push(["index", target.index, await fetchPage(target.index), "html"]);
+  if (target.feed) pages.push(["feed", target.feed, await fetchPage(target.feed), "xml"]);
+  await save(program, pages);
+}
 
+async function save(program, pages) {
   for (const [kind, url, body, type] of pages) {
-    const scrubbed = type === "json" ? scrubJson(body) : scrub(body);
+    const scrubbed = type === "json" ? scrubJson(body) : scrub(body, url);
     const file = `${program}-${kind}.${type}`;
     writeFileSync(`${here}${file}`, scrubbed.html);
     manifest[file] = {
@@ -411,9 +468,10 @@ for (const [program, target] of Object.entries(targets)) {
     };
     console.log(`${file}: ${scrubbed.html.length} bytes, ${scrubbed.names} names scrubbed`);
   }
+  // Written as it goes: a later refusal keeps what was paid for.
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
-writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(
   `${requests} Bright Data requests, about $${((requests * 1.5) / 1000).toFixed(4)} at the list price`,
 );

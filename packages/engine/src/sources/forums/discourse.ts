@@ -92,4 +92,7 @@ export const discourse: ForumProgram = {
       approximatePostedAt: false,
     };
   },
+
+  // Its newest topics as JSON, which `listThreads` reads: a section at the root.
+  feedUrl: (_page, homeUrl) => new URL("/latest.json?order=created", homeUrl).toString(),
 };

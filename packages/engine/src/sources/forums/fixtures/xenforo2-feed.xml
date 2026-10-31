@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
+  <channel>
+    <language>en-US</language>
+    <title>MacRumors Forums</title>
+    <description>Apple news and rumor discussion</description>
+    <pubDate>Sat, 31 Oct 2026 04:12:22 +0000</pubDate>
+    <lastBuildDate>Sat, 31 Oct 2026 04:12:22 +0000</lastBuildDate>
+    <generator>MacRumors Forums</generator>
+    <link>https://forums.macrumors.com/</link>
+    <atom:link rel="self" type="application/rss+xml" href="https://forums.macrumors.com/forums/-/index.rss"/>
+    <item>
+      <title>iPhone Duo is here! First impressions and photos thread</title>
+      <pubDate>Sat, 31 Oct 2026 04:11:54 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/iphone-duo-is-here-first-impressions-and-photos-thread.2492438/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492438</guid>
+      <author>member@example.com (member6)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member6</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">I picked up my iPhone Duo in Night Sky from Apple Broadway in Sydney Australia at 8am this morning.<br />
+<br />
+I got there at 7.30am and there were two separate lines, one for pickup (only 3 people, I was second in line) and another for walk ins - That was about 30 people deep and grew to about 50-60 by 8am. Only 20 walk ins were able to buy one and the rest were turned away. Overall more lively than the 18 Pro Max launch.<br />
+<br />
+First impressions:<br />
+<ul>
+<li data-xf-list-type="ul">The Night Sky is understated and the titanium edges...</li>
+</ul><br />
+<a href="https://forums.macrumors.com/threads/iphone-duo-is-here-first-impressions-and-photos-thread.2492438/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>1004</slash:comments>
+    </item>
+    <item>
+      <title>Apple Alerts Stores to iPhone Duo's Display Cracking Issue</title>
+      <pubDate>Sat, 31 Oct 2026 04:11:49 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apple-alerts-stores-to-iphone-duos-display-cracking-issue.2493282/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493282</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/apple-alerts-stores-to-iphone-duo-display-cracking/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+In a memo shared with Apple Stores and Apple Authorized Service Providers this week, and later obtained by <i>MacRumors</i>, Apple provided technicians with guidance on how to diagnose and address the iPhone Duo&#039;s inner display cracking issue.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/iPhone-Duo-Display-Cracking.jpg" data-url="https://images.macrumors.com/article-new/2026/10/iPhone-Duo-Display-Cracking.jpg" class="bbImage " loading="lazy"
+		 style="" width="1600" height="900" />&#8203;</div><br />
+<br />
+If a customer reports the issue, Apple advised technicians to inspect the...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/apple-alerts-stores-to-iphone-duos-display-cracking-issue.2493282/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>113</slash:comments>
+    </item>
+    <item>
+      <title>[Developer] Continua — testing same-task resume after Codex usage limits</title>
+      <pubDate>Sat, 31 Oct 2026 04:10:01 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/developer-continua-testing-same-task-resume-after-codex-usage-limits.2493297/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493297</guid>
+      <author>member@example.com (member3)</author>
+      <category domain="https://forums.macrumors.com/forums/mac-apps.2/"><![CDATA[Mac Apps]]></category>
+      <dc:creator>member3</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Hi everyone — I&#039;m the developer of Continua, a Mac menu-bar utility for people whose Codex Desktop tasks stop at a usage limit.<br />
+<br />
+I&#039;m building it to preserve the interrupted task, wait for the supported short-term limit to reset, and continue that same task in its original environment. It does not bypass usage limits or provide extra quota. Local Activity history shows confirmed task starts and outcomes so you can check what happened.<br />
+<br />
+I&#039;m looking for 3–5 Mac users who encounter this problem...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/developer-continua-testing-same-task-resume-after-codex-usage-limits.2493297/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>0</slash:comments>
+    </item>
+    <item>
+      <title>Apple Executive Comments on New iPad Mini Lacking 120Hz Display</title>
+      <pubDate>Sat, 31 Oct 2026 04:09:34 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apple-executive-comments-on-new-ipad-mini-lacking-120hz-display.2493184/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493184</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/29/apple-executive-on-ipad-mini-lacking-120hz/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+While the <a href="https://www.macrumors.com/2026/10/26/apple-announces-ipad-mini-with-oled-display/" target="_blank" class="link link--external" rel="noopener">new iPad mini</a> has an OLED display, the device does not support ProMotion, meaning the display&#039;s refresh rate is limited to 60Hz instead of 120Hz.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/iPad-mini-OLED-feature-1.jpg" data-url="https://images.macrumors.com/article-new/2026/10/iPad-mini-OLED-feature-1.jpg" class="bbImage " loading="lazy"
+		 style="" width="2324" height="1307" />&#8203;</div><br />
+<br />
+ProMotion support would have allowed for the iPad mini&#039;s refresh rate to automatically adjust from 10Hz to 120Hz depending on the content being displayed, but...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/apple-executive-comments-on-new-ipad-mini-lacking-120hz-display.2493184/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>230</slash:comments>
+    </item>
+    <item>
+      <title>Wait time for a replacement</title>
+      <pubDate>Sat, 31 Oct 2026 04:09:06 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/wait-time-for-a-replacement.2493203/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493203</guid>
+      <author>member@example.com (member31)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member31</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">I went to the Apple Store and reported a clicking sound when opening my Duo. They confirmed it and ordered a replacement. They did not provide me with a date on when it is going to be ready for pickup. <br />
+<br />
+Has anyone been in a similar situation? How long did it take for you?<br />
+<br />
+Clicking sound thread: <a href="https://forums.macrumors.com/threads/iphone-duo-making-plasticky-sticky-noise-when-opening-and-closing.2492831/page-3?post=34918684#post-34918684" class="link link--internal">https://forums.macrumors.com/thread...ng.2492831/page-3?post=34918684#post-34918684</a></div>]]></content:encoded>
+      <slash:comments>10</slash:comments>
+    </item>
+    <item>
+      <title>Any other 11/2-11/9 people obsessively checking the app to see if you got bumped up??</title>
+      <pubDate>Sat, 31 Oct 2026 04:08:05 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/any-other-11-2-11-9-people-obsessively-checking-the-app-to-see-if-you-got-bumped-up.2492020/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492020</guid>
+      <author>member@example.com (member27)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member27</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Help me…..I can’t stop!!! 😄</div>]]></content:encoded>
+      <slash:comments>2120</slash:comments>
+    </item>
+    <item>
+      <title>Which Case Did You Buy For Your iPhone?</title>
+      <pubDate>Sat, 31 Oct 2026 04:07:52 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/which-case-did-you-buy-for-your-iphone.2455729/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2455729</guid>
+      <author>member@example.com (member34)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone-accessories.108/"><![CDATA[iPhone Accessories]]></category>
+      <dc:creator>member34</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><b><i>See Past Cases Thread Here:</i></b><br />
+<br />
+<a href="https://forums.macrumors.com/threads/which-case-did-you-get-for-your-new-iphone-12-mini-pro-max-merged.2261391/" class="link link--internal"><b><i>iPhone 12/Mini/Pro/Pro Max Cases</i></b></a><br />
+<br />
+<a href="https://forums.macrumors.com/threads/which-case-did-you-get-for-your-new-iphone-13-mini-pro-max-merged.2309488/" class="link link--internal"><b><i>iPhone 13/Mini/Pro/Pro Max Cases</i></b></a><br />
+<br />
+<a href="https://forums.macrumors.com/threads/which-case-did-you-get-or-recommend-for-your-new-iphone-14-plus-pro-pro-max.2356756/" class="link link--internal"><b><i>iPhone 14/Plus/Pro/Pro Max Cases</i></b></a><br />
+<br />
+<b><i><a href="https://forums.macrumors.com/threads/which-case-did-you-get-or-recommend-for-your-new-iphone-15-plus-pro-pro-max.2400406/" class="link link--internal">iPhone 15/Plus/Pro/Pro Max Cases</a></i></b><br />
+ <br />
+<i><a href="https://forums.macrumors.com/threads/iphone-16-e-plus-pro-pro-max-cases.2434145" class="link link--internal"><b>iPhone 16/Plus/Pro/Pro Max Cases</b></a></i><br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<span style="font-size: 18px">For UK members only: Apple EPP link for discounted Apple cases and other stuff direct from Apple Store.<br />
+<a href="https://www.apple.com/uk_epp_8b438ccb-e53b-4a88-98b2-04bc6c893785/store" target="_blank" class="link link--external" rel="nofollow ugc noopener">Shopping Agreement - Apple (UK)</a> — up to 10% off.</span></div>]]></content:encoded>
+      <slash:comments>21894</slash:comments>
+    </item>
+    <item>
+      <title>Russia Places Apple on State Surveillance Registry</title>
+      <pubDate>Sat, 31 Oct 2026 04:07:21 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/russia-places-apple-on-state-surveillance-registry.2493243/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493243</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/political-news.218/"><![CDATA[Political News]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/apple-russian-state-surveillance-registry/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple faces Russian data retention and disclosure requirements after being added to the country&#039;s state surveillance registry, <a href="https://www.bloomberg.com/news/articles/2026-10-28/russia-adds-apple-and-microsoft-to-state-surveillance-registry" target="_blank" class="link link--external" rel="noopener"><i>Bloomberg</i></a> reports.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/Black-Apple-Event-Logo.jpeg" data-url="https://images.macrumors.com/article-new/2026/10/Black-Apple-Event-Logo.jpeg" class="bbImage " loading="lazy"
+		 style="" width="2048" height="1152" />&#8203;</div><br />
+<br />
+Russia&#039;s communications regulator, Roskomnadzor, listed Apple and Microsoft on October 2 as &quot;organizers of information dissemination,&quot; a classification that carries...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/russia-places-apple-on-state-surveillance-registry.2493243/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>105</slash:comments>
+    </item>
+    <item>
+      <title>MacBook Pro With Touch Display: 15 More Details Revealed</title>
+      <pubDate>Sat, 31 Oct 2026 04:04:42 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/macbook-pro-with-touch-display-15-more-details-revealed.2493256/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493256</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/macbook-pro-proled-xdr-details/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple on Wednesday unveiled <a href="https://www.macrumors.com/2026/10/28/apple-new-macbook-pro/" target="_blank" class="link link--external" rel="noopener">new 14-inch and 16-inch MacBook Pro models with touch-enabled OLED displays</a>, and more details about them continue to be shared by tech reporters who were invited to Apple&#039;s hands-on experience in Los Angeles.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/MacBook-Pro-PROLED-XDR-Display.jpg" data-url="https://images.macrumors.com/article-new/2026/10/MacBook-Pro-PROLED-XDR-Display.jpg" class="bbImage " loading="lazy"
+		 style="" width="1600" height="900" />&#8203;</div><br />
+<br />
+Nicolas Lellouche of the French website <i>Numerama</i> shared 15 details...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/macbook-pro-with-touch-display-15-more-details-revealed.2493256/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>77</slash:comments>
+    </item>
+    <item>
+      <title>Apple's Flash Storage Suppliers Are Finally 'Getting Their Revenge'</title>
+      <pubDate>Sat, 31 Oct 2026 04:04:35 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apples-flash-storage-suppliers-are-finally-getting-their-revenge.2493272/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493272</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/apple-flash-storage-suppliers-revenge-report/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+<i>The Wall Street Journal</i>&#039;s Rolfe Winkler this week reported that flash storage suppliers once &quot;bullied&quot; by Apple have been <a href="https://www.wsj.com/tech/apple-iphone-memory-chips-ai-c0084cc9" target="_blank" class="link link--external" rel="noopener">&quot;getting their revenge&quot; on the company</a> over the past year due to a severe memory chip shortage, which stems from AI companies building out massive data centers that utilize significant amounts of flash storage and RAM...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/apples-flash-storage-suppliers-are-finally-getting-their-revenge.2493272/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>123</slash:comments>
+    </item>
+    <item>
+      <title>Did Siri lose all brain cells in iOS 27.2?</title>
+      <pubDate>Sat, 31 Oct 2026 04:01:33 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/did-siri-lose-all-brain-cells-in-ios-27-2.2492999/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492999</guid>
+      <author>member@example.com (member19)</author>
+      <category domain="https://forums.macrumors.com/forums/ios-27.251/"><![CDATA[iOS 27]]></category>
+      <dc:creator>member19</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Seriously. What could iOS 27.2 have done to Siri? Today, Siri failed to do three simple tasks that it has handled (mostly) fine before.<br />
+<br />
+This morning, &quot;Siri, turn the alarm off.&quot; &quot;I can&#039;t turn your alarm off right now.&quot;<br />
+<br />
+This afternoon, &quot;Siri, use Waze to navigate to [place].&quot; &quot;Getting directions to [place]... Getting directions to [place]... I can&#039;t get directions to [place] using Waze right now, but I can open the app for you.&quot;<br />
+<br />
+This afternoon, &quot;Siri, call home.&quot; &quot;I don&#039;t see &#039;home&#039; in your contacts.&quot;...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/did-siri-lose-all-brain-cells-in-ios-27-2.2492999/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>38</slash:comments>
+    </item>
+    <item>
+      <title>HomeView Software 27.2: Wallpapers, Control Center, and More</title>
+      <pubDate>Sat, 31 Oct 2026 04:00:43 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/homeview-software-27-2-wallpapers-control-center-and-more.2493288/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493288</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/homeview-software-27-2/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple today released HomeView Software 27.2, which is the software that runs on the upcoming HomeView device set to launch on November 13.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/homeview_home_screen_feature-1.jpg" data-url="https://images.macrumors.com/article-new/2026/10/homeview_home_screen_feature-1.jpg" class="bbImage " loading="lazy"
+		 style="" width="2071" height="1165" />&#8203;</div><br />
+<br />
+The HomeView was announced earlier in October, but the early software release gives us a look at features like wallpapers and reveals a few tidbits we didn&#039;t previously know...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/homeview-software-27-2-wallpapers-control-center-and-more.2493288/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>25</slash:comments>
+    </item>
+    <item>
+      <title>Screen on Duo is too sensitive and screen/apps being activated while in my pocket walking.</title>
+      <pubDate>Sat, 31 Oct 2026 03:59:05 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/screen-on-duo-is-too-sensitive-and-screen-apps-being-activated-while-in-my-pocket-walking.2493202/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493202</guid>
+      <author>member@example.com (member10)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member10</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">When I&#039;m walking with the Duo in my pocket, I notice a couple of things happening.<br />
+<br />
+1.  When listening to Spotify tracks sometimes advance etc. Clearly the onscreen controls on the lockscreen are being activated<br />
+2.  Occasionally I get notice on my apple watch that the screen has been unlocked while walking and when I pull it out of my pocket an app is often open. (obviously not a problem with faceID)<br />
+<br />
+Turning off &quot;tap or swipe to wake&quot; is a possible work around but not ideal at all<br />
+<br />
+I&#039;ve...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/screen-on-duo-is-too-sensitive-and-screen-apps-being-activated-while-in-my-pocket-walking.2493202/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>6</slash:comments>
+    </item>
+    <item>
+      <title>How Accurate Were Rumors About Apple's OLED Touchscreen MacBook Pro?</title>
+      <pubDate>Sat, 31 Oct 2026 03:55:44 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/how-accurate-were-rumors-about-apples-oled-touchscreen-macbook-pro.2493095/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493095</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/28/macbook-pro-touchscreen-rumors/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Rumors about Apple&#039;s work on a touchscreen OLED MacBook Pro started in 2023, when <i>Bloomberg</i>&#039;s Mark Gurman said there <a href="https://www.macrumors.com/2023/01/11/touchscreen-macs-report/" target="_blank" class="link link--external" rel="noopener">would be a MacBook Pro</a> with an OLED display and a touchscreen, but OLED rumors date back even further. <br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/oled-macbook-pro-display.jpg" data-url="https://images.macrumors.com/article-new/2026/10/oled-macbook-pro-display.jpg" class="bbImage " loading="lazy"
+		 style="" width="2390" height="1344" />&#8203;</div><br />
+<br />
+We heard a lot about the new Mac over the last few years, and we thought we&#039;d take a...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/how-accurate-were-rumors-about-apples-oled-touchscreen-macbook-pro.2493095/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>61</slash:comments>
+    </item>
+    <item>
+      <title>Are you returning your Duo?</title>
+      <pubDate>Sat, 31 Oct 2026 03:51:10 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/are-you-returning-your-duo.2493141/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493141</guid>
+      <author>member@example.com (member4)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member4</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">what is the verdict <i>for people who purchased and have one? </i><br />
+<br />
+what are your thoughts, based off the scares out there and your experience using one and perhaps the combination?</div>]]></content:encoded>
+      <slash:comments>61</slash:comments>
+    </item>
+    <item>
+      <title>Photo of the Day | October 2026</title>
+      <pubDate>Sat, 31 Oct 2026 03:41:42 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/photo-of-the-day-october-2026.2490870/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2490870</guid>
+      <author>member@example.com (member11)</author>
+      <category domain="https://forums.macrumors.com/forums/photography.83/"><![CDATA[Photography]]></category>
+      <dc:creator>member11</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Welcome to Photo of the Day. The POTD thread was started by iGary in May, 2006 and converted to a monthly thread in November 2007 by Arn. POTD is one of the most popular picture groups on MacRumors, often exceeding 500 posts and 20,000 views per month.<br />
+Photo of the Day is intended to be a showcase for your best pictures. There is no limit to your gear, just your imagination. P&amp;S and film cameras are welcome along with DSLRs. There are no themes like the Weekly Contest, and no winners (or...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/photo-of-the-day-october-2026.2490870/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>519</slash:comments>
+    </item>
+    <item>
+      <title>OLED MBP, a major redesigned or updated version?</title>
+      <pubDate>Sat, 31 Oct 2026 03:39:08 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/oled-mbp-a-major-redesigned-or-updated-version.2493108/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493108</guid>
+      <author>member@example.com (member28)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-pro.90/"><![CDATA[MacBook Pro]]></category>
+      <dc:creator>member28</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Some say OLED MBP is a major redesigned since 6 years ago with M1 Pro/Max MBP but according to the model code, it&#039;s just another updated versions from 2026 MBP while design itself didnt changed other than replacing the panel and few tweaks. There is a rumor about a major redesigned MBP with M7 series in 2027 or 2028 but for now, I want an official info about this.<br />
+<br />
+Any idea?</div>]]></content:encoded>
+      <slash:comments>16</slash:comments>
+    </item>
+    <item>
+      <title>PRO LED MacBook Pro: Space Black or Silver?</title>
+      <pubDate>Sat, 31 Oct 2026 03:38:38 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/pro-led-macbook-pro-space-black-or-silver.2493292/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493292</guid>
+      <author>member@example.com (member32)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-pro.90/"><![CDATA[MacBook Pro]]></category>
+      <dc:creator>member32</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Hello everyone,<br />
+<br />
+I’m excited to order the new PRO LED MacBook Pro. I currently have a 2021 MacBook Pro in silver, and honestly, it still looks phenomenal after almost five years.<br />
+<br />
+That said, I’m really interested in Space Black this time around, especially with how good the glowing Apple logo looks against that color.<br />
+<br />
+Quick question for those of you who have had a Space Black MacBook Pro for a couple of years. How has it held up? Does it show fingerprints and smudges easily? How about...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/pro-led-macbook-pro-space-black-or-silver.2493292/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>3</slash:comments>
+    </item>
+    <item>
+      <title>If apple offered you MacOS on ipad for $30/mo would you do it?</title>
+      <pubDate>Sat, 31 Oct 2026 03:36:49 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/if-apple-offered-you-macos-on-ipad-for-30-mo-would-you-do-it.2492728/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492728</guid>
+      <author>member@example.com (member1)</author>
+      <category domain="https://forums.macrumors.com/forums/ipad.137/"><![CDATA[iPad]]></category>
+      <dc:creator>member1</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">One of the arguments for why apple doens’t bring macos to iPad is that it will cannibalize sales of their laptops. Well, what if apple just charges you instead $30/mo to use macOS on your tablet. That’s 360 a year. Probably the average laptop apple sell sis around $1600 with profit margins of $800? That means Apple would&#039;ve made money off of you anyway. <br />
+<br />
+Would you do it?</div>]]></content:encoded>
+      <slash:comments>32</slash:comments>
+    </item>
+    <item>
+      <title>Apple Watch Series 6 to latest worth it?</title>
+      <pubDate>Sat, 31 Oct 2026 03:36:02 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apple-watch-series-6-to-latest-worth-it.2493279/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493279</guid>
+      <author>member@example.com (member36)</author>
+      <category domain="https://forums.macrumors.com/forums/apple-watch.172/"><![CDATA[Apple Watch]]></category>
+      <dc:creator>member36</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Like to do right now. <br />
+<br />
+I mainly use my watch for notifications. Basically when I get a text or phone.</div>]]></content:encoded>
+      <slash:comments>9</slash:comments>
+    </item>
+    <item>
+      <title>Apple Says iOS 27.3 Beta Coming Next Week</title>
+      <pubDate>Sat, 31 Oct 2026 03:34:46 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apple-says-ios-27-3-beta-coming-next-week.2493278/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493278</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/apple-says-ios-27-3-beta-coming-next-week/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple today <a href="https://www.apple.com.cn/newsroom/2026/10/apple-intelligence-features-are-coming-to-users-in-china/" target="_blank" class="link link--external" rel="noopener">announced</a> that the first iOS 27.3 developer beta will be released next week and enable <a href="https://www.apple.com.cn/apple-intelligence/" target="_blank" class="link link--external" rel="noopener">some Apple Intelligence features in China</a>.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/iOS-27.3-Feature.jpg" data-url="https://images.macrumors.com/article-new/2026/10/iOS-27.3-Feature.jpg" class="bbImage " loading="lazy"
+		 style="" width="2500" height="1406" />&#8203;</div><br />
+<br />
+In a press release shared on the Apple Newsroom website in China, Apple said the beta will be released on Wednesday, November 4, but that likely means Tuesday, November 3 in...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/apple-says-ios-27-3-beta-coming-next-week.2493278/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>21</slash:comments>
+    </item>
+    <item>
+      <title>The screen hinge crack is real</title>
+      <pubDate>Sat, 31 Oct 2026 03:32:21 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/the-screen-hinge-crack-is-real.2493237/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493237</guid>
+      <author>member@example.com (member20)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member20</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">This literally just happened to mine.<img src="https://forums.macrumors.com/attachments/381-jpeg.2688231/"
+			class="bbImage "
+			style=""
+			alt="381.jpeg"
+			title="381.jpeg"
+			width="3000" height="2798" loading="lazy" /></div>]]></content:encoded>
+      <slash:comments>87</slash:comments>
+    </item>
+    <item>
+      <title>Explain why you need a Touchscreen on your Laptop ?</title>
+      <pubDate>Sat, 31 Oct 2026 03:31:14 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/explain-why-you-need-a-touchscreen-on-your-laptop.2492773/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492773</guid>
+      <author>member@example.com (member7)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-pro.90/"><![CDATA[MacBook Pro]]></category>
+      <dc:creator>member7</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">So I need to know what is the reason you need a Touchscreen on your $3,500 (estimated priced) Laptop ? <br />
+<br />
+What are you doing?</div>]]></content:encoded>
+      <slash:comments>222</slash:comments>
+    </item>
+    <item>
+      <title>Apple's Touchscreen MacBook Pro Could Ship 1.5M Units in 2027</title>
+      <pubDate>Sat, 31 Oct 2026 03:29:35 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apples-touchscreen-macbook-pro-could-ship-1-5m-units-in-2027.2493217/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493217</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/oled-macbook-pro-1-5m-shipments-2027/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple&#039;s new OLED touchscreen MacBook Pro could ship between 1.2 million and 1.5 million units in 2027, according to a new forecast from market intelligence firm <a href="https://www.trendforce.com/presscenter/news/20261029-13287.html" target="_blank" class="link link--external" rel="noopener">TrendForce</a>.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/macbook-pro-proled-blue.jpeg" data-url="https://images.macrumors.com/article-new/2026/10/macbook-pro-proled-blue.jpeg" class="bbImage " loading="lazy"
+		 style="" width="2500" height="1406" />&#8203;</div><br />
+<br />
+<a href="https://www.macrumors.com/2026/10/28/apple-new-macbook-pro/" target="_blank" class="link link--external" rel="noopener">Announced on Wednesday</a>, the new MacBook Pro is the first to feature a tandem OLED touchscreen, with pricing starting at $2,899 for the...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/apples-touchscreen-macbook-pro-could-ship-1-5m-units-in-2027.2493217/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>42</slash:comments>
+    </item>
+    <item>
+      <title>iPad mini - Starlight or Midnight ?</title>
+      <pubDate>Sat, 31 Oct 2026 03:29:28 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/ipad-mini-starlight-or-midnight.2493206/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493206</guid>
+      <author>member@example.com (member14)</author>
+      <category domain="https://forums.macrumors.com/forums/ipad.137/"><![CDATA[iPad]]></category>
+      <dc:creator>member14</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Got fed up with dark colours a while back, love my cosmic 17PM and my silver IPP.<br />
+<br />
+Never been a big Starlight fan so pre ordered Midnight/512gb/standard glass/cellular+wifi<br />
+<br />
+Looking at my Gen 1 ultra watch on my wrist last night I thought, actually starlight looks pretty similar.....so ordered the same config in Starlight......now need to cancel one order.<br />
+<br />
+Wish there was a white folio case, not keen on Tech woven colour options, see the Belkin option on Apple site but like to slip the folio...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/ipad-mini-starlight-or-midnight.2493206/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>7</slash:comments>
+    </item>
+    <item>
+      <title>Issues with scrolling after update to MacOS 27.0.1</title>
+      <pubDate>Sat, 31 Oct 2026 03:24:33 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/issues-with-scrolling-after-update-to-macos-27-0-1.2492223/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492223</guid>
+      <author>member@example.com (member35)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-neo.129/"><![CDATA[MacBook Neo]]></category>
+      <dc:creator>member35</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Hello,<br />
+<br />
+Two days ago I&#039;ve updated my week-old MacBook Neo to MacOS 27.0.1 from Tahoe 26.5 and scrolling on Safari is completely unacceptable. Has anyone experienced similar problem? The scrolling is jerky and not fluid anymore on most of the web pages. I know this is just Neo but come on - this is just scrolling through web pages.<br />
+<br />
+Tried restarting, shutting down etc. Nothing changes.</div>]]></content:encoded>
+      <slash:comments>5</slash:comments>
+    </item>
+    <item>
+      <title>Do you use a case on your iPhone? [MERGED]</title>
+      <pubDate>Sat, 31 Oct 2026 03:20:09 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/do-you-use-a-case-on-your-iphone-merged.2380104/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2380104</guid>
+      <author>member@example.com (member15)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member15</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Do you use a case on your iPhone?</div>]]></content:encoded>
+      <slash:comments>1836</slash:comments>
+    </item>
+    <item>
+      <title>MacMini G4 cannot power external FW drives?</title>
+      <pubDate>Sat, 31 Oct 2026 03:15:37 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/macmini-g4-cannot-power-external-fw-drives.2493293/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493293</guid>
+      <author>member@example.com (member5)</author>
+      <category domain="https://forums.macrumors.com/forums/powerpc-macs.145/"><![CDATA[PowerPC Macs]]></category>
+      <dc:creator>member5</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Is this something wrong with my MacMini or they actually cannot use external FW drives without their own power supply? Given that FW is the <i>only</i> available port, this is beyond annoying...</div>]]></content:encoded>
+      <slash:comments>2</slash:comments>
+    </item>
+    <item>
+      <title>Downgrading from 16" M3 MBP to 15" M4 MBA</title>
+      <pubDate>Sat, 31 Oct 2026 03:15:25 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/downgrading-from-16-m3-mbp-to-15-m4-mba.2455613/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2455613</guid>
+      <author>member@example.com (member29)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-air.122/"><![CDATA[MacBook Air]]></category>
+      <dc:creator>member29</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">I&#039;ve been thinking to downsize to the 15&quot; M4 MBA due to regular travel as the MBA is lighter and slightly smaller.<br />
+<br />
+My existing 16&quot; M3 MBP is super cold never gets hot even when charging. Can the same thing be told about the 15&quot; MBA?<br />
+<br />
+I like to place the laptop on my lap and hate having to remove it due to feeling warm/hot.<br />
+<br />
+These are the temps i am getting while being on battery and having several chrome tabs open. How does this compare to the 15&quot; MBA? <br />
+Does your 15&quot; MBA get hot while...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/downgrading-from-16-m3-mbp-to-15-m4-mba.2455613/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>22</slash:comments>
+    </item>
+    <item>
+      <title>Duo 2 - Wishlist</title>
+      <pubDate>Sat, 31 Oct 2026 03:13:12 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/duo-2-wishlist.2492491/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492491</guid>
+      <author>member@example.com (member30)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member30</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Now Duo is out there are already rumors about the next models. Potentially a larger version and hopefully FaceID and Telephoto camera.<br />
+<br />
+What do you want to see in next years model?</div>]]></content:encoded>
+      <slash:comments>44</slash:comments>
+    </item>
+    <item>
+      <title>Hinge cover or no hinge cover on the Duo? [Poll – please read first post before voting]</title>
+      <pubDate>Sat, 31 Oct 2026 03:05:50 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/hinge-cover-or-no-hinge-cover-on-the-duo-poll-please-read-first-post-before-voting.2492780/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492780</guid>
+      <author>member@example.com (member21)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone-accessories.108/"><![CDATA[iPhone Accessories]]></category>
+      <dc:creator>member21</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Trying to settle the hinge-cover debate for the Duo with something better than gut feel.<br />
+<br />
+The case for going without: plenty of long-time Galaxy Fold owners say never use a hinge case. They reckon hinge covers trap grit against the spine, scuff it, and can make the fold feel stiffer, and that the hinge is tough enough on its own. The Duo is also IP68 rated for dust.<br />
+<br />
+The case for covering it: the hinge is the most exposed and most expensive part when you drop it, and the JerryRigEverything...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/hinge-cover-or-no-hinge-cover-on-the-duo-poll-please-read-first-post-before-voting.2492780/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>4</slash:comments>
+    </item>
+    <item>
+      <title>Apple Has Released More Than 25 New Products in the Past Two Months</title>
+      <pubDate>Sat, 31 Oct 2026 02:58:41 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apple-has-released-more-than-25-new-products-in-the-past-two-months.2493238/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493238</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/25-new-apple-products/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Since late August, Apple has been on an absolute spree, releasing more than 25 new devices and accessories. Quite the start to the <a href="https://www.macrumors.com/2026/09/01/john-ternus-is-now-apple-ceo/" target="_blank" class="link link--external" rel="noopener">John Ternus era</a>.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/Apple-Has-Released-More-Than-25-New-Products-in-the-Past-Two-Months-Feature.jpg" data-url="https://images.macrumors.com/article-new/2026/10/Apple-Has-Released-More-Than-25-New-Products-in-the-Past-Two-Months-Feature.jpg" class="bbImage " loading="lazy"
+		 style="" width="1600" height="900" />&#8203;</div><br />
+<br />
+Below, we have recapped most of the new products that Apple has released over the past two months, with some available...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/apple-has-released-more-than-25-new-products-in-the-past-two-months.2493238/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>57</slash:comments>
+    </item>
+    <item>
+      <title>Cracked Duo Owners - What country of manufacture?</title>
+      <pubDate>Sat, 31 Oct 2026 02:56:18 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/cracked-duo-owners-what-country-of-manufacture.2493295/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493295</guid>
+      <author>member@example.com (member37)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member37</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">On the back of the box I&#039; noticed that it says &quot;product of India&quot;, I know there are also &quot;product of China&quot;.  If there is a manufacturing issue maybe its coming from one region? <br />
+<br />
+If you have a cracked Duo, where was your Duo manufactured?</div>]]></content:encoded>
+      <slash:comments>0</slash:comments>
+    </item>
+    <item>
+      <title>What is/was for dinner?</title>
+      <pubDate>Sat, 31 Oct 2026 02:56:07 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/what-is-was-for-dinner.2133151/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2133151</guid>
+      <author>member@example.com (member16)</author>
+      <category domain="https://forums.macrumors.com/forums/community-discussion.20/"><![CDATA[Community Discussion]]></category>
+      <dc:creator>member16</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">There’s no rules other than to share your dinner, lunch, or breakfast menu.<br />
+<br />
+It’s an opportunity to share recipes if you wish.<br />
+<br />
+Also, while not mandatory <i>original</i> photos are strongly encouraged.</div>]]></content:encoded>
+      <slash:comments>5645</slash:comments>
+    </item>
+    <item>
+      <title>Rian Johnson's iPhone Camera App Goes Viral</title>
+      <pubDate>Sat, 31 Oct 2026 02:54:19 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/rian-johnsons-iphone-camera-app-goes-viral.2493228/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493228</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/rian-johnson-iphone-camera-app/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Filmmaker Rian Johnson, best known for writing and directing &quot;Knives Out,&quot; &quot;Glass Onion,&quot; and &quot;Star Wars: The Last Jedi,&quot; has seen his new iPhone photography app <a href="https://apps.apple.com/us/app/chromagraph-camera/id6803329435" target="_blank" class="link link--external" rel="noopener">Chromagraph Camera</a> climb to the top of the paid App Store charts after attracting attention on social media this week.<br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/iPhone-18-Pro-Max-Glacier-Camera.jpg" data-url="https://images.macrumors.com/article-new/2026/10/iPhone-18-Pro-Max-Glacier-Camera.jpg" class="bbImage " loading="lazy"
+		 style="" width="1600" height="900" />&#8203;</div><br />
+<br />
+Johnson developed the app...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/rian-johnsons-iphone-camera-app-goes-viral.2493228/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>62</slash:comments>
+    </item>
+    <item>
+      <title>Terrible performance on macOS 27.2</title>
+      <pubDate>Sat, 31 Oct 2026 02:49:39 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/terrible-performance-on-macos-27-2.2492877/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492877</guid>
+      <author>member@example.com (member22)</author>
+      <category domain="https://forums.macrumors.com/forums/macos-golden-gate-27.253/"><![CDATA[macOS Golden Gate (27)]]></category>
+      <dc:creator>member22</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Ever since macOS 27.2 came out, my computer is performing very poorly. My menu bar animations are so choppy now on 27.2 like 26 again, but were fine on 27.0.1 on my MacBook Air M2. What happened? I need help fixing this. My computer freezes like absolute crazy now.</div>]]></content:encoded>
+      <slash:comments>40</slash:comments>
+    </item>
+    <item>
+      <title>MacBook Pro Bags, Sleeves, and Cases Thread</title>
+      <pubDate>Sat, 31 Oct 2026 02:47:25 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/macbook-pro-bags-sleeves-and-cases-thread.1391592/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:1391592</guid>
+      <author>member@example.com (member8)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-pro.90/"><![CDATA[MacBook Pro]]></category>
+      <dc:creator>member8</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">I&#039;m thinking of getting a Tucano Second Skin for my new MBPr that is on its way to me.<br />
+<br />
+I have one of these currently for my 2009 15&quot; MBP, and its nice and snug, it doesn&#039;t have an edge to it like most of the new cases do, so I&#039;m hoping it will also be nice and snug for the MBPr.<br />
+<br />
+Give your feedback on the best cases to buy for the MBPr.<br />
+<br />
+Specifically, whether the case is slack or snug, price, and your general rating as a user.<br />
+<br />
+Picture/links would be good too!<br />
+<br />
+Thanks for the...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/macbook-pro-bags-sleeves-and-cases-thread.1391592/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>6337</slash:comments>
+    </item>
+    <item>
+      <title>SIRI AI - Set a Reminder?</title>
+      <pubDate>Sat, 31 Oct 2026 02:47:13 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/siri-ai-set-a-reminder.2493189/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493189</guid>
+      <author>member@example.com (member23)</author>
+      <category domain="https://forums.macrumors.com/forums/ios-27.251/"><![CDATA[iOS 27]]></category>
+      <dc:creator>member23</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Sorry for the rant, but Siri AI is really frustrating me today and I am hoping folks can help, or confirm that Siri AI is difficult for other folks.  I am using this on my Ultra 4 and Series 12 watches.  Of course, picking which Siri version is done on the iphone (IOS).<br />
+<br />
+I am used to Siri Classic.  When I go to set a reminder, I say &quot;Siri, remind me to Order Cake tomorrow at 2pm&quot;.  Classic Siri, sets the reminder without a problem.<br />
+<br />
+If I do this same command, Siri AI, will ask &quot;what app do...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/siri-ai-set-a-reminder.2493189/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>17</slash:comments>
+    </item>
+    <item>
+      <title>Post a screenshot of your Android home screen!</title>
+      <pubDate>Sat, 31 Oct 2026 02:47:04 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/post-a-screenshot-of-your-android-home-screen.1432306/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:1432306</guid>
+      <author>member@example.com (member2)</author>
+      <category domain="https://forums.macrumors.com/forums/alternatives-to-ios.157/"><![CDATA[Alternatives to iOS]]></category>
+      <dc:creator>member2</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Follow this example;<br />
+<br />
+<img src="http://img.tapatalk.com/ae36758a-9814-53a7.jpg" data-url="http://img.tapatalk.com/ae36758a-9814-53a7.jpg" class="bbImage " loading="lazy"
+		 style="" width="" height="" /><br />
+<br />
+Phone: Samsung Galaxy Note i717<br />
+<br />
+Android version: 4.1 Jellybean<br />
+<br />
+ROM: Cyanogenmod 10 <br />
+<br />
+<br />
+Let&#039;s see what others have going on!</div>]]></content:encoded>
+      <slash:comments>2886</slash:comments>
+    </item>
+    <item>
+      <title>Apple Card Monthly Payments- Xfinity Wireless</title>
+      <pubDate>Sat, 31 Oct 2026 02:44:53 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/apple-card-monthly-payments-xfinity-wireless.2493291/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493291</guid>
+      <author>member@example.com (member24)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member24</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">I just got my hands on an iPhone Duo. Lots of restock today at KoP. I did the Apple Card Monthly payment method and chose Verizon. Only problem is I have Xfinity am I still able to use this phone?<br />
+<br />
+can I skip activation and get my Xfinity e-sim on the phone?</div>]]></content:encoded>
+      <slash:comments>1</slash:comments>
+    </item>
+    <item>
+      <title>14 New Things Your iPhone Can Do in iOS 27.2</title>
+      <pubDate>Sat, 31 Oct 2026 02:41:51 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/14-new-things-your-iphone-can-do-in-ios-27-2.2493269/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493269</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/new-things-iphone-can-do-ios-27-2/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple released iOS 27.2 on October 26, bringing enhancements to Siri AI, adding Suggestions in Messages, and sneaking in a string of smaller additions across Photos, Podcasts, Games, Apple TV, and FaceTime. <br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/10/Everything-New-Your-iPhone-Can-Do-on-iOS-27.2-Feature-1.jpg" data-url="https://images.macrumors.com/article-new/2026/10/Everything-New-Your-iPhone-Can-Do-on-iOS-27.2-Feature-1.jpg" class="bbImage " loading="lazy"
+		 style="" width="2500" height="1406" />&#8203;</div><br />
+<br />
+iOS 27.2 is available to download to your device now via Settings ➝ General ➝...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/14-new-things-your-iphone-can-do-in-ios-27-2.2493269/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>20</slash:comments>
+    </item>
+    <item>
+      <title>Where Did All the iPhone Duos Go? Mostly to Apple's Stores</title>
+      <pubDate>Sat, 31 Oct 2026 02:39:39 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/where-did-all-the-iphone-duos-go-mostly-to-apples-stores.2493223/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493223</guid>
+      <author>member@example.com (MacRumors)</author>
+      <category domain="https://forums.macrumors.com/forums/macrumors-com-news-discussion.4/"><![CDATA[MacRumors.com News Discussion]]></category>
+      <dc:creator>MacRumors</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><a href="https://www.macrumors.com/2026/10/30/apple-stores-as-few-as-50-iphone-duo-units/" target="_blank" class="link link--external" rel="noopener"><img src="https://images.macrumors.com/images-new/member@example.com" data-url="https://images.macrumors.com/images-new/member@example.com" class="bbImage " loading="lazy"
+		 style="width: 251px" width="251" height="52" /></a><br />
+<br />
+Apple allocated roughly 80% of its initial iPhone Duo inventory to its retail stores, with locations holding as few as 50 units each, according to <i>Bloomberg</i>&#039;s Mark Gurman. <br />
+<br />
+<div style="text-align: center"><img src="https://images.macrumors.com/article-new/2026/09/iphone-duo-colors.jpg" data-url="https://images.macrumors.com/article-new/2026/09/iphone-duo-colors.jpg" class="bbImage " loading="lazy"
+		 style="" width="1600" height="899" />&#8203;</div><br />
+<br />
+Speaking on the latest episode of his <a href="https://omny.fm/shows/power-on-with-mark-gurman/apple-embraces-a-touchscreen-macbook-iphone-duo-crackgate" target="_blank" class="link link--external" rel="noopener">Power On podcast</a>, Gurman, citing people very close to the device&#039;s logistics, said most customers who...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/where-did-all-the-iphone-duos-go-mostly-to-apples-stores.2493223/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>114</slash:comments>
+    </item>
+    <item>
+      <title>Roll you own AtomBIOS FCode for select AMD HD Radeon cards( only tested in qemu with OpenBIOS )</title>
+      <pubDate>Sat, 31 Oct 2026 02:38:55 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/roll-you-own-atombios-fcode-for-select-amd-hd-radeon-cards-only-tested-in-qemu-with-openbios.2492851/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492851</guid>
+      <author>member@example.com (member17)</author>
+      <category domain="https://forums.macrumors.com/forums/powerpc-macs.145/"><![CDATA[PowerPC Macs]]></category>
+      <dc:creator>member17</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><div class="bbCodeBlock bbCodeBlock--unfurl    js-unfurl fauxBlockLink"
+		data-unfurl="true" data-result-id="394982" data-result-token="1793419942:262ed4b46fb30bf01dc46ba1f83b12af0bfe70e4f0a54b2ef353022654e9d817" data-url="https://github.com/lyons88/rdn-fcode" data-host="github.com" data-pending="false">
+		<div class="contentRow">
+			
+				<div class="contentRow-figure contentRow-figure--fixedSmall js-unfurl-figure">
+					
+						<img src="https://opengraph.githubassets.com/9e8af59fa2d3429f80009200d06de0745ce53283b789c73924b2f6405f516e33/lyons88/rdn-fcode" loading="lazy" alt="github.com" class="bbCodeBlockUnfurl-image" data-onerror="hide-parent"/>
+					
+				</div>
+			
+			<div class="contentRow-main">
+				<h3 class="contentRow-header js-unfurl-title">
+					<a href="https://github.com/lyons88/rdn-fcode"
+						class="link link--external fauxBlockLink-blockLink"
+						target="_blank"
+						rel="nofollow ugc noopener"
+						data-proxy-href="">
+						GitHub - lyons88/rdn-fcode: Open Firmware FCode ROM for Juniper Radeons (HD 5750/5770/6750/6770) in a PCIe Power Mac G5
+					</a>
+				</h3>
+
+				<div class="contentRow-snippet js-unfurl-desc">Open Firmware FCode ROM for Juniper Radeons (HD 5750/5770/6750/6770) in a PCIe Power Mac G5 - lyons88/rdn-fcode</div>
+
+				<div class="contentRow-minor contentRow-minor--hideLinks">
+					<span class="js-unfurl-favicon">
+						
+							<img src="https://github.githubassets.com/favicons/favicon.svg" loading="lazy" alt="github.com" class="bbCodeBlockUnfurl-icon"
+								data-onerror="hide-parent"/>
+						
+					</span>
+					github.com
+				</div>
+			</div>
+		</div>
+	</div>
+<br />
+I don&#039;t have the real card yet, so this has only been tested in emulation.<br />
+<br />
+The PC VBIOS is fully copied as the first image in ROM so even if the FCODE fails in a real PowerMac the card &#039;should&#039; still work in a PC just like it always has.<br />
+<br />
+The FCode has a <b>full AtomBIOS interpreter written in Forth</b> (src/atom.fs, a port of Linux’s atom.c). At boot it:<br />
+<br />
+<ol>
+<li data-xf-list-type="ol"><b>Copies the x86 image</b> (the AtomBIOS tables) out of the card’s own expansion ROM...</li>
+</ol><br />
+<a href="https://forums.macrumors.com/threads/roll-you-own-atombios-fcode-for-select-amd-hd-radeon-cards-only-tested-in-qemu-with-openbios.2492851/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>15</slash:comments>
+    </item>
+    <item>
+      <title>Running untrusted source code in a container of sorts</title>
+      <pubDate>Sat, 31 Oct 2026 02:38:20 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/running-untrusted-source-code-in-a-container-of-sorts.2493213/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493213</guid>
+      <author>member@example.com (member25)</author>
+      <category domain="https://forums.macrumors.com/forums/macos.69/"><![CDATA[macOS]]></category>
+      <dc:creator>member25</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Given a GitHub repo which is a JavaScript application (node, React etc) for a gig task, what if its untrusted source code ?<br />
+<br />
+Normally we wouldn&#039;t check <i>all</i> the packages and also the existing code.<br />
+If this is the case, how do we contain the running code ?<br />
+I am on a macOS 15.8.2 and am wondering what I can do to prevent the code from touching the folder outside of parent.<br />
+<br />
+What macOS app (including paid) can I run as a container ?</div>]]></content:encoded>
+      <slash:comments>2</slash:comments>
+    </item>
+    <item>
+      <title>MacBook Air 15" - First MacBook Air since the original</title>
+      <pubDate>Sat, 31 Oct 2026 02:35:57 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/macbook-air-15-first-macbook-air-since-the-original.2493201/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2493201</guid>
+      <author>member@example.com (member9)</author>
+      <category domain="https://forums.macrumors.com/forums/macbook-air.122/"><![CDATA[MacBook Air]]></category>
+      <dc:creator>member9</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Hi all<br />
+<br />
+My first ever Macbook Air was the model released when Steve Jobs pulled it out of a manila envelope - back then it was Intel powered and 13 inch and had the metal bezels.  It was great machine for its time and very thin but performed pretty well.  Now skip forward to 2026, decided to trade in all my iPad devices and my old iPhone 16 Pro Max, and received around AU$4,000 in store credit.<br />
+<br />
+So took the plunge and purchased an Apple MacBook Air 15&quot; / 1TB / 24GB RAM in Midnight for around...<br />
+<br />
+<a href="https://forums.macrumors.com/threads/macbook-air-15-first-macbook-air-since-the-original.2493201/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>7</slash:comments>
+    </item>
+    <item>
+      <title>macOS 27.2 Golden Gate RC - What's New?</title>
+      <pubDate>Sat, 31 Oct 2026 02:30:01 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/macos-27-2-golden-gate-rc-whats-new.2492170/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492170</guid>
+      <author>member@example.com (member12)</author>
+      <category domain="https://forums.macrumors.com/forums/macos-golden-gate-27.253/"><![CDATA[macOS Golden Gate (27)]]></category>
+      <dc:creator>member12</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><span style="font-size: 26px"><b>macOS 27.2 Golden Gate RC</b></span><br />
+<br />
+<b><span style="font-size: 12px">Release Date</span></b><span style="font-size: 12px"> — October 19, 2026</span><br />
+<b><span style="font-size: 12px">Build Number </span></b><span style="font-size: 12px">— 26B118<br />
+<b>Apple Silicon System Firmware Version </b>— Pending<br />
+<b>Darwin Kernel Version </b>— Pending</span><br />
+<hr /><span style="font-size: 18px"><b><u>Change Tracker</u></b></span><br />
+<span style="font-size: 12px">Feel free to edit this section to add new issues! If you have an issue in the <a href="https://forums.macrumors.com/threads/macos-27-2-golden-gate-beta-4-whats-new.2491626/" class="link link--internal">previous thread</a>, please copy and paste that issue into this thread.</span><br />
+<br />
+<div class="bbTable">
+<table style='width: 100%'><tr><td style='width: 208.953px'><b>New Features &amp;...</b></td></tr></table>
+</div><br />
+<a href="https://forums.macrumors.com/threads/macos-27-2-golden-gate-rc-whats-new.2492170/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>87</slash:comments>
+    </item>
+    <item>
+      <title>*Best Buy* iPhone Duo Pre-Order / Pickup / Delivery Thread</title>
+      <pubDate>Sat, 31 Oct 2026 02:28:32 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/best-buy-iphone-duo-pre-order-pickup-delivery-thread.2492132/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492132</guid>
+      <author>member@example.com (member26)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member26</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">Given the number of Best Buy pre-orders this year due to the challenges with ordering directly from Apple, starting a separate thread for all of us counting on Best Buy to deliver on their launch day promise. 😅<br />
+<br />
+Please post your color, storage size, carrier and pickup / delivery date.<br />
+<br />
+<b>Night Sky, 512GB, AT&amp;T, release day pickup - right now status just shows “Pre-Ordered”</b></div>]]></content:encoded>
+      <slash:comments>464</slash:comments>
+    </item>
+    <item>
+      <title>10/30/2026 - TigerPorts v2.12.6.002 - MacPorts Alternative For Early Intel Based on PPCPorts (Mac OS X 10.4-10.6)</title>
+      <pubDate>Sat, 31 Oct 2026 02:27:28 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/10-30-2026-tigerports-v2-12-6-002-macports-alternative-for-early-intel-based-on-ppcports-mac-os-x-10-4-10-6.2485572/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2485572</guid>
+      <author>member@example.com (member18)</author>
+      <category domain="https://forums.macrumors.com/forums/early-intel-macs.230/"><![CDATA[Early Intel Macs]]></category>
+      <dc:creator>member18</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper"><div>
+		<a href="http://tigerports.com"
+			class="link link--external"
+			target="_blank"
+			rel="nofollow ugc noopener"
+			data-proxy-href="">
+			http://tigerports.com
+		</a>
+	</div>
+<br />
+Imagine if tiger was still supported by MacPorts, thats exactly the experience this provides.<br />
+<br />
+<h2 class="bbHeading"><a class="u-anchorTarget" name="-highlights"></a>Highlights&#8203;<a class="hoverLink" href="#-highlights" title="Permanent link"></a></h2><br />
+<ul>
+<li data-xf-list-type="ul">Officially support Tiger Intel and PowerPC. The Intel support is huge, as Intel Tiger had not been well tested since being dropped by MacPorts officially (and even then their were always more PowerPC users reporting and fixing issues). With TigerPorts having it&#039;s own custom port overlay based on <a href="https://github.com/macos-powerpc/powerpc-ports" target="_blank" class="link link--external" rel="nofollow ugc noopener">powerpc-ports</a> as upstream, I can rapidly...</li>
+</ul><br />
+<a href="https://forums.macrumors.com/threads/10-30-2026-tigerports-v2-12-6-002-macports-alternative-for-early-intel-based-on-ppcports-mac-os-x-10-4-10-6.2485572/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>125</slash:comments>
+    </item>
+    <item>
+      <title>Am I the only one who truly loves his Duo</title>
+      <pubDate>Sat, 31 Oct 2026 02:27:21 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/am-i-the-only-one-who-truly-loves-his-duo.2492762/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492762</guid>
+      <author>member@example.com (member13)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member13</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">No screen issue with mine or my wife<br />
+Apple Watch opens phone fast <br />
+And is a real pleasure to use</div>]]></content:encoded>
+      <slash:comments>148</slash:comments>
+    </item>
+    <item>
+      <title>iPhone 18 Pro Max → iPhone Duo → Back to the Pro Max</title>
+      <pubDate>Sat, 31 Oct 2026 02:25:39 +0000</pubDate>
+      <link>https://forums.macrumors.com/threads/iphone-18-pro-max-iphone-duo-back-to-the-pro-max.2492724/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:2492724</guid>
+      <author>member@example.com (member33)</author>
+      <category domain="https://forums.macrumors.com/forums/iphone.99/"><![CDATA[iPhone]]></category>
+      <dc:creator>member33</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">I originally purchased the iPhone 18 Pro Max but then decided to give the iPhone Duo a try, mainly because I fancied something a little different.<br />
+<br />
+However, after spending some time with the Duo, I&#039;ve ended up selling it and going back to the Pro Max.<br />
+<br />
+There were a few things about the Duo that I just couldn&#039;t get on with:<br />
+<ul>
+<li data-xf-list-type="ul">Outer screen: I found it far too small for everyday use, especially when quickly checking messages or doing simple tasks without opening the phone.</li>
+<li data-xf-list-type="ul">Wireless...</li>
+</ul><br />
+<a href="https://forums.macrumors.com/threads/iphone-18-pro-max-iphone-duo-back-to-the-pro-max.2492724/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>163</slash:comments>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<rss version="2.0"
+		xmlns:content="http://purl.org/rss/1.0/modules/content/"
+		xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+		xmlns:dc="http://purl.org/dc/elements/1.1/"
+		xmlns:atom="http://www.w3.org/2005/Atom"
+
+			>
+
+	<channel>
+
+		<title>WordPress.org Forums &#187; All Topics</title>
+		<atom:link href="https://wordpress.org/support/topics/feed/" rel="self" type="application/rss+xml" />
+		<link>https://wordpress.org/support/topics/feed/</link>
+		<description></description>		<lastBuildDate>Sat, 31 Oct 2026 04:04:19 +0000</lastBuildDate>
+		<generator>https://bbpress.org/?v=2.7.0-alpha-4</generator>
+		<language>en-US</language>
+
+		
+		
+			
+				<item>
+					<guid>https://wordpress.org/support/topic/cant-connect-to-stripe-4/</guid>
+					<title>Cant connect to Stripe</title>
+					<link>https://wordpress.org/support/topic/cant-connect-to-stripe-4/</link>
+					<pubDate>Sat, 31 Oct 2026 03:46:28 +0000</pubDate>
+					<dc:creator>member5</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">Hi, hope you all are fine. </p>
+
+
+
+<p class="wp-block-paragraph">I click the button <a href="https://whodat.theeventscalendar.com/commerce/v1/stripe/connect?token=https://panicodemasas.org/noctambulante/wp-json/tribe/tickets/v1/commerce/stripe/return&amp;return_url=https://whodat.theeventscalendar.com/commerce/v1/stripe/connected&amp;version=5.30.3&amp;mode=live&amp;&amp;nonce=d888e38797" rel="ugc">Get Connected with <em>Stripe</em></a> then login to the stripe, select the account, and then get back to TTickets settings / payments but canot enable payment gateway.<br />WordPress 7.1.4<br />PHP version8.4.27<br />Server version11.4.13-MariaDB <br />Server architecture Linux 4.18.0-553.141.2.lve.el8.x86_64 x86_64</p>
+
+
+
+<p class="wp-block-paragraph">Thanks in advance for your support</p>
+
+
+
+<p class="wp-block-paragraph"> </p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/iphone-zooms-in-when-tapping-form-inputs-and-wide-table-overflows-on-tablet/</guid>
+					<title>iPhone zooms in when tapping form inputs, and wide table overflows on tablet</title>
+					<link>https://wordpress.org/support/topic/iphone-zooms-in-when-tapping-form-inputs-and-wide-table-overflows-on-tablet/</link>
+					<pubDate>Sat, 31 Oct 2026 03:42:31 +0000</pubDate>
+					<dc:creator>member6</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p>Hi,</p>
+<p>I have two mobile/tablet layout problems on my homepage and I&#8217;m not sure if they come from the theme styles or my own content.</p>
+<p>1) Input zoom on iPhone<br />
+The first text input in the calculator form on the homepage has a computed font size of about 14.7px. On iPhone, Safari zooms the page in when you tap it, and the user has to pinch back out. The other inputs/selects are 20px or more and don&#8217;t cause this. Where does Kadence set the base font size for form inputs, and what&#8217;s the cleanest way to make all inputs at least 16px on mobile?</p>
+<p>2) Table overflow on tablet (768px)<br />
+The tax bracket tables are fine on a phone (they shrink to about 310px), but at a 768px wide viewport one table renders around 957px wide and runs off the screen. Is there a Kadence option to make tables scroll horizontally inside their container, or should I wrap them myself?</p>
+<p>Desktop looks fine in both cases.</p>
+<p>Thanks for any pointers!</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/full-width-alignfull-group-blocks-cause-horizontal-scroll-on-mobile/</guid>
+					<title>Full-width (alignfull) group blocks cause horizontal scroll on mobile</title>
+					<link>https://wordpress.org/support/topic/full-width-alignfull-group-blocks-cause-horizontal-scroll-on-mobile/</link>
+					<pubDate>Sat, 31 Oct 2026 03:41:42 +0000</pubDate>
+					<dc:creator>member6</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p>Hi,</p>
+<p>On my homepage, the sections I built with Group blocks set to Full width (alignfull) are slightly wider than the screen on mobile, so the whole page can be dragged sideways a little.</p>
+<p>What I see at a 360px wide viewport:<br />
+&#8211; the visible width is about 338px, but the alignfull groups render at about 361px<br />
+&#8211; they get a negative left margin of around -37px and 20px left/right padding<br />
+&#8211; the page scroll width becomes about 358px, so there is roughly 20px of horizontal scroll<br />
+&#8211; the same thing happens at 768px (tablet), with about 20px extra</p>
+<p>It looks fine on desktop. Normal-width blocks are fine; only the full-width groups overflow.</p>
+<p>Is this a known issue with Astra&#8217;s full-width alignment on mobile, or is there a setting (container layout / content width) I should change? I&#8217;d prefer a proper fix over just adding overflow-x: hidden to the body.</p>
+<p>Thanks!</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/game-changer-%f0%9f%9a%80/</guid>
+					<title>Game Changer 🚀</title>
+					<link>https://wordpress.org/support/topic/game-changer-%f0%9f%9a%80/</link>
+					<pubDate>Sat, 31 Oct 2026 03:41:19 +0000</pubDate>
+					<dc:creator>member7</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">I have been testing the plugin and am highly impressed with the results. It is performing exceptionally well, allowing me to manage my website seamlessly through the Claude chat interface. This integration has significantly optimized my workflow.</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/does-what-i-needed-30/</guid>
+					<title>Does what I needed!</title>
+					<link>https://wordpress.org/support/topic/does-what-i-needed-30/</link>
+					<pubDate>Sat, 31 Oct 2026 03:04:27 +0000</pubDate>
+					<dc:creator>member8</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">Does exactly what I needed, for free. Very easy to use and there are many options. </p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/uploaded-customer-images-not-clickable-in-woocommerce-orders/</guid>
+					<title>Uploaded customer images not clickable in WooCommerce orders</title>
+					<link>https://wordpress.org/support/topic/uploaded-customer-images-not-clickable-in-woocommerce-orders/</link>
+					<pubDate>Sat, 31 Oct 2026 03:02:01 +0000</pubDate>
+					<dc:creator>member8</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">I&#8217;m using Product Option Kit version 1.2.0 with WooCommerce on WordPress.com.</p>
+
+
+
+<p class="wp-block-paragraph">I have a product option that allows customers to upload a photo. The upload works correctly, and the filename appears in the WooCommerce order details. However, the filename is displayed as plain text rather than a clickable link to view or download the image.</p>
+
+
+
+<p class="wp-block-paragraph">I&#8217;ve confirmed that the uploaded image is successfully stored in <code>wp-content/uploads/pkset_uploads/</code>.</p>
+
+
+
+<p class="wp-block-paragraph">Is this expected behavior, or should uploaded files be accessible directly from the WooCommerce order details?</p>
+
+
+
+<p class="wp-block-paragraph">It would be helpful to have a secure download link for administrators when processing customer orders.</p>
+
+
+
+<p class="wp-block-paragraph">Thank you!</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/sitemap-category-lastmod-is-1970-01-01-index-lastmod-counts-scheduled-posts/</guid>
+					<title>Sitemap: category lastmod is 1970-01-01; index lastmod counts scheduled posts</title>
+					<link>https://wordpress.org/support/topic/sitemap-category-lastmod-is-1970-01-01-index-lastmod-counts-scheduled-posts/</link>
+					<pubDate>Sat, 31 Oct 2026 02:55:27 +0000</pubDate>
+					<dc:creator>member2</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">AIOSEO version: 5.0.4 (Lite, latest on wordpress.org)<br /><br />WordPress version: 7.1.4<br /><br />Theme: Zeever (block theme)<br /><br />Example URLs: <a href="https://member2.com/category-sitemap.xml" rel="nofollow ugc">https://member2.com/category-sitemap.xml</a> and <a href="https://member2.com/sitemap.xml" rel="nofollow ugc">https://member2.com/sitemap.xml</a><br /><br />Hello AIOSEO team,<br /><br />I found two problems with sitemap <code>&lt;lastmod&gt;</code> values while auditing our site. I read the 5.0.4 source and I think I&#8217;ve found the cause of both. Details are below.<br /><br />Bug 1: Category sitemap <code>&lt;lastmod&gt;</code> is 1970-01-01 for categories with no child categories<br /><br />What happens<br /><br />In <code>category-sitemap.xml</code>, every category that has published posts but no child categories shows:<br /><br /><code>&lt;lastmod&gt;&lt;![CDATA[1970-01-01T00:00:00+00:00]]&gt;&lt;/lastmod&gt;</code><br /><br />A parent category shows the date of its child category&#8217;s newest post, not its own. On our site, &#8220;Car Review&#8221; shows 2026-10-18 even though its own posts were updated later. That date comes from its child category &#8220;For Sale&#8221;.<br /><br />Cause (as far as I can tell)<br /><br />• <code>app/Common/Sitemap/Content.php</code>, <code>terms()</code> (line ~386) gets terms through <code>aioseo()-&gt;sitemap-&gt;query-&gt;terms()</code>. It then calls <code>getTermLastModified( $term )</code> for each entry (line 411).<br /><br />• <code>app/Common/Sitemap/Query.php</code>, <code>terms()</code> (line 366) selects only <code>t.term_id</code> by default (line 368). <code>tt.count</code> is added only when the <code>root</code> argument is set (line 380). So for the normal, non-root sitemap build, the term objects have no <code>count</code> property.<br /><br />• <code>app/Common/Sitemap/Content.php</code>, <code>getTermLastModified()</code> (line 431) checks <code>if ( empty( $term-&gt;count ) )</code> (line 442). Because <code>count</code> is never set, this is always true, so it always runs the &#8220;parent term with no posts&#8221; branch. That branch takes <code>MAX(post_modified_gmt)</code> only over posts in terms whose <code>parent</code> equals this term.<br /><br />• A category with no children gets NULL back. <code>dateTimeToIso8601( '' )</code> then turns that into 1970-01-01. A category with children gets only its children&#8217;s newest date.<br /><br />Steps to reproduce<br /><br />1. Install AIOSEO 5.0.4 with sitemaps on and the Category taxonomy included.<br /><br />2. Create a category with no child categories and assign one published post to it.<br /><br />3. Open <code>/category-sitemap.xml</code>.<br /><br />Expected: <code>&lt;lastmod&gt;</code> equals the newest <code>post_modified_gmt</code> of the published posts in that category.<br /><br />Actual: <code>&lt;lastmod&gt;</code> is <code>1970-01-01T00:00:00+00:00</code>. A parent category shows only its children&#8217;s newest date.<br /><br />Possible fix<br /><br />Select <code>tt.count</code> in <code>Query::terms()</code> for the regular build too, or don&#8217;t rely on <code>$term-&gt;count</code> in <code>getTermLastModified()</code> (for example, call <code>get_term()</code> when <code>count</code> isn&#8217;t set). Also, when no date is found, leave <code>&lt;lastmod&gt;</code> out rather than outputting the epoch.<br /><br />Bug 2: Sitemap index <code>&lt;lastmod&gt;</code> for taxonomy sitemaps counts unpublished/scheduled posts (shows a future date)<br /><br />What happens<br /><br />In <code>sitemap.xml</code>, the <code>category-sitemap.xml</code> entry shows a future date:<br /><br /><code>&lt;loc&gt;https://member2.com/category-sitemap.xml&lt;/loc&gt;</code><br /><br /><code>&lt;lastmod&gt;2026-11-19T16:35:00+00:00&lt;/lastmod&gt;</code><br /><br />(This was checked on 2026-10-31 UTC.) The date matches a scheduled post (status <code>future</code>, publishing 2026-11-19 16:35 UTC) in one of our categories.<br /><br />Cause (as far as I can tell)<br /><br />• <code>app/Common/Sitemap/Root.php</code>, <code>buildIndexes()</code> (line 532), taxonomy branch (around lines 566–591). It runs <code>MAX(p.post_modified_gmt)</code> over every post in the chunk&#8217;s terms (<code>WHERE tt.term_id IN (...)</code>, line 584) but has no <code>post_status = 'publish'</code> condition. So drafts, private posts and scheduled (<code>future</code>) posts count too, and a scheduled post&#8217;s future date ends up as the index lastmod.<br /><br />• The post-type branch of the same function (line 555, <code>whereIn( 'p.ID', $ids )</code>) uses IDs from the sitemap query, so it isn&#8217;t affected in the same way.<br /><br />• <code>getTermLastModified()</code> in <code>Content.php</code> does filter <code>p.post_status = 'publish'</code>, so the two code paths disagree.<br /><br />Steps to reproduce<br /><br />1. Include the Category taxonomy in the sitemap.<br /><br />2. Schedule a post for a future date in any included category.<br /><br />3. Open <code>/sitemap.xml</code>.<br /><br />Expected: The <code>category-sitemap.xml</code> lastmod reflects only published posts, and is never later than the current time.<br /><br />Actual: It shows the scheduled post&#8217;s future date.<br /><br />Possible fix<br /><br />Add <code>-&gt;where( 'p.post_status', 'publish' )</code> (and, if you like, limit it to the included post types) to the taxonomy lastmod query in <code>Root::buildIndexes()</code>.<br /><br />Environment notes<br /><br />• Sitemap settings: indexes on, 1000 links per index, post types post/page/attachment, taxonomy category only, author and date sitemaps off.<br /><br />Thank you for looking into this. I&#8217;m happy to give more details or test a fix.</p>
+
+
+<ul id="bbp-topic-revision-log-19060191" class="bbp-topic-revision-log">
+
+	<li id="bbp-topic-revision-log-19060191-item-19060193" class="bbp-topic-revision-log-item">
+		This topic was modified 1 hour, 16 minutes ago by <a href="https://wordpress.org/support/users/member2/" title="View member2&#039;s profile" class="bbp-author-link"><span class="bbp-author-name">member2</span></a>.
+	</li>
+	<li id="bbp-topic-revision-log-19060191-item-19060194" class="bbp-topic-revision-log-item">
+		This topic was modified 1 hour, 10 minutes ago by <a href="https://wordpress.org/support/users/member2/" title="View member2&#039;s profile" class="bbp-author-link"><span class="bbp-author-name">member2</span></a>.
+	</li>
+
+</ul>
+
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/congratulations-%f0%9f%99%82-2/</guid>
+					<title>Congratulations 🙂</title>
+					<link>https://wordpress.org/support/topic/congratulations-%f0%9f%99%82-2/</link>
+					<pubDate>Sat, 31 Oct 2026 02:46:09 +0000</pubDate>
+					<dc:creator>member3</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">Wonderfull plugin. Worth a coffe, but i dont have moneyyy hahaha.</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/ai-engine-3-8-8-free-supported-way-to-use-storefalse-with-the-responses-api/</guid>
+					<title>AI Engine 3.8.8 Free: supported way to use store=false with the Responses API?</title>
+					<link>https://wordpress.org/support/topic/ai-engine-3-8-8-free-supported-way-to-use-storefalse-with-the-responses-api/</link>
+					<pubDate>Sat, 31 Oct 2026 02:34:45 +0000</pubDate>
+					<dc:creator>member1</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 1						</p>
+						<p class="wp-block-paragraph">Hello Jordy,</p>
+
+
+
+<p class="wp-block-paragraph">I’m using AI Engine 3.8.8 Free with OpenAI’s Responses API. I found your reply in the “AI Engine – Chatbot privacy and data retention questions” thread. I understand from it that AI Engine does not currently send <code>store: false</code> and that the Automatic history strategy relies on the previous response. Could you please confirm whether this applies to version 3.8.8 Free?</p>
+
+
+
+<ol>
+<li>Is there a built-in setting in AI Engine 3.8.8 Free to send <code>store: false</code> with every Responses API request?</li>
+
+
+
+<li>If not, is there a documented filter, action hook, or other supported, update-safe way to add this parameter without modifying the plugin’s core files?</li>
+
+
+
+<li>If <code>store: false</code> is used, can conversation context continue across messages? If so, which history strategy is supported?</li>
+
+
+
+<li>If the Free version has no supported way to do this, what approach do you recommend for users who need <code>store: false</code> while preserving conversation continuity?</li>
+</ol>
+
+
+
+<p class="wp-block-paragraph">Thank you.</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+				
+				<item>
+					<guid>https://wordpress.org/support/topic/useful-for-multiple-environment/</guid>
+					<title>Useful for Multiple Environment</title>
+					<link>https://wordpress.org/support/topic/useful-for-multiple-environment/</link>
+					<pubDate>Sat, 31 Oct 2026 02:14:55 +0000</pubDate>
+					<dc:creator>member4</dc:creator>
+
+					
+					<description>
+						<![CDATA[
+						<p>
+							Replies: 0						</p>
+						<p class="wp-block-paragraph">The Multiple Environment plugin is useful for managing and switching between different environments efficiently. It helps streamline development and testing workflows, improves productivity, and makes environment management more convenient. Overall, it is a helpful tool for developers working across multiple environments.</p>
+						]]>
+					</description>
+
+					
+					
+					
+				</item>
+
+							
+		
+	</channel>
+	</rss>
+

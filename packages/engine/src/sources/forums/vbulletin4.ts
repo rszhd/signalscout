@@ -8,6 +8,8 @@
  * ("10-14-2026, 05:51 AM"), in the board's zone, so starts are approximate.
  * `sort=dateline` lists by start time.
  */
+
+import { feedFrom } from "./feeds.js";
 import { absoluteUrl, fromEnglishDate, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
@@ -76,4 +78,12 @@ export const vbulletin4: ForumProgram = {
       approximatePostedAt: true,
     };
   },
+
+  detectIndex: (html) =>
+    /class="forumbit_(?:no)?post/.test(html) && /forumdisplay\.php\?/.test(html),
+
+  feedUrl: (html, homeUrl) =>
+    feedFrom(html, homeUrl, (url) => vbulletin4.isFeed?.(url) ?? false, "external.php?type=RSS2"),
+  isFeed: (url) => /\/external\.php\?type=rss2$/i.test(url),
+  feedText: "cut",
 };

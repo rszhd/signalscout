@@ -9,6 +9,8 @@
  * early as UTC, so the start is marked approximate. A thread page has the
  * exact start in `<time datetime>`.
  */
+
+import { feedFrom } from "./feeds.js";
 import {
   absoluteUrl,
   fromEnglishDate,
@@ -72,4 +74,14 @@ export const vbulletin5: ForumProgram = {
       approximatePostedAt: false,
     };
   },
+
+  detectIndex: (html) =>
+    /<body[^>]+id="vb-page-body"/.test(html) && /class="forum-title"/.test(html),
+
+  // The whole forum's: a feed with a `nodeid` is one channel's.
+  feedUrl: (html, homeUrl) =>
+    feedFrom(html, homeUrl, (url) => vbulletin5.isFeed?.(url) ?? false, "external?type=rss2"),
+  isFeed: (url) => /\/external\?type=rss2$/i.test(url),
+  feedText: "full",
+  feedThreadId: (url) => new URL(url).pathname.match(/\/(\d+)-[^/]*$/)?.[1] ?? null,
 };

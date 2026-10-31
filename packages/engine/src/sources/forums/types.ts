@@ -55,4 +55,20 @@ export interface ForumProgram {
   listThreads(page: string, pageUrl: string, now?: Date): ForumThreadSummary[];
   /** Null when the page holds no thread this parser can read. */
   readThread(page: string, pageUrl: string, now?: Date): ForumThread | null;
+  /**
+   * True when this page is the forum's home page, which `detect` does not
+   * know: it looks for markup a list or a thread writes. US-473.
+   */
+  detectIndex?(page: string): boolean;
+  /**
+   * The newest-threads feed of the whole forum, from its home page: the feed
+   * the page names, or the program's usual address. Absent: no feed.
+   */
+  feedUrl?(homePage: string, homeUrl: string): string;
+  /** True when this address is this program's feed. */
+  isFeed?(url: string): boolean;
+  /** Full: a feed item holds the first post. Cut: the thread's page is read. */
+  readonly feedText?: "full" | "cut";
+  /** The thread's id from a feed item's address, where the address names it. */
+  feedThreadId?(url: string): string | null;
 }

@@ -17,6 +17,7 @@ import { vbulletin5 } from "./vbulletin5.js";
 import { xenforo1 } from "./xenforo1.js";
 import { xenforo2 } from "./xenforo2.js";
 
+export { type FeedItem, isReply, readFeed } from "./feeds.js";
 export type { ForumProgram, ForumThread, ForumThreadSummary } from "./types.js";
 
 /** Every program read so far, most used first. */
@@ -36,4 +37,28 @@ export const forumPrograms: readonly ForumProgram[] = [
 /** The parser for this page, or null when no parser knows it. */
 export function detectForum(html: string): ForumProgram | null {
   return forumPrograms.find((program) => program.detect(html)) ?? null;
+}
+
+/**
+ * The parser for a forum's home page, or null. A list or a thread page names
+ * its program too, so `detect` is asked first. US-473.
+ */
+export function detectForumIndex(html: string): ForumProgram | null {
+  return (
+    forumPrograms.find((program) => program.detect(html) || program.detectIndex?.(html)) ?? null
+  );
+}
+
+/** A forum's program and its newest-threads feed, from its home page; null without either. */
+export function forumFeedFrom(
+  html: string,
+  homeUrl: string,
+): { program: ForumProgram; feedUrl: string | null } | null {
+  const program = detectForumIndex(html);
+  return program ? { program, feedUrl: program.feedUrl?.(html, homeUrl) ?? null } : null;
+}
+
+/** The program whose feed this address is, or null. */
+export function feedProgramFor(url: string): ForumProgram | null {
+  return forumPrograms.find((program) => program.isFeed?.(url)) ?? null;
 }

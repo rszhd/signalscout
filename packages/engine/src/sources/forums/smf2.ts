@@ -10,6 +10,8 @@
  * and a reader opens the thread to learn it. Sorted by first post, the
  * newest threads come first after the pinned ones.
  */
+
+import { forumFolder } from "./feeds.js";
 import { absoluteUrl, fromEnglishDate, piecesAt, textOf } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
@@ -71,4 +73,12 @@ export const smf2: ForumProgram = {
       approximatePostedAt: true,
     };
   },
+
+  detectIndex: (html) => /id="board_\d+"/.test(html) && /board=\d+\.0/.test(html),
+
+  // The feed a page names lists every post; `sa=news` lists new topics only.
+  feedUrl: (_html, homeUrl) =>
+    new URL("index.php?action=.xml;type=rss2;sa=news", forumFolder(homeUrl)).toString(),
+  isFeed: (url) => /[?;]action=\.xml/.test(url),
+  feedText: "cut",
 };

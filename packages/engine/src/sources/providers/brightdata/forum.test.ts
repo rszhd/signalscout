@@ -177,6 +177,92 @@ describe("reading a forum section", () => {
   });
 });
 
+describe("reading a forum's newest-threads feed", () => {
+  const mybbFeed = manifest["mybb-feed.xml"]?.url ?? "";
+  const xenforoFeed = manifest["xenforo2-feed.xml"]?.url ?? "";
+
+  it("takes a feed's full posts as they are, in one request", async () => {
+    const stub = brightData({ [mybbFeed]: captured("mybb-feed.xml") });
+    const events: ForumPageEvent[] = [];
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      onPage: (event) => events.push(event),
+    });
+
+    // Between the newest two threads.
+    const results = await walk(source, [mybbFeed], "2026-10-30T17:50:00.000Z");
+
+    expect(stub.asked.map((call) => call.url)).toEqual([mybbFeed]);
+    expect(results.flatMap((result) => result.posts)).toEqual([
+      {
+        externalId: "forum.kodi.tv:389557",
+        url: "https://forum.kodi.tv/showthread.php?tid=389557",
+        channel: "forum.kodi.tv",
+        title: expect.stringContaining("ExtraFanart Filler"),
+        text: expect.stringContaining("I created a Kodi addon"),
+        postedAt: new Date("2026-10-30T18:08:10.000Z"),
+      },
+    ]);
+    expect(results.map((result) => result.unitsConsumed)).toEqual([1]);
+    expect(events).toEqual([
+      {
+        host: "forum.kodi.tv",
+        url: mybbFeed,
+        page: "feed",
+        via: "unlocker",
+        units: 1,
+        outcome: "read",
+        program: "mybb",
+        threads: 0,
+        posts: 1,
+      },
+    ]);
+  });
+
+  it("takes every item on a first read, and never a reply", async () => {
+    const feed = captured("mybb-feed.xml").replace(
+      "<title><![CDATA[Feature to hide",
+      "<title><![CDATA[Re: Feature to hide",
+    );
+    const stub = brightData({ [mybbFeed]: feed });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const posts = (await walk(source, [mybbFeed])).flatMap((result) => result.posts);
+
+    expect(posts).toHaveLength(14);
+    expect(posts.some((post) => post.externalId === "forum.kodi.tv:389554")).toBe(false);
+  });
+
+  it("opens each new thread where the feed cuts the text, at most the application's limit", async () => {
+    const stub = brightData(
+      { [xenforoFeed]: captured("xenforo2-feed.xml") },
+      captured("xenforo2-thread.html"),
+    );
+    const events: ForumPageEvent[] = [];
+    const connector = createBrightDataForum({
+      threadsPerSection: 3,
+      onPage: (event) => events.push(event),
+    });
+    const source = connector.create(
+      runtimeWith(stub.fetch, "2026-10-31T05:00:00.000Z"),
+    ) as BrightDataForumSource;
+
+    const results = await walk(source, [xenforoFeed]);
+
+    const asked = stub.asked.map((call) => call.url);
+    expect(asked).toHaveLength(1 + 3);
+    expect(
+      asked.slice(1).every((url) => url.startsWith("https://forums.macrumors.com/threads/")),
+    ).toBe(true);
+    // Each post is the thread's own first post, read from its page.
+    expect(results.flatMap((result) => result.posts).map((post) => post.title)).toEqual([
+      "M6 iMac",
+      "M6 iMac",
+      "M6 iMac",
+    ]);
+    expect(events[0]).toMatchObject({ page: "feed", program: "xenforo2", threads: 3, posts: 0 });
+  });
+});
+
 describe("an application's own limit", () => {
   it("opens no more threads a section than the application allows, and prices its cap so", async () => {
     const stub = brightData(

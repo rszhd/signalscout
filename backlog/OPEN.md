@@ -2,7 +2,7 @@
 
 # Open tickets
 
-82 open — 15 doing, 58 todo, 9 parked (7 p1, 58 p2, 17 p3).
+83 open — 16 doing, 58 todo, 9 parked (7 p1, 59 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -24,6 +24,7 @@
 | p2 | US-469 | [Forum pages are read by a parser per forum program and version](doing/US-469-forum-pages-are-read-by-a-parser-per-forum-program-and-version.md) | feature | doing | 2026-10-30T11:36+08:00 |
 | p2 | US-470 | [A monitor reads forum sections through Bright Data](doing/US-470-a-monitor-reads-forum-sections-through-bright-data.md) | feature | doing | 2026-10-30T15:28+08:00 |
 | p2 | US-471 | [A forum page Bright Data cannot pass is read through a cloud browser](doing/US-471-a-forum-page-bright-data-cannot-pass-is-read-through-a-cloud-browser.md) | feature | doing | 2026-10-31T09:06+08:00 |
+| p2 | US-473 | [A monitor reads a whole forum through its newest-threads feed](doing/US-473-a-monitor-reads-a-whole-forum-through-its-newest-threads-feed.md) | feature | doing | 2026-10-31T12:04+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |

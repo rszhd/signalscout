@@ -10,6 +10,8 @@
  * the newest-threads list is the most recently active one. Each row still
  * says when its thread started.
  */
+
+import { feedFrom } from "./feeds.js";
 import { absoluteUrl, fromIso, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
@@ -70,4 +72,12 @@ export const phpbb3: ForumProgram = {
       approximatePostedAt: false,
     };
   },
+
+  detectIndex: (html) => /<body[^>]+id="phpbb"/.test(html) && /viewforum\.php\?/.test(html),
+
+  // The new-topics feed, not the one of every post.
+  feedUrl: (html, homeUrl) =>
+    feedFrom(html, homeUrl, (url) => phpbb3.isFeed?.(url) ?? false, "app.php/feed/topics"),
+  isFeed: (url) => /\/feed\/topics(?:\?|$)|feed\.php\?mode=topics/.test(url),
+  feedText: "full",
 };

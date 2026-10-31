@@ -96,4 +96,14 @@ export const invision4: ForumProgram = {
       approximatePostedAt: false,
     };
   },
+
+  // No feed: Invision publishes one only when the board's owner makes it.
+  detectIndex: (html) => {
+    const body = html.match(/<body\b[^>]*>/)?.[0] ?? "";
+    return (
+      /class=['"]ipsApp ipsApp_front/.test(body) &&
+      !body.includes("data-ips-hook") &&
+      /\/forum\/\d+-/.test(html)
+    );
+  },
 };

@@ -9,6 +9,8 @@
  * `article:published_time`. bbPress lists by freshness and has no sort by
  * start time.
  */
+
+import { advertisedFeeds } from "./feeds.js";
 import {
   absoluteUrl,
   fromAgo,
@@ -72,4 +74,15 @@ export const bbpress: ForumProgram = {
       approximatePostedAt: false,
     };
   },
+
+  // The page names its forums' feed, which lists replies too; the topics feed
+  // sits beside it.
+  feedUrl(html, homeUrl) {
+    const forums = advertisedFeeds(html, homeUrl).find((url) => /\/forums\/feed\/?$/.test(url));
+    return forums
+      ? forums.replace(/\/forums\/feed\/?$/, "/topics/feed/")
+      : new URL("/topics/feed/", homeUrl).toString();
+  },
+  isFeed: (url) => /\/topics\/feed\/?$/.test(url),
+  feedText: "full",
 };

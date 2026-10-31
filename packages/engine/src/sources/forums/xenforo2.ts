@@ -8,6 +8,8 @@
  * nothing here is read from words. The markup writes `<div  class=` with two
  * spaces on some boards, so every pattern allows any space.
  */
+
+import { feedFrom, forumFolder, isXenForoFeed } from "./feeds.js";
 import { absoluteUrl, fromUnixSeconds, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
@@ -70,4 +72,15 @@ export const xenforo2: ForumProgram = {
       approximatePostedAt: false,
     };
   },
+
+  // XenForo 1 writes the same address; this program's `isFeed` names it.
+  feedUrl: (html, homeUrl) =>
+    feedFrom(
+      html,
+      homeUrl,
+      isXenForoFeed,
+      /\/forums\/$/.test(forumFolder(homeUrl)) ? "-/index.rss" : "forums/-/index.rss",
+    ),
+  feedText: "cut",
+  isFeed: isXenForoFeed,
 };

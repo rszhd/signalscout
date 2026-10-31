@@ -1,0 +1,859 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+		<title><![CDATA[Kodi Community Forum - All Forums]]></title>
+		<link>https://forum.kodi.tv/</link>
+		<description><![CDATA[Kodi Community Forum - https://forum.kodi.tv]]></description>
+		<pubDate>Sat, 31 Oct 2026 04:07:58 +0000</pubDate>
+		<generator>MyBB</generator>
+		<item>
+			<title><![CDATA[Addon: ExtraFanart Filler – Automatically fill in fanart1, fanart2, fanart3, ...]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389557</link>
+			<pubDate>Fri, 30 Oct 2026 18:08:10 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member10</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389557</guid>
+			<description><![CDATA[Hi All,<br />
+I created a Kodi addon that automatically populates fanart1, fanart2, etc. for Movies, TV Shows, and Movie Sets using the additional artwork URLs already scraped by Kodi.<br />
+<br />
+When Kodi scrapes artwork, it (usually?) stores multiple fanart image URLs from online artwork providers. One URL is assigned to the standard fanart art type, while the remaining URLs are available as Remote Art through the "Choose Art" dialog.<br />
+<br />
+This addon reads those additional fanart URLs and uses them to fill in the URLs for the fanart1, fanart2, fanart3, ...  artwork types. This allows skins and addons that support extrafanart to access the additional fanart images without requiring local artwork files.<br />
+<br />
+The addon does not download artwork, scrape new images, or manage local artwork. It simply uses Remote Art URLs that Kodi has already scraped for fanart and assigns them to fanartX artwork.<br />
+<br />
+More details are available on the GitHub project page: <a href="https://github.com/smfontes/kodi.extrafanart.filler" target="_blank"  rel="noopener" class="mycode_url">ExtraFanart Filler</a>.<br />
+You can install the addon from the zip file at: <a href="https://github.com/smfontes/kodi.extrafanart.filler/releases/download/0.5.0/script.extrafanart.filler.zip" target="_blank"  rel="noopener" class="mycode_url">script.extrafanart.filler.zip</a>]]></description>
+			<content:encoded><![CDATA[Hi All,<br />
+I created a Kodi addon that automatically populates fanart1, fanart2, etc. for Movies, TV Shows, and Movie Sets using the additional artwork URLs already scraped by Kodi.<br />
+<br />
+When Kodi scrapes artwork, it (usually?) stores multiple fanart image URLs from online artwork providers. One URL is assigned to the standard fanart art type, while the remaining URLs are available as Remote Art through the "Choose Art" dialog.<br />
+<br />
+This addon reads those additional fanart URLs and uses them to fill in the URLs for the fanart1, fanart2, fanart3, ...  artwork types. This allows skins and addons that support extrafanart to access the additional fanart images without requiring local artwork files.<br />
+<br />
+The addon does not download artwork, scrape new images, or manage local artwork. It simply uses Remote Art URLs that Kodi has already scraped for fanart and assigns them to fanartX artwork.<br />
+<br />
+More details are available on the GitHub project page: <a href="https://github.com/smfontes/kodi.extrafanart.filler" target="_blank"  rel="noopener" class="mycode_url">ExtraFanart Filler</a>.<br />
+You can install the addon from the zip file at: <a href="https://github.com/smfontes/kodi.extrafanart.filler/releases/download/0.5.0/script.extrafanart.filler.zip" target="_blank"  rel="noopener" class="mycode_url">script.extrafanart.filler.zip</a>]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[Feature to hide the titles of unwatched episodes]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389554</link>
+			<pubDate>Fri, 30 Oct 2026 17:45:29 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member13</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389554</guid>
+			<description><![CDATA[Hi,<br />
+<br />
+In Kodi, you can already hide the <span style="font-style: italic;" class="mycode_i">Movie plot</span>, <span style="font-style: italic;" class="mycode_i">Episode plot</span>, and <span style="font-style: italic;" class="mycode_i">Episode thumb</span> for unwatched items (<span style="font-style: italic;" class="mycode_i">Settings</span> / <span style="font-style: italic;" class="mycode_i">Media</span> / <span style="font-style: italic;" class="mycode_i">Videos</span> / <span style="font-style: italic;" class="mycode_i">Show information for unwatched items</span>).<br />
+<br />
+It should also be possible to hide <span style="font-style: italic;" class="mycode_i">Episode title</span>, because an event in the next episode could be spoiled in the titles of subsequent episodes.]]></description>
+			<content:encoded><![CDATA[Hi,<br />
+<br />
+In Kodi, you can already hide the <span style="font-style: italic;" class="mycode_i">Movie plot</span>, <span style="font-style: italic;" class="mycode_i">Episode plot</span>, and <span style="font-style: italic;" class="mycode_i">Episode thumb</span> for unwatched items (<span style="font-style: italic;" class="mycode_i">Settings</span> / <span style="font-style: italic;" class="mycode_i">Media</span> / <span style="font-style: italic;" class="mycode_i">Videos</span> / <span style="font-style: italic;" class="mycode_i">Show information for unwatched items</span>).<br />
+<br />
+It should also be possible to hide <span style="font-style: italic;" class="mycode_i">Episode title</span>, because an event in the next episode could be spoiled in the titles of subsequent episodes.]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[Kodi PC Game Launcher]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389548</link>
+			<pubDate>Fri, 30 Oct 2026 16:56:51 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member5</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389548</guid>
+			<description><![CDATA[<a href="javascript:void(0)" onclick="window.open('https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/service.gamelauncher/icon.png', '_blank');myWindow.focus();"><img src="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/service.gamelauncher/icon.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Kodi Game Launcher</span></span><br />
+<span style="font-style: italic;" class="mycode_i">Turn Kodi into a console-style front end for your PC games. Browse your library with descriptions and artwork, press play, and the game starts.</span><br />
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Highlights</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Any game, any store:</span> Steam, Epic, GOG, emulators and standalone games. A Windows shortcut (.lnk) decides what runs.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Rich library:</span> descriptions from IGDB and artwork from SteamGridDB (posters, fanart, logos and more).<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Launch from Kodi:</span> press play and the game starts, with a fullscreen fanart splash while it loads.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Automatic updates:</span> install the repository once and Kodi keeps every addon up to date. Older versions stay available under "Versions".<br />
+</li>
+</ul>
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">How it works</span></span><br />
+<ol type="1" class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Organise:</span> give each game a folder with a Play.avi and a .lnk shortcut.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Scrape:</span> the scraper adds each game to your Kodi library (as a movie) with metadata and artwork.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Play:</span> the launcher sees Play.avi, shows the splash and starts the shortcut.<br />
+</li>
+</ol>
+<div class="codeblock"><div class="title">Code:</div><div class="body" dir="ltr"><code>Games&#92;<br />
+&nbsp;&nbsp;Hades&#92;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Play.avi<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Hades.lnk</code></div></div><br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Addons</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">IGDB + SteamGridDB Game Scraper</span> (metadata.games.igdb): game metadata from IGDB, all artwork from SteamGridDB.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Game Launcher</span> (service.gamelauncher): detects Play.avi, shows a fanart splash and launches the game's shortcut. Windows only.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Cinema Themes</span> (service.cinemathemes): optional, plays theme music for your movie, show and game pages through mpv (needs a separate mpv.exe).<br />
+</li>
+</ul>
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Requirements</span></span><ul class="mycode_list"><li>Windows<br />
+</li>
+<li>Kodi 19 or newer<br />
+</li>
+<li>A free Twitch developer app (for IGDB metadata): <a href="https://dev.twitch.tv/console" target="_blank"  rel="noopener" class="mycode_url">https://dev.twitch.tv/console</a><br />
+</li>
+<li>A free SteamGridDB API key (for artwork): <a href="https://www.steamgriddb.com/profile/preferences/api" target="_blank"  rel="noopener" class="mycode_url">https://www.steamgriddb.com/profile/preferences/api</a><br />
+</li>
+</ul>
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Install</span></span><br />
+<ol type="1" class="mycode_list"><li>Download the repository zip: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/raw/main/zips/repository.kodigamelauncher/repository.kodigamelauncher-1.0.1.zip" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...-1.0.1.zip</a><br />
+</li>
+<li>In Kodi go to Add-ons &gt; Install from zip file and select it.<br />
+</li>
+<li>Go to Install from repository &gt; Kodi Game Launcher Repository and install the addons you want.<br />
+</li>
+<li>Follow the Installation Guide to add your keys and your games.<br />
+</li>
+</ol>
+<br />
+<span style="font-weight: bold;" class="mycode_b">Important:</span> enter your IGDB and SteamGridDB keys in the scraper's own Configure page (Add-ons &gt; My add-ons &gt; Information providers &gt; Movie information providers &gt; IGDB + SteamGridDB Game Scraper &gt; Configure), <span style="font-weight: bold;" class="mycode_b">not</span> in the settings shown while you set a source's content. Keys entered there are not saved.<br />
+<br />
+Use two smart playlists (Path contains / does not contain your games folder) to keep games and movies in separate lists.<br />
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Links</span></span><ul class="mycode_list"><li>Source and downloads: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-Launcher</a><br />
+</li>
+<li>Installation Guide: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/Installation-Guide.md" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...n-Guide.md</a><br />
+</li>
+<li>Troubleshooting: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/Troubleshooting.md" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...hooting.md</a><br />
+</li>
+<li>Changelog: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/CHANGELOG.md" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...ANGELOG.md</a><br />
+</li>
+</ul>
+<br />
+License: MIT. The addons are not affiliated with or endorsed by IGDB, Twitch or SteamGridDB.<br />
+<br />
+Feedback and bug reports are welcome here or on GitHub. If something doesn't work, please post the relevant part of your kodi.log (search for service.gamelauncher or metadata.games.igdb).]]></description>
+			<content:encoded><![CDATA[<a href="javascript:void(0)" onclick="window.open('https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/service.gamelauncher/icon.png', '_blank');myWindow.focus();"><img src="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/service.gamelauncher/icon.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Kodi Game Launcher</span></span><br />
+<span style="font-style: italic;" class="mycode_i">Turn Kodi into a console-style front end for your PC games. Browse your library with descriptions and artwork, press play, and the game starts.</span><br />
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Highlights</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Any game, any store:</span> Steam, Epic, GOG, emulators and standalone games. A Windows shortcut (.lnk) decides what runs.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Rich library:</span> descriptions from IGDB and artwork from SteamGridDB (posters, fanart, logos and more).<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Launch from Kodi:</span> press play and the game starts, with a fullscreen fanart splash while it loads.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Automatic updates:</span> install the repository once and Kodi keeps every addon up to date. Older versions stay available under "Versions".<br />
+</li>
+</ul>
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">How it works</span></span><br />
+<ol type="1" class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Organise:</span> give each game a folder with a Play.avi and a .lnk shortcut.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Scrape:</span> the scraper adds each game to your Kodi library (as a movie) with metadata and artwork.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Play:</span> the launcher sees Play.avi, shows the splash and starts the shortcut.<br />
+</li>
+</ol>
+<div class="codeblock"><div class="title">Code:</div><div class="body" dir="ltr"><code>Games&#92;<br />
+&nbsp;&nbsp;Hades&#92;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Play.avi<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Hades.lnk</code></div></div><br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Addons</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">IGDB + SteamGridDB Game Scraper</span> (metadata.games.igdb): game metadata from IGDB, all artwork from SteamGridDB.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Game Launcher</span> (service.gamelauncher): detects Play.avi, shows a fanart splash and launches the game's shortcut. Windows only.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Cinema Themes</span> (service.cinemathemes): optional, plays theme music for your movie, show and game pages through mpv (needs a separate mpv.exe).<br />
+</li>
+</ul>
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Requirements</span></span><ul class="mycode_list"><li>Windows<br />
+</li>
+<li>Kodi 19 or newer<br />
+</li>
+<li>A free Twitch developer app (for IGDB metadata): <a href="https://dev.twitch.tv/console" target="_blank"  rel="noopener" class="mycode_url">https://dev.twitch.tv/console</a><br />
+</li>
+<li>A free SteamGridDB API key (for artwork): <a href="https://www.steamgriddb.com/profile/preferences/api" target="_blank"  rel="noopener" class="mycode_url">https://www.steamgriddb.com/profile/preferences/api</a><br />
+</li>
+</ul>
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Install</span></span><br />
+<ol type="1" class="mycode_list"><li>Download the repository zip: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/raw/main/zips/repository.kodigamelauncher/repository.kodigamelauncher-1.0.1.zip" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...-1.0.1.zip</a><br />
+</li>
+<li>In Kodi go to Add-ons &gt; Install from zip file and select it.<br />
+</li>
+<li>Go to Install from repository &gt; Kodi Game Launcher Repository and install the addons you want.<br />
+</li>
+<li>Follow the Installation Guide to add your keys and your games.<br />
+</li>
+</ol>
+<br />
+<span style="font-weight: bold;" class="mycode_b">Important:</span> enter your IGDB and SteamGridDB keys in the scraper's own Configure page (Add-ons &gt; My add-ons &gt; Information providers &gt; Movie information providers &gt; IGDB + SteamGridDB Game Scraper &gt; Configure), <span style="font-weight: bold;" class="mycode_b">not</span> in the settings shown while you set a source's content. Keys entered there are not saved.<br />
+<br />
+Use two smart playlists (Path contains / does not contain your games folder) to keep games and movies in separate lists.<br />
+<br />
+<span style="font-weight: bold;" class="mycode_b"><span style="font-size: large;" class="mycode_size">Links</span></span><ul class="mycode_list"><li>Source and downloads: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-Launcher</a><br />
+</li>
+<li>Installation Guide: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/Installation-Guide.md" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...n-Guide.md</a><br />
+</li>
+<li>Troubleshooting: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/Troubleshooting.md" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...hooting.md</a><br />
+</li>
+<li>Changelog: <a href="https://github.com/GoldStart5/Kodi-Game-Launcher/blob/main/CHANGELOG.md" target="_blank"  rel="noopener" class="mycode_url">https://github.com/GoldStart5/Kodi-Game-...ANGELOG.md</a><br />
+</li>
+</ul>
+<br />
+License: MIT. The addons are not affiliated with or endorsed by IGDB, Twitch or SteamGridDB.<br />
+<br />
+Feedback and bug reports are welcome here or on GitHub. If something doesn't work, please post the relevant part of your kodi.log (search for service.gamelauncher or metadata.games.igdb).]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[trying to get Playstation 3 remote working]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389551</link>
+			<pubDate>Fri, 30 Oct 2026 13:19:40 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member14</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389551</guid>
+			<description><![CDATA[hi members, i bought a Playstation 3 Bluetooth remote for use with Kodi DS Player.<br />
+<br />
+Quite simply I can't get it to pair with Windows Bluetooth app.<br />
+<br />
+I have tried a few methods and it just won't work for me.<br />
+<br />
+Is there a tutorial on how to ? or I am incorrect that the PS3 remote will not work]]></description>
+			<content:encoded><![CDATA[hi members, i bought a Playstation 3 Bluetooth remote for use with Kodi DS Player.<br />
+<br />
+Quite simply I can't get it to pair with Windows Bluetooth app.<br />
+<br />
+I have tried a few methods and it just won't work for me.<br />
+<br />
+Is there a tutorial on how to ? or I am incorrect that the PS3 remote will not work]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[service.trakt.relay]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389542</link>
+			<pubDate>Fri, 30 Oct 2026 00:51:50 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member6</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389542</guid>
+			<description><![CDATA[<span style="font-size: large;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Trakt Relay 1.0.0~beta1</span></span><br />
+<br />
+Trakt Relay scrobbles what you watch in Kodi to Trakt and syncs your library with it. It runs on Kodi 21 (Omega) and Kodi 22 (Piers).<br />
+<br />
+<span style="font-weight: bold;" class="mycode_b">Features</span><ul class="mycode_list"><li>Scrobbles movies, episodes, live TV and recordings<br />
+</li>
+<li>Syncs your collection, watched status, ratings and playback progress, each direction switched on in the settings<br />
+</li>
+<li>Asks for a rating after you watch<br />
+</li>
+<li>Context menu to rate, add to your watchlist, start a rewatch of a show or sync your library<br />
+</li>
+<li>When you rewatch a show on Trakt, Kodi's watched status matches your rewatch progress (if setting is enabled)<br />
+</li>
+<li>Scrobbles that fail while Trakt can't be reached are sent later<br />
+</li>
+<li>Connect by entering a code or scanning a QR code<br />
+</li>
+<li>Optional OG Trakt theme with the red logo and hearts<br />
+</li>
+<li>Translated into 75 languages<br />
+</li>
+</ul>
+<br />
+Betas are in my repository and on GitHub: <a href="https://member6.github.io/repository.silvo/" target="_blank"  rel="noopener" class="mycode_url">https://member6.github.io/repository.silvo/</a><br />
+<a href="https://github.com/member6/service.trakt.relay/releases" target="_blank"  rel="noopener" class="mycode_url">https://github.com/member6/service.tra...y/releases</a><br />
+<br />
+<ul class="mycode_list"><li>Settings are not imported from the Trakt add-on, so connect again and choose your sync settings<br />
+</li>
+<li>Don't run it next to the Trakt add-on, or everything is scrobbled and synced twice. Relay offers to disable it<br />
+</li>
+</ul>
+<br />
+Report problems with a debug log here in this thread or on GitHub: <a href="https://github.com/member6/service.trakt.relay/issues" target="_blank"  rel="noopener" class="mycode_url">https://github.com/member6/service.trakt.relay/issues</a>]]></description>
+			<content:encoded><![CDATA[<span style="font-size: large;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Trakt Relay 1.0.0~beta1</span></span><br />
+<br />
+Trakt Relay scrobbles what you watch in Kodi to Trakt and syncs your library with it. It runs on Kodi 21 (Omega) and Kodi 22 (Piers).<br />
+<br />
+<span style="font-weight: bold;" class="mycode_b">Features</span><ul class="mycode_list"><li>Scrobbles movies, episodes, live TV and recordings<br />
+</li>
+<li>Syncs your collection, watched status, ratings and playback progress, each direction switched on in the settings<br />
+</li>
+<li>Asks for a rating after you watch<br />
+</li>
+<li>Context menu to rate, add to your watchlist, start a rewatch of a show or sync your library<br />
+</li>
+<li>When you rewatch a show on Trakt, Kodi's watched status matches your rewatch progress (if setting is enabled)<br />
+</li>
+<li>Scrobbles that fail while Trakt can't be reached are sent later<br />
+</li>
+<li>Connect by entering a code or scanning a QR code<br />
+</li>
+<li>Optional OG Trakt theme with the red logo and hearts<br />
+</li>
+<li>Translated into 75 languages<br />
+</li>
+</ul>
+<br />
+Betas are in my repository and on GitHub: <a href="https://member6.github.io/repository.silvo/" target="_blank"  rel="noopener" class="mycode_url">https://member6.github.io/repository.silvo/</a><br />
+<a href="https://github.com/member6/service.trakt.relay/releases" target="_blank"  rel="noopener" class="mycode_url">https://github.com/member6/service.tra...y/releases</a><br />
+<br />
+<ul class="mycode_list"><li>Settings are not imported from the Trakt add-on, so connect again and choose your sync settings<br />
+</li>
+<li>Don't run it next to the Trakt add-on, or everything is scrobbled and synced twice. Relay offers to disable it<br />
+</li>
+</ul>
+<br />
+Report problems with a debug log here in this thread or on GitHub: <a href="https://github.com/member6/service.trakt.relay/issues" target="_blank"  rel="noopener" class="mycode_url">https://github.com/member6/service.trakt.relay/issues</a>]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[used laptops turned HTPC , Share your build or tips and tricks]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389539</link>
+			<pubDate>Fri, 30 Oct 2026 00:06:29 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member11</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389539</guid>
+			<description><![CDATA[x86 is becoming more popular thanks to the breakthrough of having FEL on x86 through custom LibreELEC<br />
+but hardware is still relatively expensive.<br />
+for the same hardware I've noticed used laptops are much cheaper.<br />
+so this thread is exploring that , just from theoretical perspective (and awareness) and also practical perspective (people using them).<br />
+<br />
+The hardware to match or better is GMKtek 3500U.<br />
+<br />
+I found an Intel Chip that on paper fits the bill<br />
+Core I5-1235U<br />
+<br />
+It has e cores, about 25% more powerful GPU. smaller node.<br />
+let me show with example<br />
+<a href="https://www.ebay.co.uk/itm/307117791029" target="_blank"  rel="noopener" class="mycode_url">https://www.ebay.co.uk/itm/307117791029</a><br />
+<br />
+<a href="javascript:void(0)" onclick="window.open('https://i.ebayimg.com/images/g/qZYAAeSw4BZqPVDY/s-l1600.webp', '_blank');myWindow.focus();"><img src="https://i.ebayimg.com/images/g/qZYAAeSw4BZqPVDY/s-l1600.webp" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+since hinge is messed up, you can get this for £89.98, then another £10 say for Power brick<br />
+<br />
+the iGPU needs dual channel to unlock iris, so say another £20 for RAM stick, you got this for £120. it's cheaper than N100 system and far better<br />
+<br />
+the idea is to use this like a miniPC, Dev gave good advice and said not to bother, but still think it's fun to think about it.<br />
+<br />
+we'd want to turn of the screen using some script , this will really reduce the power draw, you could also build a case for this , many around but below are a few ideas<br />
+<br />
+<a href="https://www.printables.com/model/304678-laptop-motherboard-case" target="_blank"  rel="noopener" class="mycode_url">https://www.printables.com/model/304678-...board-case</a><br />
+<br />
+<a href="javascript:void(0)" onclick="window.open('https://media.printables.com/media/prints/304678/images/2657449_0fc6cf15-0042-4634-a97b-57621f48d8a8/thumbs/inside/1600x1200/jpg/2022-10-27-223503.webp', '_blank');myWindow.focus();"><img src="https://media.printables.com/media/prints/304678/images/2657449_0fc6cf15-0042-4634-a97b-57621f48d8a8/thumbs/inside/1600x1200/jpg/2022-10-27-223503.webp" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+<br />
+<a href="https://www.printables.com/model/1350556-boitier-pour-carte-mere-acer-58tx" target="_blank"  rel="noopener" class="mycode_url">https://www.printables.com/model/1350556...-acer-58tx</a><br />
+<br />
+<a href="javascript:void(0)" onclick="window.open('https://media.printables.com/media/prints/e7e28a73-7cdb-4f1a-9e91-509c5617e2b2/images/10191670_41017524-4b9d-4e47-b235-f60458331cdb_745abf22-91ba-45eb-b6e0-1b446ac821bf/thumbs/inside/1600x1200/jpg/img_2604.webp', '_blank');myWindow.focus();"><img src="https://media.printables.com/media/prints/e7e28a73-7cdb-4f1a-9e91-509c5617e2b2/images/10191670_41017524-4b9d-4e47-b235-f60458331cdb_745abf22-91ba-45eb-b6e0-1b446ac821bf/thumbs/inside/1600x1200/jpg/img_2604.webp" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+<br />
+<iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/f4L_MqEgTB0" frameborder="0" allowfullscreen="true"></iframe><br />
+<br />
+there are many other good ones.<br />
+<br />
+anyway why am I posting this, well because someone with a lower CPU laptop has already got it working<br />
+<br />
+Dell Latitude E7320 laptop with i5 1145G7, 16GB RAM, Iris Xe<br />
+<a href="https://github.com/CroqueMr/libreelec-x86-DV/issues/70" target="_blank"  rel="noopener" class="mycode_url">https://github.com/CroqueMr/libreelec-x86-DV/issues/70</a><br />
+<br />
+and his thoughts about noise levels<br />
+<blockquote class="mycode_quote"><cite>Quote:</cite>it's dead quite, I put it on quite mode in bios, turned off hyperthreading, 4 cores enough.</blockquote>
+So it does work, and the I5-1235U is better CPU for this and plentiful on broken used laptops (cheap)<br />
+<br />
+anyway I'm just creating a thread in the hopes it will spur on some people who have the skill set and willingness to try this project on and post their results. <br />
+maybe they found other good cheap CPU's that could work etc.<br />
+Thanks.<br />
+<br />
+I'll be posting things related to this. maybe other cool "laptop motherboard case" designs for inspiration]]></description>
+			<content:encoded><![CDATA[x86 is becoming more popular thanks to the breakthrough of having FEL on x86 through custom LibreELEC<br />
+but hardware is still relatively expensive.<br />
+for the same hardware I've noticed used laptops are much cheaper.<br />
+so this thread is exploring that , just from theoretical perspective (and awareness) and also practical perspective (people using them).<br />
+<br />
+The hardware to match or better is GMKtek 3500U.<br />
+<br />
+I found an Intel Chip that on paper fits the bill<br />
+Core I5-1235U<br />
+<br />
+It has e cores, about 25% more powerful GPU. smaller node.<br />
+let me show with example<br />
+<a href="https://www.ebay.co.uk/itm/307117791029" target="_blank"  rel="noopener" class="mycode_url">https://www.ebay.co.uk/itm/307117791029</a><br />
+<br />
+<a href="javascript:void(0)" onclick="window.open('https://i.ebayimg.com/images/g/qZYAAeSw4BZqPVDY/s-l1600.webp', '_blank');myWindow.focus();"><img src="https://i.ebayimg.com/images/g/qZYAAeSw4BZqPVDY/s-l1600.webp" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+since hinge is messed up, you can get this for £89.98, then another £10 say for Power brick<br />
+<br />
+the iGPU needs dual channel to unlock iris, so say another £20 for RAM stick, you got this for £120. it's cheaper than N100 system and far better<br />
+<br />
+the idea is to use this like a miniPC, Dev gave good advice and said not to bother, but still think it's fun to think about it.<br />
+<br />
+we'd want to turn of the screen using some script , this will really reduce the power draw, you could also build a case for this , many around but below are a few ideas<br />
+<br />
+<a href="https://www.printables.com/model/304678-laptop-motherboard-case" target="_blank"  rel="noopener" class="mycode_url">https://www.printables.com/model/304678-...board-case</a><br />
+<br />
+<a href="javascript:void(0)" onclick="window.open('https://media.printables.com/media/prints/304678/images/2657449_0fc6cf15-0042-4634-a97b-57621f48d8a8/thumbs/inside/1600x1200/jpg/2022-10-27-223503.webp', '_blank');myWindow.focus();"><img src="https://media.printables.com/media/prints/304678/images/2657449_0fc6cf15-0042-4634-a97b-57621f48d8a8/thumbs/inside/1600x1200/jpg/2022-10-27-223503.webp" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+<br />
+<a href="https://www.printables.com/model/1350556-boitier-pour-carte-mere-acer-58tx" target="_blank"  rel="noopener" class="mycode_url">https://www.printables.com/model/1350556...-acer-58tx</a><br />
+<br />
+<a href="javascript:void(0)" onclick="window.open('https://media.printables.com/media/prints/e7e28a73-7cdb-4f1a-9e91-509c5617e2b2/images/10191670_41017524-4b9d-4e47-b235-f60458331cdb_745abf22-91ba-45eb-b6e0-1b446ac821bf/thumbs/inside/1600x1200/jpg/img_2604.webp', '_blank');myWindow.focus();"><img src="https://media.printables.com/media/prints/e7e28a73-7cdb-4f1a-9e91-509c5617e2b2/images/10191670_41017524-4b9d-4e47-b235-f60458331cdb_745abf22-91ba-45eb-b6e0-1b446ac821bf/thumbs/inside/1600x1200/jpg/img_2604.webp" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a><br />
+<br />
+<iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/f4L_MqEgTB0" frameborder="0" allowfullscreen="true"></iframe><br />
+<br />
+there are many other good ones.<br />
+<br />
+anyway why am I posting this, well because someone with a lower CPU laptop has already got it working<br />
+<br />
+Dell Latitude E7320 laptop with i5 1145G7, 16GB RAM, Iris Xe<br />
+<a href="https://github.com/CroqueMr/libreelec-x86-DV/issues/70" target="_blank"  rel="noopener" class="mycode_url">https://github.com/CroqueMr/libreelec-x86-DV/issues/70</a><br />
+<br />
+and his thoughts about noise levels<br />
+<blockquote class="mycode_quote"><cite>Quote:</cite>it's dead quite, I put it on quite mode in bios, turned off hyperthreading, 4 cores enough.</blockquote>
+So it does work, and the I5-1235U is better CPU for this and plentiful on broken used laptops (cheap)<br />
+<br />
+anyway I'm just creating a thread in the hopes it will spur on some people who have the skill set and willingness to try this project on and post their results. <br />
+maybe they found other good cheap CPU's that could work etc.<br />
+Thanks.<br />
+<br />
+I'll be posting things related to this. maybe other cool "laptop motherboard case" designs for inspiration]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[OSD VideoResolution from SD, HD only To 480, 540, 576, 720, 1080]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389536</link>
+			<pubDate>Thu, 29 Oct 2026 20:25:28 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member7</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389536</guid>
+			<description><![CDATA[Hi there,<br />
+<br />
+Don't know who had the brilliant idea to remove the highly relevant VideoResolutions OSD from the skin version="5.1.2"?<br />
+Anyway, here's how to get it back.<br />
+Open folder 1080p and find file <span style="font-weight: bold;" class="mycode_b">IncludesVariables.xml</span>, open the file and search for "<span style="font-weight: bold;" class="mycode_b">VideoResolutionTypeVar</span>"<br />
+Replace with below marked in red:<br />
+<br />
+<span style="font-size: x-small;" class="mycode_size">&lt;variable name="VideoResolutionTypeVar"&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,480) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,480)]"&gt;<span style="color: #c0392b;" class="mycode_color"><span style="font-size: small;" class="mycode_size">480</span></span>&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,540) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,540)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">540</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,576) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,576)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">576</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,720) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,720)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">720</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,1080) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,1080)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">1080</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,4K) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,4K)]"&gt;4K&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,8K) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,8K)]"&gt;8K&lt;/value&gt;<br />
+&lt;value condition="Window.IsActive(fullscreenvideo)"&gt;&#36;INFO[VideoPlayer.VideoResolution]&lt;/value&gt;<br />
+&lt;value&gt;&#36;INFO[ListItem.VideoResolution]&lt;/value&gt;<br />
+&lt;/variable&gt;</span><br />
+<br />
+And for a larger font, edit <span style="font-weight: bold;" class="mycode_b">IncludesParameters.xml </span>and search for "<span style="font-weight: bold;" class="mycode_b">&lt;control type="button" id="&#36;PARAM[flag_id]"&gt;</span>"<br />
+<br />
+Replace with below marked in red:<br />
+<br />
+<span style="font-size: x-small;" class="mycode_size">        &lt;definition&gt;<br />
+            &lt;control type="button" id="&#36;PARAM[flag_id]"&gt;<br />
+                &lt;width&gt;&#36;PARAM[flag_width]&lt;/width&gt;<br />
+                &lt;height&gt;39&lt;/height&gt;<br />
+                &lt;align&gt;&#36;PARAM[flag_align]&lt;/align&gt;<br />
+                &lt;aligny&gt;center&lt;/aligny&gt;<br />
+                &lt;font&gt;</span><span style="color: #c0392b;" class="mycode_color"><span style="font-size: small;" class="mycode_size">font13_title</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/font&gt;<br />
+                &lt;textcolor&gt;ffe0e0e0&lt;/textcolor&gt;<br />
+                &lt;textoffsetx&gt;8&lt;/textoffsetx&gt;<br />
+                &lt;texturefocus border="32,2,2,2"&gt;&#36;PARAM[flag_texture]&lt;/texturefocus&gt;<br />
+                &lt;texturenofocus border="32,2,2,2"&gt;&#36;PARAM[flag_texture]&lt;/texturenofocus&gt;<br />
+                &lt;label&gt;&#36;PARAM[flag_label]&lt;/label&gt;<br />
+                &lt;visible&gt;&#36;PARAM[flag_visible]&lt;/visible&gt;<br />
+            &lt;/control&gt;<br />
+        &lt;/definition&gt;</span>]]></description>
+			<content:encoded><![CDATA[Hi there,<br />
+<br />
+Don't know who had the brilliant idea to remove the highly relevant VideoResolutions OSD from the skin version="5.1.2"?<br />
+Anyway, here's how to get it back.<br />
+Open folder 1080p and find file <span style="font-weight: bold;" class="mycode_b">IncludesVariables.xml</span>, open the file and search for "<span style="font-weight: bold;" class="mycode_b">VideoResolutionTypeVar</span>"<br />
+Replace with below marked in red:<br />
+<br />
+<span style="font-size: x-small;" class="mycode_size">&lt;variable name="VideoResolutionTypeVar"&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,480) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,480)]"&gt;<span style="color: #c0392b;" class="mycode_color"><span style="font-size: small;" class="mycode_size">480</span></span>&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,540) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,540)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">540</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,576) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,576)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">576</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,720) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,720)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">720</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,1080) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,1080)]"&gt;</span><span style="font-size: small;" class="mycode_size"><span style="color: #c0392b;" class="mycode_color">1080</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,4K) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,4K)]"&gt;4K&lt;/value&gt;<br />
+&lt;value condition="String.IsEqual(ListItem.VideoResolution,8K) | [Window.IsActive(fullscreenvideo) + String.IsEqual(VideoPlayer.VideoResolution,8K)]"&gt;8K&lt;/value&gt;<br />
+&lt;value condition="Window.IsActive(fullscreenvideo)"&gt;&#36;INFO[VideoPlayer.VideoResolution]&lt;/value&gt;<br />
+&lt;value&gt;&#36;INFO[ListItem.VideoResolution]&lt;/value&gt;<br />
+&lt;/variable&gt;</span><br />
+<br />
+And for a larger font, edit <span style="font-weight: bold;" class="mycode_b">IncludesParameters.xml </span>and search for "<span style="font-weight: bold;" class="mycode_b">&lt;control type="button" id="&#36;PARAM[flag_id]"&gt;</span>"<br />
+<br />
+Replace with below marked in red:<br />
+<br />
+<span style="font-size: x-small;" class="mycode_size">        &lt;definition&gt;<br />
+            &lt;control type="button" id="&#36;PARAM[flag_id]"&gt;<br />
+                &lt;width&gt;&#36;PARAM[flag_width]&lt;/width&gt;<br />
+                &lt;height&gt;39&lt;/height&gt;<br />
+                &lt;align&gt;&#36;PARAM[flag_align]&lt;/align&gt;<br />
+                &lt;aligny&gt;center&lt;/aligny&gt;<br />
+                &lt;font&gt;</span><span style="color: #c0392b;" class="mycode_color"><span style="font-size: small;" class="mycode_size">font13_title</span></span><span style="font-size: x-small;" class="mycode_size">&lt;/font&gt;<br />
+                &lt;textcolor&gt;ffe0e0e0&lt;/textcolor&gt;<br />
+                &lt;textoffsetx&gt;8&lt;/textoffsetx&gt;<br />
+                &lt;texturefocus border="32,2,2,2"&gt;&#36;PARAM[flag_texture]&lt;/texturefocus&gt;<br />
+                &lt;texturenofocus border="32,2,2,2"&gt;&#36;PARAM[flag_texture]&lt;/texturenofocus&gt;<br />
+                &lt;label&gt;&#36;PARAM[flag_label]&lt;/label&gt;<br />
+                &lt;visible&gt;&#36;PARAM[flag_visible]&lt;/visible&gt;<br />
+            &lt;/control&gt;<br />
+        &lt;/definition&gt;</span>]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[Mouse Movement triggers Kodi In-Game Menu]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389533</link>
+			<pubDate>Thu, 29 Oct 2026 17:44:47 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member9</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389533</guid>
+			<description><![CDATA[On Windows 11 64 bit, when I launch a PS1 game with a mouse attached (to play mouse based games such as Civ II), any mouse/cursor movement in any direction causes the game to pause and the Kodi in game menu to appear. (The menu is the Kodi one as shown <a href="https://kodi.wiki/images/d/dd/In-game_menu.png" target="_blank"  rel="noopener" class="mycode_url">here</a>, not a menu native to the game itself). This also happens if I click the left mouse button, but not the right button. It happens with both USB and bluetooth connected mice, and with Beetle and PCSX ReARMed emulators. No other controllers or keyboards are connected at the time. It happens with Kodi v21.3 (stable) and v22 RC1 (pre-release) versions. I've set up the Playstation mouse buttons. (By the way, it also happens with LibreElect v12.2.1 on a Raspberry Pi.)<br />
+<br />
+I've searched for this issue, but not seen it described elsewhere making me think (hope) it's something I've done wrong rather than a real Kodi issue. But I can't seem to figure out the cause.<br />
+<br />
+(Reposted from Support &gt; Add-on Support &gt; Game Add-ons)]]></description>
+			<content:encoded><![CDATA[On Windows 11 64 bit, when I launch a PS1 game with a mouse attached (to play mouse based games such as Civ II), any mouse/cursor movement in any direction causes the game to pause and the Kodi in game menu to appear. (The menu is the Kodi one as shown <a href="https://kodi.wiki/images/d/dd/In-game_menu.png" target="_blank"  rel="noopener" class="mycode_url">here</a>, not a menu native to the game itself). This also happens if I click the left mouse button, but not the right button. It happens with both USB and bluetooth connected mice, and with Beetle and PCSX ReARMed emulators. No other controllers or keyboards are connected at the time. It happens with Kodi v21.3 (stable) and v22 RC1 (pre-release) versions. I've set up the Playstation mouse buttons. (By the way, it also happens with LibreElect v12.2.1 on a Raspberry Pi.)<br />
+<br />
+I've searched for this issue, but not seen it described elsewhere making me think (hope) it's something I've done wrong rather than a real Kodi issue. But I can't seem to figure out the cause.<br />
+<br />
+(Reposted from Support &gt; Add-on Support &gt; Game Add-ons)]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[no items to display for Stream4Me, help!!]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389530</link>
+			<pubDate>Thu, 29 Oct 2026 11:59:55 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member4</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389530</guid>
+			<description><![CDATA[Hello, I’m having an issue launching content in the Stream4Me add-on. I have all the lists—movies, TV series, etc.—but when I try to play something, it says "no items to display." How can I fix this?]]></description>
+			<content:encoded><![CDATA[Hello, I’m having an issue launching content in the Stream4Me add-on. I have all the lists—movies, TV series, etc.—but when I try to play something, it says "no items to display." How can I fix this?]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[[Release] CableBox 42 – retro cable TV from your own library (Kodi 21)]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389521</link>
+			<pubDate>Thu, 29 Oct 2026 01:38:06 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member1</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389521</guid>
+			<description><![CDATA[Hi all,<br />
+<br />
+I've made an add-on that turns your Kodi library into live cable TV. Instead of picking something to watch, you flip channels – shows are already playing on a real schedule, with commercial breaks, bumpers, a scrolling program guide channel, a retro weather channel and static between channels.<br />
+<br />
+Highlights:<br />
+- Builds a channel lineup from your library automatically (genre networks, decade channels, movie channels, studio channels)<br />
+- Commercials, bumpers and station IDs from your own clip folders<br />
+- Weekly planner: pin shows to fixed times, e.g. Seinfeld every Friday at 8 PM, in order<br />
+- Off-air hours with a 1950s "Please Stand By" card, plus sign-off/sign-on clips<br />
+- Glowing "CH 03" channel numbers and an optional CRT effect (scanlines, curved glass, rolling hum bar)<br />
+- Uses Kodi's own player, so hardware decoding works as normal<br />
+<br />
+It was inspired by FieldStation42 by Shane Mason (no code shared – it's a separate implementation built for Kodi).<br />
+<br />
+Download and full guide: <a href="https://github.com/member1/script.cablebox42" target="_blank"  rel="noopener" class="mycode_url">https://github.com/member1/script.cablebox42</a><br />
+Install: grab the zip from the Releases page and use Settings → Add-ons → Install from zip file. It's also been submitted to the official Kodi repository.<br />
+<br />
+I've tested it on an ODROID N2 with CoreELEC 21. I'd love testers on other devices – Windows, Android TV / Shield / Fire TV, Raspberry Pi, LibreELEC. If something goes wrong, please post here or open an issue on GitHub with your device and Kodi version, and upload your log to <a href="https://paste.kodi.tv/" target="_blank"  rel="noopener" class="mycode_url">https://paste.kodi.tv/</a> and share the link.<br />
+<br />
+Thanks for taking a look!]]></description>
+			<content:encoded><![CDATA[Hi all,<br />
+<br />
+I've made an add-on that turns your Kodi library into live cable TV. Instead of picking something to watch, you flip channels – shows are already playing on a real schedule, with commercial breaks, bumpers, a scrolling program guide channel, a retro weather channel and static between channels.<br />
+<br />
+Highlights:<br />
+- Builds a channel lineup from your library automatically (genre networks, decade channels, movie channels, studio channels)<br />
+- Commercials, bumpers and station IDs from your own clip folders<br />
+- Weekly planner: pin shows to fixed times, e.g. Seinfeld every Friday at 8 PM, in order<br />
+- Off-air hours with a 1950s "Please Stand By" card, plus sign-off/sign-on clips<br />
+- Glowing "CH 03" channel numbers and an optional CRT effect (scanlines, curved glass, rolling hum bar)<br />
+- Uses Kodi's own player, so hardware decoding works as normal<br />
+<br />
+It was inspired by FieldStation42 by Shane Mason (no code shared – it's a separate implementation built for Kodi).<br />
+<br />
+Download and full guide: <a href="https://github.com/member1/script.cablebox42" target="_blank"  rel="noopener" class="mycode_url">https://github.com/member1/script.cablebox42</a><br />
+Install: grab the zip from the Releases page and use Settings → Add-ons → Install from zip file. It's also been submitted to the official Kodi repository.<br />
+<br />
+I've tested it on an ODROID N2 with CoreELEC 21. I'd love testers on other devices – Windows, Android TV / Shield / Fire TV, Raspberry Pi, LibreELEC. If something goes wrong, please post here or open an issue on GitHub with your device and Kodi version, and upload your log to <a href="https://paste.kodi.tv/" target="_blank"  rel="noopener" class="mycode_url">https://paste.kodi.tv/</a> and share the link.<br />
+<br />
+Thanks for taking a look!]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[DVD ISO Naming]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389389</link>
+			<pubDate>Wed, 28 Oct 2026 18:33:13 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member2</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389389</guid>
+			<description><![CDATA[I hope some can help me.  I am relatively new to Kodi and am having a problem getting two DVD ISOs to scan.  I am assuming I have the naming incorrect, but have read the wiki and a number of posts in various forums with no success.<br />
+<br />
+There are two dvds each with two espisodes each of a tv mini-series.<br />
+<br />
+The current naming is<br />
+Top Folder, "TV Show Name (year)"<br />
+Sub Folder contains two files "TV Show Name (year) s01e01-e02.iso" and "TV Show Name (year) s01e03-e04.iso"<br />
+<br />
+I have tried various other formats but none work.  Can anyone suggest the correct format?]]></description>
+			<content:encoded><![CDATA[I hope some can help me.  I am relatively new to Kodi and am having a problem getting two DVD ISOs to scan.  I am assuming I have the naming incorrect, but have read the wiki and a number of posts in various forums with no success.<br />
+<br />
+There are two dvds each with two espisodes each of a tv mini-series.<br />
+<br />
+The current naming is<br />
+Top Folder, "TV Show Name (year)"<br />
+Sub Folder contains two files "TV Show Name (year) s01e01-e02.iso" and "TV Show Name (year) s01e03-e04.iso"<br />
+<br />
+I have tried various other formats but none work.  Can anyone suggest the correct format?]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[CU LRC Lyrics not working]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389386</link>
+			<pubDate>Wed, 28 Oct 2026 15:54:48 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member15</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389386</guid>
+			<description><![CDATA[Hi all,<br />
+<br />
+For the last 2 weeks, I have noticed both on my Android TV AND Windows 11 PC, that CU LRC Lyrics Add-On has stopped working. It has been fine for the last 6 years or so but, suddenly, my local LRC Lyrics (saved on the same drive and album folder as the album songs and with exactly the SAME file name as the song itself) do not show. I have removed (uninstalled) the CU LRC Lyrics Add-On and re-installed again ... but no luck.<br />
+<br />
+Can someone help or, if the actual Add-On is faulty, please resolve the problem - Thanks (member15)]]></description>
+			<content:encoded><![CDATA[Hi all,<br />
+<br />
+For the last 2 weeks, I have noticed both on my Android TV AND Windows 11 PC, that CU LRC Lyrics Add-On has stopped working. It has been fine for the last 6 years or so but, suddenly, my local LRC Lyrics (saved on the same drive and album folder as the album songs and with exactly the SAME file name as the song itself) do not show. I have removed (uninstalled) the CU LRC Lyrics Add-On and re-installed again ... but no luck.<br />
+<br />
+Can someone help or, if the actual Add-On is faulty, please resolve the problem - Thanks (member15)]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[Am I "maxing out" something with my library building/compiling?]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389359</link>
+			<pubDate>Wed, 28 Oct 2026 01:28:32 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member8</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389359</guid>
+			<description><![CDATA[I am using Rpi4+ with latest kodi and libreelec versions and I think a big enough micro sd with room to spare, but when trying to scan items to the music library it often completes and then reboots, or just freezes....especially with large folders or amounts of music files to add.<br />
+<br />
+I keep the setting to using local data only and not scraping for online info but it still seems to have slowed down from the old days even when I was using the older hardware and software.<br />
+<br />
+Ques: is this normal.  True, my music library is enormous.  Will there come a day when the library is just too big to handle?<br />
+Thanks for any ideas.]]></description>
+			<content:encoded><![CDATA[I am using Rpi4+ with latest kodi and libreelec versions and I think a big enough micro sd with room to spare, but when trying to scan items to the music library it often completes and then reboots, or just freezes....especially with large folders or amounts of music files to add.<br />
+<br />
+I keep the setting to using local data only and not scraping for online info but it still seems to have slowed down from the old days even when I was using the older hardware and software.<br />
+<br />
+Ques: is this normal.  True, my music library is enormous.  Will there come a day when the library is just too big to handle?<br />
+Thanks for any ideas.]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[South Park Seasons 19-24 Not Playing]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389347</link>
+			<pubDate>Tue, 27 Oct 2026 20:18:13 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member3</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389347</guid>
+			<description><![CDATA[Using the Paramount+ addon on the Onn box I get an error trying top open any episode from seasons 19-24. Any season before or after will play fine.<br />
+<br />
+<a href="https://paste.kodi.tv/bugipipeki" target="_blank"  rel="noopener" class="mycode_url">Log File</a>]]></description>
+			<content:encoded><![CDATA[Using the Paramount+ addon on the Onn box I get an error trying top open any episode from seasons 19-24. Any season before or after will play fine.<br />
+<br />
+<a href="https://paste.kodi.tv/bugipipeki" target="_blank"  rel="noopener" class="mycode_url">Log File</a>]]></content:encoded>
+		</item>
+		<item>
+			<title><![CDATA[Encore: Alexa voice control for Kodi, self-hosted (a successor to Kanzi)]]></title>
+			<link>https://forum.kodi.tv/showthread.php?tid=389332</link>
+			<pubDate>Tue, 27 Oct 2026 14:22:28 +0000</pubDate>
+			<dc:creator><![CDATA[<a href="https://forum.kodi.tv/member.php?action=profile&uid=1">member12</a>]]></dc:creator>
+			<guid isPermaLink="false">https://forum.kodi.tv/showthread.php?tid=389332</guid>
+			<description><![CDATA[<span style="font-size: large;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Encore: control Kodi with Alexa, self-hosted and set up from a web interface</span></span><br />
+<br />
+Since <a href="https://forum.kodi.tv/showthread.php?tid=254502" target="_blank"  rel="noopener" class="mycode_url">Kanzi</a> was archived, there hasn't been a maintained way to control Kodi with an Echo, so I've built one. <span style="font-weight: bold;" class="mycode_b">Encore</span> is a self-hosted Alexa skill server for Kodi. It runs on your own network, talks to Kodi over JSON-RPC, and deploys a private Alexa skill into your own Amazon developer account, so nothing goes through anyone else's servers. A big thank you to m0ngr31 for Kanzi, which this picks up from: Encore keeps its voice commands and replaces the setup.<br />
+<br />
+Say "Alexa, ask encore to play the next episode of Severance" and Alexa sends the request to Encore, which finds the episode in your library and tells the right Kodi to play it.<br />
+<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/overview-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/overview-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/overview-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">What's different from Kanzi</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Set up in a web interface.</span> A first-run wizard walks through the admin account, the public address, Kodi, your Amazon developer account and the first deploy. No hand-made skill in the developer console, no pasting interaction models, no Lambda or Heroku.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">One-click skill deploys.</span> Encore builds the skill and creates or updates it in your developer account through Amazon's Skill Management API.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Your library in the skill.</span> Titles, rooms and playlists become slot values when you deploy, so Alexa recognises the names you actually have, and Encore's own matcher finds the ones that don't fit ("rocky two", "endgame", titles Alexa has never heard of). When two titles are close, it asks which one you meant.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">New titles are findable straight away.</span> Kodi's live notifications keep Encore's index of your library up to date, so something added a minute ago can be played by voice without a redeploy.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Rooms and several Kodi instances.</span> Link each Echo to a Kodi instance, or name a room: "play Dune in the bedroom". Instances sharing a MySQL/MariaDB library are detected automatically.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Wake-on-LAN.</span> A sleeping Kodi is woken and the request retried.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">A live request log and match tester.</span> See what Alexa heard, how it was matched, which Kodi calls were made and how long each step took.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Nine locales in five languages:</span> English (Australia, Canada, India, United Kingdom, United States), German, French, Spanish and Italian.<br />
+</li>
+</ul>
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">What you can say</span></span><br />
+Everything Kanzi understood, and a few more:<ul class="mycode_list"><li>Play a movie, a specific episode ("season 4 episode 10 of The Office"), the next or newest episode of a show, or continue the last show you watched<br />
+</li>
+<li>Play or shuffle music by song, album, artist or genre, music videos, and audio and video playlists, including smart playlists<br />
+</li>
+<li>Random movies, episodes and shows, by genre too, and recommendations with a follow-up ("want to see the trailer?")<br />
+</li>
+<li>Playback control: play/pause, stop, skip, seek ("go to the 20 minute mark"), shuffle and repeat<br />
+</li>
+<li>Volume, mute, subtitles and audio tracks<br />
+</li>
+<li>Navigate Kodi like a remote: up, down, select, back, menus, library views; the skill stays open, so you don't repeat the wake word<br />
+</li>
+<li>"What's playing?", "how long is left?", "when does this finish?" and "what's new?"<br />
+</li>
+<li>Open add-ons, search everything (with Global Search), update or clean the library<br />
+</li>
+<li>Shut down, reboot, sleep or hibernate, with a confirmation first<br />
+</li>
+</ul>
+The full list of phrases for each language is in the <a href="https://member12.github.io/encore/voice-commands/" target="_blank"  rel="noopener" class="mycode_url">voice commands reference</a>.<br />
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Screenshots</span></span><br />
+Kodi instances, with discovery, connection and library details:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/kodi-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/kodi-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/kodi-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+Deploying the Alexa skill, with the model for each locale:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/alexa-skill-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/alexa-skill-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/alexa-skill-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+The live request log:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/request-log-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/request-log-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/request-log-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+The library index and match tester:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/library-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/library-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/library-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+Echo devices and rooms:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/echo-devices-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/echo-devices-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/echo-devices-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+There's a <a href="https://member12.github.io/encore/tour/" target="_blank"  rel="noopener" class="mycode_url">tour of the whole web interface</a> in the docs.<br />
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">What you need</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Kodi 21 (Omega) or 22 (Piers)</span> with <span style="font-style: italic;" class="mycode_i">Allow remote control via HTTP</span> and <span style="font-style: italic;" class="mycode_i">Allow remote control from applications on other systems</span> turned on (Settings → Services → Control). See <a href="https://member12.github.io/encore/guides/kodi/" target="_blank"  rel="noopener" class="mycode_url">Kodi instances</a>.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">A free Amazon developer account</span>, the same Amazon account your Echo uses. The skill stays private to your account and never needs certifying. See <a href="https://member12.github.io/encore/guides/deploy-skill/" target="_blank"  rel="noopener" class="mycode_url">deploying the skill</a>.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">A public HTTPS address</span> for Alexa to reach. Only one route, /api/v1/alexa, has to be exposed, through a reverse proxy (Caddy, Traefik, SWAG, nginx) or a tunnel (Cloudflare Tunnel, Tailscale Funnel). See <a href="https://member12.github.io/encore/guides/reverse-proxy/" target="_blank"  rel="noopener" class="mycode_url">exposing Encore to Alexa</a>.<br />
+</li>
+<li>Somewhere to run it: a container image for amd64, arm64 and armv7 (Raspberry Pi), or a single binary for Linux, macOS and Windows.<br />
+</li>
+</ul>
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Getting started</span></span><br />
+ <br />
+<div class="codeblock"><div class="title">Code:</div><div class="body" dir="ltr"><code>docker run -d --name encore &#92;<br />
+  -e PUID=1000 -e PGID=1000 &#92;<br />
+  -p 8080:8080 &#92;<br />
+  -v /path/to/encore:/config &#92;<br />
+  ghcr.io/member12/encore</code></div></div>Then open http://&lt;your-server&gt;:8080, paste the setup token from the log and follow the wizard. The docs cover each step:<ul class="mycode_list"><li><a href="https://member12.github.io/encore/introduction/" target="_blank"  rel="noopener" class="mycode_url">Why Encore</a>: what it is and how it fits together<br />
+</li>
+<li><a href="https://member12.github.io/encore/getting-started/docker/" target="_blank"  rel="noopener" class="mycode_url">Running with Docker</a> or <a href="https://member12.github.io/encore/getting-started/binary/" target="_blank"  rel="noopener" class="mycode_url">as a binary</a><br />
+</li>
+<li><a href="https://member12.github.io/encore/getting-started/first-run/" target="_blank"  rel="noopener" class="mycode_url">First run</a>: the setup wizard, step by step<br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/echo-devices/" target="_blank"  rel="noopener" class="mycode_url">Echo devices and rooms</a><br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/matching/" target="_blank"  rel="noopener" class="mycode_url">Matching and aliases</a>: how titles are found, and teaching it nicknames<br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/shared-libraries/" target="_blank"  rel="noopener" class="mycode_url">Shared libraries</a> for MySQL/MariaDB setups<br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/storage/" target="_blank"  rel="noopener" class="mycode_url">Storage and backups</a><br />
+</li>
+</ul>
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Status</span></span><br />
+This is the first release, <a href="https://github.com/member12/encore/releases/tag/v0.1.0" target="_blank"  rel="noopener" class="mycode_url">v0.1.0</a>, so expect rough edges until 1.0. Voice control, the web interface and skill deploys work end to end with a real Echo, tested in English (Australia). The other locales haven't been tried on real devices yet, so if you speak German, French, Spanish or Italian, or use another English locale, I'd love to hear how it goes. Translations are on <a href="https://crowdin.com/project/encore" target="_blank"  rel="noopener" class="mycode_url">Crowdin</a> if you'd like to improve them.<br />
+<br />
+Questions are welcome here; bugs and feature requests are best as <a href="https://github.com/member12/encore/issues" target="_blank"  rel="noopener" class="mycode_url">GitHub issues</a>, with the request log entry for the command that went wrong.<br />
+<br />
+<span style="font-weight: bold;" class="mycode_b">Links:</span> <a href="https://github.com/member12/encore" target="_blank"  rel="noopener" class="mycode_url">GitHub</a> · <a href="https://member12.github.io/encore/" target="_blank"  rel="noopener" class="mycode_url">Documentation</a> · <a href="https://github.com/member12/encore/releases" target="_blank"  rel="noopener" class="mycode_url">Releases</a> · <a href="https://github.com/member12/encore/pkgs/container/encore" target="_blank"  rel="noopener" class="mycode_url">Container image</a><br />
+<br />
+Encore is open source (Apache-2.0). <a href="https://ko-fi.com/member12" target="_blank"  rel="noopener" class="mycode_url">Donations for this tool gratefully accepted.</a>]]></description>
+			<content:encoded><![CDATA[<span style="font-size: large;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Encore: control Kodi with Alexa, self-hosted and set up from a web interface</span></span><br />
+<br />
+Since <a href="https://forum.kodi.tv/showthread.php?tid=254502" target="_blank"  rel="noopener" class="mycode_url">Kanzi</a> was archived, there hasn't been a maintained way to control Kodi with an Echo, so I've built one. <span style="font-weight: bold;" class="mycode_b">Encore</span> is a self-hosted Alexa skill server for Kodi. It runs on your own network, talks to Kodi over JSON-RPC, and deploys a private Alexa skill into your own Amazon developer account, so nothing goes through anyone else's servers. A big thank you to m0ngr31 for Kanzi, which this picks up from: Encore keeps its voice commands and replaces the setup.<br />
+<br />
+Say "Alexa, ask encore to play the next episode of Severance" and Alexa sends the request to Encore, which finds the episode in your library and tells the right Kodi to play it.<br />
+<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/overview-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/overview-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/overview-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">What's different from Kanzi</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Set up in a web interface.</span> A first-run wizard walks through the admin account, the public address, Kodi, your Amazon developer account and the first deploy. No hand-made skill in the developer console, no pasting interaction models, no Lambda or Heroku.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">One-click skill deploys.</span> Encore builds the skill and creates or updates it in your developer account through Amazon's Skill Management API.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Your library in the skill.</span> Titles, rooms and playlists become slot values when you deploy, so Alexa recognises the names you actually have, and Encore's own matcher finds the ones that don't fit ("rocky two", "endgame", titles Alexa has never heard of). When two titles are close, it asks which one you meant.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">New titles are findable straight away.</span> Kodi's live notifications keep Encore's index of your library up to date, so something added a minute ago can be played by voice without a redeploy.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Rooms and several Kodi instances.</span> Link each Echo to a Kodi instance, or name a room: "play Dune in the bedroom". Instances sharing a MySQL/MariaDB library are detected automatically.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Wake-on-LAN.</span> A sleeping Kodi is woken and the request retried.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">A live request log and match tester.</span> See what Alexa heard, how it was matched, which Kodi calls were made and how long each step took.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">Nine locales in five languages:</span> English (Australia, Canada, India, United Kingdom, United States), German, French, Spanish and Italian.<br />
+</li>
+</ul>
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">What you can say</span></span><br />
+Everything Kanzi understood, and a few more:<ul class="mycode_list"><li>Play a movie, a specific episode ("season 4 episode 10 of The Office"), the next or newest episode of a show, or continue the last show you watched<br />
+</li>
+<li>Play or shuffle music by song, album, artist or genre, music videos, and audio and video playlists, including smart playlists<br />
+</li>
+<li>Random movies, episodes and shows, by genre too, and recommendations with a follow-up ("want to see the trailer?")<br />
+</li>
+<li>Playback control: play/pause, stop, skip, seek ("go to the 20 minute mark"), shuffle and repeat<br />
+</li>
+<li>Volume, mute, subtitles and audio tracks<br />
+</li>
+<li>Navigate Kodi like a remote: up, down, select, back, menus, library views; the skill stays open, so you don't repeat the wake word<br />
+</li>
+<li>"What's playing?", "how long is left?", "when does this finish?" and "what's new?"<br />
+</li>
+<li>Open add-ons, search everything (with Global Search), update or clean the library<br />
+</li>
+<li>Shut down, reboot, sleep or hibernate, with a confirmation first<br />
+</li>
+</ul>
+The full list of phrases for each language is in the <a href="https://member12.github.io/encore/voice-commands/" target="_blank"  rel="noopener" class="mycode_url">voice commands reference</a>.<br />
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Screenshots</span></span><br />
+Kodi instances, with discovery, connection and library details:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/kodi-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/kodi-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/kodi-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+Deploying the Alexa skill, with the model for each locale:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/alexa-skill-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/alexa-skill-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/alexa-skill-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+The live request log:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/request-log-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/request-log-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/request-log-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+The library index and match tester:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/library-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/library-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/library-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+Echo devices and rooms:<br />
+<a href="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/echo-devices-light.png" target="_blank"  rel="noopener" class="mycode_url"><a href="javascript:void(0)" onclick="window.open('https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/echo-devices-light.png', '_blank');myWindow.focus();"><img src="https://raw.githubusercontent.com/member12/encore/main/docs/src/assets/screenshots/echo-devices-light.png" style="max-width: 50%;" alt="Image" title="Full sized picture" /></a></a><br />
+<br />
+There's a <a href="https://member12.github.io/encore/tour/" target="_blank"  rel="noopener" class="mycode_url">tour of the whole web interface</a> in the docs.<br />
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">What you need</span></span><ul class="mycode_list"><li><span style="font-weight: bold;" class="mycode_b">Kodi 21 (Omega) or 22 (Piers)</span> with <span style="font-style: italic;" class="mycode_i">Allow remote control via HTTP</span> and <span style="font-style: italic;" class="mycode_i">Allow remote control from applications on other systems</span> turned on (Settings → Services → Control). See <a href="https://member12.github.io/encore/guides/kodi/" target="_blank"  rel="noopener" class="mycode_url">Kodi instances</a>.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">A free Amazon developer account</span>, the same Amazon account your Echo uses. The skill stays private to your account and never needs certifying. See <a href="https://member12.github.io/encore/guides/deploy-skill/" target="_blank"  rel="noopener" class="mycode_url">deploying the skill</a>.<br />
+</li>
+<li><span style="font-weight: bold;" class="mycode_b">A public HTTPS address</span> for Alexa to reach. Only one route, /api/v1/alexa, has to be exposed, through a reverse proxy (Caddy, Traefik, SWAG, nginx) or a tunnel (Cloudflare Tunnel, Tailscale Funnel). See <a href="https://member12.github.io/encore/guides/reverse-proxy/" target="_blank"  rel="noopener" class="mycode_url">exposing Encore to Alexa</a>.<br />
+</li>
+<li>Somewhere to run it: a container image for amd64, arm64 and armv7 (Raspberry Pi), or a single binary for Linux, macOS and Windows.<br />
+</li>
+</ul>
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Getting started</span></span><br />
+ <br />
+<div class="codeblock"><div class="title">Code:</div><div class="body" dir="ltr"><code>docker run -d --name encore &#92;<br />
+  -e PUID=1000 -e PGID=1000 &#92;<br />
+  -p 8080:8080 &#92;<br />
+  -v /path/to/encore:/config &#92;<br />
+  ghcr.io/member12/encore</code></div></div>Then open http://&lt;your-server&gt;:8080, paste the setup token from the log and follow the wizard. The docs cover each step:<ul class="mycode_list"><li><a href="https://member12.github.io/encore/introduction/" target="_blank"  rel="noopener" class="mycode_url">Why Encore</a>: what it is and how it fits together<br />
+</li>
+<li><a href="https://member12.github.io/encore/getting-started/docker/" target="_blank"  rel="noopener" class="mycode_url">Running with Docker</a> or <a href="https://member12.github.io/encore/getting-started/binary/" target="_blank"  rel="noopener" class="mycode_url">as a binary</a><br />
+</li>
+<li><a href="https://member12.github.io/encore/getting-started/first-run/" target="_blank"  rel="noopener" class="mycode_url">First run</a>: the setup wizard, step by step<br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/echo-devices/" target="_blank"  rel="noopener" class="mycode_url">Echo devices and rooms</a><br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/matching/" target="_blank"  rel="noopener" class="mycode_url">Matching and aliases</a>: how titles are found, and teaching it nicknames<br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/shared-libraries/" target="_blank"  rel="noopener" class="mycode_url">Shared libraries</a> for MySQL/MariaDB setups<br />
+</li>
+<li><a href="https://member12.github.io/encore/guides/storage/" target="_blank"  rel="noopener" class="mycode_url">Storage and backups</a><br />
+</li>
+</ul>
+<br />
+<span style="font-size: medium;" class="mycode_size"><span style="font-weight: bold;" class="mycode_b">Status</span></span><br />
+This is the first release, <a href="https://github.com/member12/encore/releases/tag/v0.1.0" target="_blank"  rel="noopener" class="mycode_url">v0.1.0</a>, so expect rough edges until 1.0. Voice control, the web interface and skill deploys work end to end with a real Echo, tested in English (Australia). The other locales haven't been tried on real devices yet, so if you speak German, French, Spanish or Italian, or use another English locale, I'd love to hear how it goes. Translations are on <a href="https://crowdin.com/project/encore" target="_blank"  rel="noopener" class="mycode_url">Crowdin</a> if you'd like to improve them.<br />
+<br />
+Questions are welcome here; bugs and feature requests are best as <a href="https://github.com/member12/encore/issues" target="_blank"  rel="noopener" class="mycode_url">GitHub issues</a>, with the request log entry for the command that went wrong.<br />
+<br />
+<span style="font-weight: bold;" class="mycode_b">Links:</span> <a href="https://github.com/member12/encore" target="_blank"  rel="noopener" class="mycode_url">GitHub</a> · <a href="https://member12.github.io/encore/" target="_blank"  rel="noopener" class="mycode_url">Documentation</a> · <a href="https://github.com/member12/encore/releases" target="_blank"  rel="noopener" class="mycode_url">Releases</a> · <a href="https://github.com/member12/encore/pkgs/container/encore" target="_blank"  rel="noopener" class="mycode_url">Container image</a><br />
+<br />
+Encore is open source (Apache-2.0). <a href="https://ko-fi.com/member12" target="_blank"  rel="noopener" class="mycode_url">Donations for this tool gratefully accepted.</a>]]></content:encoded>
+		</item>
+	</channel>
+</rss>

@@ -10,6 +10,8 @@
  * default theme shows no start at all. A thread page has no canonical link,
  * so its id comes from the address or the reply link.
  */
+
+import { feedFrom } from "./feeds.js";
 import { absoluteUrl, fromEnglishDate, piecesAt, textOf, withParameters } from "./html.js";
 import type { ForumProgram, ForumThreadSummary } from "./types.js";
 
@@ -80,4 +82,13 @@ export const mybb: ForumProgram = {
       approximatePostedAt: true,
     };
   },
+
+  detectIndex: (html) =>
+    /Powered By <a[^>]+mybb/i.test(html) && /forumdisplay\.php\?fid=\d+/.test(html),
+
+  feedUrl: (html, homeUrl) =>
+    feedFrom(html, homeUrl, (url) => mybb.isFeed?.(url) ?? false, "syndication.php"),
+  isFeed: (url) => /\/syndication\.php(?:\?type=rss2\.0)?$/.test(url),
+  feedText: "full",
+  feedThreadId: (url) => new URL(url).searchParams.get("tid"),
 };

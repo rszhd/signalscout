@@ -22,9 +22,15 @@
  * Bright Data unit, and each browser started as one more: the measured cost
  * was below that, and Browser Use's own figure settles too late to read here.
  * A failure of the browser skips the page; it never stops the poll.
+ *
+ * A query may instead be a forum's newest-threads feed (US-473), which covers
+ * every section. Where the program's feed holds the first post, its new items
+ * are the posts and nothing else is fetched; where it cuts the text, they are
+ * the threads to open, as a section's are. Replies are never posts.
  */
-import { detectForum } from "../../forums/index.js";
-import type { ForumThreadSummary } from "../../forums/types.js";
+import type { FeedItem } from "../../forums/feeds.js";
+import { detectForum, feedProgramFor, isReply, readFeed } from "../../forums/index.js";
+import type { ForumProgram, ForumThreadSummary } from "../../forums/types.js";
 import { forumPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
@@ -58,13 +64,15 @@ export type ForumFetcher = "unlocker" | "browser";
 export interface ForumPageEvent {
   readonly host: string;
   readonly url: string;
-  readonly page: "section" | "thread";
+  readonly page: "section" | "feed" | "thread";
   readonly via: ForumFetcher;
   /** Read: a parser read it. Unparsed: a page no parser reads. Refused: no page. */
   readonly outcome: "read" | "unparsed" | "refused";
   readonly program: string | null;
-  /** Threads the section's list chose to open, on a section read. */
+  /** Threads the section's list or the feed chose to open. */
   readonly threads?: number;
+  /** Posts a feed gave without a page of their own. */
+  readonly posts?: number;
   readonly units: number;
   readonly reason?: string;
 }
@@ -314,6 +322,19 @@ export class BrightDataForumSource implements SocialSource {
         this.tell({ ...event, outcome: "refused", program: null, reason: answer.reason });
         return { posts: [], foundBy, unitsConsumed: units, next: after([]) };
       }
+      const feed = readFeed(answer.body, section);
+      if (feed) {
+        const read = this.fromFeed(feed, section, request.query.since);
+        this.tell({
+          ...event,
+          page: "feed",
+          outcome: "read",
+          program: read.program,
+          threads: read.chosen.length,
+          posts: read.posts.length,
+        });
+        return { posts: read.posts, foundBy, unitsConsumed: units, next: after(read.chosen) };
+      }
       const program = detectForum(answer.body);
       if (!program) {
         this.runtime.logger.warn(
@@ -348,6 +369,35 @@ export class BrightDataForumSource implements SocialSource {
       }
       throw error;
     }
+  }
+
+  /** A feed's new threads: the posts, or the pages to open for them. */
+  private fromFeed(
+    feed: readonly FeedItem[],
+    address: string,
+    since: Date | undefined,
+  ): { posts: CandidatePost[]; chosen: Pending[]; program: string | null } {
+    const program = feedProgramFor(address);
+    const fresh = feed.filter(
+      (item) =>
+        !isReply(item) &&
+        (!since || !item.publishedAt || item.publishedAt.getTime() > since.getTime()),
+    );
+    if (program?.feedText === "full") {
+      const now = this.runtime.now();
+      return {
+        posts: fresh.map((item) => feedPost(item, program, now)),
+        chosen: [],
+        program: program.id,
+      };
+    }
+    // Cut, or a feed no program claims: the thread's own page is the post.
+    const chosen = fresh.slice(0, this.threadsPerSection).map((item) => ({
+      url: item.url,
+      ...(item.publishedAt ? { startedAt: item.publishedAt.toISOString() } : {}),
+      approximate: false,
+    }));
+    return { posts: [], chosen, program: program?.id ?? null };
   }
 
   private tell(event: ForumPageEvent): void {
@@ -427,6 +477,23 @@ export class BrightDataForumSource implements SocialSource {
 }
 
 const hostOf = (url: string) => new URL(url).hostname;
+
+/** A feed item that holds the thread's first post, as the post. */
+function feedPost(item: FeedItem, program: ForumProgram, now: Date): CandidatePost {
+  const url = new URL(item.url);
+  // A thread id is only unique inside its forum; where the address names no
+  // id, the address is the id.
+  const id = program.feedThreadId?.(item.url) ?? `${url.pathname}${url.search}`;
+  return {
+    externalId: `${url.hostname}:${id}`,
+    url: item.url,
+    channel: url.hostname,
+    title: item.title,
+    text: item.text || item.title,
+    postedAt: item.publishedAt ?? now,
+    ...(item.publishedAt ? {} : { postedAtIsApproximate: true }),
+  };
+}
 
 /**
  * One list and the most threads it may open; with the browser, each page may

@@ -101,9 +101,10 @@ export async function filterDropCounts(
   >();
 
   for (const row of rows) {
-    // Not a filter a person tunes: the classify step's match cap (US-443)
-    // writes its drops here only so a screen counts the post as seen.
-    if (row.stage === "match_cap") continue;
+    // Not filters a person tunes: the classify step's match cap (US-443)
+    // writes its drops here only so a screen counts the post as seen, and an
+    // old thread is one a feed listed again when someone replied (US-476).
+    if (row.stage === "match_cap" || row.stage === "old_thread") continue;
     const entry = counts.get(row.monitorId) ?? { ...noFilterDrops };
     entry[row.stage] = Number(row.dropped);
     counts.set(row.monitorId, entry);

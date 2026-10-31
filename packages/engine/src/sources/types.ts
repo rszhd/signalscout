@@ -176,6 +176,16 @@ export interface CandidatePost {
    */
   readonly postedAtIsApproximate?: boolean;
   /**
+   * Set when `text` is a cut the platform gave, not the whole post: a forum
+   * feed that shortens each item. US-476. The pre-filter and triage judge it
+   * as it is, and `SocialSource.completePost` reads the whole for a post
+   * they keep, so a page is bought only for a post worth scoring.
+   *
+   * `since` is the poll's window: the feed dates an item by its newest reply,
+   * so only the post's own page says whether the thread started inside it.
+   */
+  readonly partial?: { readonly since?: Date };
+  /**
    * How many replies the platform says this post has.
    *
    * The poll stores it and compares it on the next pass, because that is what
@@ -624,7 +634,30 @@ export interface SocialSource extends ConnectorDescriptor {
    * the pre-filter is about to drop.
    */
   fetchReplies?(request: ReplyRequest): Promise<ReplyResult>;
+  /**
+   * The whole of one partial post (`CandidatePost.partial`), from its own
+   * page. US-476. Absent: this connector never gives a partial post.
+   */
+  completePost?(request: CompleteRequest): Promise<CompleteResult>;
 }
+
+/** One partial post to read in full. */
+export interface CompleteRequest {
+  readonly url: string;
+  /** The `since` the post came with (`CandidatePost.partial`). */
+  readonly since?: Date;
+  readonly credentials: SourceCredentials;
+  readonly signal?: AbortSignal;
+}
+
+/**
+ * `complete`: the post, whole. `old`: its page shows it started before the
+ * poll's window, so it is not a new post. `unread`: no page came back or no
+ * parser read it, and the partial text is all there is.
+ */
+export type CompleteResult =
+  | { readonly status: "complete"; readonly post: CandidatePost; readonly unitsConsumed: number }
+  | { readonly status: "old" | "unread"; readonly reason: string; readonly unitsConsumed: number };
 
 /**
  * What a connector is given at construction. Every side effect a connector has

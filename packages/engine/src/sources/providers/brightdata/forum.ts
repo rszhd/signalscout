@@ -34,6 +34,8 @@ import type { ForumProgram, ForumThreadSummary } from "../../forums/types.js";
 import { forumPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CompleteRequest,
+  CompleteResult,
   ConnectorDefinition,
   CredentialCheck,
   SearchRequest,
@@ -384,15 +386,26 @@ export class BrightDataForumSource implements SocialSource {
         !isReply(item) &&
         (!since || !item.publishedAt || item.publishedAt.getTime() > since.getTime()),
     );
+    const now = this.runtime.now();
     if (program?.feedText === "full") {
-      const now = this.runtime.now();
       return {
         posts: fresh.map((item) => feedPost(item, program, now)),
         chosen: [],
         program: program.id,
       };
     }
-    // Cut, or a feed no program claims: the thread's own page is the post.
+    // Cut, with an id its items name: partial posts, whole only once the
+    // filters keep one (US-476). The feed dates an item by its newest reply,
+    // so the window goes with the post for its page to decide.
+    if (program && fresh.every((item) => program.feedThreadId?.(item.url))) {
+      const partial = since ? { since } : {};
+      return {
+        posts: fresh.map((item) => feedPost(item, program, now, partial)),
+        chosen: [],
+        program: program.id,
+      };
+    }
+    // A feed no program claims: the thread's own page is the post.
     const chosen = fresh.slice(0, this.threadsPerSection).map((item) => ({
       url: item.url,
       ...(item.publishedAt ? { startedAt: item.publishedAt.toISOString() } : {}),
@@ -415,54 +428,67 @@ export class BrightDataForumSource implements SocialSource {
     request: SearchRequest,
     fetcher: ForumPageFetcher,
   ): Promise<{ posts: CandidatePost[]; units: number }> {
-    const now = this.runtime.now();
-    const since = request.query.since;
     const posts: CandidatePost[] = [];
     let units = 0;
     for (const pending of batch) {
-      const fetched = await fetcher.fetch(pending.url);
-      units += fetched.units;
-      const { answer, via } = fetched;
-      const event = {
-        host: hostOf(pending.url),
-        url: pending.url,
-        page: "thread" as const,
-        via,
-        units: fetched.units,
+      const read = await this.readThreadPage(pending, request.query.since, fetcher);
+      units += read.unitsConsumed;
+      if (read.status === "complete") posts.push(read.post);
+    }
+    return { posts, units };
+  }
+
+  /** One thread's page as its post, unless it started before `since`. */
+  private async readThreadPage(
+    pending: Pending,
+    since: Date | undefined,
+    fetcher: ForumPageFetcher,
+  ): Promise<CompleteResult> {
+    const now = this.runtime.now();
+    const fetched = await fetcher.fetch(pending.url);
+    const unitsConsumed = fetched.units;
+    const { answer, via } = fetched;
+    const event = {
+      host: hostOf(pending.url),
+      url: pending.url,
+      page: "thread" as const,
+      via,
+      units: fetched.units,
+    };
+    if (!answer.ok) {
+      this.runtime.logger.warn(
+        { thread: pending.url, via, reason: answer.reason },
+        "forum thread skipped: no page came back",
+      );
+      this.tell({ ...event, outcome: "refused", program: null, reason: answer.reason });
+      return { status: "unread", reason: answer.reason, unitsConsumed };
+    }
+    const program = detectForum(answer.body);
+    const thread = program?.readThread(answer.body, pending.url, now);
+    if (!thread) {
+      this.runtime.logger.warn(
+        { thread: pending.url, via, program: program?.id ?? null, page: pageSummary(answer.body) },
+        "forum thread skipped: no parser read it",
+      );
+      this.tell({ ...event, outcome: "unparsed", program: program?.id ?? null });
+      return { status: "unread", reason: "no parser read the thread's page", unitsConsumed };
+    }
+    this.tell({ ...event, outcome: "read", program: program?.id ?? null });
+    const startedAt = thread.postedAt ?? (pending.startedAt ? new Date(pending.startedAt) : null);
+    const approximate = thread.postedAt
+      ? thread.approximatePostedAt
+      : pending.approximate || !startedAt;
+    const postedAt = startedAt ?? now;
+    if (since && postedAt.getTime() <= since.getTime() - (approximate ? wordsMarginMs : 0))
+      return {
+        status: "old",
+        reason: "the thread started before the poll's window",
+        unitsConsumed,
       };
-      if (!answer.ok) {
-        this.runtime.logger.warn(
-          { thread: pending.url, via, reason: answer.reason },
-          "forum thread skipped: no page came back",
-        );
-        this.tell({ ...event, outcome: "refused", program: null, reason: answer.reason });
-        continue;
-      }
-      const program = detectForum(answer.body);
-      const thread = program?.readThread(answer.body, pending.url, now);
-      if (!thread) {
-        this.runtime.logger.warn(
-          {
-            thread: pending.url,
-            via,
-            program: program?.id ?? null,
-            page: pageSummary(answer.body),
-          },
-          "forum thread skipped: no parser read it",
-        );
-        this.tell({ ...event, outcome: "unparsed", program: program?.id ?? null });
-        continue;
-      }
-      this.tell({ ...event, outcome: "read", program: program?.id ?? null });
-      const startedAt = thread.postedAt ?? (pending.startedAt ? new Date(pending.startedAt) : null);
-      const approximate = thread.postedAt
-        ? thread.approximatePostedAt
-        : pending.approximate || !startedAt;
-      const postedAt = startedAt ?? now;
-      if (since && postedAt.getTime() <= since.getTime() - (approximate ? wordsMarginMs : 0))
-        continue;
-      const host = new URL(thread.url).hostname;
-      posts.push({
+    const host = new URL(thread.url).hostname;
+    return {
+      status: "complete",
+      post: {
         // A thread id is only unique inside its forum.
         externalId: `${host}:${thread.id}`,
         url: thread.url,
@@ -471,16 +497,46 @@ export class BrightDataForumSource implements SocialSource {
         text: thread.text || thread.title,
         postedAt,
         ...(approximate ? { postedAtIsApproximate: true } : {}),
-      });
+      },
+      unitsConsumed,
+    };
+  }
+
+  /**
+   * A partial post from a feed that cuts its text, whole: its thread's page.
+   * US-476. One browser at most, stopped before this returns.
+   */
+  async completePost(request: CompleteRequest): Promise<CompleteResult> {
+    const fetcher = openForumFetcher(
+      this.runtime,
+      request.credentials,
+      { ...(this.browser ? { browser: this.browser } : {}), ...this.fetcherFor() },
+      request.signal,
+    );
+    try {
+      return await this.readThreadPage(
+        { url: request.url, approximate: false },
+        request.since,
+        fetcher,
+      );
+    } finally {
+      await fetcher.close();
     }
-    return { posts, units };
   }
 }
 
 const hostOf = (url: string) => new URL(url).hostname;
 
-/** A feed item that holds the thread's first post, as the post. */
-function feedPost(item: FeedItem, program: ForumProgram, now: Date): CandidatePost {
+/**
+ * A feed item as a post: the thread's first post, or with `partial` the cut
+ * a feed gives of it (US-476).
+ */
+function feedPost(
+  item: FeedItem,
+  program: ForumProgram,
+  now: Date,
+  partial?: CandidatePost["partial"],
+): CandidatePost {
   const url = new URL(item.url);
   // A thread id is only unique inside its forum; where the address names no
   // id, the address is the id.
@@ -493,6 +549,7 @@ function feedPost(item: FeedItem, program: ForumProgram, now: Date): CandidatePo
     text: item.text || item.title,
     postedAt: item.publishedAt ?? now,
     ...(item.publishedAt ? {} : { postedAtIsApproximate: true }),
+    ...(partial ? { partial } : {}),
   };
 }
 

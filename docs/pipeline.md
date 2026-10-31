@@ -7,10 +7,10 @@ and which row each step leaves behind.
 Read it before changing anything in `packages/pipeline/src/worker/`, and when a
 screen shows a number nobody can explain.
 
-## Five queues and a clock
+## Six queues and a clock
 
-The worker serves five pipeline queues — `poll`, `filter`, `replies`,
-`classify`, `notify` — and a scheduler tick on a `pg-boss` cron of one minute.
+The worker serves six pipeline queues — `poll`, `filter`, `complete`,
+`replies`, `classify`, `notify` — and a scheduler tick on a `pg-boss` cron of one minute.
 The steps are separate queues rather than one long job because they fail
 differently and cost differently: a model provider that is down must not make
 the poll re-fetch posts that were already paid for, and a retry of the classify
@@ -104,6 +104,7 @@ later.
 | Pages per poll, per platform | 5 | One poll spending without bound. A page's cost is known only after it is fetched |
 | Pages per input | 2, in every connector that pages | One keyword eating a whole poll |
 | Threads per replies job | 25 | One job opening every thread a poll found |
+| Pages per complete job | 20 | One job reading every partial post a poll found |
 | Pages per thread | 4 | One conversation paging for ever |
 | Comments per thread | 500 | A thread that grows faster than it is read |
 | Classification attempts per post | 3 | A post the model refuses being paid for on every poll |
@@ -170,6 +171,12 @@ with the similarity that caused it, because a threshold nobody can review is a
 number somebody guessed twice. Survivors go to the classifier; the posts among
 them also go to the replies stage when the monitor reads comments.
 
+**Complete.** A forum feed that cuts its text gives each thread as a partial
+post, and the filter judges the cut. A batch holding one goes here first: each
+partial post the filter kept is read whole from its own page, then the batch
+goes to the classifier as one job. A page that does not come back leaves the
+post partial; a page that shows an old thread drops it as `old_thread` (US-476).
+
 **Replies.** Buys a thread's comments in batches, stores each as a post of kind
 `reply`, and sends them back through the filter — where a reply meets triage
 and nothing else. A thread stops when it ends, when it hits its ceiling, or
@@ -219,6 +226,7 @@ sweeps every monitor with settings, so a lost enqueue cannot lose a match.
 | --- | --- |
 | Poll | `poll_runs`, `posts`, `post_discoveries`, `api_usage`, `source_continuations`, `source_coverage` |
 | Filter | `stage_runs`, `filter_drops`, `model_calls` (embedding, triage) |
+| Complete | `posts`, `api_usage`, `filter_drops` (`old_thread`) |
 | Replies | `stage_runs`, `posts`, `api_usage` |
 | Classify | `stage_runs`, `model_calls` (classification, rescore), `matches`, `post_copies` |
 | Notify | `stage_runs`, `notification_deliveries` |

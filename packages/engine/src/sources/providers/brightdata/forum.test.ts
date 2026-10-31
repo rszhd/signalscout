@@ -232,34 +232,76 @@ describe("reading a forum's newest-threads feed", () => {
     expect(posts.some((post) => post.externalId === "forum.kodi.tv:389554")).toBe(false);
   });
 
-  it("opens each new thread where the feed cuts the text, at most the application's limit", async () => {
-    const stub = brightData(
-      { [xenforoFeed]: captured("xenforo2-feed.xml") },
-      captured("xenforo2-thread.html"),
-    );
+  it("gives a cut feed's new items as partial posts, and opens no thread", async () => {
+    const stub = brightData({ [xenforoFeed]: captured("xenforo2-feed.xml") });
     const events: ForumPageEvent[] = [];
-    const connector = createBrightDataForum({
-      threadsPerSection: 3,
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch, "2026-10-31T05:00:00.000Z"), {
       onPage: (event) => events.push(event),
     });
-    const source = connector.create(
-      runtimeWith(stub.fetch, "2026-10-31T05:00:00.000Z"),
-    ) as BrightDataForumSource;
 
-    const results = await walk(source, [xenforoFeed]);
+    const since = "2026-10-31T04:00:00.000Z";
+    const posts = (await walk(source, [xenforoFeed], since)).flatMap((result) => result.posts);
 
-    const asked = stub.asked.map((call) => call.url);
-    expect(asked).toHaveLength(1 + 3);
-    expect(
-      asked.slice(1).every((url) => url.startsWith("https://forums.macrumors.com/threads/")),
-    ).toBe(true);
-    // Each post is the thread's own first post, read from its page.
-    expect(results.flatMap((result) => result.posts).map((post) => post.title)).toEqual([
-      "M6 iMac",
-      "M6 iMac",
-      "M6 iMac",
-    ]);
-    expect(events[0]).toMatchObject({ page: "feed", program: "xenforo2", threads: 3, posts: 0 });
+    expect(stub.asked.map((call) => call.url)).toEqual([xenforoFeed]);
+    expect(posts.length).toBeGreaterThan(0);
+    for (const post of posts) {
+      // The id a thread page gives: the number after the slug.
+      expect(post.externalId).toMatch(/^forums\.macrumors\.com:\d+$/);
+      expect(post.partial).toEqual({ since: new Date(since) });
+      expect(post.postedAt.getTime()).toBeGreaterThan(new Date(since).getTime());
+    }
+    expect(events[0]).toMatchObject({
+      page: "feed",
+      program: "xenforo2",
+      threads: 0,
+      posts: posts.length,
+    });
+  });
+});
+
+describe("completing a partial post", () => {
+  const thread = "https://forums.macrumors.com/threads/m6-imac.2493064/";
+
+  it("reads the thread's page, and gives the post whole", async () => {
+    const stub = brightData({ [thread]: captured("xenforo2-thread.html") });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const result = await source.completePost({ url: thread, credentials });
+
+    expect(result).toMatchObject({
+      status: "complete",
+      unitsConsumed: 1,
+      post: {
+        externalId: "forums.macrumors.com:2493064",
+        title: "M6 iMac",
+        text: expect.stringContaining("I ordered my M6 iMac this morning"),
+        postedAt: new Date("2026-10-28T18:05:14.000Z"),
+      },
+    });
+  });
+
+  it("says a thread that started before the window is old, the page billed", async () => {
+    const stub = brightData({ [thread]: captured("xenforo2-thread.html") });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const result = await source.completePost({
+      url: thread,
+      since: new Date("2026-10-29T00:00:00.000Z"),
+      credentials,
+    });
+
+    expect(result).toMatchObject({ status: "old", unitsConsumed: 1 });
+  });
+
+  it("says unread when no page comes back, billing nothing", async () => {
+    const refused = "Residential Failed (bad_endpoint): Requested site is not available";
+    const stub = brightData({ [thread]: refused });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    expect(await source.completePost({ url: thread, credentials })).toMatchObject({
+      status: "unread",
+      unitsConsumed: 0,
+    });
   });
 });
 

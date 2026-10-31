@@ -30,25 +30,25 @@ title, the first few hundred characters and the thread's address.
 
 ## Acceptance
 
-- [ ] A cut feed's new items become posts at once, with the feed's title and
+- [x] A cut feed's new items become posts at once, with the feed's title and
       text, marked as partial; the connector opens no thread page in the
       poll. Their id is the one a thread page gives (XenForo `.<id>/`,
       vBulletin `t=`, SMF `topic=`).
-- [ ] The keyword, embedding and triage stages judge a partial post on its
+- [x] The keyword, embedding and triage stages judge a partial post on its
       partial text.
-- [ ] A partial post that passes them is completed before the classifier:
+- [x] A partial post that passes them is completed before the classifier:
       the connector reads its thread page once, and the post takes the
       page's text and start time. The page's request is billed to the
       monitor and counts against its cap.
-- [ ] A post whose page cannot be read (refused, no parser) is classified on
+- [x] A post whose page cannot be read (refused, no parser) is classified on
       its partial text, and the reason is logged.
-- [ ] A post whose page shows it started before the poll's `since` (XenForo
+- [x] A post whose page shows it started before the poll's `since` (XenForo
       2's feed orders threads by their last reply) is dropped there, as
       today.
-- [ ] Before shipping: on stored forum posts, triage on the first 330
+- [x] Before shipping: on stored forum posts, triage on the first 330
       characters keeps the same posts as triage on the full text, or the
       difference is written in the Log and the owner accepts it.
-- [ ] Tests on a real Postgres with captured feeds and pages; no test fetches.
+- [x] Tests on a real Postgres with captured feeds and pages; no test fetches.
 
 ## Notes
 
@@ -78,4 +78,17 @@ Changing what reaches triage is a scoring change: the
   accepted. Script and results: `forum-survey/partial-triage.jsonl`.
 - 2026-10-31T17:09+08:00 — The owner accepted the difference for now, and
   asked for the comparison again on a larger sample later: US-477.
+- 2026-10-31T17:21+08:00 — Built. A cut feed's items become posts with
+  `partial: { since }` (`CandidatePost`), their ids from the item's link
+  (`feedThreadId`, now on XenForo 1 and 2, vBulletin 3/4 and SMF); the
+  connector opens no page in the poll. Migration 0076 adds
+  `posts.text_partial` and `partial_since`, and the filter stage
+  `old_thread`. The filter sends a batch holding a partial post to the new
+  `complete` queue: at most 20 pages a job, the budget guard first, each
+  page billed to the monitor through `api_usage`; a page that does not come
+  back leaves the post partial, one that shows an old thread drops it. Then
+  the batch goes to the classifier as one job. A post stored whole is never
+  made partial again: the conflict keeps the stored words. 2,735 tests pass.
+  Not yet run live. BuyerFinder's `LOOKOUT_FORUM_THREAD_PAGES` now caps only
+  section reads; the complete step's 20 caps a feed's pages.
 

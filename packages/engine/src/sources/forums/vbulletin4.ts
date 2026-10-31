@@ -86,4 +86,5 @@ export const vbulletin4: ForumProgram = {
     feedFrom(html, homeUrl, (url) => vbulletin4.isFeed?.(url) ?? false, "external.php?type=RSS2"),
   isFeed: (url) => /\/external\.php\?type=rss2$/i.test(url),
   feedText: "cut",
+  feedThreadId: (url) => url.match(/[?&]t=(\d+)/)?.[1] ?? null,
 };

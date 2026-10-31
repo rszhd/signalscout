@@ -324,6 +324,25 @@ describe("a post is checked against its own platform's queries", () => {
     expect(reached.postIds).toEqual([testsId]);
   }, 30_000);
 
+  it("sends a batch holding a partial post through the complete step to the classifier", async () => {
+    // US-476. No connector here reads a page, so the post goes on as it is.
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: perPlatform,
+      generatedSubreddits: [],
+      preFilterEnabled: true,
+      similarityThreshold: 0,
+    });
+    const testsId = await insertPost(brokenTestsPost, "platform-reddit-partial", "reddit");
+    await db.update(posts).set({ textPartial: true }).where(eq(posts.id, testsId));
+
+    const reached = await filterPosts(monitorId, [testsId]);
+
+    expect(reached.postIds).toEqual([testsId]);
+    expect(
+      lines.some((line) => line.msg === "partial posts completed" && line.monitorId === monitorId),
+    ).toBe(true);
+  }, 30_000);
+
   it("still filters a monitor whose queries were written before the split", async () => {
     // Migration 0021 keys a row by the platforms its monitor watches, and a
     // monitor that names none keeps its array. Such a row must go on polling

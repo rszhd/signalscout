@@ -533,6 +533,13 @@
       "when": 1793345338145,
       "tag": "0075_a_monitor_can_read_forums",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1793438028394,
+      "tag": "0076_a_forum_post_can_be_partial",
+      "breakpoints": true
     }
   ]
 }

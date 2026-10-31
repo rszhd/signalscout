@@ -150,6 +150,8 @@ export { assertSourcesCanBeStored } from "./storage.js";
 export type {
   CandidatePost,
   CandidateReply,
+  CompleteRequest,
+  CompleteResult,
   ConnectorDefinition,
   ConnectorDescriptor,
   CredentialCheck,

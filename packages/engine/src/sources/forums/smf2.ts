@@ -81,4 +81,5 @@ export const smf2: ForumProgram = {
     new URL("index.php?action=.xml;type=rss2;sa=news", forumFolder(homeUrl)).toString(),
   isFeed: (url) => /[?;]action=\.xml/.test(url),
   feedText: "cut",
+  feedThreadId: (url) => url.match(/topic=(\d+)/)?.[1] ?? null,
 };

@@ -330,6 +330,10 @@ function toRow(sourceId: Source, providerId: Provider, post: CandidatePost) {
      * — see the `coalesce` below, which is the other half of the same rule.
      */
     replyCount: post.replyCount ?? null,
+    // US-476. Only an insert sets these: the conflict below keeps the stored
+    // words, so a post already read whole is never made partial again.
+    textPartial: post.partial !== undefined,
+    partialSince: post.partial?.since ?? null,
   };
 }
 

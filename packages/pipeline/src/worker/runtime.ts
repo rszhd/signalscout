@@ -54,6 +54,7 @@ import { createNotificationTransport } from "../notifications/transport.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep, type PageCount } from "./collect.js";
+import { createCompleteStep } from "./complete.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { admitEveryone, type EntitlementGate } from "./entitlement.js";
 import { createEstimateStep } from "./estimate.js";
@@ -62,6 +63,7 @@ import { createNotifyStep, enqueueNotifications } from "./notify.js";
 import {
   type ClassifyPayload,
   classifyQueue,
+  completeQueue,
   retryPolicy as defaultRetryPolicy,
   type EstimatePayload,
   estimateQueue,
@@ -645,6 +647,7 @@ export async function startWorker({
     replies:
       steps.replies ??
       createRepliesStep({ registry: sources, credentialsFor: lookup, newPostsPerPairPerDay }),
+    complete: steps.complete ?? createCompleteStep({ registry: sources, credentialsFor: lookup }),
     classify:
       steps.classify ??
       createClassifyStep({
@@ -734,6 +737,7 @@ export async function startWorker({
   await work<PollPayload>(pollQueue, pipeline.poll, named, perMonitorOptions);
   await work<FilterPayload>(filterQueue, pipeline.filter, named, perMonitorOptions);
   await work<RepliesPayload>(repliesQueue, pipeline.replies, named, perMonitorOptions);
+  await work<ClassifyPayload>(completeQueue, pipeline.complete, named, perMonitorOptions);
   await work<ClassifyPayload>(classifyQueue, pipeline.classify, named, perMonitorOptions);
   await work<NotifyPayload>(notifyQueue, pipeline.notify, named, perMonitorOptions);
   await work<EstimatePayload>(estimateQueue, pipeline.estimate, ({ estimateId }) => ({

@@ -185,7 +185,7 @@ interface Thread {
 }
 
 /** What every phase of one run needs, so a phase takes one argument for it. */
-interface RepliesRun {
+export interface RepliesRun {
   readonly db: StepContext["db"];
   readonly logger: StepContext["logger"];
   readonly monitorId: string;
@@ -284,7 +284,7 @@ async function readThreads(db: RepliesRun["db"], ids: readonly string[]): Promis
  * answer to. `registry.only` refuses rather than guesses when two could
  * run and nobody has chosen.
  */
-function connectorsFor(
+export function connectorsFor(
   run: RepliesRun,
   registry: CollectOptions["registry"],
   credentialsFor: CollectOptions["credentialsFor"],

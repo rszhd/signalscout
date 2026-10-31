@@ -104,4 +104,5 @@ export const xenforo1: ForumProgram = {
       /\/forums\/$/.test(forumFolder(homeUrl)) ? "-/index.rss" : "forums/-/index.rss",
     ),
   feedText: "cut",
+  feedThreadId: (url) => url.match(/threads\/[^/]*?\.(\d+)\//)?.[1] ?? null,
 };

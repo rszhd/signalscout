@@ -6,7 +6,7 @@ priority: p2
 created: 2026-11-01T00:48+08:00
 parent: US-469
 area: sources
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -40,3 +40,7 @@ appears twice in it; the first copy is the one read.
   ISO time; the capture has no `data-timestamp`, so the plain path never
   answers for it. 86 forum tests pass. Close after a live scan reads a
   LumberJocks thread.
+- 2026-11-01T01:03+08:00 — Live: a local rockler.com scan (Browser Use first,
+  DataImpulse proxy) read 5 LumberJocks thread pages in the complete step,
+  all parsed: 3 posts whole (355 to 839 characters, dated from the page) and
+  2 dropped as old threads. No "no parser read it" line in the worker log.

@@ -2,10 +2,12 @@
 
 # Done
 
-265 finished.
+267 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-480 | [Completing partial posts starts one browser a page](done/2026-11/BUG-480-completing-partial-posts-starts-one-browser-a-page.md) | bug | shipped | 2026-11 |
+| BUG-479 | [XenForo 2 threads in VerticalScope's theme are not read](done/2026-11/BUG-479-xenforo-2-threads-in-verticalscope-s-theme-are-not-read.md) | bug | shipped | 2026-11 |
 | BUG-475 | [The pre-filter drops forum posts for missing address words](done/2026-10/BUG-475-the-pre-filter-drops-forum-posts-for-missing-address-words.md) | bug | shipped | 2026-10 |
 | US-476 | [A forum thread page is read only for a post that passed the filters](done/2026-10/US-476-a-forum-thread-page-is-read-only-for-a-post-that-passed-the-filters.md) | feature | shipped | 2026-10 |
 | US-473 | [A monitor reads a whole forum through its newest-threads feed](done/2026-10/US-473-a-monitor-reads-a-whole-forum-through-its-newest-threads-feed.md) | feature | shipped | 2026-10 |

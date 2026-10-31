@@ -52,12 +52,18 @@ function threadAddress(href: string, pageUrl: string): string {
 }
 
 /**
- * The feed itself, when a browser showed it: Bright Data's unlocker may answer
- * with Chrome's XML viewer page, which keeps the source whole in one element.
+ * The feed itself, when a browser showed it. Bright Data's unlocker answered
+ * one feed three ways on one day: as it is; as Chrome's XML viewer, which
+ * keeps the source whole in one element; and as Chrome's text view, the
+ * source escaped once inside a `<pre>`.
  */
 function unwrapped(body: string): string {
-  const start = body.indexOf('<div id="webkit-xml-viewer-source-xml">');
-  return start < 0 ? body : body.slice(start + 39);
+  const viewer = body.indexOf('<div id="webkit-xml-viewer-source-xml">');
+  if (viewer >= 0) return body.slice(viewer + 39);
+  const text = body.match(
+    /^\s*<html><head><meta name="color-scheme"[^>]*><\/head><body><pre[^>]*>([\s\S]*)<\/pre>/,
+  );
+  return text?.[1] !== undefined ? decodeEntities(text[1]) : body;
 }
 
 /** The items of an RSS or Atom feed, in its order; null when the body is neither. */
@@ -147,5 +153,8 @@ export function feedFrom(
 }
 
 /** XenForo's whole-forum feed, which versions 1 and 2 both write. */
-export const isXenForoFeed = (url: string): boolean =>
-  /\/forums\/-\/index\.rss$/.test(new URL(url).pathname);
+export const isXenForoFeed = (url: string): boolean => {
+  const { pathname, search } = new URL(url);
+  // `index.php?forums/-/index.rss` on a board without short addresses.
+  return /\/forums\/-\/index\.rss$/.test(pathname) || /^\?\/?forums\/-\/index\.rss$/.test(search);
+};

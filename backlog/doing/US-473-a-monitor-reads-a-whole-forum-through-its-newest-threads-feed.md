@@ -81,3 +81,11 @@ its activity page met a bot check, so it waits for the browser fallback.
   so a name that is a label of the page's host is now kept, and a member's
   self-introduction ("I'm <name> from") is replaced where it stands. Not yet
   run: a poll on a live feed.
+- 2026-10-31T14:34+08:00 — A second local scan (vortexoptics.com) kept no
+  forum. Two causes, both fixed: Bright Data answered Long Range Hunting's
+  feed as Chrome's text view, the feed escaped inside a `<pre>`, a minute
+  after answering it as it is, so the reader takes the feed out of that view
+  too (the real answer reads 20 items); and The High Road names its feed
+  `index.php?forums/-/index.rss`, which the XenForo rule refused for its
+  path, so the guessed `/forums/-/index.rss` answered 404.
+

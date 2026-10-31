@@ -598,6 +598,27 @@ describe("reading a feed", () => {
     expect(items?.[0]?.url).toBe("https://www.webhostingtalk.com/showthread.php?t=1965154");
   });
 
+  it("reads a feed a browser showed as text, escaped inside a <pre>", () => {
+    // Bright Data answered Long Range Hunting's feed this way on 2026-10-31,
+    // the same feed it had answered as it is a minute before.
+    const feed = manifest["mybb-feed.xml"];
+    const xml = readFileSync(new URL("./fixtures/mybb-feed.xml", import.meta.url), "utf8");
+    const escaped = xml.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    const shown = `<html><head><meta name="color-scheme" content="light dark"></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">${escaped}</pre></body></html>`;
+    expect(readFeed(shown, feed?.url ?? "")).toEqual(readFeed(xml, feed?.url ?? ""));
+  });
+
+  it("knows XenForo's feed on a board without short addresses", () => {
+    const home =
+      '<html id="XF"><head><link rel="alternate" type="application/rss+xml" title="RSS" href="/index.php?forums/-/index.rss" /></head></html>';
+    expect(xenforo2.feedUrl?.(home, "https://www.thehighroad.org/")).toBe(
+      "https://www.thehighroad.org/index.php?forums/-/index.rss",
+    );
+    expect(feedProgramFor("https://www.thehighroad.org/index.php?forums/-/index.rss")?.id).toBe(
+      "xenforo2",
+    );
+  });
+
   it("reads a title that mixes CDATA with escaped text, and a post's HTML as text", () => {
     const items = readFeed(
       `<rss version="2.0"><channel><item><title><![CDATA[[IC]]>&#093;<![CDATA[ Keycaps]]></title>

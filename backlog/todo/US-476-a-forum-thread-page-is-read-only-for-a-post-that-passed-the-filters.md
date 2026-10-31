@@ -61,3 +61,19 @@ Changing what reaches triage is a scoring change: the
 `measure-scoring-change` skill applies before it ships.
 
 ## Log
+- 2026-10-31T17:03+08:00 — Measured on the 96 forum posts stored in
+  BuyerFinder's local database (four scans of 2026-10-30 and 31), each
+  judged twice by the embedding stage (threshold 0.15) and triage (Jev):
+  on the stored text, and on its first 330 characters plus "...", the
+  length XenForo 2's feed gave. 192 triage calls, about $0.008. 53 posts are
+  longer than 330 characters. On the full text 57 posts pass both stages;
+  on the cut text 52: 7 lost, 2 gained. Of the 43 posts whose cut text is
+  their whole text, triage kept 2 differently on the second ask, so about 5%
+  of a difference is triage's own noise. None of the 7 lost posts was a
+  match; all but one had a `no` both times and fell under the confidence
+  floor on one side. Both forum matches so far (BladeForums, scores 90 and
+  52) pass on the cut text with `yes`. On the third vortexoptics.com scan,
+  24 of 51 posts pass on the cut text: 24 thread pages instead of 79. Two
+  matches are a small sample; the owner decides whether this difference is
+  accepted. Script and results: `forum-survey/partial-triage.jsonl`.
+

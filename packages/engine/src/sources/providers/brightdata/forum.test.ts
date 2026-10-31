@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../../../logger.js";
+import { readFeed } from "../../forums/index.js";
 import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
 import type { OpenPageBrowser } from "../browseruse/pages.js";
 import {
@@ -216,6 +217,60 @@ describe("reading a forum's newest-threads feed", () => {
         posts: 1,
       },
     ]);
+  });
+
+  it("takes a feed no program claims as its posts, and opens no page", async () => {
+    const feed = manifest["nofeedparser-mumsnet-feed.xml"]?.url ?? "";
+    const stub = brightData({ [feed]: captured("nofeedparser-mumsnet-feed.xml") });
+    const events: ForumPageEvent[] = [];
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      onPage: (event) => events.push(event),
+    });
+
+    const posts = (await walk(source, [feed])).flatMap((result) => result.posts);
+    const items = readFeed(captured("nofeedparser-mumsnet-feed.xml"), feed) ?? [];
+
+    expect(stub.asked.map((call) => call.url)).toEqual([feed]);
+    expect(posts).toHaveLength(items.length);
+    for (const post of posts) {
+      expect(post.externalId.startsWith("www.mumsnet.com:/talk/")).toBe(true);
+      expect(post.partial).toBeUndefined();
+    }
+    expect(events).toEqual([
+      {
+        host: "www.mumsnet.com",
+        url: feed,
+        page: "feed",
+        via: "unlocker",
+        units: 1,
+        outcome: "read",
+        program: null,
+        threads: 0,
+        posts: posts.length,
+      },
+    ]);
+  });
+
+  it("drops a feed's items older than the poll's window, where no program claims it", async () => {
+    const feed = manifest["nofeedparser-vanilla-feed.xml"]?.url ?? "";
+    const stub = brightData({ [feed]: captured("nofeedparser-vanilla-feed.xml") });
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch));
+
+    const items = readFeed(captured("nofeedparser-vanilla-feed.xml"), feed) ?? [];
+    const dates = items
+      .map((item) => item.publishedAt)
+      .filter((date): date is Date => date !== null)
+      .sort((a, b) => a.getTime() - b.getTime());
+    const since = dates[Math.floor(dates.length / 2)] ?? new Date();
+    const posts = (await walk(source, [feed], since.toISOString())).flatMap(
+      (result) => result.posts,
+    );
+
+    expect(posts.length).toBeGreaterThan(0);
+    for (const post of posts) {
+      expect(post.postedAt.getTime()).toBeGreaterThan(since.getTime());
+    }
+    expect(posts.length).toBeLessThan(items.length);
   });
 
   it("takes every item on a first read, and never a reply", async () => {

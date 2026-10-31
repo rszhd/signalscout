@@ -405,13 +405,17 @@ export class BrightDataForumSource implements SocialSource {
         program: program.id,
       };
     }
-    // A feed no program claims: the thread's own page is the post.
+    if (!program) {
+      // A feed no program claims holds its posts as the feed gives them; their pages need a parser.
+      return { posts: fresh.map((item) => feedPost(item, null, now)), chosen: [], program: null };
+    }
+    // A known program's cut feed whose items name no id: their pages are the posts.
     const chosen = fresh.slice(0, this.threadsPerSection).map((item) => ({
       url: item.url,
       ...(item.publishedAt ? { startedAt: item.publishedAt.toISOString() } : {}),
       approximate: false,
     }));
-    return { posts: [], chosen, program: program?.id ?? null };
+    return { posts: [], chosen, program: program.id };
   }
 
   private tell(event: ForumPageEvent): void {
@@ -533,14 +537,14 @@ const hostOf = (url: string) => new URL(url).hostname;
  */
 function feedPost(
   item: FeedItem,
-  program: ForumProgram,
+  program: ForumProgram | null,
   now: Date,
   partial?: CandidatePost["partial"],
 ): CandidatePost {
   const url = new URL(item.url);
   // A thread id is only unique inside its forum; where the address names no
   // id, the address is the id.
-  const id = program.feedThreadId?.(item.url) ?? `${url.pathname}${url.search}`;
+  const id = program?.feedThreadId?.(item.url) ?? `${url.pathname}${url.search}`;
   return {
     externalId: `${url.hostname}:${id}`,
     url: item.url,

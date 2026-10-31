@@ -516,6 +516,31 @@ describe("a forum's home page and its feed", () => {
     });
   }
 
+  for (const [name, feedName] of [
+    ["nofeedparser-vanilla-index", "nofeedparser-vanilla-feed.xml"],
+    ["nofeedparser-mumsnet-index", "nofeedparser-mumsnet-feed.xml"],
+  ] as const) {
+    it(`names the feed of ${name}, a home page no program knows`, () => {
+      const home = page(name);
+      expect(forumFeedFrom(home.html, home.url)).toEqual({
+        program: null,
+        feedUrl: manifest[feedName]?.url,
+      });
+    });
+  }
+
+  it("passes over a comments feed, and gives nothing when it is the only one", () => {
+    const onlyComments =
+      '<html><head><link rel="alternate" type="application/rss+xml" href="/comments/feed/"></head></html>';
+    expect(forumFeedFrom(onlyComments, "https://f.example/")).toBeNull();
+    const withForum =
+      '<html><head><link rel="alternate" type="application/rss+xml" href="/comments/feed/"><link rel="alternate" type="application/rss+xml" href="/discussions/feed.rss"></head></html>';
+    expect(forumFeedFrom(withForum, "https://f.example/")).toEqual({
+      program: null,
+      feedUrl: "https://f.example/discussions/feed.rss",
+    });
+  });
+
   it("takes Discourse's newest topics from its root", () => {
     const head = page("discourse-section");
     expect(forumFeedFrom(head.html, head.url)?.feedUrl).toBe(

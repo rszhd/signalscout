@@ -29,17 +29,17 @@ that feed with no parser: its items are the posts as the feed gives them.
 
 ## Acceptance
 
-- [ ] From a home page no program knows, `forumFeedFrom` gives the first
+- [x] From a home page no program knows, `forumFeedFrom` gives the first
       feed the page names, with no program; a comments feed is passed over.
       With no feed named, it gives nothing, as before.
-- [ ] A forum query that is a feed no program claims gives its new items as
+- [x] A forum query that is a feed no program claims gives its new items as
       posts, the text as the feed gives it, with no page opened; their id is
       the item's address. Replies are never posts.
-- [ ] A feed's item older than the poll's window is dropped, as for any
+- [x] A feed's item older than the poll's window is dropped, as for any
       feed, so the Vanilla feeds' old threads never reach the pipeline after
       the first poll.
-- [ ] A known program's feed reads as before.
-- [ ] Tests on the captured LowEndTalk and Mumsnet home pages and feeds;
+- [x] A known program's feed reads as before.
+- [x] Tests on the captured LowEndTalk and Mumsnet home pages and feeds;
       no test fetches.
 
 ## Notes
@@ -53,3 +53,12 @@ parser. BuyerFinder's scan check takes a forum with no program once this is
 in (its `checkForums`).
 
 ## Log
+- 2026-10-31T19:34+08:00 — Built by DeepSeek Flash through opencode from a
+  brief, reviewed and checked here; one round of follow-ups (a comment, the
+  comments-feed case with a second feed, the window test on the Vanilla
+  feed). `forumFeedFrom` gives `{ program: null, feedUrl }` for a home page
+  no program knows that names a feed other than comments; a feed no program
+  claims gives its items as posts, the address as the id. 2,740 tests pass.
+  Not yet run live; BuyerFinder's `checkForums` still drops a forum with no
+  program until it takes this.
+

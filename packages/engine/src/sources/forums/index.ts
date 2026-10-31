@@ -7,6 +7,7 @@
  */
 import { bbpress } from "./bbpress.js";
 import { discourse } from "./discourse.js";
+import { advertisedFeeds } from "./feeds.js";
 import { invision4 } from "./invision4.js";
 import { mybb } from "./mybb.js";
 import { phpbb3 } from "./phpbb3.js";
@@ -49,13 +50,19 @@ export function detectForumIndex(html: string): ForumProgram | null {
   );
 }
 
-/** A forum's program and its newest-threads feed, from its home page; null without either. */
+/**
+ * A forum's program and its newest-threads feed, from its home page. A page no
+ * program knows still gives a feed, unless the only feed it names is comments.
+ */
 export function forumFeedFrom(
   html: string,
   homeUrl: string,
-): { program: ForumProgram; feedUrl: string | null } | null {
+): { program: ForumProgram | null; feedUrl: string | null } | null {
   const program = detectForumIndex(html);
-  return program ? { program, feedUrl: program.feedUrl?.(html, homeUrl) ?? null } : null;
+  if (program) return { program, feedUrl: program.feedUrl?.(html, homeUrl) ?? null };
+  const feedUrl =
+    advertisedFeeds(html, homeUrl).find((url) => !/comments/i.test(new URL(url).pathname)) ?? null;
+  return feedUrl ? { program: null, feedUrl } : null;
 }
 
 /** The program whose feed this address is, or null. */

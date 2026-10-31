@@ -4,6 +4,7 @@ title: An Invision forum is read through its activity stream
 type: feature
 priority: p2
 created: 2026-11-01T02:34+08:00
+resolution: shipped
 parent: US-473
 area: pipeline
 ---
@@ -31,20 +32,20 @@ reader exists (`invision4.ts`); Invision 5 has no reader at all.
 
 ## Acceptance
 
-- [ ] An Invision 4 or 5 home page gives the forum's `/discover/` address as
+- [x] An Invision 4 or 5 home page gives the forum's `/discover/` address as
       its newest-threads address, in the board's own folder
       (`/forums/discover/` where the board lives in `/forums/`).
-- [ ] A stream reader for Invision 4 and for Invision 5 returns the new
+- [x] A stream reader for Invision 4 and for Invision 5 returns the new
       topics only, each with its topic address, title, start time and the
       text the item shows; replies are dropped by a rule that reads no
       words in the board's language.
-- [ ] A poll reads older pages with `?before=` until it passes the last
+- [x] A poll reads older pages with `?before=` until it passes the last
       poll's time or reaches a page cap, and reports how many pages it read.
-- [ ] A new topic whose text the stream cuts is completed from its thread
+- [x] A new topic whose text the stream cuts is completed from its thread
       page; an Invision 5 thread page is read too.
-- [ ] Fixtures for both versions are captured through the browser, names
+- [x] Fixtures for both versions are captured through the browser, names
       scrubbed: a stream page, a second page, a thread page.
-- [ ] A live poll of one Invision 4 and one Invision 5 board finds new
+- [x] A live poll of one Invision 4 and one Invision 5 board finds new
       topics, with the units it spent in the Log.
 
 ## Notes
@@ -77,3 +78,14 @@ reader exists (`invision4.ts`); Invision 5 has no reader at all.
   member-named photo file in JSON-LD). New-topic rule: an item's status
   line names one member (`data-ipshover` links), a reply's names two; it
   agreed with the words "posted a topic" on all 142 topic items.
+- 2026-11-01T03:03+08:00 — Built (7c1ca5a, written by DeepSeek Flash from a
+  brief, reviewed): `invision-stream.ts` reads the stream for both versions,
+  `invision5.ts` reads Invision 5 threads and home pages, and the connector
+  follows `?before=` through its cursor. Pages read are told one page event
+  each; the cursor counts them against the cap. 2,776 tests pass. Live poll,
+  3-hour window, browser first: MyGolfSpy (Invision 4) read 2 pages and
+  stopped past the window, 1 new topic; GolfWRX (Invision 5) read 5 pages and
+  stopped at the cap, 15 new topics, all distinct. 2 + 1 posts completed from
+  their thread pages, whole. 24 units in all: each stream page is 2 units,
+  because each call starts its own browser. Reading several pages in one call
+  would halve that; not done here.

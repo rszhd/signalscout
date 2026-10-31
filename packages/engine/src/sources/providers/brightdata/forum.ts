@@ -64,7 +64,8 @@ export type ForumFetcher = "unlocker" | "browser";
 export interface ForumPageEvent {
   readonly host: string;
   readonly url: string;
-  readonly page: "section" | "feed" | "thread";
+  /** `home`: a forum's home page, read by an application looking for its feed. */
+  readonly page: "home" | "section" | "feed" | "thread";
   readonly via: ForumFetcher;
   /** Read: a parser read it. Unparsed: a page no parser reads. Refused: no page. */
   readonly outcome: "read" | "unparsed" | "refused";

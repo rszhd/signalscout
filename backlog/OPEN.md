@@ -2,7 +2,7 @@
 
 # Open tickets
 
-84 open — 16 doing, 59 todo, 9 parked (7 p1, 60 p2, 17 p3).
+85 open — 16 doing, 60 todo, 9 parked (7 p1, 60 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -80,6 +80,7 @@
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p3 | US-360 | [A pull request builds the image beside the checks](todo/US-360-a-pull-request-builds-the-image-beside-the-checks.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p3 | US-362 | [The worktree script finds what it left behind](todo/US-362-the-worktree-script-finds-what-it-left-behind.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p3 | US-486 | [Forums a scan cannot read yet are recovered where it pays](todo/US-486-forums-a-scan-cannot-read-yet-are-recovered-where-it-pays.md) | spike | todo | 2026-11-01T03:26+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | BUG-348 | [The issue sync says an issue is missing when it could not look](todo/BUG-348-sync-says-an-issue-is-missing-when-it-could-not-look.md) | bug | todo | 2026-09-23T12:28+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |

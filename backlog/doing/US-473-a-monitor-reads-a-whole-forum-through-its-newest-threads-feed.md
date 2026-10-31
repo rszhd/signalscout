@@ -88,4 +88,13 @@ its activity page met a bot check, so it waits for the browser fallback.
   too (the real answer reads 20 items); and The High Road names its feed
   `index.php?forums/-/index.rss`, which the XenForo rule refused for its
   path, so the guessed `/forums/-/index.rss` answered 404.
+- 2026-10-31T15:06+08:00 — Third local scan (vortexoptics.com), with BUG-475
+  and the fixes above: four of five forums kept (Long Range Hunting,
+  AccurateShooter, BirdForum, The High Road; Sniper's Hide has no parser).
+  The first poll read 4 feeds and 79 thread pages: 51 posts from three
+  forums, none dropped by keywords, 28 past the embedding stage and triage,
+  28 scored on the Claude bridge, no match: the threads were reloading,
+  builds and introductions, not optics purchases. All 20 of The High Road's
+  thread pages were skipped: XenForo 2's reader took a thread id from
+  `/threads/` only, and the board writes `index.php?threads/`. Fixed.
 

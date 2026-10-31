@@ -54,7 +54,8 @@ export const xenforo2: ForumProgram = {
 
   readThread(html, pageUrl) {
     const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1] ?? pageUrl;
-    const id = canonical.match(/\/threads\/[^/]*?\.(\d+)\//)?.[1];
+    // `/threads/…`, or `index.php?threads/…` on a board without short addresses.
+    const id = canonical.match(/[/?]threads\/[^/]*?\.(\d+)\//)?.[1];
     const heading = html.match(/<h1 class="p-title-value">([\s\S]*?)<\/h1>/)?.[1];
     const post = html.search(/<article class="message[^"]*message--post/);
     if (!id || heading === undefined || post < 0) return null;

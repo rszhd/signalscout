@@ -608,6 +608,19 @@ describe("reading a feed", () => {
     expect(readFeed(shown, feed?.url ?? "")).toEqual(readFeed(xml, feed?.url ?? ""));
   });
 
+  it("reads a XenForo 2 thread on a board without short addresses", () => {
+    // The High Road's threads are index.php?threads/<slug>.<id>/; all 20 of a
+    // live poll on 2026-10-31 were skipped before this.
+    const thread = page("xenforo2-thread");
+    const html = thread.html.replace(
+      '<link rel="canonical" href="https://forums.macrumors.com/threads/',
+      '<link rel="canonical" href="https://forums.macrumors.com/index.php?threads/',
+    );
+    const read = xenforo2.readThread(html, thread.url);
+    expect(read?.id).toBe("2493064");
+    expect(read?.url).toBe("https://forums.macrumors.com/index.php?threads/m6-imac.2493064/");
+  });
+
   it("knows XenForo's feed on a board without short addresses", () => {
     const home =
       '<html id="XF"><head><link rel="alternate" type="application/rss+xml" title="RSS" href="/index.php?forums/-/index.rss" /></head></html>';

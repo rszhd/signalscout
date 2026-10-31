@@ -21,7 +21,8 @@
  * call and is stopped when the call ends. A browser page is counted as one
  * Bright Data unit, and each browser started as one more: the measured cost
  * was below that, and Browser Use's own figure settles too late to read here.
- * A failure of the browser skips the page; it never stops the poll.
+ * A browser failure goes back to Bright Data when the browser went first;
+ * otherwise the page is skipped. Neither stops the poll.
  *
  * A query may instead be a forum's newest-threads feed (US-473), which covers
  * every section. Where the program's feed holds the first post, its new items
@@ -117,12 +118,13 @@ export interface ForumPageFetcher {
 }
 
 /**
- * Bright Data first, unless the application sends the forum to the browser,
- * and the browser when Bright Data brings back no page. A browser starts at
- * the first page that needs one and serves every later page until `close`,
- * which a caller must reach, an error included: a browser bills until it is
- * stopped. Bright Data's own errors (a refused key, a rate limit) are thrown;
- * the browser's are a page lost.
+ * Bright Data first, unless the application sends the forum to the browser.
+ * When the first brings back no page, the other reads it: the browser after
+ * a Bright Data refusal, Bright Data after a browser failure. A browser starts at the first page that needs one and serves
+ * every later page until `close`, which a caller must reach, an error
+ * included: a browser bills until it is stopped. Bright Data's own errors (a
+ * refused key, a rate limit) are thrown; a browser failure loses the page only
+ * when the browser was the fallback.
  */
 export function openForumFetcher(
   runtime: SourceRuntime,
@@ -137,9 +139,14 @@ export function openForumFetcher(
   let pages: PageBrowser | null = null;
   return {
     async fetch(url) {
-      if (!browser || options.fetcherFor?.(hostOf(url)) !== "browser") {
+      if (!browser) {
         const answer = await fetchThroughUnlocker(runtime, unlocker, url, signal);
-        if (answer.ok || !browser) return { answer, via: "unlocker", units: answer.ok ? 1 : 0 };
+        return { answer, via: "unlocker", units: answer.ok ? 1 : 0 };
+      }
+      const browserFirst = options.fetcherFor?.(hostOf(url)) === "browser";
+      if (!browserFirst) {
+        const answer = await fetchThroughUnlocker(runtime, unlocker, url, signal);
+        if (answer.ok) return { answer, via: "unlocker", units: 1 };
         runtime.logger.info(
           { url, reason: answer.reason },
           "forum page refused through Bright Data; reading it through the browser",
@@ -147,19 +154,30 @@ export function openForumFetcher(
       }
       pages ??= (browser.open ?? openBrowserUse)(runtime, browser.credentials, signal);
       const before = pages.started;
+      let answer: FetchedPage["answer"];
       try {
-        const answer = await pages.read(url);
-        return { answer, via: "browser", units: 1 + (pages.started - before) };
+        answer = await pages.read(url);
       } catch (error) {
-        // Browser Use out of credit, or a browser that stopped answering: this
-        // page is lost, the rest of the poll is not.
-        runtime.logger.error({ url, err: error }, "forum page not read through the browser");
-        return {
-          answer: { ok: false, reason: (error as Error).message },
-          via: "browser",
-          units: pages.started - before,
-        };
+        answer = { ok: false, reason: (error as Error).message };
+        if (!browserFirst) {
+          // Browser Use out of credit, or a browser that stopped answering:
+          // this page is lost, the rest of the poll is not.
+          runtime.logger.error({ url, err: error }, "forum page not read through the browser");
+          return { answer, via: "browser", units: pages.started - before };
+        }
       }
+      if (answer.ok || !browserFirst)
+        return { answer, via: "browser", units: 1 + (pages.started - before) };
+      runtime.logger.info(
+        { url, reason: answer.reason },
+        "forum page not read through the browser; reading it through Bright Data",
+      );
+      const fallback = await fetchThroughUnlocker(runtime, unlocker, url, signal);
+      return {
+        answer: fallback,
+        via: "unlocker",
+        units: pages.started - before + (fallback.ok ? 1 : 0),
+      };
     },
     async close() {
       await pages?.close();

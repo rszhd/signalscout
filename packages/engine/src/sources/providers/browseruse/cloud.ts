@@ -40,11 +40,33 @@ export function hasBrowserCredentials(credentials: SourceCredentials | undefined
 
 /**
  * A residential proxy keeps one address for a session named in its password
- * (Evomi: `<password>_session-<id>`), so each browser gets an id of its own and
- * a retry gets a new address.
+ * (Evomi: `<password>_session-<id>`) or one address per port (DataImpulse).
+ * `proxyFor` picks the form the credentials name.
  */
 export function sessionPassword(password: string, session: string): string {
   return `${password}_session-${session}`;
+}
+
+/** A whole number from 0 to 999, the same for one session id. */
+function portOffset(session: string): number {
+  let hash = 0;
+  for (const char of session) hash = (hash * 31 + char.charCodeAt(0)) % 1000;
+  return hash;
+}
+
+/**
+ * The proxy address a browser uses. The default keeps one address for a
+ * session named in the password; `proxySession: "port"` keeps it by port
+ * instead and leaves the password as it is.
+ */
+export function proxyFor(
+  credentials: SourceCredentials,
+  session: string,
+): { port: number; password: string } {
+  const { proxyPort = "", proxyPassword = "" } = credentials;
+  if (credentials.proxySession === "port")
+    return { port: Number(proxyPort) + portOffset(session), password: proxyPassword };
+  return { port: Number(proxyPort), password: sessionPassword(proxyPassword, session) };
 }
 
 function headers(apiKey: string): Record<string, string> {
@@ -88,16 +110,17 @@ export async function startCloudBrowser(
       0,
     );
   }
-  const { apiKey = "", proxyHost, proxyPort, proxyUsername, proxyPassword = "" } = credentials;
+  const { apiKey = "", proxyHost, proxyUsername } = credentials;
+  const proxy = proxyFor(credentials, session);
   const response = await runtime.fetch(api, {
     method: "POST",
     headers: headers(apiKey),
     body: JSON.stringify({
       customProxy: {
         host: proxyHost,
-        port: Number(proxyPort),
+        port: proxy.port,
         username: proxyUsername,
-        password: sessionPassword(proxyPassword, session),
+        password: proxy.password,
       },
     }),
     ...(signal ? { signal } : {}),

@@ -557,6 +557,12 @@ function fakeBrowser(pages: Record<string, string>, threads?: string) {
         read.push(url);
         const body = pages[url] ?? threads;
         if (body === "throw") throw new Error("Browser Use answered 402");
+        if (body === challenge)
+          return {
+            ok: false,
+            reason: "the site answered with a challenge page",
+            connection: false,
+          };
         return body === undefined
           ? { ok: false, reason: "not captured", connection: false }
           : { ok: true, body };
@@ -617,6 +623,55 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
 
     expect(stub.asked).toEqual([]);
     expect(browser.read).toEqual([xenforoList]);
+  });
+
+  it("reads through Bright Data a page the browser answers with a challenge", async () => {
+    const stub = brightData({ [xenforoList]: captured("xenforo2-list.html") });
+    const browser = fakeBrowser({ [xenforoList]: challenge });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+      fetcherFor: (host) => (host === "forums.macrumors.com" ? "browser" : undefined),
+    });
+
+    const page = await fetcher.fetch(xenforoList);
+    await fetcher.close();
+
+    expect(stub.asked.map((call) => call.url)).toEqual([xenforoList]);
+    expect(page.answer.ok).toBe(true);
+    expect(page.via).toBe("unlocker");
+    expect(page.units).toBe(2);
+  });
+
+  it("reads through Bright Data a page the browser throws on", async () => {
+    const stub = brightData({ [xenforoList]: captured("xenforo2-list.html") });
+    const browser = fakeBrowser({ [xenforoList]: "throw" });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+      fetcherFor: (host) => (host === "forums.macrumors.com" ? "browser" : undefined),
+    });
+
+    const page = await fetcher.fetch(xenforoList);
+    await fetcher.close();
+
+    expect(stub.asked.map((call) => call.url)).toEqual([xenforoList]);
+    expect(page.answer.ok).toBe(true);
+    expect(page.via).toBe("unlocker");
+    expect(page.units).toBe(2);
+  });
+
+  it("asks Bright Data once when it goes first and the browser reads the page", async () => {
+    const stub = brightData({ [xenforoList]: challenge });
+    const browser = fakeBrowser({ [xenforoList]: captured("xenforo2-list.html") });
+    const fetcher = openForumFetcher(runtimeWith(stub.fetch), credentials, {
+      browser: { credentials: browserCredentials, open: browser.open },
+    });
+
+    const page = await fetcher.fetch(xenforoList);
+    await fetcher.close();
+
+    expect(stub.asked.map((call) => call.url)).toEqual([xenforoList]);
+    expect(page.answer.ok).toBe(true);
+    expect(page.via).toBe("browser");
   });
 
   it("starts no browser while Bright Data passes", async () => {

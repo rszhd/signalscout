@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createLogger } from "../../../logger.js";
 import type { SourceRuntime } from "../../types.js";
 import { CdpTab } from "./cdp.js";
-import { BrowserUseError, startCloudBrowser, stopCloudBrowser } from "./cloud.js";
+import { BrowserUseError, proxyFor, startCloudBrowser, stopCloudBrowser } from "./cloud.js";
 import { openBrowserUse } from "./pages.js";
 
 const credentials = {
@@ -81,6 +81,23 @@ describe("Browser Use's cloud browser", () => {
       throw new Error("no connection");
     });
     await expect(stopCloudBrowser(down, credentials, "b1")).resolves.toBeUndefined();
+  });
+
+  it("keeps one address per session in the password by default", () => {
+    expect(proxyFor(credentials, "abc123")).toEqual({
+      port: 1000,
+      password: "secret_country-US_session-abc123",
+    });
+  });
+
+  it("keeps one address per port when the credentials say so", () => {
+    const byPort = { ...credentials, proxyPort: "10000", proxySession: "port" };
+    const first = proxyFor(byPort, "abc123");
+
+    expect(first.password).toBe("secret_country-US");
+    expect(first.port).toBeGreaterThanOrEqual(10000);
+    expect(first.port).toBeLessThanOrEqual(10999);
+    expect(proxyFor(byPort, "abc123")).toEqual(first);
   });
 });
 

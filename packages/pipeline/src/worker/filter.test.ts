@@ -123,7 +123,7 @@ const lines: Array<Record<string, unknown>> = [];
 async function insertPost(
   post: (typeof fakePosts)[number],
   externalId: string,
-  source: "reddit" | "x" = "reddit",
+  source: "reddit" | "x" | "forum" = "reddit",
 ): Promise<string> {
   const [row] = await db
     .insert(posts)
@@ -303,6 +303,23 @@ describe("a post is checked against its own platform's queries", () => {
     const testsId = await insertPost(brokenTestsPost, "platform-reddit-tests", "reddit");
 
     const reached = await filterPosts(monitorId, [sourdoughId, testsId]);
+
+    expect(reached.postIds).toEqual([testsId]);
+  }, 30_000);
+
+  it("keeps a forum post: a forum's queries are addresses, with no words a post would use", async () => {
+    // BUG-475. A forum query is a feed or a section address. Its "words",
+    // "sawmillcreek", "forums", "rss", dropped 28 of 29 posts in a live scan.
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: { forum: ["https://www.sawmillcreek.org/forums/-/index.rss"] },
+      generatedSubreddits: ["SaaS"],
+      preFilterEnabled: true,
+      similarityThreshold: 0,
+    });
+
+    const testsId = await insertPost(brokenTestsPost, "platform-forum-tests", "forum");
+
+    const reached = await filterPosts(monitorId, [testsId]);
 
     expect(reached.postIds).toEqual([testsId]);
   }, 30_000);

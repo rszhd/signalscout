@@ -7,7 +7,6 @@ created: 2026-11-02T00:26+08:00
 parent:
 area: pipeline
 resolution: shipped
-resolution:
 ---
 
 ## Context

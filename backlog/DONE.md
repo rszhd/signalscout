@@ -6,7 +6,7 @@
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
-| BUG-495 | [Reconcile warns for every post of a platform with no connector](done/2026-11/BUG-495-reconcile-warns-for-every-post-of-a-platform-with-no-connector.md) | bug | — | 2026-11 |
+| BUG-495 | [Reconcile warns for every post of a platform with no connector](done/2026-11/BUG-495-reconcile-warns-for-every-post-of-a-platform-with-no-connector.md) | bug | shipped | 2026-11 |
 | BUG-492 | [A release carries high and critical dependency holes](done/2026-11/BUG-492-a-release-carries-high-and-critical-dependency-holes.md) | bug | shipped | 2026-11 |
 | BUG-484 | [A Bright Data 5xx answer skips the browser](done/2026-11/BUG-484-a-bright-data-5xx-skips-the-browser.md) | bug | shipped | 2026-11 |
 | BUG-483 | [vBulletin 3 and 5 home pages are not detected](done/2026-11/BUG-483-vbulletin-3-and-5-home-pages-are-not-detected.md) | bug | shipped | 2026-11 |

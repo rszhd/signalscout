@@ -78,7 +78,7 @@ reader exists (`invision4.ts`); Invision 5 has no reader at all.
   member-named photo file in JSON-LD). New-topic rule: an item's status
   line names one member (`data-ipshover` links), a reply's names two; it
   agreed with the words "posted a topic" on all 142 topic items.
-- 2026-11-01T03:03+08:00 — Built (7c1ca5a, written by DeepSeek Flash from a
+- 2026-11-01T03:03+08:00 — Built (057dd40, written by DeepSeek Flash from a
   brief, reviewed): `invision-stream.ts` reads the stream for both versions,
   `invision5.ts` reads Invision 5 threads and home pages, and the connector
   follows `?before=` through its cursor. Pages read are told one page event

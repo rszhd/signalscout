@@ -200,12 +200,20 @@ walk on its earliest poll row; later polls keep the classifier's score.
 Unset, which this repository's application leaves it, the classifier's
 score stands.
 
-**A collection may stop at a number of matches.** US-443. `startWorker`
-takes `matchesPerCollection`. Once a walk has that many matches, the classify
-step reads no more of its posts and writes each as a `match_cap` drop, so it
-is never paid for and a screen counts it as seen. Every job of one walk
-shares the count; the next walk starts again. Calls already in flight
-finish, so a walk can end a few over. Unset, there is no cap.
+**A collection may stop at a number of matches.** US-443, US-490.
+`startWorker` takes `matchesPerCollection`, and `firstMatchesPerCollection`
+when a monitor's first walk needs a different number. Unset, the first walk
+takes `matchesPerCollection`. Once a walk has that many matches, the classify step reads no more of
+its posts and writes each as a `match_cap` drop, so it is never paid for and a
+screen counts it as seen. Every job of one walk shares the count; the next walk
+starts again. Calls already in flight finish, so a walk can end a few over.
+With neither number set, there is no cap.
+
+The replies and complete steps stop too, batch by batch. A batch that arrives
+after the walk has its matches opens no thread and reads no partial post. The
+replies step records the skip in its stage run, and the complete step sends its
+posts on unchanged, where the classify step makes them `match_cap` drops. A
+batch that arrives before the walk has its matches is read as before.
 
 **A post written twice is one card.** US-400. A
 post whose author made the same post within a week — same platform, same

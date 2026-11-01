@@ -52,7 +52,7 @@ import {
   scoreColumns,
   type ThreadContext,
 } from "@signalscout/engine";
-import { and, asc, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNotNull, isNull, ne, notInArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
@@ -63,7 +63,6 @@ import {
   matches,
   modelCalls,
   monitors,
-  pollRuns,
   postCopies,
   posts,
   type Signal,
@@ -71,6 +70,7 @@ import {
 import { recordFilterDrops } from "../filter/drops.js";
 import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
 import { loadCeiling } from "./ceiling.js";
+import { capForWalk, isFirstWalk, matchesInWalk, validateMatchCaps } from "./match-cap.js";
 import { sendNotify } from "./notify.js";
 import type { ClassifyPayload } from "./queues.js";
 import { forMonitor, repliesQueue } from "./queues.js";
@@ -149,6 +149,12 @@ export interface ClassifyOptions {
    * collection can end up to `concurrency - 1` over. Unset, no cap.
    */
   readonly matchesPerCollection?: number | undefined;
+  /**
+   * The most matches a monitor's first collection may make, when it differs
+   * from `matchesPerCollection`. US-490. Unset, the first collection takes
+   * `matchesPerCollection`.
+   */
+  readonly firstMatchesPerCollection?: number | undefined;
 }
 
 /** The most calls one classify job may keep in flight. */
@@ -398,55 +404,6 @@ async function sendJudgedThreads(
   }
 }
 
-/**
- * The matches a collection has made so far. US-443.
- *
- * A match is counted from the start of its walk's first poll, so every job of
- * one collection shares one count. A job with no walk counts only its own.
- */
-async function matchesInWalk(
-  db: Database,
-  monitorId: string,
-  walkId: string | undefined,
-): Promise<number> {
-  if (!walkId) return 0;
-  const [start] = await db
-    .select({ at: sql<Date | null>`min(${pollRuns.startedAt})` })
-    .from(pollRuns)
-    .where(and(eq(pollRuns.monitorId, monitorId), eq(pollRuns.walkId, walkId)));
-  if (!start?.at) return 0;
-  const [row] = await db
-    .select({ n: count() })
-    .from(matches)
-    .where(and(eq(matches.monitorId, monitorId), sql`${matches.createdAt} >= ${start.at}`));
-  return Number(row?.n ?? 0);
-}
-
-/**
- * Whether a job's posts come from the monitor's first collection.
- *
- * A collection is a walk: every poll job of it, a resumed page included,
- * carries one `walk_id`, and so does every classify job it leads to, replies
- * too. The first walk is the one on the monitor's earliest poll row. A job
- * with no walk is not the first. `poll_runs` keeps a monitor's newest 200
- * rows, so after that many polls the earliest row left is a later walk's,
- * whose jobs finished long before.
- */
-async function isFirstWalk(
-  db: Database,
-  monitorId: string,
-  walkId: string | undefined,
-): Promise<boolean> {
-  if (!walkId) return false;
-  const [earliest] = await db
-    .select({ walkId: pollRuns.walkId })
-    .from(pollRuns)
-    .where(eq(pollRuns.monitorId, monitorId))
-    .orderBy(asc(pollRuns.startedAt))
-    .limit(1);
-  return earliest?.walkId === walkId;
-}
-
 export function createClassifyStep({
   classifierFor,
   newPostsPerPairPerDay,
@@ -454,6 +411,7 @@ export function createClassifyStep({
   rescorerFor,
   rescorePolls = "every",
   matchesPerCollection,
+  firstMatchesPerCollection,
 }: ClassifyOptions): Step<ClassifyPayload> {
   if (
     !Number.isInteger(concurrency) ||
@@ -464,14 +422,8 @@ export function createClassifyStep({
       `concurrency must be a whole number from 1 to ${maximumClassifyConcurrency}, not ${concurrency}`,
     );
   }
-  if (
-    matchesPerCollection !== undefined &&
-    (!Number.isInteger(matchesPerCollection) || matchesPerCollection < 1)
-  ) {
-    throw new RangeError(
-      `matchesPerCollection must be a whole number of 1 or more, not ${matchesPerCollection}`,
-    );
-  }
+  const caps = { firstMatchesPerCollection, matchesPerCollection };
+  validateMatchCaps(caps);
 
   return async function classify(
     { monitorId, postIds, walkId, pollRunId },
@@ -560,6 +512,7 @@ export function createClassifyStep({
       return;
     }
 
+    const cap = await capForWalk(db, monitorId, walkId, caps);
     const rescorer =
       rescorerFor && (rescorePolls === "every" || (await isFirstWalk(db, monitorId, walkId)))
         ? await rescorerFor(monitor.userId)
@@ -614,8 +567,7 @@ export function createClassifyStep({
     const refused: string[] = [];
     /** Posts left unread because the collection had its matches. US-443. */
     const capped: string[] = [];
-    const matchedBefore =
-      matchesPerCollection === undefined ? 0 : await matchesInWalk(db, monitorId, walkId);
+    const matchedBefore = cap === undefined ? 0 : await matchesInWalk(db, monitorId, walkId);
 
     const profile = profileOf(monitor);
     const matchIds: string[] = [];
@@ -826,10 +778,7 @@ export function createClassifyStep({
         }
 
         // Asked after the wait, so the calls that just finished have counted.
-        if (
-          matchesPerCollection !== undefined &&
-          matchedBefore + matchIds.length >= matchesPerCollection
-        ) {
+        if (cap !== undefined && matchedBefore + matchIds.length >= cap) {
           capped.push(post.id);
           continue;
         }
@@ -921,7 +870,7 @@ export function createClassifyStep({
     );
     if (capped.length > 0) {
       logger.info(
-        { monitorId, capped: capped.length, limit: matchesPerCollection },
+        { monitorId, capped: capped.length, limit: cap },
         "posts left unread: the collection has its matches",
       );
     }

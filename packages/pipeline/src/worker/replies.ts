@@ -46,6 +46,7 @@ import { readProviderChoices } from "../sources/choices.js";
 import { type Ceiling, loadCeiling } from "./ceiling.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
+import { type MatchCaps, walkHasItsMatches } from "./match-cap.js";
 import type { RepliesPayload } from "./queues.js";
 import { filterQueue, forMonitor } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
@@ -606,7 +607,9 @@ export function createRepliesStep({
   registry,
   credentialsFor,
   newPostsPerPairPerDay,
-}: CollectOptions): Step<RepliesPayload> {
+  firstMatchesPerCollection,
+  matchesPerCollection,
+}: CollectOptions & MatchCaps): Step<RepliesPayload> {
   return async function replies(
     { monitorId, postIds, walkId, pollRunId },
     { db, boss, logger }: StepContext,
@@ -669,6 +672,24 @@ export function createRepliesStep({
     };
 
     const run: RepliesRun = { db, logger, monitorId, userId: monitor.userId };
+
+    if (
+      await walkHasItsMatches(db, monitorId, walkId, {
+        firstMatchesPerCollection,
+        matchesPerCollection,
+      })
+    ) {
+      logger.info(
+        { monitorId, threads: ids.length },
+        "replies skipped: the collection has its matches",
+      );
+      await writeStageRun({
+        outcome: "empty",
+        itemsOut: 0,
+        detail: { threadsOpened: 0, threadsSkipped: ids.length, pagesBought: 0 },
+      });
+      return;
+    }
 
     if (await refuseAtCap(run, ids)) {
       await writeStageRun({ outcome: "refused", itemsOut: 0, stopReason: "budget_exhausted" });

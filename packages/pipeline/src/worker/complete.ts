@@ -22,6 +22,7 @@ import { recordFilterDrops } from "../filter/drops.js";
 import { readProviderChoices } from "../sources/choices.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
+import { type MatchCaps, walkHasItsMatches } from "./match-cap.js";
 import type { ClassifyPayload } from "./queues.js";
 import { classifyQueue, forMonitor } from "./queues.js";
 import { connectorsFor } from "./replies.js";
@@ -36,7 +37,9 @@ export const maxCompletionsPerJob = 20;
 export function createCompleteStep({
   registry,
   credentialsFor,
-}: Pick<CollectOptions, "registry" | "credentialsFor">): Step<ClassifyPayload> {
+  firstMatchesPerCollection,
+  matchesPerCollection,
+}: Pick<CollectOptions, "registry" | "credentialsFor"> & MatchCaps): Step<ClassifyPayload> {
   return async function complete(payload, { db, boss, logger }: StepContext): Promise<void> {
     const { monitorId } = payload;
     const ids = [...payload.postIds];
@@ -66,6 +69,20 @@ export function createCompleteStep({
       return;
     }
     const run = { db, logger, monitorId, userId: monitor.userId };
+
+    if (
+      await walkHasItsMatches(db, monitorId, payload.walkId, {
+        firstMatchesPerCollection,
+        matchesPerCollection,
+      })
+    ) {
+      logger.info(
+        { monitorId, partial: partial.length },
+        "partial posts go on as they are: the collection has its matches",
+      );
+      await send(ids);
+      return;
+    }
 
     const budget = await enforceBudget(db, monitorId);
     if (budget.exhausted) {

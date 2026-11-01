@@ -15,9 +15,18 @@ import {
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, budgets, filterDrops, monitors, posts } from "../db/schema.js";
+import {
+  apiUsage,
+  budgets,
+  filterDrops,
+  matches,
+  monitors,
+  pollRuns,
+  posts,
+} from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createCompleteStep } from "./complete.js";
+import type { MatchCaps } from "./match-cap.js";
 import type { ClassifyPayload } from "./queues.js";
 import { classifyQueue } from "./queues.js";
 import type { StepContext } from "./steps.js";
@@ -26,6 +35,7 @@ import { insertMonitor } from "./testing.js";
 const fixtures = new URL("../../../engine/src/sources/forums/fixtures/", import.meta.url);
 const threadPage = readFileSync(new URL("xenforo2-thread.html", fixtures), "utf8");
 const thread = "https://forums.macrumors.com/threads/m6-imac.2493064/";
+const walkId = "11111111-1111-4111-8111-111111111111";
 const refused = "Residential Failed (bad_endpoint): Requested site is not available";
 const logger = createLogger({ level: "silent", name: "complete-test" });
 
@@ -44,7 +54,7 @@ afterAll(async () => {
 });
 
 /** A step over a Bright Data that answers `page` for every address, and what it sent on. */
-function harness(page: string, definition?: ConnectorDefinition) {
+function harness(page: string, definition?: ConnectorDefinition, caps: MatchCaps = {}) {
   const asked: string[] = [];
   const fetch: typeof globalThis.fetch = async (_endpoint, init) => {
     asked.push((JSON.parse(String(init?.body)) as { url: string }).url);
@@ -57,6 +67,7 @@ function harness(page: string, definition?: ConnectorDefinition) {
   const step = createCompleteStep({
     registry,
     credentialsFor: () => ({ apiKey: "bd-key", unlockerZone: "web_unlocker1" }),
+    ...caps,
   });
   const sent: { queue: string; payload: ClassifyPayload }[] = [];
   const boss = {
@@ -66,7 +77,7 @@ function harness(page: string, definition?: ConnectorDefinition) {
     },
   } as unknown as StepContext["boss"];
   const run = (monitorId: string, postIds: string[]) =>
-    step({ monitorId, postIds, walkId: "walk-1" }, { db, boss, logger } as StepContext);
+    step({ monitorId, postIds, walkId }, { db, boss, logger } as StepContext);
   return { asked, sent, run };
 }
 
@@ -119,6 +130,29 @@ async function forumMonitor(): Promise<string> {
   });
 }
 
+async function startWalk(monitorId: string, matchPostId?: string): Promise<void> {
+  await db.insert(pollRuns).values({
+    monitorId,
+    userId: "user-1",
+    walkId,
+    outcome: "collected",
+    startedAt: new Date(Date.now() - 60_000),
+  });
+  if (!matchPostId) return;
+  await db.insert(matches).values({
+    monitorId,
+    postId: matchPostId,
+    score: 80,
+    relevance: 80,
+    problemFit: 80,
+    icpFit: 80,
+    intent: 80,
+    urgency: 50,
+    intentType: "problem",
+    reasons: ["A person describing the problem."],
+  });
+}
+
 async function insertPost(
   externalId: string,
   partial: { since?: Date } | null,
@@ -166,7 +200,7 @@ describe("completing the partial posts the filter kept", () => {
     expect(sent).toEqual([
       {
         queue: classifyQueue,
-        payload: { monitorId, postIds: [partialId, wholeId], walkId: "walk-1" },
+        payload: { monitorId, postIds: [partialId, wholeId], walkId },
       },
     ]);
     const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
@@ -199,6 +233,41 @@ describe("completing the partial posts the filter kept", () => {
 
     const [post] = await db.select().from(posts).where(eq(posts.id, id));
     expect(post?.textPartial).toBe(true);
+    expect(sent[0]?.payload.postIds).toEqual([id]);
+  });
+
+  it("reads no page when the walk already has its matches, and sends the batch on", async () => {
+    const monitorId = await forumMonitor();
+    const id = await insertPost("forums.macrumors.com:2493064-match-cap", {});
+    await startWalk(monitorId, id);
+    const calls: CompleteRequest[] = [];
+    const { asked, sent, run } = harness(threadPage, recordingConnector(calls), {
+      firstMatchesPerCollection: 1,
+      matchesPerCollection: 1,
+    });
+
+    await run(monitorId, [id]);
+
+    expect(calls).toEqual([]);
+    expect(asked).toEqual([]);
+    expect(sent[0]?.payload.postIds).toEqual([id]);
+    const [post] = await db.select().from(posts).where(eq(posts.id, id));
+    expect(post?.textPartial).toBe(true);
+  });
+
+  it("reads a partial post as before when the walk has no matches yet", async () => {
+    const monitorId = await forumMonitor();
+    const id = await insertPost("forums.macrumors.com:2493064-under-cap", {});
+    await startWalk(monitorId);
+    const calls: CompleteRequest[] = [];
+    const { sent, run } = harness(threadPage, recordingConnector(calls), {
+      firstMatchesPerCollection: 1,
+      matchesPerCollection: 1,
+    });
+
+    await run(monitorId, [id]);
+
+    expect(calls).toHaveLength(1);
     expect(sent[0]?.payload.postIds).toEqual([id]);
   });
 

@@ -81,6 +81,24 @@ async function somePosts(n: number): Promise<string[]> {
   return rows.map((row) => row.id);
 }
 
+async function postsWithSources(
+  rows: readonly { readonly source: "reddit" | "x"; readonly externalId: string }[],
+): Promise<string[]> {
+  const inserted = await db
+    .insert(posts)
+    .values(
+      rows.map(({ source, externalId }) => ({
+        source,
+        externalId,
+        url: `https://example.test/${externalId}`,
+        excerpt: `Which test runner do small teams use? Asking for ${externalId}.`,
+        postedAt: new Date(),
+      })),
+    )
+    .returning({ id: posts.id });
+  return inserted.map((row) => row.id);
+}
+
 /** A monitor with one walk that started a minute ago. */
 async function monitorWithWalk() {
   const monitorId = await insertMonitor(database, { minScore: 50 });
@@ -117,6 +135,34 @@ describe("a cap on the matches one collection makes", () => {
     await step({ monitorId, postIds: await somePosts(4), walkId }, contextFor(db));
 
     expect(await outcomeOf(monitorId)).toEqual({ matches: 2, capped: 2 });
+    expect(cheap.classify).toHaveBeenCalledTimes(2);
+  });
+
+  it("scores one post of each platform when the first could fill the cap", async () => {
+    const { monitorId, walkId } = await monitorWithWalk();
+    const cheap = passingClassifier();
+    const step = createClassifyStep({
+      classifierFor: async () => cheap.classifier,
+      firstMatchesPerCollection: 2,
+      matchesPerCollection: 2,
+    });
+    const [r1, f1, r2, r3] = (await postsWithSources([
+      { source: "reddit", externalId: "r1" },
+      { source: "x", externalId: "f1" },
+      { source: "reddit", externalId: "r2" },
+      { source: "reddit", externalId: "r3" },
+    ])) as [string, string, string, string];
+
+    await step({ monitorId, postIds: [r1, f1, r2, r3], walkId }, contextFor(db));
+
+    const made = await db.select().from(matches).where(eq(matches.monitorId, monitorId));
+    const capped = await db
+      .select()
+      .from(filterDrops)
+      .where(and(eq(filterDrops.monitorId, monitorId), eq(filterDrops.stage, "match_cap")));
+
+    expect(made.map((row) => row.postId).sort()).toEqual([r1, f1].sort());
+    expect(capped.map((row) => row.postId).sort()).toEqual([r2, r3].sort());
     expect(cheap.classify).toHaveBeenCalledTimes(2);
   });
 

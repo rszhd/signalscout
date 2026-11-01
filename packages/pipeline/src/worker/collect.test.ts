@@ -27,7 +27,7 @@ import {
 } from "../db/schema.js";
 import { setProviderChoice } from "../sources/choices.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
-import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
+import { createCollectStep, excerptLength, inTurn, maxPagesPerPoll } from "./collect.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, pollQueue } from "./queues.js";
 import type { StepContext } from "./steps.js";
@@ -75,6 +75,44 @@ function callsOf(registry: ReturnType<typeof fakeRegistry>): readonly SearchRequ
   return (registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
 }
 
+describe("inTurn", () => {
+  const keyOf = (row: string) => row[0] as string;
+
+  it("takes one row of each platform in turn", () => {
+    expect(inTurn(["r1", "r2", "r3", "f1", "f2"], keyOf)).toEqual(["r1", "f1", "r2", "f2", "r3"]);
+  });
+
+  it("takes three platforms in turn", () => {
+    expect(inTurn(["a1", "a2", "b1", "c1", "c2", "c3"], keyOf)).toEqual([
+      "a1",
+      "b1",
+      "c1",
+      "a2",
+      "c2",
+      "c3",
+    ]);
+  });
+
+  it("keeps one platform's order as it was", () => {
+    expect(inTurn(["r1", "r2", "r3"], keyOf)).toEqual(["r1", "r2", "r3"]);
+  });
+
+  it("returns nothing for an empty list", () => {
+    expect(inTurn([], keyOf)).toEqual([]);
+  });
+
+  it("drops a platform out once it runs out", () => {
+    expect(inTurn(["a1", "b1", "b2", "c1", "c2", "b3"], keyOf)).toEqual([
+      "a1",
+      "b1",
+      "c1",
+      "b2",
+      "c2",
+      "b3",
+    ]);
+  });
+});
+
 describe("the poll step", () => {
   let database: TestDatabase;
   let db: Database;
@@ -115,6 +153,59 @@ describe("the poll step", () => {
 
     expect(boss.send).toHaveBeenCalledTimes(1);
     expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("hands the filter step the platforms in turn", async () => {
+    const postedAt = new Date("2026-08-10T09:00:00.000Z");
+    const redditPosts: CandidatePost[] = [
+      { externalId: "r1", url: "https://example.test/r1", text: "Reddit one", postedAt },
+      { externalId: "r2", url: "https://example.test/r2", text: "Reddit two", postedAt },
+      { externalId: "r3", url: "https://example.test/r3", text: "Reddit three", postedAt },
+    ];
+    const xPosts: CandidatePost[] = [
+      { externalId: "f1", url: "https://example.test/f1", text: "X one", postedAt },
+      { externalId: "f2", url: "https://example.test/f2", text: "X two", postedAt },
+    ];
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+          posts: redditPosts,
+        }),
+        fakeSourceDefinition({
+          id: "x",
+          displayName: "X",
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+          posts: xPosts,
+        }),
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: { reddit: ["flaky tests"], x: ["flaky tests"] },
+    });
+    const boss = stubBoss();
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, boss),
+    );
+
+    const stored = await db.select().from(posts);
+    const externalIdOf = new Map(stored.map((row) => [row.id, row.externalId]));
+
+    expect(sentTo(boss, filterQueue).postIds.map((id) => externalIdOf.get(id))).toEqual([
+      "r1",
+      "f1",
+      "r2",
+      "f2",
+      "r3",
+    ]);
   });
 
   it("stores one row when a poll finds the same post twice", async () => {

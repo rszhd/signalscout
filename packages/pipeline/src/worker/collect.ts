@@ -309,6 +309,34 @@ function keyOf(row: { source: Source; externalId: string }): string {
   return JSON.stringify([row.source, row.externalId]);
 }
 
+/**
+ * Rows in the order their platforms take turns: one of each, then the next of
+ * each, until all are used. A platform that runs out drops out. US-496.
+ */
+export function inTurn<T>(rows: readonly T[], keyOfRow: (row: T) => string): T[] {
+  const groups = new Map<string, T[]>();
+
+  for (const row of rows) {
+    const key = keyOfRow(row);
+    const group = groups.get(key);
+
+    if (group) group.push(row);
+    else groups.set(key, [row]);
+  }
+
+  const lists = [...groups.values()];
+  const inTurnRows: T[] = [];
+
+  for (let index = 0; lists.some((list) => index < list.length); index += 1) {
+    for (const list of lists) {
+      const row = list[index];
+      if (row !== undefined) inTurnRows.push(row);
+    }
+  }
+
+  return inTurnRows;
+}
+
 function toRow(sourceId: Source, providerId: Provider, post: CandidatePost) {
   return {
     source: sourceId,
@@ -419,7 +447,11 @@ function rowsOf(outcomes: readonly SourceOutcome[]) {
    * poll that found one post through three queries found one post and paid
    * for three searches, and both halves of that are worth reading.
    */
-  const rows = [...new Map(collected.map((row) => [keyOf(row), row])).values()];
+  const deduplicated = [...new Map(collected.map((row) => [keyOf(row), row])).values()];
+
+  // A capped collection spends its cap in the order the filter hands it on,
+  // so a platform that comes first must not fill it alone. US-496.
+  const rows = inTurn(deduplicated, (row) => row.source);
 
   return { rows, foundBy };
 }

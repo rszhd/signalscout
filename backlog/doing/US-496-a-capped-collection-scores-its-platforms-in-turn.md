@@ -30,14 +30,14 @@ platform, so taking platforms in turn changes no ceiling outcome.
 
 ## Acceptance
 
-- [ ] The collect step hands the filter step its posts with the platforms
+- [x] The collect step hands the filter step its posts with the platforms
       in turn: with Reddit posts r1 r2 r3 and forum posts f1 f2, the order
       is r1 f1 r2 f2 r3. Each platform keeps its own order.
-- [ ] The filter step hands triage, complete and classify its survivors in
+- [x] The filter step hands triage, complete and classify its survivors in
       the order it was handed them, not the order Postgres returns.
-- [ ] A test with a cap of 2 and two platforms scores and matches one post
+- [x] A test with a cap of 2 and two platforms scores and matches one post
       of each platform when the first platform alone could fill the cap.
-- [ ] Lint, type check and the suite pass.
+- [x] Lint, type check and the suite pass.
 
 ## Notes
 
@@ -55,3 +55,6 @@ platform, so taking platforms in turn changes no ceiling outcome.
   Proposal agreed: platforms in turn, and the filter step keeps the handed
   order. A fixed share of the cap per platform was the other option; it
   gives almost the same result with more code.
+- 2026-11-02T01:28+08:00 — Built (DeepSeek Flash, reviewed): `inTurn` in collect.ts orders the
+  rows by platform in turn; the filter step sorts its candidates by the handed
+  order. Lint, type check and 2,799 tests pass. Not yet run live.

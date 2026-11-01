@@ -288,7 +288,7 @@ async function pass(
 
 /** The rows this job was handed, as both stages read them. */
 async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Promise<Candidate[]> {
-  return db
+  const candidates = await db
     .select({
       id: posts.id,
       source: posts.source,
@@ -303,6 +303,12 @@ async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Prom
     })
     .from(posts)
     .where(inArray(posts.id, [...ids]));
+
+  // In the order the batch was handed, which the steps after this one keep.
+  const handed = new Map(ids.map((id, index) => [id, index]));
+  candidates.sort((a, b) => (handed.get(a.id) ?? 0) - (handed.get(b.id) ?? 0));
+
+  return candidates;
 }
 
 /** The free stage: each post against the words that could have found it. */

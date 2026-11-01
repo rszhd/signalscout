@@ -78,9 +78,30 @@ export function createReconcileStep({
       return read;
     };
 
+    // A platform with no connector is a setting, not a fault: its posts are
+    // left out quietly, before any per-post read. BUG-495.
+    const unverifiable = new Map<string, Set<string>>();
+    const verifiable = candidates.filter(({ post }) => {
+      if (registry.forPlatform(post.source).length > 0) return true;
+      const ids = unverifiable.get(post.source) ?? new Set<string>();
+      ids.add(post.id);
+      unverifiable.set(post.source, ids);
+      return false;
+    });
+    if (unverifiable.size > 0) {
+      logger.debug(
+        {
+          posts: Object.fromEntries(
+            [...unverifiable].map(([platform, ids]) => [platform, ids.size]),
+          ),
+        },
+        "verification skipped: no connector for the platform",
+      );
+    }
+
     const seen = new Set<string>();
     let checked = 0;
-    for (const { match, post, pending } of candidates) {
+    for (const { match, post, pending } of verifiable) {
       if (seen.has(post.id)) continue;
       if (checked >= maxChecksPerJob) break;
       const monitorId = pending?.cursor ? pending.monitorId : match.monitorId;

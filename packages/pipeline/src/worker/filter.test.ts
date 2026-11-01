@@ -250,6 +250,19 @@ describe("the keyword stage", () => {
   }, 30_000);
 });
 
+describe("the order the posts are handed on", () => {
+  it("keeps the handed order even when it differs from insert order", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const first = await insertPost(strongPost, "order-first");
+    const second = await insertPost(strongPost, "order-second");
+    const third = await insertPost(strongPost, "order-third");
+
+    const reached = await filterPosts(monitorId, [third, first, second]);
+
+    expect(reached.postIds).toEqual([third, first, second]);
+  }, 30_000);
+});
+
 describe("a post is checked against its own platform's queries", () => {
   /**
    * US-027. A monitor holds one list of queries per platform, because the same

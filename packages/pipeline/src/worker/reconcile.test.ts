@@ -78,13 +78,14 @@ async function seed(
     read?: boolean;
     postId?: string;
     monitor?: string;
+    source?: "reddit" | "x";
   } = {},
 ) {
   const postId = options.postId ?? randomUUID();
   if (!options.postId)
     await db.insert(posts).values({
       id: postId,
-      source: "reddit",
+      source: options.source ?? "reddit",
       provider: "brightdata",
       externalId: `t3_${postId}`,
       url: "https://www.reddit.com/comments/abc/",
@@ -365,4 +366,49 @@ it("defers new checks while a poll waits on an already-triggered snapshot", asyn
   });
   await run({}, context);
   expect(verify).not.toHaveBeenCalled();
+});
+
+it("leaves out a post whose platform has no connector, with no warning", async () => {
+  // BUG-495: an instance that turned a platform off keeps its old matches.
+  await seed({ source: "x" });
+  await seed({ source: "x" });
+  await seed();
+  const warn = vi.spyOn(silentLogger, "warn");
+  const debug = vi.spyOn(silentLogger, "debug");
+  try {
+    await run({}, context);
+    expect(verify).toHaveBeenCalledTimes(1);
+    expect(warn).not.toHaveBeenCalled();
+    const lines = debug.mock.calls.filter(
+      ([, message]) => message === "verification skipped: no connector for the platform",
+    );
+    expect(lines).toEqual([
+      [{ posts: { x: 2 } }, "verification skipped: no connector for the platform"],
+    ]);
+  } finally {
+    warn.mockRestore();
+    debug.mockRestore();
+  }
+});
+
+it("still warns for a platform with connectors and no single choice", async () => {
+  await seed();
+  const registry = twoProviderRegistry();
+  registry.get("reddit", "brightdata").verify = verify;
+  registry.get("reddit", "scrapecreators").verify = verify;
+  const warn = vi.spyOn(silentLogger, "warn");
+  try {
+    await createReconcileStep({
+      registry,
+      credentialsFor: async () => ({ token: "test" }),
+      now: () => now,
+    })({}, context);
+    expect(verify).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({ postId: expect.any(String) }),
+      "verification skipped: provider choice cannot run",
+    );
+  } finally {
+    warn.mockRestore();
+  }
 });

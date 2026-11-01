@@ -28,13 +28,13 @@ with two connectors and no choice is a fault, and keeps its warning.
 
 ## Acceptance
 
-- [ ] A post whose platform has no connector in the registry is left out of
+- [x] A post whose platform has no connector in the registry is left out of
       the job before any per-post read, with no warn line.
-- [ ] The job logs once, at debug, how many it left out and for which
+- [x] The job logs once, at debug, how many it left out and for which
       platforms.
-- [ ] A post whose platform has connectors but no single choice still logs
+- [x] A post whose platform has connectors but no single choice still logs
       the warning.
-- [ ] Tests for both cases in `reconcile.test.ts`, written first: the step
+- [x] Tests for both cases in `reconcile.test.ts`, written first: the step
       is correctness-critical.
 - [ ] Released as a patch, and BuyerFinder on it.
 
@@ -46,3 +46,6 @@ with two connectors and no choice is a fault, and keeps its warning.
 ## Log
 - 2026-11-02T00:26+08:00 — Opened from BuyerFinder's production worker log
   after the 0.23.0 deploy.
+- 2026-11-02T01:34+08:00 — Built: the job filters out posts of a platform the registry
+  has no connector for, and logs their count per platform once at debug. Tests
+  first: the no-connector one failed with two warn lines before the change.

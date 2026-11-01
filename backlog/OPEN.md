@@ -2,7 +2,7 @@
 
 # Open tickets
 
-88 open — 18 doing, 61 todo, 9 parked (9 p1, 61 p2, 18 p3).
+88 open — 19 doing, 60 todo, 9 parked (9 p1, 61 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -28,6 +28,7 @@
 | p2 | US-471 | [A forum page Bright Data cannot pass is read through a cloud browser](doing/US-471-a-forum-page-bright-data-cannot-pass-is-read-through-a-cloud-browser.md) | feature | doing | 2026-10-31T09:06+08:00 |
 | p2 | US-478 | [A forum no parser reads is read through the feed its home page names](doing/US-478-a-forum-no-parser-reads-is-read-through-the-feed-its-home-page-names.md) | feature | doing | 2026-10-31T19:30+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
+| p2 | BUG-495 | [Reconcile warns for every post of a platform with no connector](doing/BUG-495-reconcile-warns-for-every-post-of-a-platform-with-no-connector.md) | bug | doing | 2026-11-02T00:26+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -74,7 +75,6 @@
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-341 | [The boot check opens every stored secret](todo/BUG-341-the-boot-check-opens-every-stored-secret.md) | bug | todo | 2026-09-23T10:05+08:00 |
 | p2 | BUG-428 | [Committed fixtures carry numeric account ids](todo/BUG-428-committed-fixtures-carry-numeric-account-ids.md) | bug | todo | 2026-09-26T02:59+08:00 |
-| p2 | BUG-495 | [Reconcile warns for every post of a platform with no connector](todo/BUG-495-reconcile-warns-for-every-post-of-a-platform-with-no-connector.md) | bug | todo | 2026-11-02T00:26+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |

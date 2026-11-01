@@ -20,6 +20,48 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.23.0 — 2026-11-01
+
+Two migrations, in the pipeline's stream. `0075` adds `forum` to the sources
+six tables accept (`posts`, `source_providers`, `source_coverage`,
+`source_continuations`, `api_usage`, `query_estimate_probes`). `0076` adds
+`text_partial` and `partial_since` to `posts`, both with defaults, and
+`old_thread` to the stages `filter_drops` accepts. Neither changes a row.
+
+**Added.** Forums are a platform (US-469, US-470, US-473, US-478, US-485).
+`forumPlatform` is in `platforms`, so a screen that lists every platform
+shows *Forums* from this version on. A forum query is an address, not
+keywords (`search.input: "address"`): a section, or a whole forum read
+through its newest-threads feed. `createBrightDataForum` is the connector:
+pages go through Bright Data's Web Unlocker, and, given `browser`
+credentials, through Browser Use's cloud browser when Bright Data meets a
+bot check, refuses, answers empty or answers 5xx. Parsers cover XenForo 1
+and 2, phpBB 3, vBulletin 3, 4 and 5, SMF 2.0, MyBB, bbPress, Discourse and
+Invision 4 and 5; `detectForum`, `detectForumIndex`, `forumFeedFrom` and
+`readFeed` let an application find a forum's program and feed itself, and
+`openForumFetcher` fetches a page the way the connector does. Nothing is
+read from a forum unless an application registers the connector.
+
+**Added.** A post may arrive with only part of its text (US-476). A
+connector marks it `partial`; a post the filters keep is then read whole by
+the source's `completePosts` before the classifier, on a new queue,
+`complete`, that `startWorker` runs. A forum thread a feed lists again for
+a new reply is dropped at the stage `old_thread`. The per-stage drop counts
+a monitor screen reads leave it out.
+
+**Added.** A monitor's first collection may have its own match cap
+(US-490). `startWorker` takes `firstMatchesPerCollection`; unset, the first
+collection takes `matchesPerCollection`. Once a walk has its matches, the
+paid reads before the classifier stop too: the replies step and the
+complete step read nothing more for that walk.
+
+**Changed.** Forum queries pass the keyword stage (BUG-475): an address
+holds no word a post would use, so the embedding stage judges forum posts.
+
+**Changed.** The Reddit connectors read less on a walk after the first. A
+SocialCrawl input stops at the posts the last walk read (US-467), and a
+ScrapeCreators input stops on the first page that reaches them (US-468).
+
 ## 0.22.0 — 2026-10-02
 
 No migration.

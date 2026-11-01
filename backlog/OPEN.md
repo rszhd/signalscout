@@ -2,7 +2,7 @@
 
 # Open tickets
 
-85 open — 16 doing, 60 todo, 9 parked (7 p1, 60 p2, 18 p3).
+86 open — 16 doing, 61 todo, 9 parked (8 p1, 60 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,6 +13,7 @@
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
 | p1 | US-364 | [The score is evaluated against human verdicts](todo/US-364-the-score-is-evaluated-against-human-verdicts.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p1 | US-419 | [Query performance shows what each phrase costs](todo/US-419-query-performance-shows-what-each-phrase-costs.md) | feature | todo | 2026-09-26T02:07+08:00 |
+| p1 | US-490 | [A first collection has its own match cap, and the paid reads before scoring stop at the cap](todo/US-490-a-first-collection-has-its-own-match-cap-and-the-paid-reads-stop-at-the-cap.md) | feature | todo | 2026-11-01T11:39+08:00 |
 | p2 | US-345 | [A cloud customer finds what differs from the self-hosted build](doing/US-345-a-cloud-customer-finds-what-differs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p2 | US-384 | [The OpenAI recommendations move to GPT-6](doing/US-384-the-openai-recommendations-move-to-gpt-6.md) | chore | doing | 2026-09-23T23:03+08:00 |
 | p2 | US-385 | [Each platform's hint is written for a person](doing/US-385-each-platform-s-hint-is-written-for-a-person.md) | chore | doing | 2026-09-23T23:09+08:00 |

@@ -62,6 +62,12 @@ holds no word a post would use, so the embedding stage judges forum posts.
 SocialCrawl input stops at the posts the last walk read (US-467), and a
 ScrapeCreators input stops on the first page that reaches them (US-468).
 
+**Security.** The engine and the pipeline depend on `zod` 4.6.7, past a
+high advisory: memory exhaustion while validating oversized constrained
+collections (BUG-492). The lockfile also moves `undici`, which the engine
+reaches through `@ai-sdk/provider-utils`, past four high advisories; a
+consumer's own lockfile resolves it, within `^7.29.0`, to 7.30.1 or later.
+
 ## 0.22.0 — 2026-10-02
 
 No migration.

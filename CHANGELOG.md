@@ -20,6 +20,22 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.23.1 — 2026-11-02
+
+No migration.
+
+**Changed.** A capped collection scores its platforms in turn (US-496). The
+collect step hands on one post of each platform, then the next of each,
+and the filter step keeps the order it was handed instead of the order
+Postgres returns. A monitor that reads Reddit and forums no longer spends
+its whole match cap on whichever platform came first. Each platform keeps
+its own order, so the daily per-pair ceiling decides as before.
+
+**Fixed.** The reconcile job leaves out, without a warning, the posts of a
+platform that has no connector in the registry (BUG-495). It logs their
+count per platform once, at debug. A platform with connectors and no
+single provider choice still warns.
+
 ## 0.23.0 — 2026-11-01
 
 Two migrations, in the pipeline's stream. `0075` adds `forum` to the sources

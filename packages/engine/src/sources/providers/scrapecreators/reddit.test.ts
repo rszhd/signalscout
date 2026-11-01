@@ -372,11 +372,12 @@ describe("searching", () => {
     expect(result.next).toEqual({ status: "done" });
   });
 
-  it("keeps the posts newer than `since` and pages on", async () => {
+  it("keeps the posts newer than `since` and pages on while every post is new", async () => {
     const stub = scrapeCreators([subredditPage]);
     const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
 
-    const since = new Date("2026-09-01T00:00:00.000Z");
+    // Before the page's oldest post, 2026-08-13: nothing on it was read before.
+    const since = new Date("2026-08-01T00:00:00.000Z");
     const result = await source.search(
       request({ query: { queries: [], channels: ["softwaretesting"], since } }),
     );
@@ -388,6 +389,35 @@ describe("searching", () => {
       status: "ready",
       cursor: cursorAt("subreddit", 0, 1, subredditCursor),
     });
+  });
+
+  it("stops on the first page that reaches posts the last poll read", async () => {
+    const stub = scrapeCreators([subredditPage]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    // Inside the page, which runs from 2026-08-13 to 2026-09-04, newest first:
+    // the next page could hold only posts older than this. US-468.
+    const since = new Date("2026-09-01T00:00:00.000Z");
+    const result = await source.search(
+      request({ query: { queries: [], channels: ["softwaretesting"], since } }),
+    );
+
+    expect(result.posts.length).toBeGreaterThan(0);
+    for (const post of result.posts)
+      expect(post.postedAt.getTime()).toBeGreaterThan(since.getTime());
+    expect(result.next).toEqual({ status: "done" });
+  });
+
+  it("goes on to the next input after that page, not to its next page", async () => {
+    const stub = scrapeCreators([subredditPage]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const since = new Date("2026-09-01T00:00:00.000Z");
+    const result = await source.search(
+      request({ query: { queries: [], channels: ["softwaretesting", "QualityAssurance"], since } }),
+    );
+
+    expect(result.next).toEqual({ status: "ready", cursor: cursorAt("subreddit", 1, 0) });
   });
 
   it("returns no more than the caller asked for", async () => {

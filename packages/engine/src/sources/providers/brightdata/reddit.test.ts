@@ -564,8 +564,10 @@ describe("the connector is registered like any other", () => {
     // bills each one. STACK.md, *Source economics*.
     expect(reddit.billableUnit).toBe("record");
     expect(reddit.pricePerUnitMicros).toBe(1500);
+    // The provider's list, which forums share since US-470.
     expect(reddit.provider.credentialFields).toEqual([
       { name: "apiKey", label: "Bright Data API key", secret: true },
+      { name: "unlockerZone", label: "Bright Data Web Unlocker zone", secret: false },
     ]);
   });
 

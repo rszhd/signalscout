@@ -39,6 +39,15 @@ Its path is its address: `site/self-hosting/email.md` is
 `/self-hosting/email`. Add it to the sidebar in `.vitepress/config.mts`, or
 nobody finds it.
 
+## The self-hosting guide is hidden
+
+The owner decided on 2026-10-23 that the site shows SignalScout Cloud only.
+`site/self-hosting/` stays online, because the repository's README and
+SECURITY.md link into it, but nothing else on the site does: not the menu,
+the home page, another page, search, or `llms.txt`. Its pages keep their
+own sidebar, for a reader who arrives from GitHub. A page outside
+`self-hosting/` never links into it.
+
 **Plain Markdown only.** No Vue component inside a page. A page is read as
 text by agents, through the repository and through `llms.txt`, and a
 component is a hole in that text.

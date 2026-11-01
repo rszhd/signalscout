@@ -1,25 +1,22 @@
 # SignalScout Cloud
 
-SignalScout Cloud is the same product, run by us at
+SignalScout Cloud is SignalScout, run by us at
 [app.signalscout.run](https://app.signalscout.run). You do not set up a
 server, and you do not bring any keys: the data providers and the AI model
 are included in your plan.
 
-## How it differs from self-hosting
+## What the plan covers
 
-| | Cloud | Self-hosted |
-|---|---|---|
-| **Keys** | None. Search and AI usage are included. | You bring a key for each provider and model. |
-| **Cost** | A monthly plan, with a usage allowance | Free software; you pay your providers |
-| **A project** | Is one monitor, set up with it | Can hold several monitors |
-| **Schedule** | Set by your plan | You choose it per monitor |
-| **Budget** | Your plan's allowance | A monthly cap you set per monitor |
-| **Sign-up** | Email confirmation, and password reset by email | You decide; see [accounts](../self-hosting/accounts) |
-| **Screens you will not see** | Providers, Connections, Models | — |
+- **Keys:** none. Search and AI usage are included.
+- **Cost:** a monthly plan, with a usage allowance.
+- **A project** is one monitor, set up with it.
+- **Schedule:** set by your plan.
+- **Budget:** your plan's allowance.
+- **Sign-up:** email confirmation, and password reset by email.
 
-Everything else in these guides is the same: the [inbox](../using/inbox),
-[reply drafts](../using/replies), [notifications](../using/notifications)
-and [webhooks](../self-hosting/webhooks).
+The [inbox](../using/inbox), [reply drafts](../using/replies),
+[notifications](../using/notifications) and [webhooks](../using/webhooks)
+work as their pages say.
 
 ## Set up a project
 

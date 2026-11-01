@@ -8,6 +8,19 @@ export {
   fakeSourceId,
 } from "./fake/index.js";
 export {
+  detectForum,
+  detectForumIndex,
+  type FeedItem,
+  type ForumProgram,
+  type ForumThread,
+  type ForumThreadSummary,
+  feedProgramFor,
+  forumFeedFrom,
+  forumPrograms,
+  isReply,
+  readFeed,
+} from "./forums/index.js";
+export {
   isOffered,
   notOfferedReason,
   offeredConnectors,
@@ -15,6 +28,8 @@ export {
 } from "./offering.js";
 export { maximumPagesPerInput, pagesPerInputFor } from "./pages.js";
 export {
+  forumPlatform,
+  forumPlatformId,
   groupByPlatform,
   instagramPlatform,
   instagramPlatformId,
@@ -39,6 +54,20 @@ export {
 } from "./providers/apify/linkedin.js";
 export { apifyProvider, apifyProviderId } from "./providers/apify/provider.js";
 export {
+  BrightDataForumSource,
+  brightDataForum,
+  createBrightDataForum,
+  type FetchedPage,
+  type ForumFetcher,
+  type ForumOptions,
+  type ForumPageEvent,
+  type ForumPageFetcher,
+  maxThreadsPerSection,
+  openForumFetcher,
+  threadsPerCall,
+  worthOpening,
+} from "./providers/brightdata/forum.js";
+export {
   brightDataProvider,
   brightDataProviderId,
 } from "./providers/brightdata/provider.js";
@@ -47,6 +76,13 @@ export {
   RedditSource,
   toCandidatePost,
 } from "./providers/brightdata/reddit.js";
+export {
+  fetchThroughUnlocker,
+  type UnlockerAnswer,
+  UnlockerError,
+} from "./providers/brightdata/unlocker.js";
+export { BrowserUseError, hasBrowserCredentials } from "./providers/browseruse/cloud.js";
+export type { OpenPageBrowser, PageBrowser } from "./providers/browseruse/pages.js";
 export {
   HarvestApiLinkedInSource,
   harvestApiLinkedIn,
@@ -114,6 +150,8 @@ export { assertSourcesCanBeStored } from "./storage.js";
 export type {
   CandidatePost,
   CandidateReply,
+  CompleteRequest,
+  CompleteResult,
   ConnectorDefinition,
   ConnectorDescriptor,
   CredentialCheck,
@@ -136,6 +174,7 @@ export type {
 export { connectorIdPattern } from "./types.js";
 
 import { apifyLinkedIn } from "./providers/apify/linkedin.js";
+import { brightDataForum } from "./providers/brightdata/forum.js";
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { harvestApiLinkedIn } from "./providers/harvestapi/linkedin.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
@@ -190,4 +229,5 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   socialCrawlTikTok,
   scrapeCreatorsTikTok,
   socialCrawlInstagram,
+  brightDataForum,
 ];

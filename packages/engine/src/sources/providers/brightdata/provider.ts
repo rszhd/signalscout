@@ -22,6 +22,9 @@ export const brightDataProviderId = "brightdata";
  */
 const credentialFields: readonly CredentialField[] = [
   { name: "apiKey", label: "Bright Data API key", secret: true },
+  // Forums go through the Web Unlocker, which answers only inside a zone the
+  // account made for it (US-470). Not a secret: it is a name.
+  { name: "unlockerZone", label: "Bright Data Web Unlocker zone", secret: false },
 ];
 
 export const brightDataProvider: ProviderDescriptor = {

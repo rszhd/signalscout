@@ -19,7 +19,7 @@ Open the monitor, then **Notification settings**. Each monitor has its own.
 | **Email digest** | Turns the digest email on or off. |
 | **Recipient email** | Where the email goes. |
 | **Immediate email alerts** and **Immediate alert score** | An email for each match at or above this score, as soon as it is found. |
-| **Enable webhook**, **Webhook URL**, **Webhook delivery** | Sends matches to your URL. See [webhooks](../self-hosting/webhooks). |
+| **Enable webhook**, **Webhook URL**, **Webhook delivery** | Sends matches to your URL. See [webhooks](./webhooks). |
 
 Press **Save notifications**.
 
@@ -42,6 +42,3 @@ matches.
 - **A paused monitor still delivers** the matches it already found.
 - **A failure shows on the monitor.** A webhook that fails five times in a
   row turns itself off until you fix it and save again.
-
-On a self-hosted instance, email needs a mail server first:
-[Email](../self-hosting/email).

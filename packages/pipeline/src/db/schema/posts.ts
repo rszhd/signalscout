@@ -129,6 +129,14 @@ export const posts = pgTable(
      */
     replyCount: integer("reply_count"),
     /**
+     * True while the excerpt is a cut the platform gave (a forum feed), not
+     * the post. US-476. The pre-filter and triage judge it as it is; a post
+     * they keep is read whole before the classifier, and this turns false.
+     */
+    textPartial: boolean("text_partial").notNull().default(false),
+    /** The poll's window a partial post came with: its page must start later. */
+    partialSince: timestamp("partial_since", { withTimezone: true }),
+    /**
      * Whether the thread under this post is known to be incompletely read.
      *
      * Null on a post nobody asked for replies on. True is the normal state

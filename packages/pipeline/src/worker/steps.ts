@@ -33,6 +33,8 @@ export interface PipelineSteps {
   readonly poll: Step<PollPayload>;
   readonly filter: Step<FilterPayload>;
   readonly replies: Step<RepliesPayload>;
+  /** US-476: partial posts read whole, then the batch to `classify`. */
+  readonly complete: Step<ClassifyPayload>;
   readonly classify: Step<ClassifyPayload>;
   readonly notify: Step<NotifyPayload>;
 }

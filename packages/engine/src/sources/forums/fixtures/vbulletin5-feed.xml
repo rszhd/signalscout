@@ -1,0 +1,1866 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<title>vBulletin Community Forum - Home</title>
+		<link>https://forum.vbulletin.com/</link>
+		<description>vBulletin Forums</description>
+		<language>en</language>
+		<lastBuildDate>Sat, 31 Oct 2026 04:07:46 GMT</lastBuildDate>
+		<generator>vBulletin</generator>
+		<ttl>60</ttl>
+		<image>
+			<url>https://forum.vbulletin.com/images/misc/vb_icon_darkblue.svg</url>
+			<title>vBulletin Community Forum - Home</title>
+			<link>https://forum.vbulletin.com/</link>
+		</image>
+		<item>
+			<title>Download OnlyAjax Live Forum Statistics</title>
+			<link>https://forum.vbulletin.com/vbulletin/packages/4513341-ajax-live-forum-statistics</link>
+			<pubDate>Fri, 30 Oct 2026 16:48:27 GMT</pubDate>
+			<description>Live Forum Statistics 
+ 
+ Live Forum Statistics is a powerful, modular, and fully native statistics widget for vBulletin 6 Site Builder, featuring a modern two-column layout, dynamic activity tabs,...</description>
+			<content:encoded><![CDATA[<span style="color:#1E90FF"><b><span style="font-size:28px">Live Forum Statistics</span></b></span><br />
+<br />
+<span style="color:#333333"><span style="font-size:12px"><b> Live Forum Statistics</b> is a powerful, modular, and fully native statistics widget for <b>vBulletin 6 Site Builder</b>, featuring a modern two-column layout, dynamic activity tabs, advanced member rankings, and fully responsive mobile support.<br />
+<br />
+<i>Exclusive release by web-start.net</i></span></span><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">✨ Key Features ✨</span></b></span><ul><li><b>Modern Two-Column Layout</b> — Displays forum activity and member rankings in a clean, organized, and responsive design.</li>
+<li><b>Dynamic Member Rankings</b> — Switch between Top Posters, Newest Members, and Most Reacted.</li>
+<li><b>Cyclic Rank Badges</b> — Attractive ranking badges with dynamically repeating color schemes, supporting any number of displayed rows.</li>
+<li><b>Guest-Accessible Rankings</b> — Guests can view member rankings without permission errors.</li>
+<li><b>Latest Posts</b> — Displays thread titles, last reply authors, and last post dates, with direct navigation to the latest post.</li>
+<li><b>Latest Threads</b> — Shows recently created discussions with author names and discussion statistics.</li>
+<li><b>Hottest Threads</b> — Highlights discussions with the highest participation and engagement.</li>
+<li><b>Most Viewed Threads</b> — Displays the most frequently viewed discussions.</li>
+<li><b>Up to 6 Custom Channel Tabs</b> — Create custom tabs with individual titles and filter discussions by specific channels.</li>
+<li><b>Remember Selected Tab</b> — Automatically remembers each visitor's selected tab across page reloads.</li>
+<li><b>Independent Auto Refresh</b> — Refreshes widget data automatically without reloading the entire page.</li>
+<li><b>Responsive Mobile Design</b> — Automatically adapts the two-column layout for smaller screens.</li>
+<li><b>Synchronized Row Alignment</b> — Keeps rows and titles consistently aligned across both columns.</li>
+</ul><br />
+<br />
+<br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">📊 Widget Sections &amp; Features 📊</span></b></span><br />
+<br />
+<b>1. Member Rankings (Sidebar)</b><ul><li><b>Top Posters</b> — Displays members with the highest number of posts.</li>
+<li><b>Newest Members</b> — Displays the most recently registered members.</li>
+<li><b>Most Reacted</b> — Highlights members who have received the most reactions.</li>
+<li><b>Dynamic Rank Colors</b> — Ranking badge colors automatically cycle through an attractive color palette, regardless of the number of displayed rows.</li>
+<li><b>Guest Access</b> — Member rankings remain accessible to visitors who are not logged in.</li>
+</ul><br />
+<br />
+<b>2. Forum Activity Tabs</b><ul><li><b>Latest Posts</b> — Displays thread titles, last post authors, and posting dates. Clicking a topic takes users directly to its latest post using vBulletin's native post redirection.</li>
+<li><b>Latest Threads</b> — Displays the newest discussions along with their authors and activity information.</li>
+<li><b>Hottest Threads</b> — Shows discussions with the highest user participation and engagement.</li>
+<li><b>Most Viewed</b> — Lists the most viewed discussions across the forum.</li>
+<li><b>Custom Channel Tabs (1–6)</b> — Create up to six additional tabs, each with a custom title and a selected forum channel.</li>
+</ul><br />
+<br />
+<b>3. User Experience &amp; Interaction</b><ul><li><b>Remember Selected Tab</b> — Saves the active tab in the visitor's browser and restores it on subsequent page loads.</li>
+<li><b>Automatic Refresh</b> — Refreshes widget data independently at configurable intervals: 30 seconds, 1 minute, or 2 minutes.</li>
+<li><b>No Full Page Reload</b> — Updates the widget without refreshing the entire forum page.</li>
+<li><b>Responsive Layout</b> — Automatically adjusts the widget layout for desktop, tablet, and mobile devices.</li>
+<li><b>Consistent Row Alignment</b> — Maintains synchronized row heights and title alignment across both columns.</li>
+</ul><br />
+<a href="filedata/fetch?id=4513345&amp;d=1793378882&amp;type=thumb" title="Name:  4.png
+Views: 8
+Size:  351.0 KB" >4.png</a><br />
+<br />
+<a href="filedata/fetch?id=4513343&amp;d=1793378882&amp;type=thumb" title="Name:  1.png
+Views: 11
+Size:  154.5 KB" >1.png</a><br />
+<br />
+<a href="filedata/fetch?id=4513344&amp;d=1793378882&amp;type=thumb" title="Name:  3.png
+Views: 8
+Size:  142.3 KB" >3.png</a><br />
+<br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">⚙️ Site Builder Settings ⚙️</span></b></span><br />
+<br />
+The widget includes configurable options directly inside the vBulletin Site Builder live editor. Simply click the widget settings icon to customize its appearance and behavior.<ol class="decimal"><li><b>Widget Title</b> — Use the default widget title or enter a custom title.</li>
+<li><b>Left Column List</b> — Select the default ranking category: Top Posters, Newest Members, or Most Reacted.</li>
+<li><b>Rows per Tab</b> — Configure the number of rows displayed in each section (Default: 10).</li>
+<li><b>Auto Refresh</b> — Choose the automatic refresh interval:<ul><li>Never</li>
+<li>30 Seconds</li>
+<li>1 Minute</li>
+<li>2 Minutes</li>
+</ul></li>
+<li><b>Remember Selected Tab</b> — Enable or disable automatic tab selection memory.</li>
+<li><b>Default Tab Visibility</b> — Independently enable or disable the following tabs:<ul><li>Latest Posts</li>
+<li>Latest Threads</li>
+<li>Hottest Threads</li>
+<li>Most Viewed</li>
+</ul></li>
+<li><b>Custom Tabs 1–6</b> — Enable each custom tab, define its display title, and select the associated forum channel using the native channel selector.</li>
+</ol><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">🚀 Performance &amp; Technical Architecture 🚀</span></b></span><ul><li><b>No Database Modifications</b> — Does not create additional database tables or modify the original vBulletin database structure.</li>
+<li><b>Clean Installation &amp; Uninstallation</b> — Designed without intrusive database changes or heavy installation routines.</li>
+<li><b>Two-Level Instance Caching</b> — Uses vBulletin's internal caching system with a standard 1-minute expiration time to minimize repeated database queries.</li>
+<li><b>Native vBulletin 6 APIs</b> — Built using standard vBulletin APIs, including vB_Api_Search, Node libraries, and the vB5_Route routing system.</li>
+<li><b>Dark &amp; Light Style Compatibility</b> — Designed to work with different forum styles and display modes.</li>
+<li><b>Language Compatibility</b> — All interface labels and text are managed through the native vBulletin Phrase system.</li>
+<li><b>RTL &amp; Persian Support</b> — Supports right-to-left layouts and Persian language environments.</li>
+<li><b>Mobile Responsive</b> — Automatically adapts to different screen sizes and devices.</li>
+</ul><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">📥 Installation &amp; Upgrade 📥</span></b></span><ol class="decimal"><li>Upload the contents of the <div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">upload</pre>
+</div> directory to your vBulletin installation root.</li>
+<li>Go to:<br />
+	<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">AdminCP → Plugins &amp; Products → Manage Products</pre>
+</div></li>
+<li>Click <b>Add/Import Product</b> and select the following XML file:<br />
+	<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">product_webstartforumstats.xml</pre>
+</div></li>
+<li>Import the product. If upgrading from an earlier version, enable the <b>Overwrite</b> option.</li>
+<li>Navigate to your forum homepage or any desired page and enable <b>Site Builder</b>.</li>
+<li>Find the <b>web-start</b> category in the widget list.</li>
+<li>Drag and drop the <b>Live Forum Statistics</b> widget into your preferred page position.</li>
+<li>Save your layout.</li>
+<li>Done! Your live forum statistics widget is now ready to use.</li>
+</ol><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">🔧 Technical Details 🔧</span></b></span><ul><li><b>Product ID:</b> webstartforumstats</li>
+<li><b>Version:</b> 1.1.1</li>
+<li><b>Platform:</b> vBulletin 6</li>
+<li><b>Compatibility:</b> vBulletin 6.0.0 to 6.9.9+</li>
+<li><b>PHP Requirements:</b> PHP 8.1 / 8.2 / 8.3</li>
+<li><b>Integration:</b> Native vBulletin Site Builder Widget</li>
+<li><b>Widget Category:</b> web-start</li>
+<li><b>Custom Tabs:</b> Up to 6</li>
+<li><b>Default Rows:</b> 10</li>
+<li><b>Auto Refresh Intervals:</b> 30 Seconds, 1 Minute, 2 Minutes, or Disabled</li>
+<li><b>Caching:</b> vBulletin Instance Cache (1 Minute)</li>
+<li><b>Database Modifications:</b> None</li>
+<li><b>Developer:</b> Web-Start (<a href="https://www.web-start.net/" target="_blank">www.web-start.net</a>)</li>
+</ul><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">❓ FAQ ❓</span></b></span><ol class="decimal"><li><b>Does this add-on work with vBulletin 5?</b> No. It is designed specifically for vBulletin 6.</li>
+<li><b>Where can I display the widget?</b> Anywhere supported by the native vBulletin Site Builder, including the homepage, channel pages, sidebars, and other widget positions.</li>
+<li><b>Can I customize the widget title?</b> Yes. You can change the title directly through the Site Builder widget settings.</li>
+<li><b>How many custom tabs are supported?</b> Up to six custom channel tabs, each with its own title and channel selection.</li>
+<li><b>Can guests view member rankings?</b> Yes. The ranking sections are accessible to both guests and registered users.</li>
+<li><b>Does automatic refresh reload the entire page?</b> No. Only the widget data is refreshed.</li>
+<li><b>Can I disable individual activity tabs?</b> Yes. You can independently enable or disable each default activity tab.</li>
+<li><b>Does the widget support mobile devices?</b> Yes. The layout automatically adapts to smaller screens.</li>
+<li><b>Does it modify the vBulletin database?</b> No. It does not create additional database tables or modify the original database structure.</li>
+</ol><br />
+<br />
+<span style="color:#FF4500"><b><span style="font-size:20px">🔒 Security &amp; Support 🔒</span></b></span><ul><li>Uses native vBulletin APIs and caching mechanisms.</li>
+<li>Does not modify the original vBulletin database structure.</li>
+<li>Designed to minimize unnecessary database queries and server overhead.</li>
+<li>Back up your database and files before installing or upgrading.</li>
+<li>For installation assistance or technical support, visit <a href="https://www.web-start.net/" target="_blank">Web Start</a>.</li>
+</ul><br />
+ ]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/vbulletin/packages">vB6 Packages</category>
+			<dc:creator>member11</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/vbulletin/packages/4513341-ajax-live-forum-statistics</guid>
+		</item>
+		<item>
+			<title>Download OnlyLLMs AI Directory</title>
+			<link>https://forum.vbulletin.com/vbulletin/packages/4513337-llms-ai-directory</link>
+			<pubDate>Fri, 30 Oct 2026 16:42:42 GMT</pubDate>
+			<description>LLMs.txt AI Directory 
+ 
+LLMs.txt AI Directory is a powerful AI SEO add-on for vBulletin 6 that automatically generates standards-compliant llms.txt and llms-full.txt files, helping AI search engines...</description>
+			<content:encoded><![CDATA[<span style="color:#1E90FF"><b><span style="font-size:28px">LLMs.txt AI Directory</span></b></span><br />
+<br />
+<span style="color:#333333"><span style="font-size:12px"><b>LLMs.txt AI Directory</b> is a powerful AI SEO add-on for <b>vBulletin 6</b> that automatically generates standards-compliant <b>llms.txt</b> and <b>llms-full.txt</b> files, helping AI search engines and language models discover, understand, and reference your forum content.<br />
+<br />
+<i>Exclusive release by web-start.net</i></span></span><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">✨ Key Features ✨</span></b></span><ul><li>Automatically generates structured and standards-compliant llms.txt and llms-full.txt files.</li>
+<li>Introduces your forum, channels, featured discussions, rules, and feeds to AI crawlers.</li>
+<li>Helps AI-powered platforms such as Google AI Overviews, ChatGPT Search, Claude, and Perplexity discover your public forum content.</li>
+<li>Privacy protection — only includes channels and topics accessible to guest users.</li>
+<li>Excludes private, VIP, restricted, and hidden forum content.</li>
+<li>Smart BBCode &amp; HTML Stripper — converts forum content into clean Markdown format.</li>
+<li>Quad-Layer Delivery System — supports dynamic routing, physical file generation, and hybrid delivery.</li>
+<li>Smart database caching to minimize repeated queries and server load.</li>
+<li>Automatic scheduled updates without manual intervention.</li>
+<li>Dedicated AdminCP dashboard with live previews, file health checks, and crawler statistics.</li>
+<li>Instant file regeneration with a single click.</li>
+</ul><br />
+<a href="filedata/fetch?id=4513338&amp;d=1793378516&amp;type=thumb" title="Name:  1.png
+Views: 9
+Size:  458.3 KB" >1.png</a><br />
+<br />
+<a href="filedata/fetch?id=4513339&amp;d=1793378516&amp;type=thumb" title="Name:  2.png
+Views: 6
+Size:  462.7 KB" >2.png</a><br />
+<br />
+<br />
+<br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">⚙️ Settings &amp; Configuration ⚙️</span></b></span><br />
+<br />
+The add-on provides a comprehensive configuration panel under:<br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">AdminCP → Settings → Options → Web Start LLMs.txt AI Settings</pre>
+</div><ol class="decimal"><li><b>Enable LLMs.txt Generator</b> — Enable or disable the add-on globally (Default: Enabled).</li>
+<li><b>Site Summary</b> — Define a short description of your forum for AI models (1–3 sentences). Uses the default forum description if left empty.</li>
+<li><b>AI Context &amp; Guidelines</b> — Provide instructions on how AI models should reference your forum content, such as including topic links and author names.</li>
+<li><b>Delivery Mode</b> — Choose how generated files are delivered:<ul><li>Hybrid (Recommended) — Combines dynamic routing and physical file generation.</li>
+<li>Dynamic Route Only — Serves files directly through vBulletin without creating physical files.</li>
+<li>Static Physical File Only — Generates and serves physical text files from your hosting root directory.</li>
+</ul></li>
+<li><b>Cache Lifetime</b> — Configure how often cached database content is refreshed (Default: 24 hours).</li>
+<li><b>Excluded Channel IDs</b> — Exclude specific channels from AI-generated files by entering their channel IDs.</li>
+<li><b>Include Featured Topics</b> — Include selected popular, important, and trending discussions.</li>
+<li><b>Max Topics</b> — Set the maximum number of featured topics (Default: 25).</li>
+<li><b>Enable llms-full.txt</b> — Enable or disable the extended version of the AI directory.</li>
+</ol><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">📊 AdminCP Dashboard 📊</span></b></span><br />
+<br />
+A dedicated <b>AI &amp; LLMs.txt Manager</b> dashboard is available in the AdminCP sidebar.<ul><li><b>File Health Checks</b> — View file status, file sizes, and root directory write permissions.</li>
+<li><b>Crawler Statistics</b> — Track the number of requests made by AI crawlers to your generated files.</li>
+<li><b>Live Preview</b> — Preview the exact Markdown output served to AI search engines and language models.</li>
+<li><b>Rebuild Now</b> — Instantly regenerate the database cache and physical files with a single click.</li>
+</ul><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">📥 Installation 📥</span></b></span><ol class="decimal"><li>Upload the contents of the <div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">upload</pre>
+</div> directory included in the package to your vBulletin installation root.</li>
+<li>Go to:<br />
+	<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">AdminCP → Plugins &amp; Products → Manage Products → Add/Import Product</pre>
+</div></li>
+<li>Import the product XML file located at:<br />
+	<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">core/packages/wsllmstxt/xml/product_wsllmstxt.xml</pre>
+</div></li>
+<li>Set <b>Overwrite</b> to <b>Yes</b> if updating an existing installation.</li>
+<li>Navigate to:<br />
+	<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">AdminCP → Settings → Options → Web Start LLMs.txt AI Settings</pre>
+</div></li>
+<li>Configure your forum description, AI guidelines, delivery mode, and other options.</li>
+<li>Visit <div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">https://yourdomain.com/llms.txt</pre>
+</div> to verify your generated AI directory.</li>
+<li>Done! Your forum is now ready to provide structured content to AI crawlers.</li>
+</ol><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">🔧 Technical Details 🔧</span></b></span><ul><li><b>Product ID:</b> wsllmstxt</li>
+<li><b>Version:</b> 1.0.0</li>
+<li><b>Compatibility:</b> vBulletin 6.0.0 to 6.9.x+</li>
+<li><b>PHP Requirements:</b> PHP 8.1 to 8.3+</li>
+<li><b>Developer:</b> Web Start</li>
+<li><b>Output Files:</b> llms.txt and llms-full.txt</li>
+<li><b>Output Format:</b> Markdown (text/markdown)</li>
+<li><b>Caching:</b> Database caching with configurable lifetime</li>
+<li><b>Scheduled Updates:</b> Automatic</li>
+<li><b>AdminCP Dashboard:</b> Included</li>
+</ul><br />
+<br />
+<span style="color:#1E90FF"><b><span style="font-size:20px">❓ FAQ ❓</span></b></span><ol class="decimal"><li><b>What is llms.txt?</b> It is a Markdown-based convention designed to provide AI systems with structured information about a website and its content.</li>
+<li><b>Does this add-on expose private forum content?</b> No. Only content accessible to guest users is eligible for inclusion.</li>
+<li><b>What is the difference between llms.txt and llms-full.txt?</b> llms.txt provides a concise overview, while llms-full.txt offers a more comprehensive version with additional topic information.</li>
+<li><b>Does it support ChatGPT and Perplexity?</b> The generated files provide structured content that AI-powered search and language-model systems can discover and potentially use.</li>
+<li><b>Does it affect forum performance?</b> Database caching and physical file delivery options are designed to minimize repeated database queries and PHP processing.</li>
+<li><b>Can I exclude specific channels?</b> Yes. Enter the channel IDs in the Excluded Channel IDs setting.</li>
+<li><b>Can I regenerate the files manually?</b> Yes. Use the Rebuild Now button in the AdminCP dashboard.</li>
+</ol><br />
+<br />
+<span style="color:#FF4500"><b><span style="font-size:20px">🔒 Security &amp; Support 🔒</span></b></span><ul><li>Only guest-accessible public content is included in generated files.</li>
+<li>Private, restricted, and VIP channel content is excluded.</li>
+<li>Database caching helps reduce unnecessary server queries.</li>
+<li>Always back up your database and files before installing or updating.</li>
+<li>For installation assistance or technical support, visit <a href="https://www.web-start.net/" target="_blank">Web Start</a>.</li>
+</ul>]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/vbulletin/packages">vB6 Packages</category>
+			<dc:creator>member11</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/vbulletin/packages/4513337-llms-ai-directory</guid>
+		</item>
+		<item>
+			<title>Discount Code</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/vbulletin-pre-sales-questions/4513331-discount-code</link>
+			<pubDate>Fri, 30 Oct 2026 15:21:29 GMT</pubDate>
+			<description>Hello, dear member5  , are there no discount codes available at the moment?</description>
+			<content:encoded><![CDATA[Hello, dear <a href="https://forum.vbulletin.com/member/1-member" style="background-image:url('https://forum.vbulletin.com/core/custompics/avatar/avatar1_1.png');" class="b-bbcode-user b-bbcode-user--has-avatar js-bbcode-user" data-userid="1" data-vbnamecard="1">member5</a>  , are there no discount codes available at the moment?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/vbulletin-pre-sales-questions">vBulletin Pre-sales Questions</category>
+			<dc:creator>member15</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/vbulletin-pre-sales-questions/4513331-discount-code</guid>
+		</item>
+		<item>
+			<title>Need to Add Unsubscribe From Admin Emails</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513329-need-to-add-unsubscribe-from-admin-emails</link>
+			<pubDate>Fri, 30 Oct 2026 15:14:52 GMT</pubDate>
+			<description><![CDATA[I need to add the one-click Unsubscribe Link to Admin Emails (under &quot;Send Messages to Users&quot; in the control panel), as shown in other Notification Emails. It looks like a legal requirement, so how do...]]></description>
+			<content:encoded><![CDATA[I need to add the one-click Unsubscribe Link to Admin Emails (under &quot;Send Messages to Users&quot; in the control panel), as shown in other Notification Emails. It looks like a legal requirement, so how do I do it?<br />
+<br />
+It's the &quot;Unsubscribe From All Notification Emails&quot; in the image below. This is the Trending Notifications email that the forum sends out.<br />
+<br />
+<img itemprop="image" alt="Forum Unsubscribe Link Image" title="Forum Unsubscribe Link Image.jpg" data-attachmentid="4513330" data-align="none" data-size="full" border="0" src="filedata/fetch?id=4513330&amp;d=1793372895" data-fullsize-url="filedata/fetch?id=4513330&amp;d=1793372895" data-thumb-url="filedata/fetch?id=4513330&amp;d=1793372895&amp;type=thumb" data-title="Click on the image to see the original version" data-caption="Forum Unsubscribe Link Image.jpg" class="bbcode-attachment thumbnail js-lightbox bbcode-attachment--lightbox" /><br />
+Thanks]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member6</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513329-need-to-add-unsubscribe-from-admin-emails</guid>
+		</item>
+		<item>
+			<title>ForumBrowser console error on a showthread.php page: Uncaught DOMException: Operation is not supported - ckeditor.js</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-4/vbulletin-4-questions-problems-and-troubleshooting/4513328-browser-console-error-on-a-showthread-php-page-uncaught-domexception-operation-is-not-supported-ckeditor-js</link>
+			<pubDate>Fri, 30 Oct 2026 14:17:17 GMT</pubDate>
+			<description>vBulletin 4 forum has a problem where on a showthread.php page while logged-in user and using a Firefox browser, going to a developer console (F12 key, console tab) shows error: 
+ 
+ 
+ 
+It seems like...</description>
+			<content:encoded><![CDATA[vBulletin 4 forum has a problem where on a showthread.php page while logged-in user and using a Firefox browser, going to a developer console (F12 key, console tab) shows error:<br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_quote">
+		<div class="quote_container">
+			
+			<div class="bbcode_quote_container b-icon-fa b-icon-fa--24 fa-solid fa-quote-left"></div>
+			
+				13:16:22.582 Uncaught DOMException: Operation is not supported<br />
+E /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:81<br />
+setTimeout /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:9<br />
+setTimeout handler*setTimeout /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:9<br />
+Y /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:82<br />
+addFunction /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:10<br />
+callFunction /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:10<br />
+&lt;anonymous&gt; /showthread.php?123-abc line 13 &gt; injectedScript:10<br />
+write /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:13<br />
+W /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:81<br />
+q /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fire /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+prototype /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:12<br />
+append /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:16<br />
+W /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:82<br />
+loadData /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:84<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:83<br />
+setMode /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:111<br />
+init /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:110<br />
+q /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fire /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fire /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:7<br />
+fireOnce /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fireOnce /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:7<br />
+build /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:132<br />
+y /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+y /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+w /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+w /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+w /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+v /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+v /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+C /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+q /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+u /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+q /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fire /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fire /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:7<br />
+fireOnce /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:6<br />
+fireOnce /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:7<br />
+s /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+s /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+x /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+y /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+z /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+onload /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+setTimeout handler*load/A/E.$.onload /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+A /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:22<br />
+load /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:23<br />
+s /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+t /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:24<br />
+_init /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:25<br />
+editor /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:7<br />
+replace /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:7<br />
+h /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:8<br />
+replace /clientscript/ckeditor/ckeditor.js?t=A7HG4HT&amp;v=4110:8<br />
+init /clientscript/vbulletin_textedit.js?v=4110:11<br />
+load_language /clientscript/vbulletin_textedit.js?v=4110:11<br />
+handleTransactionResponse /clientscript/yui/connection/connection-min.js?v=4110:7<br />
+handleReadyState/this._poll[c.tId]&lt; /clientscript/yui/connection/connection-min.js?v=4110:7<br />
+setInterval handler*handleReadyState /clientscript/yui/connection/connection-min.js?v=4110:7<br />
+asyncRequest /clientscript/yui/connection/connection-min.js?v=4110:7<br />
+vB_Text_Editor /clientscript/vbulletin_textedit.js?v=4110:11<br />
+&lt;anonymous&gt; /showthread.php?123-abc:1261<br />
+ckeditor.js:81:389
+			
+		</div>
+	</div>
+</div>It seems like the error disappears when I go to vBulletin admin area, Options, Message Posting and Editing Options and switch &quot;Quick Reply&quot; from &quot;Yes, Click Required&quot; to &quot;Yes, Click Not Required&quot;.<br />
+<br />
+Files possibly responsible for the error (ckeditor.js, Quick reply .js's) <a href="https://drive.proton.me/urls/8S720KVX68#2CF2CEE6FfYa" target="_blank">are here</a>.<br />
+<br />
+Can anyone please mention what to replace by what in order to fix the issue?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-4/vbulletin-4-questions-problems-and-troubleshooting"><![CDATA[vB4 Support &amp; Troubleshooting]]></category>
+			<dc:creator>member16</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-4/vbulletin-4-questions-problems-and-troubleshooting/4513328-browser-console-error-on-a-showthread-php-page-uncaught-domexception-operation-is-not-supported-ckeditor-js</guid>
+		</item>
+		<item>
+			<title>Self-HostedCloudflare Cloudflare Managed Challenge.</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513269-cloudflare-cloudflare-managed-challenge</link>
+			<pubDate>Wed, 28 Oct 2026 23:44:11 GMT</pubDate>
+			<description><![CDATA[Can you advise what settings you used for the site when you set up Cloudflare Managed Challenge? I'm mostly looking at what changed to avoid creating any conflicts. I have it set up on one of my...]]></description>
+			<content:encoded><![CDATA[Can you advise what settings you used for the site when you set up Cloudflare Managed Challenge? I'm mostly looking at what changed to avoid creating any conflicts. I have it set up on one of my sites as;<br />
+<br />
+<b>Rule Name</b> - Verify forum visitors<br />
+<b>When incoming requests match…</b> - FIELD Hostname<br />
+<b>OPERATOR</b> = website url being protected<br />
+<b>Choose action</b> - Managed challenge<br />
+<b>Execution order</b> - first<br />
+<b>Status</b> - Active<br />
+<br />
+This is currently causing issues with posting, so I must be missing another setting. If you can share the settings, that would be very helpful.<br />
+<br />
+Do you also use the <b>Human Verification </b>setup in admincp, or does the managed challenge serve that same purpose?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member20</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513269-cloudflare-cloudflare-managed-challenge</guid>
+		</item>
+		<item>
+			<title>Can I change the multi-colored avatar background color?</title>
+			<link>https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting/4513266-can-i-change-the-multi-colored-avatar-background-color</link>
+			<pubDate>Wed, 28 Oct 2026 16:56:21 GMT</pubDate>
+			<description><![CDATA[I'd like to change the multi-colored avatar background color to a custom singe color. Is this possible with the cloud account? I didn't see anything in the style var editor, but did attempt a few...]]></description>
+			<content:encoded><![CDATA[I'd like to change the multi-colored avatar background color to a custom singe color. Is this possible with the cloud account? I didn't see anything in the style var editor, but did attempt a few tests.<br />
+<br />
+Future Thanks<br />
+<br />
+<img itemprop="image" title="color.png" data-attachmentid="4513267" data-align="none" data-size="full" border="0" src="filedata/fetch?id=4513267&amp;d=1793206567" alt="Click image for larger version
+
+Name:	color.png
+Views:	19
+Size:	936 Bytes
+ID:	4513267" data-fullsize-url="filedata/fetch?id=4513267&amp;d=1793206567" data-thumb-url="filedata/fetch?id=4513267&amp;d=1793206567&amp;type=thumb" data-title="Click on the image to see the original version" data-caption="color.png" class="bbcode-attachment thumbnail js-lightbox bbcode-attachment--lightbox" />]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting"><![CDATA[vB Cloud Support &amp; Troubleshooting.]]></category>
+			<dc:creator>member3</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting/4513266-can-i-change-the-multi-colored-avatar-background-color</guid>
+		</item>
+		<item>
+			<title>Do you use Cloudflare Free or Pro?</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513236-do-you-use-cloudflare-free-or-pro</link>
+			<pubDate>Tue, 27 Oct 2026 22:54:54 GMT</pubDate>
+			<description><![CDATA[Due to all the bots hitting my forum I'm considering moving my DNS to Cloudflare. 
+ 
+For those of you running VB6 and using Cloudflare I'm wondering if you're using the Free version or the Pro...]]></description>
+			<content:encoded><![CDATA[Due to all the bots hitting my forum I'm considering moving my DNS to Cloudflare.<br />
+<br />
+For those of you running VB6 and using Cloudflare I'm wondering if you're using the Free version or the Pro version?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member17</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513236-do-you-use-cloudflare-free-or-pro</guid>
+		</item>
+		<item>
+			<title>Markdown for AI Agents</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions/4513182-markdown-for-ai-agents</link>
+			<pubDate>Mon, 26 Oct 2026 19:50:45 GMT</pubDate>
+			<description><![CDATA[Hi. Given the huge numbers of bots hitting our sites now, how about a feature that automates production of markdown using &quot;Accept: text/markdown&quot; headers to generate lightweight versions of the page....]]></description>
+			<content:encoded><![CDATA[Hi. Given the huge numbers of bots hitting our sites now, how about a feature that automates production of markdown using &quot;Accept: text/markdown&quot; headers to generate lightweight versions of the page. Cheers.]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions"><![CDATA[Feedback &amp; Suggestions]]></category>
+			<dc:creator>member7</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions/4513182-markdown-for-ai-agents</guid>
+		</item>
+		<item>
+			<title>Bulk Email Campaign.  What do I need to do?</title>
+			<link>https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting/4513176-bulk-email-campaign-what-do-i-need-to-do</link>
+			<pubDate>Mon, 26 Oct 2026 16:22:07 GMT</pubDate>
+			<description><![CDATA[I'm looking to send out a mass email to about 3,000 members.  What do I need to do?  I'm on the Gold Cloud plan.  I've sent out some test emails, so that seems to work.  I appreciate any help and...]]></description>
+			<content:encoded><![CDATA[I'm looking to send out a mass email to about 3,000 members.  What do I need to do?  I'm on the Gold Cloud plan.  I've sent out some test emails, so that seems to work.  I appreciate any help and advice.  Thanks!]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting"><![CDATA[vB Cloud Support &amp; Troubleshooting.]]></category>
+			<dc:creator>member6</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting/4513176-bulk-email-campaign-what-do-i-need-to-do</guid>
+		</item>
+		<item>
+			<title><![CDATA[Who's read thread/topic]]></title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513132-who-s-read-thread-topic</link>
+			<pubDate>Sun, 25 Oct 2026 03:11:17 GMT</pubDate>
+			<description><![CDATA[in v6.2.3 is there a setting for Members who have read this thread/topic: as there is in vB4+. I've looked everywhere I can think of and can't find it or anything similar. It is a good confidence...]]></description>
+			<content:encoded><![CDATA[in v6.2.3 is there a setting for <b>Members who have read this thread/topic: </b>as there is in vB4+. I've looked everywhere I can think of and can't find it or anything similar. It is a good confidence builder for posters to see who and how many people have read a thread rather than seeing who's on line looking at the thread/topic which often shows as 0 or 1 if there are a few hundred member names listed as having read but no replies at least the poster realised it hasn't been a waste of time posting, as it has at least been looked at and just ignored.]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member18</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513132-who-s-read-thread-topic</guid>
+		</item>
+		<item>
+			<title><![CDATA[Show or don't show signature in topice]]></title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513104-show-or-don-t-show-signature-in-topice</link>
+			<pubDate>Sat, 24 Oct 2026 01:23:08 GMT</pubDate>
+			<description><![CDATA[Is there a way to allow and stop your signature showing in a thread, post, etc prior to hitting enter or reply, without deleting it from your account settings. As per vB4+ 
+ 
+It's not always...]]></description>
+			<content:encoded><![CDATA[Is there a way to allow and stop your signature showing in a thread, post, etc prior to hitting enter or reply, without deleting it from your account settings. As per vB4+<br />
+<br />
+It's not always appropriate, or needed to show your signature in every post and having to delete it from account and reinstall it every time it is or isn't really very helpful.<br />
+ ]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member18</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513104-show-or-don-t-show-signature-in-topice</guid>
+		</item>
+		<item>
+			<title>Email batch sending</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513091-email-batch-sending</link>
+			<pubDate>Fri, 23 Oct 2026 18:37:46 GMT</pubDate>
+			<description>Hello 
+ 
+I recently migrated servers on hosting.com as there was no upgrade path for Maria, that went fine, now I am being hit with a hourly email limit which is to say the least infuriating as I had...</description>
+			<content:encoded><![CDATA[Hello<br />
+<br />
+I recently migrated servers on hosting.com as there was no upgrade path for Maria, that went fine, now I am being hit with a hourly email limit which is to say the least infuriating as I had no such thing on the previous server. Lots of other gripes on limitations<br />
+<br />
+So i set the batch size below the hourly limit and set the scheduled task to what I thought was hourly by setting minutes to 00 but it just triggered at half past the hour so if it triggers at 00 minute it will send very 30 minutes and that will trigger bounces.<br />
+<br />
+Have i understood the cron settings correctly for sending every 1 hour on the turn of the hour ??<br />
+<br />
+Day of week &gt;     *<br />
+Day of month &gt;  *<br />
+Hour &gt;                  *<br />
+Minute &gt;              0<br />
+<br />
+BR&lt; John<br />
+<br />
+ ]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member8</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4513091-email-batch-sending</guid>
+		</item>
+		<item>
+			<title>vBulletin 6.2.4 is available for download.</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-announcements/vbulletin-announcements_aa/4513020-vbulletin-6-2-4-is-available-for-download</link>
+			<pubDate>Thu, 22 Oct 2026 18:01:16 GMT</pubDate>
+			<description><![CDATA[&lt;h1&gt;vBulletin 6.2.4 Changes and Updates&lt;/h1&gt; 
+&lt;p&gt;vBulletin 6.2.4 is now available for download. vBulletin Cloud&lt;br /&gt; 
+customers can expect their sites to be updated within the next two&lt;br /&gt;...]]></description>
+			<content:encoded><![CDATA[&lt;h1&gt;vBulletin 6.2.4 Changes and Updates&lt;/h1&gt;<br />
+&lt;p&gt;vBulletin 6.2.4 is now available for download. vBulletin Cloud&lt;br /&gt;<br />
+customers can expect their sites to be updated within the next two&lt;br /&gt;<br />
+weeks.&lt;/p&gt;<br />
+&lt;h2&gt;Admin Control Panel Cleanup&lt;/h2&gt;<br />
+&lt;p&gt;Further enhancements to the AdminCP have updated more of the codebase&lt;br /&gt;<br />
+with current standards, eliminated inline JavaScript, removed the&lt;br /&gt;<br />
+final remnants of the YUI library, and optimized layouts through the&lt;br /&gt;<br />
+removal of redundant code.&lt;/p&gt;<br />
+&lt;h2&gt;User Table Cleanup&lt;/h2&gt;<br />
+&lt;p&gt;Several columns and bitfield options have been removed from the &lt;code&gt;user&lt;/code&gt;&lt;br /&gt;<br />
+table in the database. These fields were obsolete and had not been&lt;br /&gt;<br />
+utilized by the software for an extended period. Corresponding&lt;br /&gt;<br />
+configuration controls in the AdminCP have also been eliminated. This&lt;br /&gt;<br />
+change includes:&lt;/p&gt;<br />
+&lt;p&gt;daysprune, friendcount, friendreacount, isfriend, pmboxwarning&lt;br /&gt;<br />
+(bitfield), pmdefaultsavecopy (bitfield), pmfolders, profilevisits,&lt;br /&gt;<br />
+receivefriendemailrequest (bitfield), showvbcode, vbasset_enable&lt;br /&gt;<br />
+(bitfield), vbcode (bitfield), vbcode_standard (bitfield),&lt;br /&gt;<br />
+vbcode_enhanced (bitfield), vm_contactonly (bitfield),&lt;br /&gt;<br />
+vmmoderatedcount, and vmunreadcount.&lt;/p&gt;<br />
+&lt;h2&gt;Notification Pausing&lt;/h2&gt;<br />
+&lt;p&gt;Users who remain inactive (defined as no site visits for one year)&lt;br /&gt;<br />
+will have all email and web-based notifications suspended to reduce&lt;br /&gt;<br />
+bounce rates, false spam reports, and unnecessary database entries. If&lt;br /&gt;<br />
+a user returns and updates their password, notifications will be&lt;br /&gt;<br />
+restored for their active subscriptions. Subscriptions during the&lt;br /&gt;<br />
+inactive period will not exist or be restored. This feature may be&lt;br /&gt;<br />
+disabled by deactivating “Expire Passwords for Inactive Users” in&lt;br /&gt;<br />
+Settings → Options → User Registration.&lt;/p&gt;<br />
+&lt;h2&gt;Automatically Remove Featured Topic Flag&lt;/h2&gt;<br />
+&lt;p&gt;Administrators may now add Channel Tasks to automatically remove the&lt;br /&gt;<br />
+Featured Topic designation after XX days from the date of topic&lt;br /&gt;<br />
+creation. This setting is accessible via the AdminCP under Channel&lt;br /&gt;<br />
+Management → Channel Tasks. The calculation is based on the topic&lt;br /&gt;<br />
+creation date, as vBulletin does not record the timestamp when a topic&lt;br /&gt;<br />
+is marked as featured.&lt;/p&gt;<br />
+&lt;h2&gt;Additional Issues&lt;/h2&gt;<br />
+&lt;ul&gt;<br />
+&lt;li&gt;Eliminated duplicate extensions from email logs.&lt;/li&gt;<br />
+&lt;li&gt;Content Slider links now direct to the specific node rather than the<br />
+topic starter.&lt;/li&gt;<br />
+&lt;li&gt;The “Go To New Post” function on new topics now correctly displays<br />
+the topic starter.&lt;/li&gt;<br />
+&lt;li&gt;Refined the priority-based display of user ranks.&lt;/li&gt;<br />
+&lt;li&gt;Resolved an issue with automated site map generation via Scheduled Tasks.&lt;/li&gt;<br />
+&lt;li&gt;Updated installation and upgrade wizards to reflect versioning and<br />
+code enhancements.&lt;/li&gt;<br />
+&lt;/ul&gt;<br />
+&lt;h2&gt;Deprecations&lt;/h2&gt;<br />
+&lt;ul&gt;<br />
+&lt;li&gt;With the release of PHP 8.6 and PHP 8.2 reaching End of Life, we<br />
+will be deprecating support for PHP 8.2.X. Future versions of<br />
+vBulletin are not guaranteed to run on PHP 8.2. Please upgrade your<br />
+servers.&lt;/li&gt;<br />
+&lt;li&gt;The Legacy PHP and Legacy SMTP settings for outgoing email are now<br />
+considered deprecated. We will be removing these settings in the near<br />
+future. Please update to the newer Email or SMTP classes available in<br />
+the AdminCP under Settings → Email Manager. Cloud Customers do not<br />
+need to worry about this change. We will update your systems<br />
+automatically.&lt;/li&gt;<br />
+&lt;li&gt;The developers will remove the Worldpay payment gateway in a future<br />
+version of the software. This system is out of date and will no longer<br />
+be supported.&lt;/li&gt;<br />
+&lt;/ul&gt;<br />
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;h2&gt;Additional Information&lt;/h2&gt;<br />
+&lt;h3&gt;Install / Upgrade&lt;/h3&gt;<br />
+&lt;ul&gt;<br />
+&lt;li&gt;&lt;a href=&quot;https://www.vbulletin.com/forum/node/4483267&quot;&gt;Installation Instructions&lt;/a&gt;&lt;/li&gt;<br />
+&lt;li&gt;&lt;a href=&quot;https://www.vbulletin.com/forum/node/4483262&quot;&gt;Upgrade Instructions&lt;/a&gt;&lt;/li&gt;<br />
+&lt;/ul&gt;<br />
+&lt;h3&gt;File Cleanup&lt;/h3&gt;<br />
+&lt;p&gt;After upgrading your vBulletin system, delete any obsolete files that&lt;br /&gt;<br />
+may still be present. You can find more information on why this is&lt;br /&gt;<br />
+needed and instructions for doing this in this&lt;br /&gt;<br />
+&lt;a href=&quot;https://www.vbulletin.com/forum/node/4391346&quot;&gt;topic&lt;/a&gt; in the vBulletin&lt;br /&gt;<br />
+6 Installs &amp;amp; Upgrades forum.&lt;/p&gt;<br />
+&lt;h3&gt;System Requirements&lt;/h3&gt;<br />
+&lt;p&gt;Current Minimum System Requirements&lt;/p&gt;<br />
+&lt;ul&gt;<br />
+&lt;li&gt;PHP Version: 8.2.0&lt;/li&gt;<br />
+&lt;li&gt;MySQL Version: 8.0.11&lt;/li&gt;<br />
+&lt;li&gt;MariaDB Version: 10.6.0&lt;/li&gt;<br />
+&lt;/ul&gt;<br />
+&lt;p&gt;Recommended System Requirements&lt;/p&gt;<br />
+&lt;ul&gt;<br />
+&lt;li&gt;PHP Version: 8.5+&lt;/li&gt;<br />
+&lt;li&gt;MySQL Version: 9.0+&lt;/li&gt;<br />
+&lt;li&gt;MariaDB Version: 11.4+&lt;/li&gt;<br />
+&lt;/ul&gt;<br />
+&lt;p&gt;For more information, see &lt;a href=&quot;https://www.vbulletin.com/forum/node/4391344&quot;&gt;vBulletin System&lt;br /&gt;<br />
+Requirements&lt;/a&gt;.&lt;/p&gt;<br />
+&lt;h3&gt;Current Support Schedule&lt;/h3&gt;<br />
+&lt;ul&gt;<br />
+&lt;li&gt;Active Version - 6.2.4&lt;/li&gt;<br />
+&lt;li&gt;Security Patch - 6.2.3&lt;/li&gt;<br />
+&lt;li&gt;Security Patch - 6.2.2&lt;/li&gt;<br />
+&lt;/ul&gt;<br />
+&lt;h3&gt;Discussion&lt;/h3&gt;<br />
+&lt;p&gt;If you have any questions about these changes, you may discuss them in&lt;br /&gt;<br />
+the <a href="https://forum.vbulletin.com/node/4513019" >https://forum.vbulletin.com/node/4513019</a>&lt;/p&gt;<br />
+&lt;p&gt;If you encounter an issue with the software or wish to submit a&lt;br /&gt;<br />
+feature request, please visit our&lt;br /&gt;<br />
+&lt;a href=&quot;https://tracker.vbulletin.com/vbulletin6&quot;&gt;tracker&lt;/a&gt;.&lt;/p&gt;<br />
+&lt;p&gt;To receive support for your vBulletin Product, please visit our&lt;br /&gt;<br />
+&lt;a href=&quot;https://www.vbulletin.com/forum/&quot;&gt;community forums&lt;/a&gt;.&lt;/p&gt;<br />
+<br />
+]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-announcements/vbulletin-announcements_aa">vBulletin Announcements</category>
+			<dc:creator>member5</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-announcements/vbulletin-announcements_aa/4513020-vbulletin-6-2-4-is-available-for-download</guid>
+		</item>
+		<item>
+			<title>Discuss the vBulletin 6.2.4 Release Here.</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions/4513019-discuss-the-vbulletin-6-2-4-release-here</link>
+			<pubDate>Thu, 22 Oct 2026 17:59:13 GMT</pubDate>
+			<description>Discuss the changes and updates in the vBulletin 6.2.4 release. 
+ 
+Completed Issues...</description>
+			<content:encoded><![CDATA[Discuss the changes and updates in the vBulletin 6.2.4 release.<br />
+<br />
+<a href="https://tracker.vbulletin.com/vbulletin6/issues/find?fs%5Bproject_id%5D%5Bo%5D=%3D&amp;fs%5Bproject_id%5D%5Bv%5D=6&amp;fs%5Bissuetype%5D%5Bo%5D=%3D&amp;fs%5Bissuetype%5D%5Bv%5D=&amp;fs%5Bstatus%5D%5Bo%5D=%3D&amp;fs%5Bstatus%5D%5Bv%5D=closed&amp;filters_status_value_closed=closed&amp;fs%5Bcategory%5D%5Bo%5D=%3D&amp;fs%5Bcategory%5D%5Bv%5D=&amp;sortfields=issues.last_updated%3Ddesc&amp;fs%5Btext%5D%5Bo%5D=%3D&amp;fs%5Btext%5D%5Bv%5D=&amp;scs_current_template=results_normal&amp;columns%5Btitle%5D=title&amp;columns%5Bissuetype%5D=issuetype&amp;columns%5Bstatus%5D=status&amp;columns%5Bpriority%5D=priority&amp;columns%5Bcomponents%5D=components&amp;columns%5Bmilestone%5D=milestone&amp;columns%5Blast_updated%5D=last_updated&amp;columns%5Bcomments%5D=comments&amp;template=results_normal&amp;template_parameter=&amp;grouporder=asc&amp;groupby=&amp;issues_per_page=50&amp;fs%5Bmilestone%5D%5Bo%5D=%3D&amp;fs%5Bmilestone%5D%5Bv%5D=392&amp;filters_milestone_value_392=392" target="_blank">Completed Issues</a>]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions"><![CDATA[Feedback &amp; Suggestions]]></category>
+			<dc:creator>member5</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions/4513019-discuss-the-vbulletin-6-2-4-release-here</guid>
+		</item>
+		<item>
+			<title>Bug / IssueSystem error sometimes but only for guests</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512997-system-error-sometimes-but-only-for-guests</link>
+			<pubDate>Thu, 22 Oct 2026 09:08:42 GMT</pubDate>
+			<description><![CDATA[All fine for logged in users, but for guests, I'm sometimes getting: 
+&quot;A System Error has occured. 
+The software is experiencing a systems error. 
+You should attempt to repeat your last action. If...]]></description>
+			<content:encoded><![CDATA[All fine for logged in users, but for guests, I'm sometimes getting:<br />
+&quot;A System Error has occured.<br />
+The software is experiencing a systems error.<br />
+You should attempt to repeat your last action. If this error occurs again, please contact the site administrator.&quot;<br />
+<br />
+If I enable debug mode briefly, the action of saving that config file seems to fix the issue almost always, but maybe that's pure coincidence.<br />
+Anyway, the one time I was able to see the error message in debug in a logged out private tab, I see:<br />
+<br />
+Error: API ErrorController: TwitterLogin:ExternalLoginMethod: getStateError(s):array ( 0 =&gt; array ( 0 =&gt; 'The server is too busy at the moment. Please try again later.', ),)on line 1087 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template/runtime.phpStep 0: parseData() called on line 1 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template.php(435) : eval()'d codeStep 1: eval() called on line 435 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template.phpStep 2: runTemplateCode() called on line 389 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template.phpStep 3: render() called on line 137 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template/cache.phpStep 4: replacePlaceholders() called on line 403 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template.phpStep 5: render() called on line 137 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template/cache.phpStep 6: replacePlaceholders() called on line 403 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template.phpStep 7: render() called on line 137 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template/cache.phpStep 8: replacePlaceholders() called on line 403 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/template.phpStep 9: render() called on line 740 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/applicationabstract.phpStep 10: echoPageTemplate() called on line 696 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/applicationabstract.phpStep 11: showMsgPage() called on line 189 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/frontend/routing.phpStep 12: setRoutes() called on line 21 in /home/storm/sites/pwxje-nimsite-uk/public/includes/vb5/frontend/application.phpStep 13: init() called on line 65 in /home/storm/sites/pwxje-nimsite-uk/public/index.phpException API ErrorController: TwitterLogin:ExternalLoginMethod: getStateError(s):array ( 0 =&gt; array ( 0 =&gt; 'The server is<br />
+<br />
+This talks about the server being too busy, but in the logged in tab all is fine and can search etc no problem.<br />
+In 3rd party login settings, everything is disabled.<br />
+<br />
+However, when I go to Products &amp; Hooks, I see that &quot;Third Party Login - Twitter&quot; is not struck through. I've disabled it there, so it's now struck through.<br />
+<br />
+I'll report back if the error happens again after this change, but do you feel that was the right place to make this error go away?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member7</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512997-system-error-sometimes-but-only-for-guests</guid>
+		</item>
+		<item>
+			<title>Which Database Management Systems Does vBulletin Support?</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/vbulletin-pre-sales-questions/4512977-which-database-management-systems-does-vbulletin-support</link>
+			<pubDate>Thu, 22 Oct 2026 02:36:18 GMT</pubDate>
+			<description><![CDATA[Hello, 
+ 
+I'm considering vBulletin for a forum project and would like to clarify its database compatibility before purchasing a license. 
+ 
+Which database management systems (DBMS) are officially...]]></description>
+			<content:encoded><![CDATA[Hello,<br />
+<br />
+I'm considering vBulletin for a forum project and would like to clarify its database compatibility before purchasing a license.<br />
+<br />
+Which database management systems (DBMS) are officially supported by the current version of vBulletin?<br />
+<br />
+In particular, does vBulletin support only MySQL, or are alternatives such as MariaDB, PostgreSQL, and SQLite supported as well?<br />
+<br />
+Are there any differences in database support between vBulletin versions, and is there an official compatibility list or documentation covering supported database systems and versions?<br />
+<br />
+Thank you for your help.]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/vbulletin-pre-sales-questions">vBulletin Pre-sales Questions</category>
+			<dc:creator>member12</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/vbulletin-pre-sales-questions/4512977-which-database-management-systems-does-vbulletin-support</guid>
+		</item>
+		<item>
+			<title>Is vBulletin Cloud down? (FIXED)</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512969-is-vbulletin-cloud-down-fixed</link>
+			<pubDate>Wed, 21 Oct 2026 19:05:16 GMT</pubDate>
+			<description><![CDATA[UPDATE: it's working again. 
+---------------- 
+ 
+Our cloud site is currently down... 
+ 
+Is there a server issue?]]></description>
+			<content:encoded><![CDATA[UPDATE: it's working again.<br />
+----------------<br />
+<br />
+Our cloud site is currently down...<br />
+<br />
+Is there a server issue?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member4</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512969-is-vbulletin-cloud-down-fixed</guid>
+		</item>
+		<item>
+			<title>Update PHP on your Self-Hosted Servers</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-announcements/vbulletin-announcements_aa/4512964-update-php-on-your-self-hosted-servers</link>
+			<pubDate>Wed, 21 Oct 2026 17:16:49 GMT</pubDate>
+			<description>This is note a vBulletin issue. We cannot resolve this for you 
+ 
+Please see: https://www.php.net/archive/2026.php#2026-10-21-5 
+ 
+PHP 8.5.12, 8.4.27, 8.3.36 and 8.2.35 fix two critical...</description>
+			<content:encoded><![CDATA[<div class="contentnote" style="color:#00529B;font-weight:bold;padding:8px;">Note: This is note a vBulletin issue. We cannot resolve this for you</div><br />
+<br />
+Please see: <a href="https://www.php.net/archive/2026.php#2026-10-21-5" target="_blank">https://www.php.net/archive/2026.php#2026-10-21-5</a><br />
+<br />
+<b>PHP 8.5.12, 8.4.27, 8.3.36 and 8.2.35 fix two critical vulnerabilities that can allow unauthenticated remote code execution. All PHP users are strongly encouraged to update immediately.</b><br />
+<br />
+<b>Who is at risk:</b> all PHP installations serving web requests, including PHP-FPM, Apache with mod_php, php-cgi, FrankenPHP and LiteSpeed. We consider the risk highest for mod_php, with a demonstrated exploit where an unauthenticated request can trigger the attack before any application code runs.<br />
+]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-announcements/vbulletin-announcements_aa">vBulletin Announcements</category>
+			<dc:creator>member5</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-announcements/vbulletin-announcements_aa/4512964-update-php-on-your-self-hosted-servers</guid>
+		</item>
+		<item>
+			<title>PHP vulnerability</title>
+			<link>https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting/4512959-php-vulnerability</link>
+			<pubDate>Wed, 21 Oct 2026 15:20:25 GMT</pubDate>
+			<description><![CDATA[member5 in the Netherlands where I live, the vulnerability found in the PHP code is big news. I haven't seen anything yet here. 
+In the ACP I see we run on PHP 8.2.34, the patched version is...]]></description>
+			<content:encoded><![CDATA[<a href="https://forum.vbulletin.com/member/1-member" style="background-image:url('https://forum.vbulletin.com/core/custompics/avatar/avatar1_1.png');" class="b-bbcode-user b-bbcode-user--has-avatar js-bbcode-user" data-userid="1" data-vbnamecard="1">member5</a> in the Netherlands where I live, the vulnerability found in the PHP code is big news. I haven't seen anything yet here.<br />
+In the ACP I see we run on PHP 8.2.34, the patched version is 8.2.35<br />
+Is vbulletin going to implement a patch or are we safe already? ]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting"><![CDATA[vB Cloud Support &amp; Troubleshooting.]]></category>
+			<dc:creator>member19</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbcloud/vbulletin-cloud-questions-problems-and-troubleshooting/4512959-php-vulnerability</guid>
+		</item>
+		<item>
+			<title>Bug / IssueCustom Node Fields</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512924-custom-node-fields</link>
+			<pubDate>Tue, 20 Oct 2026 23:26:45 GMT</pubDate>
+			<description>I am attempting to use custom node fields.  It seems straightforward.  The issue I have is that regardless of the Required setting of Yes or No, the user is always required to enter something in the...</description>
+			<content:encoded><![CDATA[I am attempting to use custom node fields.  It seems straightforward.  The issue I have is that regardless of the Required setting of Yes or No, the user is always required to enter something in the field. <br />
+<br />
+Is this a bug, or am I missing some setting elsewhere?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member13</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512924-custom-node-fields</guid>
+		</item>
+		<item>
+			<title><![CDATA[Email to an address for all new posts &amp;amp; replies in a channel]]></title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512922-email-to-an-address-for-all-new-posts-replies-in-a-channel</link>
+			<pubDate>Tue, 20 Oct 2026 18:31:48 GMT</pubDate>
+			<description>In vB4.2, I could set an email address to be notified of new posts in a given forum. I cannot find that same functionality in vB6. I can only find a way to assigned a moderator to the desired...</description>
+			<content:encoded><![CDATA[In vB4.2, I could set an email address to be notified of new posts in a given forum. I cannot find that same functionality in vB6. I can only find a way to assigned a moderator to the desired channels, then enable the <i>Receive Email When a New Topic is Created</i> and <i>Receive Email When a New Post</i> is Created options.<br />
+<br />
+I need to be able to continue sending such notifications to a couple of different email distribution lists, depending on the channel, i.e. marketing, product engineering/development, or tech support.<br />
+<br />
+Is my only option to create a new account for each workgroup, then add each one as a moderator where needed?]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member13</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512922-email-to-an-address-for-all-new-posts-replies-in-a-channel</guid>
+		</item>
+		<item>
+			<title>vBulletin 7 — Technical Proposal</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions/4512916-vbulletin-7-—-technical-proposal</link>
+			<pubDate>Mon, 19 Oct 2026 22:28:34 GMT</pubDate>
+			<description>vBulletin 7 — Technical Proposal 
+ 
+ 
+ 
+Summary 
+ 
+We propose that vBulletin 7 is a deliberate modernization of the existing core, not a rewrite: a slimmer, faster, file-based platform on Symfony...</description>
+			<content:encoded><![CDATA[<span style="font-size:24px"><b>vBulletin 7 — Technical Proposal</b></span><br />
+<br />
+<br />
+<br />
+<span style="font-size:28px"><b>Summary</b></span><br />
+<br />
+We propose that vBulletin 7 is a deliberate modernization of the existing core, not a rewrite: a slimmer, faster, file-based platform on Symfony components, with a brand-new extension system, Twig templates, file-based languages and a light frontend.<br />
+<br />
+The current architecture (a presentation app that calls an internal API, with routes, libraries and data managers behind it) is sound. What holds us back is the weight that has piled up around it: no namespaces, a service locator instead of dependency injection, PHP code stored in XML and run through <span style="font-family:Courier New">eval()</span>, a 3.5 MB style file, a 2019 editor, and 600 KB of JavaScript on every page.<br />
+<br />
+If we fix those things and ship only when v7 is measurably faster and more complete than 6.x, we can offer a combination few forum platforms offer today:<ul><li><b>Everything in the box.</b> Forums, blogs, groups, albums, articles and calendar built in, each one optional.</li>
+<li><b>The best developer experience of any forum platform.</b> A typed API, a CLI that scaffolds extensions, and docs written so that both people and AI assistants can build add-ons in an hour.</li>
+<li><b>Painless migration</b> from other forum platforms, with URLs and passwords preserved.</li>
+</ul><br />
+<br />
+Old 6.x add-ons will not run on v7. We accept that on purpose: the add-on ecosystem has already thinned out, and a clean break is what lets us remove <span style="font-family:Courier New">eval()</span>, XML-embedded code and the global registry for good. Forum data, users and URLs always carry over.<br />
+<br />
+<span style="font-size:28px"><b>Where 6.2.3 stands today</b></span><br />
+<br />
+The core is in better shape than its reputation, but almost none of it follows the conventions a PHP developer expects in 2026. Every number below was measured directly on the 6.2.3 package, with <span style="font-family:Courier New">vb.phar</span> and <span style="font-family:Courier New">libraries.phar</span> extracted and the code counted with PHP's own tokenizer.<br />
+<br />
+<span style="font-size:20px"><b>What is already good</b></span><ul><li><b>Sound layering.</b> <span style="font-family:Courier New">index.php</span> routes through the <span style="font-family:Courier New">vB5_Frontend_*</span> app, which calls the core API in-process (<span style="font-family:Courier New">includes/api/interface/collapsed.php</span>). Routes, API, libraries and data managers are cleanly separated.</li>
+<li><b>One query layer.</b> Almost all SQL goes through the assertor and named queries (<span style="font-family:Courier New">querydefs.php</span>: 95 table definitions, 219 named and 93 method queries). There are only 3 inline SQL strings inside the core.</li>
+<li><b>Modern password hashing.</b> argon2id and bcrypt are used, with the legacy md5 scheme kept only to rehash old accounts. CSRF tokens are in place.</li>
+<li><b>Current server baseline.</b> The minimums are PHP 8.2, MySQL 8.0.11 and MariaDB 10.6.</li>
+<li><b>Current Composer packages.</b> Inside <span style="font-family:Courier New">libraries.phar</span>: Guzzle 7.10, PHPMailer 7.0, ramsey/uuid 4.9, league/oauth2-client 2.9 and others.</li>
+<li><b>The start of an extension model.</b> <span style="font-family:Courier New">core/packages/&lt;name&gt;/</span> already holds <span style="font-family:Courier New">product.php</span>, <span style="font-family:Courier New">hooks.php</span>, <span style="font-family:Courier New">api/</span> and <span style="font-family:Courier New">library/</span>. <span style="font-family:Courier New">vB_Api_Wrapper</span> also runs extension classes after every API call.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>What holds us back</b></span><br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Area</b></td>
+<td class="text_table_grid_td"><b>Measured fact</b></td>
+<td class="text_table_grid_td"><b>Why it matters</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Code style</td>
+<td class="text_table_grid_td">887 first-party PHP files (519 inside a minified <span style="font-family:Courier New">vb.phar</span>). 0 namespaces, 0 <span style="font-family:Courier New">strict_types</span>, no test suite</td>
+<td class="text_table_grid_td">Unfamiliar to modern PHP developers. Stack traces point at 65,000-character lines</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Typing</td>
+<td class="text_table_grid_td">17% of 5,246 methods have return types; 19% of properties are typed</td>
+<td class="text_table_grid_td">IDEs and static analysis can do little</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Dependencies</td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">vB::getDbAssertor()</span> 811×, <span style="font-family:Courier New">getDatastore()</span> 562×, <span style="font-family:Courier New">getUserContext()</span> 421×. Legacy <span style="font-family:Courier New">$vbulletin</span> registry in 106 files</td>
+<td class="text_table_grid_td">No DI container. Hard to test or to replace a service</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Procedural code</td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">core/includes</span>: 41,000 lines, 387 global functions. AdminCP: 52,000 lines, 3,553 <span style="font-family:Courier New">print_*</span> calls</td>
+<td class="text_table_grid_td">Slow to change. AdminCP looks and feels dated</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Code execution</td>
+<td class="text_table_grid_td">23 <span style="font-family:Courier New">eval()</span> calls: template runtime, product install and uninstall code, setting validation</td>
+<td class="text_table_grid_td">Security and debugging risk. Add-on code lives in the database</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Add-on packaging</td>
+<td class="text_table_grid_td">Templates, phrases, settings and install code ship in one XML per product</td>
+<td class="text_table_grid_td">Hard to review, diff or version with Git</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Styles and language</td>
+<td class="text_table_grid_td">Master style: 598 templates and 1,082 stylevars in a 3.5 MB XML. 10,621 phrases in a 1.8 MB XML</td>
+<td class="text_table_grid_td">Designers and translators can't work in files</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Editor</td>
+<td class="text_table_grid_td">CKEditor 4.13.0 (2019). CKEditor 4 is end-of-life</td>
+<td class="text_table_grid_td">Highest-priority security item</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Frontend weight</td>
+<td class="text_table_grid_td">Every public page loads jQuery (88 KB) plus <span style="font-family:Courier New">footer-rollup.js</span> (514 KB, 148 KB gzip): jQuery UI 1.13, qtip, jCarousel (2018), history.js and others</td>
+<td class="text_table_grid_td">Poor Core Web Vitals on mobile</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Database</td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">node</span> has 57 columns and 32 indexes. Several time columns are signed INT. 3 tables are still MyISAM</td>
+<td class="text_table_grid_td">Every new post updates 32 indexes. Y2038 limit</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Dead or old code</td>
+<td class="text_table_grid_td">APC cache backend (APC no longer exists on PHP 7+). Facebook PHP SDK 4.0.9 (abandoned). Stripe PHP 8.8.0</td>
+<td class="text_table_grid_td">Maintenance cost and risk</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Upgrade path</td>
+<td class="text_table_grid_td">369 upgrade step classes, 52,854 lines, going back to vB 3.5</td>
+<td class="text_table_grid_td">A large surface we keep maintaining</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Migration</td>
+<td class="text_table_grid_td">No importer from other platforms in core (<span style="font-family:Courier New">bulkimporter.php</span> is a vB4 CMS upgrade helper)</td>
+<td class="text_table_grid_td">No path for sites on other platforms to move to vBulletin</td>
+</tr>
+</table></div>
+ YUI is used only in AdminCP and the installer, not on public pages.<br />
+<br />
+<span style="font-size:28px"><b>Goals and release targets</b></span><br />
+<br />
+v7 ships as Final only when it meets every target below, measured on the same hardware and data as 6.2.x. These are proposed numbers for the team to confirm, not measurements.<br />
+<br />
+<b>Product goals</b><ol class="decimal"><li>Be the fastest full-featured forum platform. A thread page should feel instant on a mid-range phone.</li>
+<li>Make writing an extension a one-hour job for a PHP developer, or for an AI assistant following our docs.</li>
+<li>Let a site on another forum platform move to vBulletin in an afternoon without losing URLs, users or search ranking.</li>
+<li>Keep the &quot;everything in the box&quot; promise, but make every large feature optional.</li>
+</ol><br />
+<br />
+<b>Release gate (proposed targets)</b><br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Metric</b></td>
+<td class="text_table_grid_td"><b>Target for 7.0 Final</b></td>
+<td class="text_table_grid_td"><b>How we measure</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">JavaScript on a thread page</td>
+<td class="text_table_grid_td">≤ 50 KB gzip (editor loaded only when the reply box opens)</td>
+<td class="text_table_grid_td">Lighthouse and the network panel on a default install</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">CSS on a thread page</td>
+<td class="text_table_grid_td">≤ 30 KB gzip</td>
+<td class="text_table_grid_td">Same</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">DB queries per thread page</td>
+<td class="text_table_grid_td">≤ 15 for a guest, ≤ 20 for a member</td>
+<td class="text_table_grid_td">Built-in query explain mode (<span style="font-family:Courier New">vB5_Frontend_ExplainQueries</span>)</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Server time to first byte</td>
+<td class="text_table_grid_td">≤ 100 ms on shared-hosting class hardware, warm cache</td>
+<td class="text_table_grid_td">Benchmark script with 1M posts</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Lighthouse mobile performance</td>
+<td class="text_table_grid_td">≥ 95 on index, forum and thread pages</td>
+<td class="text_table_grid_td">Lighthouse CI in the build</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Core Web Vitals</td>
+<td class="text_table_grid_td">LCP &lt; 2.0 s, INP &lt; 200 ms, CLS &lt; 0.05</td>
+<td class="text_table_grid_td">Lighthouse and field data from beta sites</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">eval()</span> calls in core</td>
+<td class="text_table_grid_td">0</td>
+<td class="text_table_grid_td">CI grep check</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Code with namespaces and <span style="font-family:Courier New">strict_types</span></td>
+<td class="text_table_grid_td">100% of new code; 100% of core classes behind PSR-4 aliases</td>
+<td class="text_table_grid_td">PHPStan in CI</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Static analysis</td>
+<td class="text_table_grid_td">PHPStan level 6 or higher on new code</td>
+<td class="text_table_grid_td">CI</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Test coverage of the API layer</td>
+<td class="text_table_grid_td">≥ 60% of public API methods have tests</td>
+<td class="text_table_grid_td">PHPUnit in CI</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Upgrade from 5.7.x / 6.x</td>
+<td class="text_table_grid_td">Completes without manual steps on the test data set</td>
+<td class="text_table_grid_td">Upgrade CI job</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Official extensions available</td>
+<td class="text_table_grid_td">15 or more covering the most-requested add-ons</td>
+<td class="text_table_grid_td">Marketplace list</td>
+</tr>
+</table></div>
+ <span style="font-size:28px"><b>Principles</b></span><br />
+<br />
+v7 keeps the data and the URLs, and breaks the code interfaces once, cleanly.<br />
+<br />
+<b>What we keep</b><ul><li>Every site's data: users, nodes, permissions, attachments, settings and phrases.</li>
+<li>Every public URL, or a permanent 301 redirect to its new form.</li>
+<li>The layering of routes, API, libraries and data managers, and the assertor with named queries.</li>
+<li>The &quot;everything in the box&quot; feature set, repackaged as official extensions.</li>
+</ul><br />
+<br />
+<b>What we break, on purpose</b><ul><li>Old XML products, PHP hook code stored in the database, and <span style="font-family:Courier New">{vb:...}</span> templates in custom styles. A converter handles the common cases (see Templates and Migration).</li>
+<li>Global functions and the <span style="font-family:Courier New">$vbulletin</span> registry as a public API. They remain only as internal shims during 7.x.</li>
+<li>PHP below 8.3, so that v7 can rely on typed class constants, readonly classes and current Symfony LTS.</li>
+</ul><br />
+<br />
+<b>Lessons from vB5 we commit to</b><ol class="decimal"><li><b>No release before parity.</b> 7.0 Final does not ship with fewer features or slower pages than 6.x. A long public beta comes first.</li>
+<li><b>Strangler, not big bang.</b> Every phase leaves a working product. New code wraps old code, then replaces it.</li>
+<li><b>Measured, not claimed.</b> The release gate above runs in CI. Performance numbers in announcements come from the same benchmark.</li>
+<li><b>Developers first.</b> If it is not documented with a working example, it is not finished.</li>
+<li><b>One way to do each thing.</b> Add-ons get one extension format, one event system and one template engine, not two in parallel.</li>
+</ol><br />
+<br />
+<span style="font-size:28px"><b>Target architecture</b></span><br />
+<br />
+v7 keeps today's layering and puts a small Symfony-component kernel and a real DI container underneath it. We do not adopt a full-stack framework.<br />
+<br />
+<b>Every request passes the same thin layers; extensions plug into each</b><ol class="decimal"><li><b>Entry points</b> — index.php · api.php (REST) · bin/vb console: install, upgrade, cron</li>
+<li><b>Kernel</b> — HttpFoundation · Routing · DI container · session, CSRF, rate limit</li>
+<li><b>Presentation</b> — Controllers render Twig views; page-builder widgets are optional</li>
+<li><b><span style="color:#1E66D0">Core API (the public contract)</span></b> — vBulletin\Api\*: permissions, validation; what extensions and apps call</li>
+<li><b>Domain libraries</b> — vBulletin\Library\*: business rules; emits typed events (PostCreated)</li>
+<li><b>Infrastructure</b> — Assertor queries · Redis/APCu cache · queue · mailer · search</li>
+</ol><br />
+<b>Extensions</b> plug into every layer above: extension.json manifest · own routes and controllers · Twig templates and slots · service decorators · event subscribers · migrations and queue jobs · CLI commands. <i>Only via vBulletin\Contracts, never internal classes.</i><br />
+<br />
+The Core API is the one contract that extensions, the mobile app and the REST API depend on. Everything below it may change between minor versions.<br />
+<br />
+<span style="font-size:20px"><b>Why components, not a full framework</b></span><br />
+<br />
+vBulletin is installed by thousands of customers on hosts we don't control, and it must stay stable for years. A full framework would tie our release cycle to theirs. Laravel in particular ships a major version every year. Our own route, API and library layers already do the job of a framework's application layer.<br />
+<br />
+Symfony components give us standard, well-documented building blocks with long-term-support releases. Developers who know Symfony or Laravel recognise them immediately, and several major PHP projects are built the same way.<br />
+<br />
+<span style="font-size:20px"><b>Components we adopt</b></span><br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Component</b></td>
+<td class="text_table_grid_td"><b>Replaces in 6.x</b></td>
+<td class="text_table_grid_td"><b>What it gives us</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/dependency-injection</span></td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">vB::getX()</span> service locator (2,500+ calls)</td>
+<td class="text_table_grid_td">Constructor injection, testable services, extensions can decorate any service. Compiled container, no runtime cost</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/event-dispatcher</span></td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">vB::getHooks()</span> (26 untyped hooks) and DB-stored hook code</td>
+<td class="text_table_grid_td">Typed events with priorities, the standard PSR-14 model</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/console</span></td>
+<td class="text_table_grid_td">Browser-only installer, upgrader and cron</td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">bin/vb install</span>, <span style="font-family:Courier New">upgrade</span>, <span style="font-family:Courier New">cron:run</span>, <span style="font-family:Courier New">cache:clear</span>, <span style="font-family:Courier New">make:extension</span>, <span style="font-family:Courier New">extension:install</span></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/http-foundation</span> + <span style="font-family:Courier New">routing</span></td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">vB5_Frontend_Routing</span>, raw superglobals (1,764 direct uses)</td>
+<td class="text_table_grid_td">Standard request and response objects. Routes from PHP attributes or files, cached</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/messenger</span></td>
+<td class="text_table_grid_td">Heavy cron jobs and synchronous mail and push</td>
+<td class="text_table_grid_td">Background queue (DB transport by default, Redis optional) for mail, notifications, counters and search indexing</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/cache</span></td>
+<td class="text_table_grid_td">Custom cache classes, including dead APC</td>
+<td class="text_table_grid_td">PSR-6/16 caches on Redis, APCu, Memcached and filesystem</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/mailer</span></td>
+<td class="text_table_grid_td">Direct PHPMailer wrapper</td>
+<td class="text_table_grid_td">Transports, templated mail, async sending via Messenger</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">symfony/rate-limiter</span>, <span style="font-family:Courier New">security-csrf</span></td>
+<td class="text_table_grid_td">Hand-written flood and token checks</td>
+<td class="text_table_grid_td">Tested implementations</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">twig/twig</span></td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">{vb:...}</span> compiler and <span style="font-family:Courier New">eval()</span> runtime</td>
+<td class="text_table_grid_td">See Templates</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><span style="font-family:Courier New">doctrine/migrations</span></td>
+<td class="text_table_grid_td">Upgrade step classes for schema changes</td>
+<td class="text_table_grid_td">Versioned schema changes for core and every extension</td>
+</tr>
+</table></div>
+ We do <b>not</b> adopt Doctrine ORM. The assertor and named queries work well and give us full control over SQL on large boards.<br />
+<br />
+<span style="font-size:20px"><b>Compatibility bridge</b></span><br />
+<br />
+During 7.x, <span style="font-family:Courier New">vB::getDbAssertor()</span> and the other locator methods remain, but they read from the container. Old internal code keeps working while new code uses constructor injection. Each class moves under a namespace (<span style="font-family:Courier New">vB_Api_Node</span> becomes <span style="font-family:Courier New">vBulletin\Api\Node</span>) with a <span style="font-family:Courier New">class_alias</span> for the old name, so the change can land file by file.<br />
+<br />
+<span style="font-size:20px"><b>Directory layout</b></span><br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">bin/vb                      # console entry point
+config/                     # config.php, services.php, routes
+public/                     # index.php, api.php, built assets (web root)
+src/
+  Api/  Library/  Entity/  Controller/  Event/  Contracts/
+  Kernel/  Db/  Search/  Template/  Console/
+migrations/                 # core schema migrations
+templates/                  # core Twig templates (overridable)
+language/en/*.php           # core phrases by group
+styles/default/  styles/classic/
+extensions/&lt;vendor&gt;/&lt;name&gt;/ # installed extensions
+var/cache/  var/log/  var/storage/   # writable, outside the web root
+vendor/                     # Composer dependencies (shipped pre-built)</pre>
+</div>The web root becomes <span style="font-family:Courier New">public/</span>, so source, config and storage are no longer reachable over HTTP by accident.<br />
+<br />
+<span style="font-size:20px"><b>Distribution</b></span><ul><li>Source ships unminified and readable. Opcache removes any speed difference, and readable stack traces matter for every add-on developer.</li>
+<li><span style="font-family:Courier New">vendor/</span> ships pre-built so shared-hosting customers never need to run Composer. Core dependencies are prefixed with <span style="font-family:Courier New">php-scoper</span> (for example <span style="font-family:Courier New">vBulletin\Vendor\GuzzleHttp</span>), so an extension can bring its own version of a library without a conflict.</li>
+<li>The minimum is PHP 8.3, so we can use typed class constants, readonly classes and the current Symfony LTS.</li>
+</ul><br />
+<br />
+<span style="font-size:28px"><b>Extension system</b></span><br />
+<br />
+An extension in v7 is a folder of ordinary files: PHP classes, Twig templates, phrase files and migrations, described by one <span style="font-family:Courier New">extension.json</span>. Nothing is stored as code in the database and nothing runs through <span style="font-family:Courier New">eval()</span>. It grows out of what <span style="font-family:Courier New">core/packages/</span> already does; it is not a new invention.<br />
+<br />
+<span style="font-size:20px"><b>Folder structure</b></span><br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">extensions/acme/seo/
+  extension.json            # identity, versions, requirements
+  composer.json             # optional: the extension's own dependencies
+  src/                      # PSR-4, namespace Acme\Seo\
+    Setup.php               # optional install / upgrade / uninstall steps
+    Listener/ThreadListener.php
+    Controller/SitemapController.php
+    Api/SeoApi.php          # optional: adds methods to the public API
+  config/
+    services.php            # service registration and decorators
+    routes.php              # the extension's own routes
+    settings.php            # AdminCP settings, with types and defaults
+    permissions.php         # new permissions, with defaults per usergroup
+  templates/                # Twig: own templates and slot fills
+  language/en/seo.php       # phrases
+  migrations/               # Doctrine migrations for its own tables
+  assets/                   # JS and CSS, built by Vite
+  tests/</pre>
+</div><span style="font-size:20px"><b>The manifest</b></span><br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">{
+  &quot;id&quot;: &quot;acme/seo&quot;,
+  &quot;name&quot;: &quot;SEO Toolkit&quot;,
+  &quot;version&quot;: &quot;1.2.0&quot;,
+  &quot;description&quot;: &quot;Schema.org markup, IndexNow and sitemap tools&quot;,
+  &quot;author&quot;: { &quot;name&quot;: &quot;Acme&quot;, &quot;url&quot;: &quot;https://acme.example&quot; },
+  &quot;requires&quot;: {
+    &quot;vbulletin&quot;: &quot;^7.0&quot;,
+    &quot;php&quot;: &quot;&gt;=8.3&quot;,
+    &quot;extensions&quot;: { &quot;vbulletin/blog&quot;: &quot;^7.0&quot; }
+  },
+  &quot;autoload&quot;: { &quot;psr-4&quot;: { &quot;Acme\\Seo\\&quot;: &quot;src/&quot; } },
+  &quot;setup&quot;: &quot;Acme\\Seo\\Setup&quot;,
+  &quot;admin&quot;: { &quot;settingsGroup&quot;: &quot;seo&quot;, &quot;icon&quot;: &quot;search&quot; }
+}</pre>
+</div>Versions follow semantic versioning. The installer refuses an extension whose <span style="font-family:Courier New">requires</span> cannot be met, and it explains why in plain words.<br />
+<br />
+<span style="font-size:20px"><b>How an extension changes behaviour</b></span><br />
+<br />
+There are five sanctioned ways, from lightest to heaviest:<ol class="decimal"><li><b>Listen to an event.</b> Typed event objects, for example <span style="font-family:Courier New">PostCreated</span>, <span style="font-family:Courier New">ThreadViewing</span>, <span style="font-family:Courier New">UserRegistered</span>, <span style="font-family:Courier New">PermissionsResolving</span> and <span style="font-family:Courier New">PostRendering</span>. Listeners are registered in <span style="font-family:Courier New">services.php</span> or with a PHP attribute.</li>
+<li><b>Fill a template slot.</b> Core templates declare named slots (<span style="font-family:Courier New">{% slot 'thread.after_title' %}</span>). An extension adds a Twig file into a slot without touching the core template. Today's 71 <span style="font-family:Courier New">{vb:hook}</span> locations become the first set of slots.</li>
+<li><b>Decorate a service.</b> An extension can wrap any service in the container (for example the search service or the notification sender). This is the clean version of what <span style="font-family:Courier New">vB_Api_Extensions</span> does today after each API call.</li>
+<li><b>Add routes, controllers, API methods and CLI commands</b> of its own.</li>
+<li><b>Override a template</b> in a style, the same way a theme does.</li>
+</ol><br />
+<br />
+There is no sanctioned way to patch core files. If a common need can only be met by patching, that is a missing event or slot, and we add one.<br />
+<br />
+<span style="font-size:20px"><b>The stability promise</b></span><ul><li>Extensions may only depend on interfaces and classes in <span style="font-family:Courier New">vBulletin\Contracts\*</span>, events in <span style="font-family:Courier New">vBulletin\Event\*</span> and the public API. These are covered by semantic versioning: no breaking change within 7.x.</li>
+<li>Everything else is internal and marked <span style="font-family:Courier New">@internal</span>. PHPStan rules warn extension authors who use it.</li>
+<li>Deprecations are announced one minor version ahead and logged at runtime in debug mode.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Lifecycle</b></span><br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Step</b></td>
+<td class="text_table_grid_td"><b>What happens</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Install</td>
+<td class="text_table_grid_td">Requirements checked, migrations run, settings and permissions registered with defaults, <span style="font-family:Courier New">Setup::install()</span> called, caches rebuilt</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Enable / disable</td>
+<td class="text_table_grid_td">The extension's services, routes, listeners and slots are added to or removed from the compiled container. Its data stays</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Upgrade</td>
+<td class="text_table_grid_td">New migrations run in order, then <span style="font-family:Courier New">Setup::upgrade($from)</span></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Uninstall</td>
+<td class="text_table_grid_td"><span style="font-family:Courier New">Setup::uninstall()</span>, migrations rolled back if the admin chooses to remove data, phrases and settings removed</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Failure</td>
+<td class="text_table_grid_td">If an extension throws during a request in production, it is logged and that listener or slot is skipped. The page still renders. Repeated failures auto-disable it and notify the admin</td>
+</tr>
+</table></div>
+ <span style="font-size:20px"><b>Tooling</b></span><ul><li><span style="font-family:Courier New">bin/vb make:extension acme/seo</span> creates a working skeleton with a listener, a slot fill, a setting, a phrase, a migration and a test.</li>
+<li><span style="font-family:Courier New">bin/vb make:listener</span>, <span style="font-family:Courier New">make:controller</span>, <span style="font-family:Courier New">make:migration</span>, <span style="font-family:Courier New">make:setting</span>.</li>
+<li><span style="font-family:Courier New">bin/vb extension:validate</span> checks the manifest, the namespaces and use of internal classes, and runs the extension's tests.</li>
+<li><span style="font-family:Courier New">bin/vb extension:package</span> builds a signed zip for the marketplace.</li>
+<li>In debug mode, template and phrase changes are picked up without rebuilding anything.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Documentation built for people and AI assistants</b></span><br />
+<br />
+Every event, slot, contract and setting type is documented from the code itself and published as a website, plus a single <span style="font-family:Courier New">llms.txt</span> and machine-readable JSON. A developer, or an AI coding assistant pointed at those docs, should be able to build a correct extension on the first try. No forum platform offers this today, and it lowers the cost of rebuilding our add-on ecosystem.<br />
+<br />
+<span style="font-size:28px"><b>Templates, styles and languages</b></span><br />
+<br />
+In v7, templates, styles and phrases live in files, one per thing, under Git. The database only stores an admin's overrides. This replaces the 3.5 MB style XML, the 1.8 MB language XML and the <span style="font-family:Courier New">eval()</span> template runtime.<br />
+<br />
+<span style="font-size:20px"><b>Template engine: Twig</b></span><br />
+<br />
+We move to Twig 3 in 7.0. While the add-on ecosystem is thin, this is the cheapest moment for the change:<ul><li>Designers who have worked with Symfony, Drupal or Craft already know it, and every editor has Twig support.</li>
+<li>It compiles to PHP class files cached in <span style="font-family:Courier New">var/cache/twig</span>, run by opcache. Nothing goes through <span style="font-family:Courier New">eval()</span>.</li>
+<li>It escapes output by default, which removes a whole class of XSS mistakes in custom styles.</li>
+<li>It is sandboxable, so we can safely allow template editing in AdminCP.</li>
+</ul><br />
+<br />
+The 598 master templates are ported by a converter that handles the regular constructs (<span style="font-family:Courier New">{vb:raw}</span>, <span style="font-family:Courier New">{vb:var}</span>, <span style="font-family:Courier New">{vb:if}</span>, <span style="font-family:Courier New">{vb:each}</span>, <span style="font-family:Courier New">{vb:phrase}</span>, <span style="font-family:Courier New">{vb:url}</span>, <span style="font-family:Courier New">{vb:template}</span>) and flags the rest for a person. The same converter is offered to customers for their custom styles, with a report of what it could not convert.<br />
+<br />
+<span style="font-size:20px"><b>Style structure</b></span><br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">styles/default/
+  style.json               # name, parent style, version, preview image
+  tokens.css               # design tokens as CSS custom properties
+  templates/
+    layout/base.twig  layout/header.twig  layout/footer.twig
+    forum/index.twig  forum/channel.twig  forum/thread.twig
+    components/post.twig  components/pagination.twig  ...
+  assets/                  # style-specific CSS and images</pre>
+</div><ul><li><b>Inheritance:</b> a child style lists a parent in <span style="font-family:Courier New">style.json</span> and contains only the files it changes. Twig resolves a template from child to parent to core.</li>
+<li><b>Stylevars become design tokens:</b> the 1,082 stylevars collapse into a much smaller set of CSS custom properties (colours, spacing, radius, fonts) in <span style="font-family:Courier New">tokens.css</span>. AdminCP gets a visual editor that writes these tokens, including a dark-mode set. Only a token change rebuilds CSS; there is no per-request stylesheet generation.</li>
+<li><b>Admin edits:</b> editing a template in AdminCP stores an override in the database, shown as a diff against the file. An upgrade shows exactly which overridden templates changed upstream, with a three-way merge.</li>
+<li><b>Two default styles:</b> &quot;Default&quot; (modern, fast, mobile-first) and &quot;Classic&quot; (the familiar 3.8 / 4.x layout, rebuilt on the same templates). Classic is cheap to build on shared templates and gives long-time members a familiar home.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Languages</b></span><br />
+<br />
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code notranslate" style="max-height:calc(30 *  + 2 * var(--bbcode-padding) + var(--h-scrollbar-allowance));">language/en/
+  global.php   forum.php   user.php   admin/settings.php   admin/users.php   ...
+language/fa/
+  global.php   ...</pre>
+</div><ul><li>Each file returns a PHP array of <span style="font-family:Courier New">key =&gt; text</span>, compiled into one cached file per language and group, so a page loads only the groups it uses.</li>
+<li>The 10,621 phrases are split automatically along the existing 62 phrase types.</li>
+<li>Translations can be exchanged as standard XLIFF or PO files, so translators can use Crowdin, Weblate or POEditor. A public translation project replaces emailing XML files around.</li>
+<li>ICU message format handles plurals and genders correctly in every language, which also matters for right-to-left languages such as Persian and Arabic.</li>
+<li>Admin edits to phrases are stored as overrides, exactly like templates.</li>
+</ul><br />
+<br />
+<span style="font-size:28px"><b>Database and performance</b></span><br />
+<br />
+We keep the node model and the assertor, and we make them cheaper: measure first, then cut index and write cost, move slow work to a queue, and cache whole pages for guests.<br />
+<br />
+<span style="font-size:20px"><b>Step 1: measure before we change anything</b></span><br />
+<br />
+We build a benchmark data set (1M posts, 50k users, 200 channels; plus 10M posts for large-board tests) and a script that records, for the index, channel, thread, profile and search pages: queries, time per query, peak memory and time to first byte. <span style="font-family:Courier New">vB5_Frontend_ExplainQueries</span> already gives most of this. The numbers go into CI so that every change shows its effect. <b>The steps below are hypotheses until this data confirms them.</b><br />
+<br />
+<span style="font-size:20px"><b>Step 2: the node table</b></span><ul><li><span style="font-family:Courier New">node</span> has 57 columns and 32 indexes. Every new post writes all of them, plus one <span style="font-family:Courier New">closure</span> row per ancestor. We review each index against real query plans and drop those no query uses. <span style="font-family:Courier New">nodeid (nodeid, contenttypeid)</span> next to the primary key, and single-column indexes on low-cardinality flags (<span style="font-family:Courier New">sticky</span>, <span style="font-family:Courier New">approved</span>, <span style="font-family:Courier New">inlist</span>, <span style="font-family:Courier New">featured</span>, <span style="font-family:Courier New">showpublished</span>), are the first candidates.</li>
+<li>Rarely-read columns (<span style="font-family:Courier New">taglist</span>, <span style="font-family:Courier New">deletereason</span>, <span style="font-family:Courier New">CRC32</span>, Q&amp;A answer fields) move to a side table, so the hot row stays small.</li>
+<li>Time columns move to <span style="font-family:Courier New">INT UNSIGNED</span> or <span style="font-family:Courier New">BIGINT</span>. <span style="font-family:Courier New">node.created</span>, <span style="font-family:Courier New">node.publishdate</span> and <span style="font-family:Courier New">closure.publishdate</span> are signed <span style="font-family:Courier New">INT</span> today and stop working in January 2038.</li>
+<li>The three MyISAM tables (<span style="font-family:Courier New">language</span>, <span style="font-family:Courier New">phrase</span>, <span style="font-family:Courier New">userfield</span>) move to InnoDB. <span style="font-family:Courier New">phrase</span> and <span style="font-family:Courier New">language</span> largely leave the database anyway with file-based languages.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Step 3: move slow work out of the request</b></span><br />
+<br />
+With Symfony Messenger, the work that does not need to happen before the page returns runs in a background worker: counter and last-post updates on parent channels, notification fan-out, email and push, search indexing, related-topics and trending calculation (today's heaviest cron jobs), and thumbnail generation.<br />
+<br />
+On shared hosting the queue drains at the end of requests and from cron. Where a worker is possible, <span style="font-family:Courier New">bin/vb messenger:consume</span> runs it continuously.<br />
+<br />
+<span style="font-size:20px"><b>Step 4: caching</b></span><ul><li><b>Guest full-page cache.</b> Guests are the majority of traffic on most boards and see identical pages. A thread page for a guest is rendered once and served from cache until something in it changes, invalidated by the same events extensions listen to. This alone can take most guest load off PHP and MySQL.</li>
+<li><b>Object cache</b> on Redis or APCu (Memcached still supported) for permissions, settings, routes and user info, through <span style="font-family:Courier New">symfony/cache</span>. The database cache backend remains the fallback for hosts with nothing else.</li>
+<li><b>HTTP caching</b> headers and ETags on pages, attachments and assets, so a CDN or reverse proxy can help out of the box.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Step 5: the heaviest queries</b></span><br />
+<br />
+By JOIN count the heaviest query builders are <span style="font-family:Courier New">fetchUserinfo</span> (up to 22 conditional JOINs), <span style="font-family:Courier New">getFollowingContent</span> (20), <span style="font-family:Courier New">getFollowing</span> (18) and <span style="font-family:Courier New">fetchProfileMedia</span> (13). Most JOINs are optional, so the real cost depends on the call. The benchmark tells us which ones actually run on hot pages; those get split into smaller cached lookups.<br />
+<br />
+<span style="font-size:20px"><b>Search</b></span><br />
+<br />
+Core keeps the built-in MySQL search for small boards. Search becomes a contract (<span style="font-family:Courier New">vBulletin\Contracts\Search\Engine</span>) with official extensions for Meilisearch and OpenSearch/Elasticsearch, and the existing Sphinx support as a community extension. Indexing runs through the queue.<br />
+<br />
+<span style="font-size:28px"><b>Frontend and editor</b></span><br />
+<br />
+The public frontend becomes server-rendered HTML with a small layer of modern JavaScript, loaded per page. The editor is replaced. Together these are the biggest visible wins of v7.<br />
+<br />
+<span style="font-size:20px"><b>JavaScript</b></span><ul><li><b>Today:</b> every public page loads jQuery (88 KB) and <span style="font-family:Courier New">footer-rollup.js</span> (514 KB, 148 KB gzip). That is 37 scripts, including jQuery UI, qtip, jCarousel (last released 2018), history.js and selectBox, whether the page uses them or not.</li>
+<li><b>v7:</b> no jQuery on public pages. Interactivity uses small ES modules plus <a href="https://htmx.org" target="_blank">htmx</a> for partial page updates (load more posts, inline edit, reactions, moderation actions) and <a href="https://alpinejs.dev" target="_blank">Alpine.js</a> for local UI state (menus, dialogs, tabs). Both are tiny, need no build step to use, and keep the server as the single source of truth.</li>
+<li><b>Build:</b> Vite produces one small shared bundle plus a bundle per page type, with hashed filenames for long-term caching. This replaces <span style="font-family:Courier New">jsrollup_vbulletin.xml</span> and <span style="font-family:Courier New">cssrollup_vbulletin.xml</span>.</li>
+<li><b>Native over plugins:</b> <span style="font-family:Courier New">&lt;dialog&gt;</span>, <span style="font-family:Courier New">&lt;details&gt;</span>, popover, <span style="font-family:Courier New">&lt;input type=&quot;date&quot;&gt;</span>, CSS scroll-snap and the View Transitions API replace jQuery UI, qtip, jCarousel, history.js and the datepicker.</li>
+<li><b>Navigation:</b> View Transitions plus htmx-boosted links give app-like page changes without a single-page-app rewrite. Search engines still get full HTML.</li>
+<li><b>AdminCP</b> keeps jQuery during 7.0 so the panel can be ported screen by screen. YUI is removed from AdminCP in 7.0.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>CSS</b></span><ul><li>One small base stylesheet built from design tokens, plus component CSS loaded with its page.</li>
+<li>Critical CSS inlined for the first paint; the rest loaded without blocking.</li>
+<li>Dark mode from the token set, honouring the visitor's system setting.</li>
+<li>Logical properties (<span style="font-family:Courier New">margin-inline-start</span> and so on), so right-to-left languages work without a separate stylesheet.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Editor</b></span><br />
+<br />
+CKEditor 4.13.0 (2019) is replaced. CKEditor 4 is end-of-life and no longer receives public security fixes. That makes it the most urgent security item in this proposal.<br />
+<br />
+<b>Proposal: <a href="https://tiptap.dev" target="_blank">Tiptap</a></b> (built on ProseMirror). It is modular, headless and easy to extend, which suits an editor that add-ons need to build on.<ul><li>It is loaded only when the reply box gains focus, so it never weighs on reading.</li>
+<li>It stores a structured document and renders to BBCode for full compatibility with existing posts. Markdown shortcuts while typing (<span style="font-family:Courier New">**bold**</span>, <span style="font-family:Courier New">&gt; quote</span>, <span style="font-family:Courier New">- list</span>) give modern users what they expect.</li>
+<li>Mentions, quotes, attachments with drag-and-drop and paste, image resize, code blocks with highlighting, tables, spoilers and emoji are built as Tiptap extensions. Add-on authors can add their own buttons and blocks through a documented editor API.</li>
+<li>An excellent mobile experience is a requirement, not an afterthought.</li>
+</ul><br />
+<br />
+A security patch for 6.x comes first, by replacing or patching CKEditor in a 6.2.x release, independent of v7 (see Roadmap).<br />
+<br />
+<span style="font-size:20px"><b>Accessibility</b></span><br />
+<br />
+Target WCAG 2.2 AA for the default styles: keyboard navigation everywhere, focus states, labelled controls, correct heading structure and colour contrast checked in CI.<br />
+<br />
+<span style="font-size:28px"><b>Slim core, official extensions</b></span><br />
+<br />
+The v7 core contains only what every community needs. Everything else becomes an official, first-party extension that ships in the download, is maintained by us, and can be switched on in one click. We keep the &quot;everything in the box&quot; promise, but a fresh install is small, fast and simple.<br />
+<br />
+This also proves the extension system: if our own blog, groups and calendar can be built as extensions, any outside developer can build anything.<br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Feature</b></td>
+<td class="text_table_grid_td"><b>v7 home</b></td>
+<td class="text_table_grid_td"><b>On by default</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Forums, channels, topics, replies, polls, attachments</td>
+<td class="text_table_grid_td">Core</td>
+<td class="text_table_grid_td">Yes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Users, usergroups, permissions, profiles, registration and login</td>
+<td class="text_table_grid_td">Core</td>
+<td class="text_table_grid_td">Yes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Private messages, notifications, subscriptions</td>
+<td class="text_table_grid_td">Core</td>
+<td class="text_table_grid_td">Yes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Moderation, reports, infractions, warnings, spam protection</td>
+<td class="text_table_grid_td">Core</td>
+<td class="text_table_grid_td">Yes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Search (built-in MySQL engine)</td>
+<td class="text_table_grid_td">Core</td>
+<td class="text_table_grid_td">Yes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Reactions and reputation</td>
+<td class="text_table_grid_td">Core</td>
+<td class="text_table_grid_td">Yes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Blogs</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Social groups</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Articles / CMS</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Calendar and events</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Photo albums and media gallery</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Q&amp;A (accepted answers)</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Paid subscriptions and payment gateways (Stripe, PayPal, Square)</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">PM chat (real-time)</td>
+<td class="text_table_grid_td">Official extension</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Page builder (screen layouts and widgets)</td>
+<td class="text_table_grid_td">Official extension for custom pages; core pages render directly</td>
+<td class="text_table_grid_td">Custom pages only</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Google, WordPress, Microsoft and Facebook login</td>
+<td class="text_table_grid_td">Official extensions (OAuth2 via league/oauth2-client)</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Shopify, Nativo, VigLink</td>
+<td class="text_table_grid_td">Official extensions</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Meilisearch and OpenSearch search</td>
+<td class="text_table_grid_td">Official extensions</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Sphinx search</td>
+<td class="text_table_grid_td">Community extension (no longer maintained by us)</td>
+<td class="text_table_grid_td">No</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">vB4 API compatibility layer (31 files, 210 KB)</td>
+<td class="text_table_grid_td">Removed; the mobile app moves to the new REST API</td>
+<td class="text_table_grid_td">n/a</td>
+</tr>
+</table></div>
+ <span style="font-size:20px"><b>The page builder</b></span><br />
+<br />
+The page builder is a real strength for customers who build portals, but it is also the reason a simple thread page assembles screen layouts and widget instances on every request. In v7, the core pages (index, channel, thread, profile, search) render directly from Twig templates. The page builder remains available for custom pages and for sidebars, through a template slot. Customers who rely on it keep their layouts; everyone else stops paying for it.<br />
+<br />
+<span style="font-size:28px"><b>Security</b></span><br />
+<br />
+v7 removes the structural risks we found in 6.2.3 and makes the safe path the default path for us and for extension authors.<br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Area</b></td>
+<td class="text_table_grid_td"><b>6.2.3 today</b></td>
+<td class="text_table_grid_td"><b>v7</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Code execution</td>
+<td class="text_table_grid_td">23 <span style="font-family:Courier New">eval()</span> calls, including product install code, setting validation and the template runtime</td>
+<td class="text_table_grid_td">Zero. Code lives in files; templates compile to cached PHP classes. CI fails on any <span style="font-family:Courier New">eval()</span></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Editor</td>
+<td class="text_table_grid_td">CKEditor 4.13.0 (2019, end-of-life)</td>
+<td class="text_table_grid_td">Tiptap, kept current (see Frontend)</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Template output</td>
+<td class="text_table_grid_td">Escaping depends on using <span style="font-family:Courier New">{vb:var}</span> vs <span style="font-family:Courier New">{vb:raw}</span> correctly</td>
+<td class="text_table_grid_td">Twig auto-escaping; raw output must be explicit and is flagged in review</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Serialized data</td>
+<td class="text_table_grid_td">171 <span style="font-family:Courier New">unserialize()</span> calls, 3 with <span style="font-family:Courier New">allowed_classes</span>; <span style="font-family:Courier New">unserialize_callback_func</span> set to autoload (<span style="font-family:Courier New">vb.php:240</span>)</td>
+<td class="text_table_grid_td">Stored structures move to JSON. Remaining <span style="font-family:Courier New">unserialize()</span> calls pass <span style="font-family:Courier New">allowed_classes =&gt; false</span>. The autoload callback is removed</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Request input</td>
+<td class="text_table_grid_td">1,764 direct reads of <span style="font-family:Courier New">$_GET</span> / <span style="font-family:Courier New">$_POST</span> / <span style="font-family:Courier New">$_REQUEST</span> / <span style="font-family:Courier New">$_COOKIE</span> across the code</td>
+<td class="text_table_grid_td">One <span style="font-family:Courier New">Request</span> object; typed, validated input objects for controllers and API methods</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Outdated SDKs</td>
+<td class="text_table_grid_td">Facebook PHP SDK 4.0.9 (abandoned), Stripe PHP 8.8.0, both outside Composer</td>
+<td class="text_table_grid_td">All third-party code through Composer, scoped, with automated advisories (<span style="font-family:Courier New">composer audit</span>) in CI</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Web root</td>
+<td class="text_table_grid_td">The whole install is web-accessible</td>
+<td class="text_table_grid_td">Only <span style="font-family:Courier New">public/</span> is web-accessible; config, source, cache and logs sit outside it</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Small issues</td>
+<td class="text_table_grid_td">e.g. <span style="font-family:Courier New">index.php</span> reads <span style="font-family:Courier New">$_SERVER['HTTP_USER_AGENT']</span> without checking it exists</td>
+<td class="text_table_grid_td">Caught by PHPStan at level 6</td>
+</tr>
+</table></div>
+ <span style="font-size:20px"><b>Additional measures</b></span><ul><li><b>Content Security Policy</b> with nonces, enabled by default on the new frontend. No inline scripts in core templates.</li>
+<li><b>Security headers</b> by default: HSTS when on HTTPS, <span style="font-family:Courier New">X-Content-Type-Options</span>, <span style="font-family:Courier New">Referrer-Policy</span>, <span style="font-family:Courier New">Permissions-Policy</span>.</li>
+<li><b>Sessions:</b> <span style="font-family:Courier New">SameSite=Lax</span>, <span style="font-family:Courier New">HttpOnly</span> and <span style="font-family:Courier New">Secure</span> cookies; session rotation on login and privilege change.</li>
+<li><b>Accounts:</b> passkeys (WebAuthn) and TOTP two-factor in core; argon2id stays the default hash; rate limits on login, registration, password reset and posting through <span style="font-family:Courier New">symfony/rate-limiter</span>.</li>
+<li><b>Uploads:</b> stored outside the web root, served through a controller, with type checked by content (not extension) and image re-encoding to strip embedded payloads.</li>
+<li><b>Extensions:</b> the marketplace runs automated checks (no <span style="font-family:Courier New">eval</span>, no internal classes, no raw SQL from request input) and signs packages. AdminCP warns when installing an unsigned extension.</li>
+<li><b>Process:</b> a public security policy and disclosure address, and an advisory for every security release. An external audit before 7.0 Final.</li>
+</ul><br />
+<br />
+<span style="font-size:28px"><b>Where v7 stands out</b></span><br />
+<br />
+Catching up is not enough; v7 needs clear reasons to choose it. These are the areas where v7 can lead.<ol class="decimal"><li><b>Everything in the box.</b> vBulletin already has blogs, groups, albums, articles and a calendar. In v7 they become fast, optional official extensions.</li>
+<li><b>The best developer experience of any forum platform.</b> A typed public API, a stable contracts package, <span style="font-family:Courier New">bin/vb make:extension</span>, hot-reloading templates in debug mode, PHPStan rules for extension authors, an OpenAPI description of the REST API, and docs written for both people and AI coding assistants (<span style="font-family:Courier New">llms.txt</span>). The pitch to developers: &quot;build your first vBulletin extension in an hour.&quot;</li>
+<li><b>A complete REST API and webhooks.</b> Every action a member or moderator can take is available over a versioned, OAuth2-protected REST API, with outgoing webhooks for events. Headless front ends, mobile apps, Discord and Slack bridges and automation tools (Zapier, n8n) can all build on it. This replaces the vB4 compatibility layer.</li>
+<li><b>Real-time by default.</b> New replies, reactions, typing indicators and notifications arrive live through Server-Sent Events with the Mercure protocol, with a polling fallback on shared hosting.</li>
+<li><b>SEO for how search works now.</b> Search engines give forum discussions their own prominent results. v7 ships <span style="font-family:Courier New">DiscussionForumPosting</span> structured data, clean canonical URLs, IndexNow pings, fast pages and correct pagination out of the box, with no add-on needed.</li>
+<li><b>Built-in, private-by-default AI assistance (optional).</b> Thread summaries for long discussions, duplicate-question detection when posting, spam and toxicity scoring for moderators, and smart related topics. The admin brings their own provider key or uses a local model; nothing is sent anywhere unless the admin turns it on.</li>
+<li><b>Federation (official extension, 7.x).</b> ActivityPub support, so people on Mastodon and other fediverse platforms can follow and reply to topics. Discussions get discovered outside the forum without depending on one social network.</li>
+<li><b>Migration as a first-class feature.</b> Importers from the most widely used forum platforms, with URL redirects and password-hash compatibility (see Migration). Switching to vBulletin should be easier than switching away.</li>
+<li><b>Classic and modern in one product.</b> A modern default style and a &quot;Classic&quot; style that brings back the 3.8 / 4.x look many long-time admins and members still miss.</li>
+<li><b>Easy hosting.</b> An official Docker image, one-command install (<span style="font-family:Courier New">bin/vb install</span>), a Softaculous / Installatron package for shared hosting, and a health page in AdminCP that explains what to fix.</li>
+<li><b>Community-owner tools.</b> Built-in onboarding for new members, scheduled posts, member badges and achievements, and an analytics dashboard (active members, retention, top content). These are what admins measure their success by.</li>
+</ol><br />
+<br />
+<span style="font-size:28px"><b>Migration</b></span><br />
+<br />
+Two paths matter: our own customers moving up to v7, and sites on other platforms moving over. Both must keep every URL and every member's ability to log in.<br />
+<br />
+<span style="font-size:20px"><b>From vBulletin 5.x and 6.x</b></span><ul><li><b>Supported starting point:</b> 5.7.x or any 6.x. Older sites (3.x, 4.x, early 5.x) first upgrade to 6.2 with the existing upgrader, then to 7. The 369 historic upgrade step classes (52,854 lines) stay in 6.x and leave the v7 codebase.</li>
+<li><b>How it runs:</b> <span style="font-family:Courier New">bin/vb upgrade</span> from the command line, with resumable steps, progress output and a dry-run mode that reports problems before any change. The browser upgrader remains for shared hosting and calls the same steps.</li>
+<li><b>Data:</b> schema changes are Doctrine migrations, and large tables are migrated in batches so a 10M-post board can upgrade without hours of downtime.</li>
+<li><b>Styles:</b> custom templates go through the <span style="font-family:Courier New">{vb:...}</span> to Twig converter. The site switches to the new default style automatically, and the converted custom style is offered for review with a list of templates that need a person.</li>
+<li><b>Phrases and settings</b> carry over; customised phrases become overrides.</li>
+<li><b>Add-ons:</b> v7 lists every installed 6.x product, says whether an official or marketplace replacement exists, and disables the rest. Their data tables are left untouched.</li>
+<li><b>URLs:</b> route structures stay the same. Where a route changes (for example removed vB4 API endpoints), a permanent redirect map is generated.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>From other platforms</b></span><br />
+<br />
+Today no importer from another platform ships in core. In v7 this becomes an official tool, <span style="font-family:Courier New">bin/vb import &lt;platform&gt;</span>, with a web wizard on top.<br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Source</b></td>
+<td class="text_table_grid_td"><b>Priority</b></td>
+<td class="text_table_grid_td"><b>Notes</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">XenForo 2.x</td>
+<td class="text_table_grid_td">1</td>
+<td class="text_table_grid_td">Modern schema; reactions and attachments map closely</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">phpBB 3.3</td>
+<td class="text_table_grid_td">1</td>
+<td class="text_table_grid_td">Simple schema; BBCode posts map directly</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">SMF 2.x, MyBB 1.8</td>
+<td class="text_table_grid_td">2</td>
+<td class="text_table_grid_td">Long tail of older communities</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Discourse</td>
+<td class="text_table_grid_td">2</td>
+<td class="text_table_grid_td">Markdown posts and categories; via its API or a database export</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Invision Community</td>
+<td class="text_table_grid_td">3</td>
+<td class="text_table_grid_td">Rich content model; attachments need careful mapping</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">vBulletin 3.x / 4.x direct</td>
+<td class="text_table_grid_td">3</td>
+<td class="text_table_grid_td">Many old boards are still online; replaces the separate ImpEx tool</td>
+</tr>
+</table></div>
+ Every importer must:<ol class="decimal"><li>Import users, groups, permissions as closely as the models allow, forums, topics, posts, polls, attachments, avatars, private messages, likes, tags and moderation history.</li>
+<li><b>Keep passwords working.</b> Store the original hash with its scheme. On a member's first login it is verified with the source platform's algorithm and transparently re-hashed with argon2id. vBulletin's password schemes (<span style="font-family:Courier New">pwschemes_vbulletin.xml</span>) already support this pattern.</li>
+<li><b>Keep URLs working.</b> Generate a redirect map from every old URL pattern (topic, post, forum, member and attachment) to the new one, served as permanent 301 redirects, so search ranking carries over.</li>
+<li>Run incrementally: import once, keep the old site live, re-sync the delta, then switch DNS. A two-hour cut-over window for a large board should be realistic.</li>
+<li>Produce a report: counts per entity on both sides, and anything skipped and why.</li>
+</ol><br />
+<br />
+We recommend a step-by-step guide for each supported platform, and test migrations of a few large real boards during the beta to harden the importers.<br />
+<br />
+<span style="font-size:28px"><b>Ecosystem, developer experience and community</b></span><br />
+<br />
+Code quality brings developers back, and developers bring add-ons. Add-ons and visible momentum bring admins back. This part of the plan matters as much as the code.<br />
+<br />
+<span style="font-size:20px"><b>Rebuild the add-on catalogue before launch</b></span><ul><li><b>Launch with 15 or more extensions.</b> Besides our own official extensions (Slim core), we build, or help developers build, the add-ons admins ask for most: advanced SEO, anti-spam (Akismet, StopForumSpam, Turnstile and hCaptcha), thanks / likes leaderboards, member badges, an ads manager, a donation and fundraising widget, a Discord bridge, a link-preview tool, a sitemap and IndexNow tool, a backup tool and a GDPR toolkit.</li>
+<li><b>Early-access programme.</b> Six months before 7.0 Final, selected developers get access to betas, a private channel with the core team, and early marketplace placement.</li>
+<li><b>Porting support</b> for the most popular 5.x / 6.x add-ons whose authors are still active.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Marketplace</b></span><ul><li>Hosted on vbulletin.com with listings, versions, reviews, screenshots and compatibility badges.</li>
+<li>Install and update from inside AdminCP, verified by package signature.</li>
+<li>Automated validation on upload (see Security), plus manual review for the &quot;Verified&quot; badge.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Visibility and process</b></span><ul><li><b>Public roadmap and changelog.</b> Regular, predictable releases, for example a minor release every 8 to 10 weeks.</li>
+<li><b>Visible team.</b> Core developers post development diaries on vbulletin.com: what is being built, why, with screenshots and code.</li>
+<li><b>RFCs for big changes.</b> Significant changes to contracts, events or templates are proposed publicly and discussed before they land.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Documentation</b></span><ul><li>A developer guide with a full tutorial (build a real extension end to end), a reference generated from the code (every event, slot, contract, setting type, API endpoint and CLI command), and an upgrade guide for each minor version.</li>
+<li>A designer guide: build a child style, use design tokens, override a template.</li>
+<li>An admin guide that covers installation, upgrades, migration from each supported platform, performance tuning and security.</li>
+<li>Machine-readable docs (<span style="font-family:Courier New">llms.txt</span>, JSON) so AI coding assistants give correct answers about vBulletin.</li>
+</ul><br />
+<br />
+<span style="font-size:28px"><b>Roadmap</b></span><br />
+<br />
+The work runs in five phases. Each one ships something usable, and each ends at a gate it must pass before the next begins. Phases 0 and 1 change nothing for add-on authors; the clean break happens in Phase 2.<br />
+<br />
+<b>Every phase ships something; 7.0 Final ships only after the release gate</b><br />
+<i>Phases in order, each ending at a gate it must pass. Not drawn to a time scale.</i><br />
+<br />
+<b>Phase 0 · 6.2.x security update</b><ul><li>Replace or patch CKEditor 4.13; remove Facebook SDK 4.0.9 and the dead APC cache; update Stripe</li>
+<li>Build the benchmark data set and record 6.2.x baseline numbers</li>
+<li>Write and agree the RFCs: extension manifest, contracts, events, template slots</li>
+</ul><br />
+◇ <i>Gate: baseline measured, RFCs agreed</i><br />
+<br />
+<b>Phase 1 · 6.3 foundations (no breaking changes)</b><ul><li>Unminified source; namespaces with class_alias for old names; Composer with a scoped vendor folder</li>
+<li>DI container behind vB::getX(); bin/vb console for install, upgrade and cron</li>
+<li>PHPUnit and PHPStan in CI; MyISAM tables to InnoDB; time columns widened past 2038</li>
+</ul><br />
+◇ <i>Gate: 6.3 passes CI and upgrade tests with no regressions</i><br />
+<br />
+<b>Phase 2 · 7.0 alpha (the clean break)</b><ul><li>Symfony-component kernel, extension system, typed events and template slots; zero eval()</li>
+<li>Twig styles with the template converter; file-based languages; Default and Classic styles</li>
+<li>New frontend and Tiptap editor on index, channel and thread pages; guest page cache</li>
+</ul><br />
+◇ <i>Gate: the new core pages beat the 6.2 baseline on every metric</i><br />
+<br />
+<b>Phase 3 · 7.0 public beta</b><ul><li>Blogs, groups, articles, calendar and albums as official extensions; REST API and webhooks</li>
+<li>Importers from the most widely used forum platforms; batched CLI upgrade rehearsed on real boards</li>
+<li>15+ extensions from us and early-access developers; external security audit</li>
+</ul><br />
+◆ <b><span style="color:#1E66D0">Release gate: feature parity with 6.x and every target in Goals met</span></b><br />
+<br />
+<b>Phase 4 · 7.0 Final, then 7.x</b><ul><li>Real-time updates; more importers; Meilisearch and OpenSearch search extensions</li>
+<li>ActivityPub federation, optional AI tools, marketplace and extension catalogue growth</li>
+<li>6.x security-only from 7.0 beta; end of support 18 months after 7.0 Final</li>
+</ul><br />
+<br />
+The release gate before 7.0 Final is the most important line in this plan: no date pressure moves it.<br />
+<br />
+Durations are deliberately not estimated here. They depend on team size and on what the Phase 0 benchmark shows. Once the team agrees the scope, each phase gets a dated plan.<br />
+<br />
+<span style="font-size:28px"><b>Risks and mitigations</b></span><br />
+<br />
+The biggest risk is repeating vB5: a long, ambitious rewrite that ships late, slower and with fewer features than the version it replaces. Most mitigations below exist to prevent exactly that.<br />
+  <div class="b-bbcode__table--wrapper text_table_"><table class="b-bbcode__table text_table_grid"><tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td"><b>Risk</b></td>
+<td class="text_table_grid_td"><b>Impact</b></td>
+<td class="text_table_grid_td"><b>Mitigation</b></td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Scope grows and 7.0 slips for years</td>
+<td class="text_table_grid_td">Customers leave while they wait; team morale drops</td>
+<td class="text_table_grid_td">Phased plan where every phase ships something. Fixed release gate. Features that miss a phase move to 7.x, not into a bigger 7.0</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">7.0 ships slower or with fewer features than 6.x</td>
+<td class="text_table_grid_td">Repeat of vB5, lasting brand damage</td>
+<td class="text_table_grid_td">Benchmark in CI from day one; parity checklist; long public beta; Final only when the gate passes</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Custom styles break on upgrade</td>
+<td class="text_table_grid_td">Admins refuse to upgrade</td>
+<td class="text_table_grid_td">Twig converter with a report; Classic style; conversion help for large customers during beta</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Add-on catalogue empty at launch</td>
+<td class="text_table_grid_td">&quot;Nothing works on v7&quot;</td>
+<td class="text_table_grid_td">15+ extensions at launch; early-access developer programme; porting support</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Team too small for the full plan</td>
+<td class="text_table_grid_td">Everything half-done</td>
+<td class="text_table_grid_td">Prioritise by phase (Roadmap). The slim core reduces what must be rewritten. Official extensions can follow after 7.0</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Shared hosting can't run queues, Redis or CLI</td>
+<td class="text_table_grid_td">Features fail on cheap hosts</td>
+<td class="text_table_grid_td">Every advanced piece has a fallback: DB queue drained by requests and cron, DB or filesystem cache, browser installer and upgrader</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Large boards can't upgrade in an acceptable window</td>
+<td class="text_table_grid_td">Big customers stay on 6.x</td>
+<td class="text_table_grid_td">Batched migrations, resumable CLI upgrade, dry run, rehearsal on customer copies during beta</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Symfony major versions force churn</td>
+<td class="text_table_grid_td">Ongoing maintenance cost</td>
+<td class="text_table_grid_td">Track LTS releases only; dependencies scoped so extensions are isolated from our upgrade timing</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Security regression in new code</td>
+<td class="text_table_grid_td">Loss of trust</td>
+<td class="text_table_grid_td">PHPStan, <span style="font-family:Courier New">composer audit</span>, CSP, external audit before Final, public security policy</td>
+</tr>
+<tr valign="top" class="text_table_grid_tr"><td class="text_table_grid_td">Maintaining 6.x and 7.x together drains the team</td>
+<td class="text_table_grid_td">Both suffer</td>
+<td class="text_table_grid_td">6.x moves to security-only fixes once 7.0 enters beta; a published end-of-support date for 6.x</td>
+</tr>
+</table></div>
+ <span style="font-size:28px"><b>Decisions needed</b></span><br />
+<br />
+These decisions shape the plan and are the team's or leadership's to make. Each comes with this proposal's recommendation.<ul><li>☐ <b>Template engine.</b> Twig in 7.0, or keep <span style="font-family:Courier New">{vb:...}</span> file-based for 7.0 and move later? <i>Recommendation:</i> Twig in 7.0, since the clean break is happening anyway.</li>
+<li>☐ <b>Minimum PHP version.</b> 8.3 or 8.4? <i>Recommendation:</i> 8.3, checked against hosting statistics before beta.</li>
+<li>☐ <b>Editor.</b> Tiptap, or another modern editor? <i>Recommendation:</i> Tiptap, plus an interim CKEditor fix in 6.2.x.</li>
+<li>☐ <b>Upgrade floor.</b> Is 5.7.x / 6.x as the direct upgrade source acceptable? <i>Recommendation:</i> yes, with older sites going through 6.2 first.</li>
+<li>☐ <b>Which features become official extensions</b> (Slim core table): confirm or adjust the list.</li>
+<li>☐ <b>Release cadence</b> after 7.0. <i>Recommendation:</i> a minor release every 8 to 10 weeks, security releases as needed.</li>
+<li>☐ <b>6.x end of support.</b> <i>Recommendation:</i> security-only from 7.0 beta, end of support 18 months after 7.0 Final.</li>
+</ul><br />
+<br />
+<span style="font-size:20px"><b>Immediate next steps</b></span><ol class="decimal"><li>Review this proposal as a team and record decisions on the list above.</li>
+<li>Ship the 6.2.x security update (editor, Facebook SDK, Stripe, APC removal).</li>
+<li>Build the benchmark data set and capture 6.2.x baseline numbers for the release gate.</li>
+<li>Write the first RFCs: the extension manifest and contracts, the event list, and the template slot list.</li>
+<li>Build the Phase 1 proof of concept: the new kernel serving the index, channel and thread pages from Twig, measured against the 6.2.x baseline.</li>
+</ol>]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions"><![CDATA[Feedback &amp; Suggestions]]></category>
+			<dc:creator>member11</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/feedback-suggestions/4512916-vbulletin-7-—-technical-proposal</guid>
+		</item>
+		<item>
+			<title>How do I add FAQ to 6.2.3 Navigation Bar or sub nav bar</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512886-how-do-i-add-faq-to-6-2-3-navigation-bar-or-sub-nav-bar</link>
+			<pubDate>Mon, 19 Oct 2026 05:21:20 GMT</pubDate>
+			<description><![CDATA[I'm unable to figure out how to ad FAQ to nav bar either top or sub nav. Have tried New Page &gt; Page Title &gt; dragged to Page Title Module and unable to enter title or do anything else.other than edit...]]></description>
+			<content:encoded><![CDATA[I'm unable to figure out how to ad FAQ to nav bar either top or sub nav. Have tried <b>New Page</b> &gt; <b>Page Title</b> &gt; dragged to <b>Page Title Module</b> and unable to enter title or do anything else.other than edit what isn't there <b>Page Title Module</b> and apparently save it. But nothing happens.<br />
+<br />
+I'm at a loss as what to try next.<br />
+<br />
+Cheers - Neil]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member18</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512886-how-do-i-add-faq-to-6-2-3-navigation-bar-or-sub-nav-bar</guid>
+		</item>
+		<item>
+			<title><![CDATA[[vB3]Looking for old vbulletin 3 icons]]></title>
+			<link>https://forum.vbulletin.com/forum/customizing-vbulletin/vbulletin-templates-graphics-styles/4512877-looking-for-old-vbulletin-3-icons</link>
+			<pubDate>Sun, 18 Oct 2026 15:36:26 GMT</pubDate>
+			<description>Hi all,  
+Around 20 years ago I had a style for vbulletin 3. There were some icons that I liked a lot, I could find most of them but one is missing: user_online.gif 
+ 
+Here are the rest of them,...</description>
+			<content:encoded><![CDATA[Hi all, <br />
+Around 20 years ago I had a style for vbulletin 3. There were some icons that I liked a lot, I could find most of them but one is missing: user_online.gif<br />
+<br />
+Here are the rest of them, anyone have idea what the style named?<br />
+<br />
+<img itemprop="image" title="user_offline.gif" data-attachmentid="4512878" data-align="none" data-size="full" border="0" src="filedata/fetch?id=4512878&amp;d=1792337615" alt="Click image for larger version
+
+Name:	user_offline.gif
+Views:	81
+Size:	292 Bytes
+ID:	4512878" data-fullsize-url="filedata/fetch?id=4512878&amp;d=1792337615" data-thumb-url="filedata/fetch?id=4512878&amp;d=1792337615&amp;type=thumb" data-title="Click on the image to see the original version" data-caption="user_offline.gif" class="bbcode-attachment thumbnail js-lightbox bbcode-attachment--lightbox" /><br />
+<img itemprop="image" title="forum_new.gif" data-attachmentid="4512879" data-align="none" data-size="full" border="0" src="filedata/fetch?id=4512879&amp;d=1792337721" alt="Click image for larger version
+
+Name:	forum_new.gif
+Views:	68
+Size:	19.1 KB
+ID:	4512879" data-fullsize-url="filedata/fetch?id=4512879&amp;d=1792337721" data-thumb-url="filedata/fetch?id=4512879&amp;d=1792337721&amp;type=thumb" data-title="Click on the image to see the original version" data-caption="forum_new.gif" class="bbcode-attachment thumbnail js-lightbox bbcode-attachment--lightbox" /><br />
+<img itemprop="image" title="forum_old.gif" data-attachmentid="4512880" data-align="none" data-size="full" border="0" src="filedata/fetch?id=4512880&amp;d=1792337736" alt="Click image for larger version
+
+Name:	forum_old.gif
+Views:	70
+Size:	438 Bytes
+ID:	4512880" data-fullsize-url="filedata/fetch?id=4512880&amp;d=1792337736" data-thumb-url="filedata/fetch?id=4512880&amp;d=1792337736&amp;type=thumb" data-title="Click on the image to see the original version" data-caption="forum_old.gif" class="bbcode-attachment thumbnail js-lightbox bbcode-attachment--lightbox" /><br />
+<img itemprop="image" title="forum_old_lock.gif" data-attachmentid="4512881" data-align="none" data-size="full" border="0" src="filedata/fetch?id=4512881&amp;d=1792337758" alt="Click image for larger version
+
+Name:	forum_old_lock.gif
+Views:	69
+Size:	692 Bytes
+ID:	4512881" data-fullsize-url="filedata/fetch?id=4512881&amp;d=1792337758" data-thumb-url="filedata/fetch?id=4512881&amp;d=1792337758&amp;type=thumb" data-title="Click on the image to see the original version" data-caption="forum_old_lock.gif" class="bbcode-attachment thumbnail js-lightbox bbcode-attachment--lightbox" />]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/customizing-vbulletin/vbulletin-templates-graphics-styles"><![CDATA[vBulletin Templates, Graphics &amp; Styles]]></category>
+			<dc:creator>member9</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/customizing-vbulletin/vbulletin-templates-graphics-styles/4512877-looking-for-old-vbulletin-3-icons</guid>
+		</item>
+		<item>
+			<title><![CDATA[Can't Get Past a Bug Using the QUOTE Function on a Thread]]></title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512874-can-t-get-past-a-bug-using-the-quote-function-on-a-thread</link>
+			<pubDate>Sat, 17 Oct 2026 18:57:46 GMT</pubDate>
+			<description><![CDATA[I have bumped into this bug before, but it seems more persistent now. I wanted to add a post by first quoting a user's post in the same thread. Unfortunately, I clicked the wrong post to quote. When...]]></description>
+			<content:encoded><![CDATA[I have bumped into this bug before, but it seems more persistent now. I wanted to add a post by first quoting a user's post in the same thread. Unfortunately, I clicked the wrong post to quote. When I went to add my comments I saw the wrong text quoted, so I refreshed the page to start over. Now I can not get the QUOTE to work. It does not quoted text and does not move me to the new post area.<br />
+<br />
+I changed from my normal Chrome to Firefox and I was able to QUOTE what I wanted and add my comments. But I can't get Chrome to work for this now. I cleared its cache, closed Chrome and re-opened it. Then I went to the admin panel and cleared the system cache. None of that worked.<br />
+<br />
+Is this a known bug?<br />
+<br />
+And will it be fixed if I upgrade to 6.2.3? <b><i>(I am waiting for a support ticket to be acted on to do the upgrade, in the hopes it will fix this and a few other bugs.)</i></b>]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member14</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512874-can-t-get-past-a-bug-using-the-quote-function-on-a-thread</guid>
+		</item>
+		<item>
+			<title>Permissions on this vb site</title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/site-feedback/4512863-permissions-on-this-vb-site</link>
+			<pubDate>Sat, 17 Oct 2026 09:37:32 GMT</pubDate>
+			<description>member5 
+ 
+i’m posting this here because I seem to no longer have the permissions to start a topic, reply to a topic, , use reactions in the other forums on this site. I also don’t see the link to...</description>
+			<content:encoded><![CDATA[<a href="https://forum.vbulletin.com/member/1-member" style="background-image:url('https://forum.vbulletin.com/core/custompics/avatar/avatar1_1.png');" class="b-bbcode-user b-bbcode-user--has-avatar js-bbcode-user" data-userid="1" data-vbnamecard="1">member5</a><br />
+<br />
+i’m posting this here because I seem to no longer have the permissions to start a topic, reply to a topic, , use reactions in the other forums on this site. I also don’t see the link to the Tracker anymore. Yes I am logged in<br />
+Can you please look into this.<br />
+<br />
+TY]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/site-feedback">vBulletin.com Site Feedback</category>
+			<dc:creator>member10</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-sales-and-feedback/site-feedback/4512863-permissions-on-this-vb-site</guid>
+		</item>
+		<item>
+			<title><![CDATA[Subscribe-&amp;gt; Follow]]></title>
+			<link>https://forum.vbulletin.com/forum/customizing-vbulletin/vbulletin-languages-phrases/4512816-subscribe-follow</link>
+			<pubDate>Thu, 15 Oct 2026 17:19:35 GMT</pubDate>
+			<description><![CDATA[My site offers paid subscriptions, and I've had a few people that are confused between the two vastly different uses of the term subscription within the phrasing and labeling in vBulletin. 
+ 
+When I...]]></description>
+			<content:encoded><![CDATA[My site offers paid subscriptions, and I've had a few people that are confused between the two vastly different uses of the term subscription within the phrasing and labeling in vBulletin.<br />
+<br />
+When I look at the phrase naming In the admincp, it's pretty clear that over half of the phrases have variable names using follow as opposed to subscribe.<br />
+<br />
+Is there a planned change within the default tool phrase settings that will make this change on labels in the UI? I've started working on one for my own site, but don't want to make that available if there is a formal task already planned to do that within the product itself.]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/customizing-vbulletin/vbulletin-languages-phrases"><![CDATA[vBulletin Languages &amp; Phrases]]></category>
+			<dc:creator>member1</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/customizing-vbulletin/vbulletin-languages-phrases/4512816-subscribe-follow</guid>
+		</item>
+		<item>
+			<title><![CDATA[VBulletin 6.2 error and won't upload pictures]]></title>
+			<link>https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512813-vbulletin-6-2-error-and-won-t-upload-pictures</link>
+			<pubDate>Thu, 15 Oct 2026 15:45:29 GMT</pubDate>
+			<description>Database error in vBulletin 6.2.1: 
+ 
+Invalid SQL: 
+ 
+SELECT 
+IF(filehash = MD5(filedata), 1, 0) AS filehash_matches, 
+IF(filesize = LENGTH(filedata), 1, 0) AS filesize_matches 
+FROM filedata AS fd...</description>
+			<content:encoded><![CDATA[Database error in vBulletin 6.2.1:<br />
+<br />
+Invalid SQL:<br />
+<br />
+SELECT<br />
+IF(filehash = MD5(filedata), 1, 0) AS filehash_matches,<br />
+IF(filesize = LENGTH(filedata), 1, 0) AS filesize_matches<br />
+FROM filedata AS fd<br />
+WHERE filedataid = 250;<br />
+<br />
+MySQL Error : Illegal mix of collations (latin1_swedish_ci,IMPLICIT) and (utf8mb3_general_ci,COERCIBLE) for operation '='<br />
+Error Number : 1267<br />
+Request Date : Tuesday, October 13th 2026 @ 06:38:35 PM<br />
+Error Date : Tuesday, October 13th 2026 @ 06:38:37 PM<br />
+Script : <a href="https://www.fightbackinsac.com/forums/uploader/upload-photo" target="_blank">https://www.fightbackinsac.com/forum...r/upload-photo</a><br />
+Referrer : <a href="https://www.fightbackinsac.com/forums/forum/local-events-and-campaigns/local-focus-campaigns/24508-missing-person-francisco-frank-tyquiengco" target="_blank">https://www.fightbackinsac.com/forum...ank-tyquiengco</a><br />
+IP Address : 172.69.140.176<br />
+Username : member2<br />
+Classname : vB_Db_Mysql_Connection]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/forum/vbulletin-6/support-questions"><![CDATA[Support &amp; Questions]]></category>
+			<dc:creator>member2</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/forum/vbulletin-6/support-questions/4512813-vbulletin-6-2-error-and-won-t-upload-pictures</guid>
+		</item>
+		<item>
+			<title>Download OnlyvBulletin 6 Turkish Language Pack</title>
+			<link>https://forum.vbulletin.com/vbulletin/languages/4512792-vbulletin-6-turkish-language-pack</link>
+			<pubDate>Wed, 14 Oct 2026 20:38:05 GMT</pubDate>
+			<description>Description: 
+ 
+The Turkish language pack for vBulletin 6.x is now available. 
+ 
+This pack has been tested on the latest vBulletin 6.x versions and is fully compatible with the current 6.x series. 
+...</description>
+			<content:encoded><![CDATA[Description:<br />
+<br />
+The Turkish language pack for vBulletin 6.x is now available.<br />
+<br />
+This pack has been tested on the latest vBulletin 6.x versions and is fully compatible with the current 6.x series.<br />
+<br />
+Features:<br />
+Full Turkish translation<br />
+UTF-8 encoding<br />
+Preserves all placeholders and HTML tags<br />
+Tested and verified on vBulletin 6.x.<br />
+If your vB version is lower or higher than 6.0.7, check the &quot;Ignore Language Version&quot; option during installation.<br />
+<br />
+Package contents:<ul><li>vBulletin</li>
+<li>Nativo</li>
+<li>Third Party Login - Google</li>
+<li>Third Party Login - Twitter</li>
+<li>vBulletin File Scanner</li>
+<li>vBulletin Shopify Integration</li>
+<li>VigLink</li>
+</ul>=====================================<br />
+Türkçe:<br />
+Açıklama:<br />
+<br />
+vBulletin 6.x için Türkçe dil paketi artık mevcut.<br />
+<br />
+Bu paket, en son vBulletin 6.x sürümlerinde test edilmiştir ve mevcut 6.x serisiyle tamamen uyumludur.<br />
+<br />
+Özellikler:<br />
+Tam Türkçe çeviri<br />
+UTF-8 kodlaması<br />
+Tüm yer tutucuları ve HTML etiketlerini korur<br />
+vBulletin 6.x üzerinde test edilmiş ve doğrulanmıştır.<br />
+vb sürümü 6.0.7'den aşağı veya yukarı ise yüklerken &quot;Dil Sürümünü Yoksay&quot;ı işaretleyin.<ul><li>Paket içeriği</li>
+<li>vBulletin</li>
+<li>Nativo</li>
+<li>Third Party Login - Google</li>
+<li>Third Party Login - Twitter</li>
+<li>vBulletin File Scanner</li>
+<li>vBulletin Shopify Integration</li>
+<li>VigLink​</li>
+</ul>]]></content:encoded>
+			<category domain="https://forum.vbulletin.com/vbulletin/languages">vB 6 Languages</category>
+			<dc:creator>member15</dc:creator>
+			<guid isPermaLink="true">https://forum.vbulletin.com/vbulletin/languages/4512792-vbulletin-6-turkish-language-pack</guid>
+		</item>
+	</channel>
+</rss>

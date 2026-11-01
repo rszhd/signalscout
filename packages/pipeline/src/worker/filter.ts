@@ -22,6 +22,7 @@ import {
   keywordRuleFor,
   type MonitorProfile,
   monitorDescriptionText,
+  platforms,
   postEmbeddingText,
   type Triager,
 } from "@signalscout/engine";
@@ -33,7 +34,7 @@ import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
 import { type Monitor, monitorQueries } from "../monitors/monitors.js";
 import { recordStageRun } from "../monitors/stage-runs.js";
 import type { FilterPayload } from "./queues.js";
-import { classifyQueue, forMonitor, repliesQueue } from "./queues.js";
+import { classifyQueue, completeQueue, forMonitor, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 export interface FilterOptions {
@@ -75,6 +76,8 @@ interface Candidate {
   readonly title: string | null;
   readonly excerpt: string;
   readonly embedded: boolean;
+  /** The excerpt is a cut, read whole before the classifier. US-476. */
+  readonly textPartial: boolean;
 }
 
 /** Postgres reads a vector from this text form. */
@@ -149,8 +152,10 @@ async function deliver(
 
   await recordFilterDrops(db, monitorId, drops);
   await writeStageRun(run, survivors, drops);
+  // A partial post is read whole first (US-476); the whole batch goes, so the
+  // classifier still gets one job for it.
   await boss.send(
-    classifyQueue,
+    survivors.some((candidate) => candidate.textPartial) ? completeQueue : classifyQueue,
     { monitorId, postIds: survivors.map((candidate) => candidate.id), walkId, pollRunId },
     forMonitor(monitorId),
   );
@@ -291,6 +296,7 @@ async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Prom
       title: posts.title,
       excerpt: posts.excerpt,
       kind: posts.kind,
+      textPartial: posts.textPartial,
       // The vector itself is never selected. It is a thousand numbers per
       // row that this step never reads: pgvector does the comparing.
       embedded: sql<boolean>`${posts.embedding} is not null`,
@@ -300,6 +306,17 @@ async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Prom
 }
 
 /** The free stage: each post against the words that could have found it. */
+/**
+ * Platforms whose queries are addresses (forums: a feed or a section). An
+ * address holds no word a post would use, so their posts pass this stage and
+ * the embedding stage judges them. BUG-475.
+ */
+const addressPlatforms = new Set(
+  platforms
+    .filter((platform) => platform.search?.input === "address")
+    .map((platform) => platform.id),
+);
+
 function keywordStage(
   monitor: Monitor,
   candidates: readonly Candidate[],
@@ -319,10 +336,13 @@ function keywordStage(
     const found = rules.get(source);
     if (found) return found;
 
-    const rule = keywordRuleFor({
-      queries: monitorQueries(monitor.generatedQueries, source),
-      subreddits: monitor.generatedSubreddits,
-    });
+    // An empty rule keeps every post.
+    const rule = addressPlatforms.has(source)
+      ? keywordRuleFor({ queries: [], subreddits: [] })
+      : keywordRuleFor({
+          queries: monitorQueries(monitor.generatedQueries, source),
+          subreddits: monitor.generatedSubreddits,
+        });
     rules.set(source, rule);
     return rule;
   };

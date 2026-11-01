@@ -67,7 +67,18 @@ export const minimumPollIntervalSeconds = 60;
  * `match_cap` is a post a collection that already had its matches did not
  * read. US-443. Written here so a screen counts it as seen.
  */
-export const filterStages = ["keyword", "embedding", "triage", "ceiling", "match_cap"] as const;
+/**
+ * `old_thread` is a partial post whose own page showed it started before the
+ * poll's window: a feed lists an old thread again when someone replies. US-476.
+ */
+export const filterStages = [
+  "keyword",
+  "embedding",
+  "triage",
+  "ceiling",
+  "match_cap",
+  "old_thread",
+] as const;
 
 export type FilterStage = (typeof filterStages)[number];
 

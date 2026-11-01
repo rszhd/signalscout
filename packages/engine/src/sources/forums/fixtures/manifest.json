@@ -1,0 +1,338 @@
+{
+  "xenforo1-list.html": {
+    "url": "https://forums.digitalpoint.com/forums/content-creation.102/?order=post_date&direction=desc",
+    "capturedAt": "2026-10-30T03:36:11.130Z",
+    "bytes": 139869,
+    "namesScrubbed": 36
+  },
+  "xenforo1-thread.html": {
+    "url": "https://forums.digitalpoint.com/threads/hiring-malaysia-based-writer-for-igaming-payment-guides-screenshots.2885650/",
+    "capturedAt": "2026-10-30T03:36:11.132Z",
+    "bytes": 38601,
+    "namesScrubbed": 1
+  },
+  "phpbb3-list.html": {
+    "url": "https://forums.gentoo.org/viewforum.php?f=14&sk=t&sd=d",
+    "capturedAt": "2026-10-30T03:36:14.013Z",
+    "bytes": 107910,
+    "namesScrubbed": 61
+  },
+  "phpbb3-thread.html": {
+    "url": "https://forums.gentoo.org/viewtopic.php?t=1178757",
+    "capturedAt": "2026-10-30T03:36:14.013Z",
+    "bytes": 32126,
+    "namesScrubbed": 4
+  },
+  "discourse-list.json": {
+    "url": "https://meta.discourse.org/c/support/6/l/latest.json?order=created",
+    "capturedAt": "2026-10-30T03:46:56.692Z",
+    "bytes": 99846,
+    "namesScrubbed": 87
+  },
+  "discourse-thread.json": {
+    "url": "https://meta.discourse.org/t/416139.json",
+    "capturedAt": "2026-10-30T03:46:56.695Z",
+    "bytes": 22078,
+    "namesScrubbed": 25
+  },
+  "discourse-section.html": {
+    "url": "https://meta.discourse.org/c/support/6",
+    "capturedAt": "2026-10-30T03:46:56.696Z",
+    "bytes": 53462,
+    "namesScrubbed": 0
+  },
+  "smf2-list.html": {
+    "url": "https://geekhack.org/index.php?board=64.0;sort=first_post;desc",
+    "capturedAt": "2026-10-30T03:50:08.423Z",
+    "bytes": 85741,
+    "namesScrubbed": 41
+  },
+  "smf2-thread.html": {
+    "url": "https://geekhack.org/index.php?topic=126408.0",
+    "capturedAt": "2026-10-30T03:50:08.425Z",
+    "bytes": 51041,
+    "namesScrubbed": 9
+  },
+  "xenforo2-list.html": {
+    "url": "https://forums.macrumors.com/forums/imac.91/?order=post_date&direction=desc",
+    "capturedAt": "2026-10-30T04:03:34.054Z",
+    "bytes": 288860,
+    "namesScrubbed": 71
+  },
+  "xenforo2-thread.html": {
+    "url": "https://forums.macrumors.com/threads/m6-imac.2493064/",
+    "capturedAt": "2026-10-30T04:03:34.064Z",
+    "bytes": 232737,
+    "namesScrubbed": 8
+  },
+  "vbulletin5-list.html": {
+    "url": "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations",
+    "capturedAt": "2026-10-30T04:04:27.861Z",
+    "bytes": 171189,
+    "namesScrubbed": 22
+  },
+  "vbulletin5-thread.html": {
+    "url": "https://forum.vbulletin.com/forum/vbulletin-5-connect/vbulletin-5-installations/4512751-keep-getting-error",
+    "capturedAt": "2026-10-30T04:04:27.866Z",
+    "bytes": 117343,
+    "namesScrubbed": 7
+  },
+  "bbpress-list.html": {
+    "url": "https://wordpress.org/support/forum/how-to-and-troubleshooting/",
+    "capturedAt": "2026-10-30T06:59:17.767Z",
+    "bytes": 213463,
+    "namesScrubbed": 56
+  },
+  "bbpress-thread.html": {
+    "url": "https://wordpress.org/support/topic/wordpress-http-500-error-website-and-admin-login-unavailable/",
+    "capturedAt": "2026-10-30T06:59:17.776Z",
+    "bytes": 187468,
+    "namesScrubbed": 3
+  },
+  "mybb-list.html": {
+    "url": "https://forum.kodi.tv/forumdisplay.php?fid=164&sortby=started&order=desc",
+    "capturedAt": "2026-10-30T07:06:07.231Z",
+    "bytes": 73680,
+    "namesScrubbed": 23
+  },
+  "mybb-thread.html": {
+    "url": "https://forum.kodi.tv/showthread.php?tid=389074",
+    "capturedAt": "2026-10-30T07:06:07.236Z",
+    "bytes": 51105,
+    "namesScrubbed": 3
+  },
+  "vbulletin4-list.html": {
+    "url": "https://www.webhostingtalk.com/forumdisplay.php?f=6&sort=dateline&order=desc",
+    "capturedAt": "2026-10-30T11:46:14.892Z",
+    "bytes": 168111,
+    "namesScrubbed": 39
+  },
+  "vbulletin4-thread.html": {
+    "url": "https://www.webhostingtalk.com/showthread.php?t=1964520",
+    "capturedAt": "2026-10-30T11:46:14.899Z",
+    "bytes": 115731,
+    "namesScrubbed": 10
+  },
+  "invision4-list.html": {
+    "url": "https://linustechtips.com/forum/18-new-builds-and-planning/",
+    "capturedAt": "2026-10-30T14:27:14.019Z",
+    "bytes": 168233,
+    "namesScrubbed": 45
+  },
+  "invision4-thread.html": {
+    "url": "https://linustechtips.com/topic/1644011-pc-for-cs2/",
+    "capturedAt": "2026-10-30T14:27:14.068Z",
+    "bytes": 419618,
+    "namesScrubbed": 22
+  },
+  "xenforo1-index.html": {
+    "url": "https://forums.digitalpoint.com/",
+    "capturedAt": "2026-10-31T03:38:52.359Z",
+    "bytes": 129793,
+    "namesScrubbed": 40
+  },
+  "xenforo2-index.html": {
+    "url": "https://forums.macrumors.com/",
+    "capturedAt": "2026-10-31T03:39:10.575Z",
+    "bytes": 287521,
+    "namesScrubbed": 85
+  },
+  "vbulletin4-index.html": {
+    "url": "https://www.webhostingtalk.com/",
+    "capturedAt": "2026-10-31T03:40:06.458Z",
+    "bytes": 189791,
+    "namesScrubbed": 38
+  },
+  "vbulletin5-index.html": {
+    "url": "https://forum.vbulletin.com/",
+    "capturedAt": "2026-10-31T03:40:14.373Z",
+    "bytes": 191421,
+    "namesScrubbed": 19
+  },
+  "invision4-index.html": {
+    "url": "https://linustechtips.com/",
+    "capturedAt": "2026-10-31T03:46:26.832Z",
+    "bytes": 185509,
+    "namesScrubbed": 46
+  },
+  "mybb-index.html": {
+    "url": "https://forum.kodi.tv/",
+    "capturedAt": "2026-10-31T03:40:27.718Z",
+    "bytes": 106746,
+    "namesScrubbed": 21
+  },
+  "bbpress-index.html": {
+    "url": "https://wordpress.org/support/forums/",
+    "capturedAt": "2026-10-31T03:41:18.115Z",
+    "bytes": 183126,
+    "namesScrubbed": 0
+  },
+  "smf2-index.html": {
+    "url": "https://geekhack.org/index.php",
+    "capturedAt": "2026-10-31T03:41:22.029Z",
+    "bytes": 58520,
+    "namesScrubbed": 40
+  },
+  "phpbb3-index.html": {
+    "url": "https://forums.gentoo.org/",
+    "capturedAt": "2026-10-31T03:41:27.721Z",
+    "bytes": 13712,
+    "namesScrubbed": 3
+  },
+  "xenforo1-feed.xml": {
+    "url": "https://forums.digitalpoint.com/forums/-/index.rss",
+    "capturedAt": "2026-10-31T04:08:40.367Z",
+    "bytes": 58126,
+    "namesScrubbed": 49
+  },
+  "xenforo2-feed.xml": {
+    "url": "https://forums.macrumors.com/forums/-/index.rss",
+    "capturedAt": "2026-10-31T04:12:23.524Z",
+    "bytes": 72282,
+    "namesScrubbed": 37
+  },
+  "vbulletin4-feed.xml": {
+    "url": "https://www.webhostingtalk.com/external.php?type=RSS2",
+    "capturedAt": "2026-10-31T04:12:50.925Z",
+    "bytes": 66716,
+    "namesScrubbed": 12
+  },
+  "vbulletin5-feed.xml": {
+    "url": "https://forum.vbulletin.com/external?type=rss2",
+    "capturedAt": "2026-10-31T04:07:55.538Z",
+    "bytes": 158915,
+    "namesScrubbed": 20
+  },
+  "mybb-feed.xml": {
+    "url": "https://forum.kodi.tv/syndication.php",
+    "capturedAt": "2026-10-31T04:08:01.517Z",
+    "bytes": 85923,
+    "namesScrubbed": 15
+  },
+  "bbpress-feed.xml": {
+    "url": "https://wordpress.org/support/topics/feed/",
+    "capturedAt": "2026-10-31T04:12:26.156Z",
+    "bytes": 18347,
+    "namesScrubbed": 8
+  },
+  "smf2-feed.xml": {
+    "url": "https://geekhack.org/index.php?action=.xml;type=rss2;sa=news",
+    "capturedAt": "2026-10-31T04:08:07.938Z",
+    "bytes": 5586,
+    "namesScrubbed": 0
+  },
+  "phpbb3-feed.xml": {
+    "url": "https://forums.gentoo.org/app.php/feed/topics",
+    "capturedAt": "2026-10-31T04:08:17.280Z",
+    "bytes": 20353,
+    "namesScrubbed": 9
+  },
+  "nofeedparser-vanilla-index.html": {
+    "url": "https://lowendtalk.com/",
+    "capturedAt": "2026-10-31T11:30:12.952Z",
+    "bytes": 239145,
+    "namesScrubbed": 163
+  },
+  "nofeedparser-mumsnet-index.html": {
+    "url": "https://www.mumsnet.com/talk",
+    "capturedAt": "2026-10-31T11:29:12.020Z",
+    "bytes": 285342,
+    "namesScrubbed": 0
+  },
+  "nofeedparser-vanilla-feed.xml": {
+    "url": "https://lowendtalk.com/discussions/feed.rss",
+    "capturedAt": "2026-10-31T11:29:53.937Z",
+    "bytes": 354594,
+    "namesScrubbed": 101
+  },
+  "nofeedparser-mumsnet-feed.xml": {
+    "url": "https://www.mumsnet.com/talk/feed",
+    "capturedAt": "2026-10-31T11:29:18.098Z",
+    "bytes": 74662,
+    "namesScrubbed": 0
+  },
+  "xenforo2-california-thread.html": {
+    "url": "https://www.lumberjocks.com/threads/pen-turning-problem.367057/",
+    "capturedAt": "2026-10-31T15:50:06.669Z",
+    "bytes": 423969,
+    "namesScrubbed": 36
+  },
+  "vbulletin3-index.html": {
+    "url": "https://www.acousticguitarforum.com/forums/",
+    "capturedAt": "2026-10-31T17:51:09.217Z",
+    "bytes": 432683,
+    "namesScrubbed": 34
+  },
+  "vbulletin5-widgets-index.html": {
+    "url": "https://pitmaster.amazingribs.com/",
+    "capturedAt": "2026-10-31T17:50:10.567Z",
+    "bytes": 67834,
+    "namesScrubbed": 1
+  },
+  "discourse-folder-index.html": {
+    "url": "https://www.sitepoint.com/community/",
+    "capturedAt": "2026-10-31T17:50:13.625Z",
+    "bytes": 30735,
+    "namesScrubbed": 0
+  },
+  "invision4-stream-stream.html": {
+    "url": "https://linustechtips.com/discover/",
+    "capturedAt": "2026-10-31T18:45:32.150Z",
+    "bytes": 138885,
+    "namesScrubbed": 30
+  },
+  "invision4-stream-stream2.html": {
+    "url": "https://linustechtips.com/discover/?before=1793468592",
+    "capturedAt": "2026-10-31T18:45:32.169Z",
+    "bytes": 139574,
+    "namesScrubbed": 27
+  },
+  "invision5-stream.html": {
+    "url": "https://forums.golfwrx.com/discover/",
+    "capturedAt": "2026-10-31T18:46:28.920Z",
+    "bytes": 223738,
+    "namesScrubbed": 35
+  },
+  "invision5-stream2.html": {
+    "url": "https://forums.golfwrx.com/discover/?before=1793469636",
+    "capturedAt": "2026-10-31T18:46:28.944Z",
+    "bytes": 216654,
+    "namesScrubbed": 42
+  },
+  "invision5-thread.html": {
+    "url": "https://forums.golfwrx.com/topic/2113624-lab-vnz/",
+    "capturedAt": "2026-10-31T18:46:28.961Z",
+    "bytes": 253660,
+    "namesScrubbed": 15
+  },
+  "invision5-index.html": {
+    "url": "https://forums.golfwrx.com/",
+    "capturedAt": "2026-10-31T18:46:28.994Z",
+    "bytes": 292344,
+    "namesScrubbed": 44
+  },
+  "invision5-folder-index.html": {
+    "url": "https://www.stereonet.com/forums/",
+    "capturedAt": "2026-10-31T18:45:55.681Z",
+    "bytes": 349060,
+    "namesScrubbed": 61
+  },
+  "invision4-stream-topics-stream.html": {
+    "url": "https://forum.mygolfspy.com/discover/",
+    "capturedAt": "2026-10-31T18:49:13.501Z",
+    "bytes": 203072,
+    "namesScrubbed": 33
+  },
+  "invision4-stream-topics-stream2.html": {
+    "url": "https://forum.mygolfspy.com/discover/?before=1793463303",
+    "capturedAt": "2026-10-31T18:49:13.523Z",
+    "bytes": 214562,
+    "namesScrubbed": 39
+  },
+  "invision4-stream-topics-thread.html": {
+    "url": "https://forum.mygolfspy.com/topic/76730-the-drinks-thread/",
+    "capturedAt": "2026-10-31T18:49:13.531Z",
+    "bytes": 124653,
+    "namesScrubbed": 13
+  }
+}

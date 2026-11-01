@@ -1,0 +1,551 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><style id="xml-viewer-style">/* Copyright 2014 The Chromium Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+:root {
+  color-scheme: light dark;
+}
+
+div.header {
+    border-bottom: 2px solid black;
+    padding-bottom: 5px;
+    margin: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  div.header {
+    border-bottom: 2px solid white;
+  }
+}
+
+div.folder &gt; div.hidden {
+    display:none;
+}
+
+div.folder &gt; span.hidden {
+    display:none;
+}
+
+.pretty-print {
+    margin-top: 1em;
+    margin-left: 20px;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+#webkit-xml-viewer-source-xml {
+    display: none;
+}
+
+.opened {
+    margin-left: 1em;
+}
+
+.comment {
+    white-space: pre;
+}
+
+.cdata {
+    white-space: pre-wrap;
+}
+
+.folder-button {
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+    margin-left: -10px;
+    width: 10px;
+    background-repeat: no-repeat;
+    background-position: left top;
+    vertical-align: bottom;
+}
+
+.fold {
+    background: url("data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' fill='%23909090' width='10' height='10'&gt;&lt;path d='M0 0 L8 0 L4 7 Z'/&gt;&lt;/svg&gt;");
+    height: 10px;
+}
+
+.open {
+    background: url("data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' fill='%23909090' width='10' height='10'&gt;&lt;path d='M0 0 L0 8 L7 4 Z'/&gt;&lt;/svg&gt;");
+    height: 10px;
+}
+</style></head><body><div id="webkit-xml-viewer-source-xml"><rss xmlns="" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+	<channel>
+		<title>Web Hosting Talk</title>
+		<link>https://www.webhostingtalk.com/</link>
+		<description>Welcome to Web Hosting Talk. WHT is the largest, most influential web and cloud hosting community on the Internet. It is your main source for discussions and breaking news on all aspects of web hosting including managed hosting, dedicated servers and VPS hosting</description>
+		<language>en</language>
+		<lastBuildDate>Sat, 31 Oct 2026 03:48:14 GMT</lastBuildDate>
+		<generator>vBulletin</generator>
+		<ttl>60</ttl>
+		<image>
+			<url>https://www.webhostingtalk.com/images/misc/rss.png</url>
+			<title>Web Hosting Talk</title>
+			<link>https://www.webhostingtalk.com/</link>
+		</image>
+		<item>
+			<title><![CDATA[member7 Premium Hosting &#9658; NVMe | Free SSL | DDoS Protection | Instant Setup | From * $3.99]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965154&amp;goto=newpost</link>
+			<pubDate>Sat, 31 Oct 2026 01:40:59 GMT</pubDate>
+			<description>*member7 * has been providing reliable, secure and fast optimized hosting services for years. 
+We provide high availability for your...</description>
+			<content:encoded><![CDATA[<div><b>member7 </b> has been providing reliable, secure and fast optimized hosting services for years.<br />
+We provide high availability for your we... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965154&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=4">Shared Hosting Offers</category>
+			<dc:creator>member7</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965154</guid>
+		</item>
+		<item>
+			<title>NVMe KVM VPS in Dallas with 10Gbps DDOS. High RAM, Snapshots, ISOs, High GHz. Starts $3/m</title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965153&amp;goto=newpost</link>
+			<pubDate>Sat, 31 Oct 2026 00:34:28 GMT</pubDate>
+			<description><![CDATA[* NVMe VPS (KVM) in Dallas with 10Gbps DDOS protection* 
+[COLOR=Navy] 
+Grab o... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965153&amp;goto=newpost]]></description>
+			<content:encoded><![CDATA[<div><div style="text-align: center;"><span style="font-family: Verdana"><b><font color="Navy"> NVMe VPS (KVM) in Dallas with 10Gbps DDOS protection</font></b></span></div>[COLOR=Navy]<br />
+Grab o... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965153&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=104">VPS Hosting Offers</category>
+			<dc:creator>member4</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965153</guid>
+		</item>
+		<item>
+			<title><![CDATA[Fully Managed & Self-Managed KVM VPS as low as $7/m + JSOPanel Unlimited]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965152&amp;goto=newpost</link>
+			<pubDate>Sat, 31 Oct 2026 00:19:19 GMT</pubDate>
+			<description>*JoneSolutions.Com - Fully Managed KVM VPS (EU/USA)* 
+ 
+JoneSolutions.Com offers only the fastest non-oversold KVM VPS. All KVM VPS...</description>
+			<content:encoded><![CDATA[<div><b>JoneSolutions.Com - Fully Managed KVM VPS (EU/USA)</b><br />
+<br />
+JoneSolutions.Com offers only the fastest non-oversold KVM VPS. All KVM VPS pla... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965152&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=104">VPS Hosting Offers</category>
+			<dc:creator>member12</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965152</guid>
+		</item>
+		<item>
+			<title>PHPstorm and Jetbrain product users, update</title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965151&amp;goto=newpost</link>
+			<pubDate>Sat, 31 Oct 2026 00:01:26 GMT</pubDate>
+			<description>There was just a release of a new version of PHPstorm from Jetbrains (along with most other JB titles) to address a third party...</description>
+			<content:encoded><![CDATA[<div>There was just a release of a new version of PHPstorm from Jetbrains (along with most other JB titles) to address a third party intermediate... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965151&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=37">Programming Discussion</category>
+			<dc:creator>member11</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965151</guid>
+		</item>
+		<item>
+			<title><![CDATA[&#9733;&#9733; Intel Dedicated Servers in Indiana | Circle City Servers | INDIANAPOLIS &#9733;&#9733;]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965150&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 21:06:22 GMT</pubDate>
+			<description>*While other providers are raising prices, we have slashed our prices on all server line-ups!* 
+Circle City Ser... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965150&amp;goto=newpost</description>
+			<content:encoded><![CDATA[<div><font color="RoyalBlue"><b>While other providers are raising prices, we have slashed our prices on all server line-ups!</b></font><br />
+Circle City Ser... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965150&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=36">Dedicated Hosting Offers</category>
+			<dc:creator>member5</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965150</guid>
+		</item>
+		<item>
+			<title><![CDATA[&#9733;&#9734; $40 BLOWOUT SALE &#9734;&#9733; ARP ThunderTM Dedicated, 4GB RAM 80GB SSD + 200GB SATA 5TB]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965149&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 20:53:34 GMT</pubDate>
+			<description><![CDATA[*ARP ThunderTM Cloud Dedicated -- From $40/mo -- Deploy Instantly* 
+ 
+Full plan details: [url]https://arpnetwor... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965149&amp;goto=newpost]]></description>
+			<content:encoded><![CDATA[<div><b><font color="#405A85">ARP ThunderTM Cloud Dedicated -- From $40/mo -- Deploy Instantly</font></b><br />
+<br />
+Full plan details: [url]https://arpnetwor... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965149&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=36">Dedicated Hosting Offers</category>
+			<dc:creator>member8</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965149</guid>
+		</item>
+		<item>
+			<title><![CDATA[&#9733;&#9734; LIFETIME 20% OFF &#9734;&#9733; [US|LAX|DE|FRA] ARP Networks - Focus on High Quality VMs - Only $8]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965148&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 20:52:55 GMT</pubDate>
+			<description><![CDATA[*$8/mo VPS -- Deploy in 55 Seconds -- No Waiting, No Tickets* 
+ 
+[URL="https://phoenix.arpnetworks.com/sign-up... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965148&amp;goto=newpost]]></description>
+			<content:encoded><![CDATA[<div><b><font color="#405A85">$8/mo VPS -- Deploy in 55 Seconds -- No Waiting, No Tickets</font></b><br />
+<br />
+[URL=&quot;https://phoenix.arpnetworks.com/sign-up... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965148&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=104">VPS Hosting Offers</category>
+			<dc:creator>member8</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965148</guid>
+		</item>
+		<item>
+			<title>Offshore Dedicated Servers | BG/RO/NL/CH/UA | Streaming, +10Gbps, Storage | From $58/mo</title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965147&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 19:14:06 GMT</pubDate>
+			<description>*OFFSHORE DEDICATED SERVERS - 5 LOCATIONS | FROM $58/MONTH* 
+ 
+*Bulgaria o Romania o Netherlands o Switzerland o Ukraine* 
+...</description>
+			<content:encoded><![CDATA[<div><b>OFFSHORE DEDICATED SERVERS - 5 LOCATIONS | FROM $58/MONTH</b><br />
+<br />
+<b>Bulgaria o Romania o Netherlands o Switzerland o Ukraine</b><br />
+<br />
+[b]De... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965147&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=36">Dedicated Hosting Offers</category>
+			<dc:creator>member1</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965147</guid>
+		</item>
+		<item>
+			<title>Serverbyt and Hostkicker</title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965145&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 18:13:12 GMT</pubDate>
+			<description>Does anyone have any experience with these guys?  
+I saw a facebook ad and checked it out.  
+ 
+ 
+Shared hosting: 
+Serverbyt   $12/year...</description>
+			<content:encoded><![CDATA[<div>Does anyone have any experience with these guys? <br />
+I saw a facebook ad and checked it out. <br />
+<br />
+<br />
+Shared hosting:<br />
+Serverbyt   $12/year unlimited ... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965145&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=1">Web Hosting</category>
+			<dc:creator>member9</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965145</guid>
+		</item>
+		<item>
+			<title>A Question for Dedicated Server Hosting Owners: Are You Collecting Customer KYC?</title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965143&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 18:08:30 GMT</pubDate>
+			<description><![CDATA[Hey everyone, 
+ 
+Been in the hosting and server management game since around 2004, and I've got to say, the current state of cyberattacks...]]></description>
+			<content:encoded><![CDATA[<div>Hey everyone,<br />
+<br />
+Been in the hosting and server management game since around 2004, and I've got to say, the current state of cyberattacks is j... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965143&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=2">Dedicated Server</category>
+			<dc:creator>member10</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965143</guid>
+		</item>
+		<item>
+			<title><![CDATA[Weeby Studio - WHMCS Theme & Visual Website Builder with Client Area & Checkout &#128142;]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965142&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 17:53:10 GMT</pubDate>
+			<description><![CDATA[Hello WHT Members,  
+ 
+       We�re introducing *Weeby Studio* - a complete WHMCS theme with a [B]visual website builder, custom client...]]></description>
+			<content:encoded><![CDATA[<div>Hello WHT Members, <br />
+<br />
+       We�re introducing <b>Weeby Studio</b> - a complete WHMCS theme with a [B]visual website builder, custom client a... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965142&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=56">Design Offers</category>
+			<dc:creator>member3</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965142</guid>
+		</item>
+		<item>
+			<title><![CDATA[WHMCS 9.1 Stable Is Here: Proxmox VE VPS & Cloud 4.4.2 and More member2 Updates]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965141&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 16:49:44 GMT</pubDate>
+			<description><![CDATA[*WHMCS 9.1* is now officially available as a stable release, and we're continuing to roll out compatibility updates across our...]]></description>
+			<content:encoded><![CDATA[<div><b>WHMCS 9.1</b> is now officially available as a stable release, and we're continuing to roll out compatibility updates across our ModulesG... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965141&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=145"><![CDATA[Software & Scripts Offers]]></category>
+			<dc:creator>member2</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965141</guid>
+		</item>
+		<item>
+			<title><![CDATA[High-Performance NVMe Shared Hosting | From $1.49/mo | LiteSpeed & Free SSL]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965140&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 15:52:06 GMT</pubDate>
+			<description><![CDATA[Power your website with member6's high-performance shared hosting platform. Built on enterprise-grade infrastructure with NVMe storage,...]]></description>
+			<content:encoded><![CDATA[<div>Power your website with member6's high-performance shared hosting platform. Built on enterprise-grade infrastructure with NVMe storage, L... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965140&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=4">Shared Hosting Offers</category>
+			<dc:creator>member6</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965140</guid>
+		</item>
+		<item>
+			<title><![CDATA[[member6] Global Managed KVM VPS Hosting (ID &#127480;&#127468; SG &#127471;&#127477; JP &#127482;&#127480; US &#127464;&#127462; CA &#127465;&#127466; DE)]]></title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965139&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 15:50:34 GMT</pubDate>
+			<description><![CDATA[*_<a href="https://member6.com" target="_blank">member6</a>_* is a privately held firm that has been providing fully premium managed...]]></description>
+			<content:encoded><![CDATA[<div><b><u><a href="https://member6.com" target="_blank">member6</a></u></b> is a privately held firm that has been providing fully premium managed services... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965139&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=104">VPS Hosting Offers</category>
+			<dc:creator>member6</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965139</guid>
+		</item>
+		<item>
+			<title>DEAL: 30% OFF WhiteLabel Reseller Hosting| Free WHMCS + Included Domain| 99.9% Uptime</title>
+			<link>https://www.webhostingtalk.com/showthread.php?t=1965138&amp;goto=newpost</link>
+			<pubDate>Fri, 30 Oct 2026 15:48:32 GMT</pubDate>
+			<description><![CDATA[Launch and grow your hosting business with *<a href="https://member6.com" target="_blank">member6's</a>* premium...]]></description>
+			<content:encoded><![CDATA[<div>Launch and grow your hosting business with <b><a href="https://member6.com" target="_blank"><font color="#4B0082">member6's</font></a></b> premium reseller... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965138&amp;goto=newpost</div>
+
+]]></content:encoded>
+			<category domain="https://www.webhostingtalk.com/forumdisplay.php?f=130">Reseller Hosting Offers</category>
+			<dc:creator>member6</dc:creator>
+			<guid isPermaLink="true">https://www.webhostingtalk.com/showthread.php?t=1965138</guid>
+		</item>
+	</channel>
+</rss></div><div class="header"><span>This XML file does not appear to have any style information associated with it. The document tree is shown below.</span><br /></div><div class="pretty-print"><div class="folder" id="folder0"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;rss<span class="html-attribute"> <span class="html-attribute-name">xmlns:dc</span>="<span class="html-attribute-value">http://purl.org/dc/elements/1.1/</span>"</span><span class="html-attribute"> <span class="html-attribute-name">xmlns:content</span>="<span class="html-attribute-value">http://purl.org/rss/1.0/modules/content/</span>"</span><span class="html-attribute"> <span class="html-attribute-name">version</span>="<span class="html-attribute-value">2.0</span>"</span>&gt;</span></div><div class="opened"><span>
+	</span><div class="folder" id="folder1"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;channel&gt;</span></div><div class="opened"><span>
+		</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>Web Hosting Talk</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+		</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+		</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>Welcome to Web Hosting Talk. WHT is the largest, most influential web and cloud hosting community on the Internet. It is your main source for discussions and breaking news on all aspects of web hosting including managed hosting, dedicated servers and VPS hosting</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+		</span><div class="line"><span class="html-tag">&lt;language&gt;</span><span>en</span><span class="html-tag">&lt;/language&gt;</span></div><span>
+		</span><div class="line"><span class="html-tag">&lt;lastBuildDate&gt;</span><span>Sat, 31 Oct 2026 03:48:14 GMT</span><span class="html-tag">&lt;/lastBuildDate&gt;</span></div><span>
+		</span><div class="line"><span class="html-tag">&lt;generator&gt;</span><span>vBulletin</span><span class="html-tag">&lt;/generator&gt;</span></div><span>
+		</span><div class="line"><span class="html-tag">&lt;ttl&gt;</span><span>60</span><span class="html-tag">&lt;/ttl&gt;</span></div><span>
+		</span><div class="folder" id="folder2"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;image&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;url&gt;</span><span>https://www.webhostingtalk.com/images/misc/rss.png</span><span class="html-tag">&lt;/url&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>Web Hosting Talk</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/image&gt;</span></div></div><span>
+		</span><div class="folder" id="folder3"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder4"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ member7 Premium Hosting &amp;#9658; NVMe | Free SSL | DDoS Protection | Instant Setup | From * $3.99 ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965154&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Sat, 31 Oct 2026 01:40:59 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>*member7 * has been providing reliable, secure and fast optimized hosting services for years. 
+We provide high availability for your...</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+			</span><div class="folder" id="folder5"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;member7 &lt;/b&gt; has been providing reliable, secure and fast optimized hosting services for years.&lt;br /&gt;
+We provide high availability for your we... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965154&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=4</span>"</span>&gt;</span><span>Shared Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member7</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965154</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder6"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>NVMe KVM VPS in Dallas with 10Gbps DDOS. High RAM, Snapshots, ISOs, High GHz. Starts $3/m</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965153&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Sat, 31 Oct 2026 00:34:28 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder7"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ * NVMe VPS (KVM) in Dallas with 10Gbps DDOS protection* 
+[COLOR=Navy] 
+Grab o... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965153&amp;amp;goto=newpost ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder8"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;div style="text-align: center;"&gt;&lt;span style="font-family: Verdana"&gt;&lt;b&gt;&lt;font color="Navy"&gt; NVMe VPS (KVM) in Dallas with 10Gbps DDOS protection&lt;/font&gt;&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;[COLOR=Navy]&lt;br /&gt;
+Grab o... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965153&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=104</span>"</span>&gt;</span><span>VPS Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member4</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965153</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder9"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder10"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Fully Managed &amp; Self-Managed KVM VPS as low as $7/m + JSOPanel Unlimited ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965152&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Sat, 31 Oct 2026 00:19:19 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>*JoneSolutions.Com - Fully Managed KVM VPS (EU/USA)* 
+ 
+JoneSolutions.Com offers only the fastest non-oversold KVM VPS. All KVM VPS...</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+			</span><div class="folder" id="folder11"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;JoneSolutions.Com - Fully Managed KVM VPS (EU/USA)&lt;/b&gt;&lt;br /&gt;
+&lt;br /&gt;
+JoneSolutions.Com offers only the fastest non-oversold KVM VPS. All KVM VPS pla... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965152&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=104</span>"</span>&gt;</span><span>VPS Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member12</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965152</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder12"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>PHPstorm and Jetbrain product users, update</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965151&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Sat, 31 Oct 2026 00:01:26 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>There was just a release of a new version of PHPstorm from Jetbrains (along with most other JB titles) to address a third party...</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+			</span><div class="folder" id="folder13"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;There was just a release of a new version of PHPstorm from Jetbrains (along with most other JB titles) to address a third party intermediate... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965151&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=37</span>"</span>&gt;</span><span>Programming Discussion</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member11</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965151</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder14"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder15"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &amp;#9733;&amp;#9733; Intel Dedicated Servers in Indiana | Circle City Servers | INDIANAPOLIS &amp;#9733;&amp;#9733; ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965150&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 21:06:22 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>*While other providers are raising prices, we have slashed our prices on all server line-ups!* 
+Circle City Ser... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965150&amp;goto=newpost</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+			</span><div class="folder" id="folder16"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;font color="RoyalBlue"&gt;&lt;b&gt;While other providers are raising prices, we have slashed our prices on all server line-ups!&lt;/b&gt;&lt;/font&gt;&lt;br /&gt;
+Circle City Ser... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965150&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=36</span>"</span>&gt;</span><span>Dedicated Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member5</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965150</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder17"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder18"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &amp;#9733;&amp;#9734; $40 BLOWOUT SALE &amp;#9734;&amp;#9733; ARP ThunderTM Dedicated, 4GB RAM 80GB SSD + 200GB SATA 5TB ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965149&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 20:53:34 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder19"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ *ARP ThunderTM Cloud Dedicated -- From $40/mo -- Deploy Instantly* 
+ 
+Full plan details: [url]https://arpnetwor... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965149&amp;amp;goto=newpost ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder20"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;&lt;font color="#405A85"&gt;ARP ThunderTM Cloud Dedicated -- From $40/mo -- Deploy Instantly&lt;/font&gt;&lt;/b&gt;&lt;br /&gt;
+&lt;br /&gt;
+Full plan details: [url]https://arpnetwor... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965149&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=36</span>"</span>&gt;</span><span>Dedicated Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member8</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965149</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder21"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder22"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &amp;#9733;&amp;#9734; LIFETIME 20% OFF &amp;#9734;&amp;#9733; [US|LAX|DE|FRA] ARP Networks - Focus on High Quality VMs - Only $8 ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965148&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 20:52:55 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder23"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ *$8/mo VPS -- Deploy in 55 Seconds -- No Waiting, No Tickets* 
+ 
+[URL="https://phoenix.arpnetworks.com/sign-up... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965148&amp;amp;goto=newpost ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder24"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;&lt;font color="#405A85"&gt;$8/mo VPS -- Deploy in 55 Seconds -- No Waiting, No Tickets&lt;/font&gt;&lt;/b&gt;&lt;br /&gt;
+&lt;br /&gt;
+[URL=&amp;quot;https://phoenix.arpnetworks.com/sign-up... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965148&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=104</span>"</span>&gt;</span><span>VPS Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member8</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965148</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder25"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>Offshore Dedicated Servers | BG/RO/NL/CH/UA | Streaming, +10Gbps, Storage | From $58/mo</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965147&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 19:14:06 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>*OFFSHORE DEDICATED SERVERS - 5 LOCATIONS | FROM $58/MONTH* 
+ 
+*Bulgaria o Romania o Netherlands o Switzerland o Ukraine* 
+...</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+			</span><div class="folder" id="folder26"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;OFFSHORE DEDICATED SERVERS - 5 LOCATIONS | FROM $58/MONTH&lt;/b&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;b&gt;Bulgaria o Romania o Netherlands o Switzerland o Ukraine&lt;/b&gt;&lt;br /&gt;
+&lt;br /&gt;
+[b]De... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965147&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=36</span>"</span>&gt;</span><span>Dedicated Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member1</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965147</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder27"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>Serverbyt and Hostkicker</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965145&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 18:13:12 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;description&gt;</span><span>Does anyone have any experience with these guys?  
+I saw a facebook ad and checked it out.  
+ 
+ 
+Shared hosting: 
+Serverbyt   $12/year...</span><span class="html-tag">&lt;/description&gt;</span></div><span>
+			</span><div class="folder" id="folder28"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;Does anyone have any experience with these guys? &lt;br /&gt;
+I saw a facebook ad and checked it out. &lt;br /&gt;
+&lt;br /&gt;
+&lt;br /&gt;
+Shared hosting:&lt;br /&gt;
+Serverbyt   $12/year unlimited ... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965145&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=1</span>"</span>&gt;</span><span>Web Hosting</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member9</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965145</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder29"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>A Question for Dedicated Server Hosting Owners: Are You Collecting Customer KYC?</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965143&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 18:08:30 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder30"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Hey everyone, 
+ 
+Been in the hosting and server management game since around 2004, and I've got to say, the current state of cyberattacks... ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder31"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;Hey everyone,&lt;br /&gt;
+&lt;br /&gt;
+Been in the hosting and server management game since around 2004, and I've got to say, the current state of cyberattacks is j... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965143&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=2</span>"</span>&gt;</span><span>Dedicated Server</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member10</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965143</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder32"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder33"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Weeby Studio - WHMCS Theme &amp; Visual Website Builder with Client Area &amp; Checkout &amp;#128142; ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965142&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 17:53:10 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder34"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Hello WHT Members,  
+ 
+       We�re introducing *Weeby Studio* - a complete WHMCS theme with a [B]visual website builder, custom client... ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder35"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;Hello WHT Members, &lt;br /&gt;
+&lt;br /&gt;
+       We�re introducing &lt;b&gt;Weeby Studio&lt;/b&gt; - a complete WHMCS theme with a [B]visual website builder, custom client a... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965142&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=56</span>"</span>&gt;</span><span>Design Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member3</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965142</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder36"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder37"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ WHMCS 9.1 Stable Is Here: Proxmox VE VPS &amp; Cloud 4.4.2 and More member2 Updates ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965141&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 16:49:44 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder38"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ *WHMCS 9.1* is now officially available as a stable release, and we're continuing to roll out compatibility updates across our... ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder39"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;WHMCS 9.1&lt;/b&gt; is now officially available as a stable release, and we're continuing to roll out compatibility updates across our ModulesG... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965141&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="folder" id="folder40"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=145</span>"</span>&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Software &amp; Scripts Offers ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/category&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member2</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965141</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder41"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder42"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ High-Performance NVMe Shared Hosting | From $1.49/mo | LiteSpeed &amp; Free SSL ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965140&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 15:52:06 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder43"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Power your website with member6's high-performance shared hosting platform. Built on enterprise-grade infrastructure with NVMe storage,... ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder44"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;Power your website with member6's high-performance shared hosting platform. Built on enterprise-grade infrastructure with NVMe storage, L... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965140&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=4</span>"</span>&gt;</span><span>Shared Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member6</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965140</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder45"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="folder" id="folder46"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;title&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ [member6] Global Managed KVM VPS Hosting (ID &amp;#127480;&amp;#127468; SG &amp;#127471;&amp;#127477; JP &amp;#127482;&amp;#127480; US &amp;#127464;&amp;#127462; CA &amp;#127465;&amp;#127466; DE) ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/title&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965139&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 15:50:34 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder47"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ *_&lt;a href="https://member6.com" target="_blank"&gt;member6&lt;/a&gt;_* is a privately held firm that has been providing fully premium managed... ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder48"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;&lt;b&gt;&lt;u&gt;&lt;a href="https://member6.com" target="_blank"&gt;member6&lt;/a&gt;&lt;/u&gt;&lt;/b&gt; is a privately held firm that has been providing fully premium managed services... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965139&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=104</span>"</span>&gt;</span><span>VPS Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member6</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965139</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+		</span><div class="folder" id="folder49"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;item&gt;</span></div><div class="opened"><span>
+			</span><div class="line"><span class="html-tag">&lt;title&gt;</span><span>DEAL: 30% OFF WhiteLabel Reseller Hosting| Free WHMCS + Included Domain| 99.9% Uptime</span><span class="html-tag">&lt;/title&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;link&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965138&amp;goto=newpost</span><span class="html-tag">&lt;/link&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;pubDate&gt;</span><span>Fri, 30 Oct 2026 15:48:32 GMT</span><span class="html-tag">&lt;/pubDate&gt;</span></div><span>
+			</span><div class="folder" id="folder50"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;description&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ Launch and grow your hosting business with *&lt;a href="https://member6.com" target="_blank"&gt;member6's&lt;/a&gt;* premium... ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/description&gt;</span></div></div><span>
+			</span><div class="folder" id="folder51"><div class="line"><span class="folder-button fold"></span><span class="html-tag">&lt;content:encoded&gt;</span></div><div class="opened"><div class="line"><span class="cdata">&lt;![CDATA[ &lt;div&gt;Launch and grow your hosting business with &lt;b&gt;&lt;a href="https://member6.com" target="_blank"&gt;&lt;font color="#4B0082"&gt;member6's&lt;/font&gt;&lt;/a&gt;&lt;/b&gt; premium reseller... | Read the rest of https://www.webhostingtalk.com/showthread.php?t=1965138&amp;amp;goto=newpost&lt;/div&gt;
+
+ ]]&gt;</span></div></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/content:encoded&gt;</span></div></div><span>
+			</span><div class="line"><span class="html-tag">&lt;category<span class="html-attribute"> <span class="html-attribute-name">domain</span>="<span class="html-attribute-value">https://www.webhostingtalk.com/forumdisplay.php?f=130</span>"</span>&gt;</span><span>Reseller Hosting Offers</span><span class="html-tag">&lt;/category&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;dc:creator&gt;</span><span>member6</span><span class="html-tag">&lt;/dc:creator&gt;</span></div><span>
+			</span><div class="line"><span class="html-tag">&lt;guid<span class="html-attribute"> <span class="html-attribute-name">isPermaLink</span>="<span class="html-attribute-value">true</span>"</span>&gt;</span><span>https://www.webhostingtalk.com/showthread.php?t=1965138</span><span class="html-tag">&lt;/guid&gt;</span></div><span>
+		</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/item&gt;</span></div></div><span>
+	</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/channel&gt;</span></div></div><span>
+</span></div><span class="folded hidden">...</span><div class="line"><span class="html-tag">&lt;/rss&gt;</span></div></div></div></body></html>

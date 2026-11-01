@@ -20,8 +20,9 @@ matches, verdicts. It polls on a schedule, refuses a poll that would spend
 past its cap, reads deep threads in batches, and delivers a match by digest,
 immediate email or signed webhook.
 
-**Six platforms are fetched, through six providers, and a connector is the
-pair.** A platform is what a person ticks and it keys `posts.source` and
+**Seven platforms are fetched, through six providers, and a connector is the
+pair.** Forums, the seventh, are read by section address, one parser per forum
+program (US-469, US-470). A platform is what a person ticks and it keys `posts.source` and
 deduplication; a provider fetches, owns the key and sends the bill. Two
 connectors ship switched off. [docs/sources.md](docs/sources.md) holds the
 rules — read it before touching a connector.

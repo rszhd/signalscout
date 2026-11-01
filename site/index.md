@@ -12,9 +12,6 @@ hero:
     - theme: brand
       text: Get started
       link: /getting-started/
-    - theme: alt
-      text: Run it yourself
-      link: https://github.com/rszhd/signalscout#running-it
 
 features:
   - title: Six platforms

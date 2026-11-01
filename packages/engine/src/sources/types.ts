@@ -176,6 +176,16 @@ export interface CandidatePost {
    */
   readonly postedAtIsApproximate?: boolean;
   /**
+   * Set when `text` is a cut the platform gave, not the whole post: a forum
+   * feed that shortens each item. US-476. The pre-filter and triage judge it
+   * as it is, and `SocialSource.completePosts` reads the whole for the posts
+   * they keep, so a page is bought only for a post worth scoring.
+   *
+   * `since` is the poll's window: the feed dates an item by its newest reply,
+   * so only the post's own page says whether the thread started inside it.
+   */
+  readonly partial?: { readonly since?: Date };
+  /**
    * How many replies the platform says this post has.
    *
    * The poll stores it and compares it on the next pass, because that is what
@@ -409,6 +419,12 @@ export interface PlatformSearchStyle {
   readonly maxQueryWords: number;
   readonly note: string;
   readonly hint: string;
+  /**
+   * What one of this platform's queries is. Absent means a phrase. A forum
+   * has no keyword search: its queries are the addresses of the sections it
+   * reads, held to an `https` address rather than a word count. US-470.
+   */
+  readonly input?: "phrase" | "address";
 }
 
 /**
@@ -618,7 +634,36 @@ export interface SocialSource extends ConnectorDescriptor {
    * the pre-filter is about to drop.
    */
   fetchReplies?(request: ReplyRequest): Promise<ReplyResult>;
+  /**
+   * Read the posts in full (`CandidatePost.partial`) from their own pages.
+   * US-476. Absent: this connector never gives a partial post.
+   *
+   * One call reads its posts through one fetcher, so it starts one browser at
+   * most and stops it when the call ends. It yields one result per post, in the
+   * order given.
+   */
+  completePosts?(request: CompleteRequest): AsyncIterable<CompleteResult>;
 }
+
+/** The partial posts to read in full, in the order their results come back. */
+export interface CompleteRequest {
+  readonly posts: readonly {
+    readonly url: string;
+    /** The `since` the post came with (`CandidatePost.partial`). */
+    readonly since?: Date;
+  }[];
+  readonly credentials: SourceCredentials;
+  readonly signal?: AbortSignal;
+}
+
+/**
+ * `complete`: the post, whole. `old`: its page shows it started before the
+ * poll's window, so it is not a new post. `unread`: no page came back or no
+ * parser read it, and the partial text is all there is.
+ */
+export type CompleteResult =
+  | { readonly status: "complete"; readonly post: CandidatePost; readonly unitsConsumed: number }
+  | { readonly status: "old" | "unread"; readonly reason: string; readonly unitsConsumed: number };
 
 /**
  * What a connector is given at construction. Every side effect a connector has

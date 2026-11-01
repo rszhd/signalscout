@@ -54,14 +54,17 @@ import { createNotificationTransport } from "../notifications/transport.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep, type PageCount } from "./collect.js";
+import { createCompleteStep } from "./complete.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { admitEveryone, type EntitlementGate } from "./entitlement.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
+import { validateMatchCaps } from "./match-cap.js";
 import { createNotifyStep, enqueueNotifications } from "./notify.js";
 import {
   type ClassifyPayload,
   classifyQueue,
+  completeQueue,
   retryPolicy as defaultRetryPolicy,
   type EstimatePayload,
   estimateQueue,
@@ -232,9 +235,15 @@ export interface StartWorkerOptions {
   rescorePolls?: "first" | "every";
   /**
    * The most matches one collection may make. US-443. Past it, the classify
-   * step reads no more of that collection's posts. Unset, no cap.
+   * step and the paid reads before it (US-490) stop for that collection.
+   * Unset, no cap.
    */
   matchesPerCollection?: number;
+  /**
+   * The most matches a monitor's first collection may make, when it differs.
+   * US-490. Unset, the first collection takes `matchesPerCollection`.
+   */
+  firstMatchesPerCollection?: number;
   /**
    * How many jobs of each pipeline queue (poll, filter, replies, classify,
    * notify) the worker runs at the same time, 1 to 16. US-439. Two jobs of
@@ -450,6 +459,7 @@ export async function startWorker({
   rescorer,
   rescorePolls,
   matchesPerCollection,
+  firstMatchesPerCollection,
   queueConcurrency,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
@@ -465,6 +475,8 @@ export async function startWorker({
       `queueConcurrency must be a whole number from 1 to ${maximumQueueConcurrency}, not ${queueConcurrency}`,
     );
   }
+
+  validateMatchCaps({ firstMatchesPerCollection, matchesPerCollection });
 
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -644,7 +656,21 @@ export async function startWorker({
       }),
     replies:
       steps.replies ??
-      createRepliesStep({ registry: sources, credentialsFor: lookup, newPostsPerPairPerDay }),
+      createRepliesStep({
+        registry: sources,
+        credentialsFor: lookup,
+        newPostsPerPairPerDay,
+        firstMatchesPerCollection,
+        matchesPerCollection,
+      }),
+    complete:
+      steps.complete ??
+      createCompleteStep({
+        registry: sources,
+        credentialsFor: lookup,
+        firstMatchesPerCollection,
+        matchesPerCollection,
+      }),
     classify:
       steps.classify ??
       createClassifyStep({
@@ -652,7 +678,8 @@ export async function startWorker({
         newPostsPerPairPerDay,
         ...(classifyConcurrency === undefined ? {} : { concurrency: classifyConcurrency }),
         ...(rescorer === undefined ? {} : { rescorerFor: async () => rescorer, rescorePolls }),
-        ...(matchesPerCollection === undefined ? {} : { matchesPerCollection }),
+        firstMatchesPerCollection,
+        matchesPerCollection,
       }),
     notify:
       steps.notify ??
@@ -734,6 +761,7 @@ export async function startWorker({
   await work<PollPayload>(pollQueue, pipeline.poll, named, perMonitorOptions);
   await work<FilterPayload>(filterQueue, pipeline.filter, named, perMonitorOptions);
   await work<RepliesPayload>(repliesQueue, pipeline.replies, named, perMonitorOptions);
+  await work<ClassifyPayload>(completeQueue, pipeline.complete, named, perMonitorOptions);
   await work<ClassifyPayload>(classifyQueue, pipeline.classify, named, perMonitorOptions);
   await work<NotifyPayload>(notifyQueue, pipeline.notify, named, perMonitorOptions);
   await work<EstimatePayload>(estimateQueue, pipeline.estimate, ({ estimateId }) => ({

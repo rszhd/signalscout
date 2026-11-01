@@ -2,13 +2,13 @@
 
 # Open tickets
 
-80 open — 13 doing, 58 todo, 9 parked (8 p1, 55 p2, 17 p3).
+86 open — 17 doing, 60 todo, 9 parked (8 p1, 60 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-343 | [A newcomer reaches a first match from the docs](doing/US-343-a-newcomer-reaches-a-first-match-from-the-docs.md) | feature | doing | 2026-09-23T10:50+08:00 |
 | p1 | US-418 | [The query plan writes the topic, not the question](doing/US-418-the-query-plan-writes-the-topic-not-the-question.md) | feature | doing | 2026-09-26T02:07+08:00 |
-| p1 | US-449 | [Intent means wanting a product, not asking for advice](doing/US-449-intent-means-wanting-a-product-not-asking-for-advice.md) | feature | doing | 2026-10-02T16:42+08:00 |
+| p1 | US-490 | [A first collection has its own match cap, and the paid reads before scoring stop at the cap](doing/US-490-a-first-collection-has-its-own-match-cap-and-the-paid-reads-stop-at-the-cap.md) | feature | doing | 2026-11-01T11:39+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
@@ -22,6 +22,10 @@
 | p2 | US-442 | [SocialCrawl can browse a subreddit beside its keyword searches](doing/US-442-socialcrawl-can-browse-a-subreddit-beside-its-keyword-searches.md) | feature | doing | 2026-09-30T15:03+08:00 |
 | p2 | US-443 | [A collection stops scoring at its match cap](doing/US-443-a-collection-stops-scoring-at-its-match-cap.md) | feature | doing | 2026-09-30T23:41+08:00 |
 | p2 | US-448 | [gpt-6.1-sol is priced](doing/US-448-gpt-6-1-sol-is-priced.md) | feature | doing | 2026-10-02T09:24+08:00 |
+| p2 | US-469 | [Forum pages are read by a parser per forum program and version](doing/US-469-forum-pages-are-read-by-a-parser-per-forum-program-and-version.md) | feature | doing | 2026-10-30T11:36+08:00 |
+| p2 | US-470 | [A monitor reads forum sections through Bright Data](doing/US-470-a-monitor-reads-forum-sections-through-bright-data.md) | feature | doing | 2026-10-30T15:28+08:00 |
+| p2 | US-471 | [A forum page Bright Data cannot pass is read through a cloud browser](doing/US-471-a-forum-page-bright-data-cannot-pass-is-read-through-a-cloud-browser.md) | feature | doing | 2026-10-31T09:06+08:00 |
+| p2 | US-478 | [A forum no parser reads is read through the feed its home page names](doing/US-478-a-forum-no-parser-reads-is-read-through-the-feed-its-home-page-names.md) | feature | doing | 2026-10-31T19:30+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
@@ -63,6 +67,7 @@
 | p2 | US-422 | [A phrase that hits the page limit says so](todo/US-422-a-phrase-that-hits-the-page-limit-says-so.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-423 | [A monitor is told what each platform returns](todo/US-423-a-monitor-is-told-what-each-platform-returns.md) | feature | todo | 2026-09-26T02:07+08:00 |
 | p2 | US-425 | [Instagram comments are read at a cheaper provider](todo/US-425-instagram-comments-are-read-at-a-cheaper-provider.md) | spike | todo | 2026-09-26T02:32+08:00 |
+| p2 | US-477 | [Measure cut-text triage on a larger forum sample](todo/US-477-measure-cut-text-triage-on-a-larger-forum-sample.md) | chore | todo | 2026-10-31T17:09+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
@@ -76,6 +81,7 @@
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p3 | US-360 | [A pull request builds the image beside the checks](todo/US-360-a-pull-request-builds-the-image-beside-the-checks.md) | chore | todo | 2026-09-23T14:32+08:00 |
 | p3 | US-362 | [The worktree script finds what it left behind](todo/US-362-the-worktree-script-finds-what-it-left-behind.md) | chore | todo | 2026-09-23T14:32+08:00 |
+| p3 | US-486 | [Forums a scan cannot read yet are recovered where it pays](todo/US-486-forums-a-scan-cannot-read-yet-are-recovered-where-it-pays.md) | spike | todo | 2026-11-01T03:26+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | BUG-348 | [The issue sync says an issue is missing when it could not look](todo/BUG-348-sync-says-an-issue-is-missing-when-it-could-not-look.md) | bug | todo | 2026-09-23T12:28+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |

@@ -12,7 +12,7 @@ import { type CandidateReply, createLogger } from "@signalscout/engine";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, budgets, matches, posts } from "../db/schema.js";
+import { apiUsage, budgets, matches, pollRuns, posts, stageRuns } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { ClassifyPayload, FilterPayload } from "./queues.js";
 import { repliesQueue } from "./queues.js";
@@ -90,8 +90,8 @@ async function insertPost(
   return row.id;
 }
 
-async function run(monitorId: string, postIds: string[]): Promise<void> {
-  await worker.boss.send(repliesQueue, { monitorId, postIds });
+async function run(monitorId: string, postIds: string[], walkId?: string): Promise<void> {
+  await worker.boss.send(repliesQueue, { monitorId, postIds, ...(walkId ? { walkId } : {}) });
 }
 
 beforeAll(async () => {
@@ -117,6 +117,8 @@ beforeAll(async () => {
     },
     retry: fastRetries,
     scheduleTicks: false,
+    firstMatchesPerCollection: 1,
+    matchesPerCollection: 1,
   });
 }, 60_000);
 
@@ -431,6 +433,64 @@ describe("what is never bought", () => {
 
     expect(usage).toEqual([]);
     expect(filtered).toEqual([]);
+  }, 20_000);
+
+  it("opens no thread once the walk has its matches, and records the skip", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const walkId = crypto.randomUUID();
+    await db.insert(pollRuns).values({
+      monitorId,
+      userId: owner,
+      walkId,
+      outcome: "collected",
+      startedAt: new Date(Date.now() - 60_000),
+    });
+    const postId = await insertPost("t3_match_cap", { replyCount: 2 });
+    const seen = replyRequests.length;
+
+    await run(monitorId, [postId], walkId);
+    await until("the thread to be opened", () =>
+      replyRequests.length > seen ? replyRequests.at(-1) : undefined,
+    );
+    expect(replyRequests.length).toBe(seen + 1);
+    replyRequests.length = 0;
+
+    await db.insert(matches).values({
+      monitorId,
+      postId,
+      score: 80,
+      relevance: 80,
+      problemFit: 80,
+      icpFit: 80,
+      intent: 80,
+      urgency: 50,
+      intentType: "problem",
+      reasons: ["A person describing the problem."],
+    });
+
+    // A new thread, which the step would open: only the cap stops it.
+    const fresh = await insertPost("t3_match_cap_fresh", { replyCount: 3 });
+    await run(monitorId, [fresh], walkId);
+    const rows = await until("the replies stage to record the skip", async () => {
+      const found = await db
+        .select()
+        .from(stageRuns)
+        .where(
+          and(
+            eq(stageRuns.monitorId, monitorId),
+            eq(stageRuns.walkId, walkId),
+            eq(stageRuns.stage, "replies"),
+          ),
+        );
+      return found.length >= 2 ? found : undefined;
+    });
+
+    expect(replyRequests).toEqual([]);
+    const skipped = rows.find((row) => row.outcome === "empty");
+    expect(skipped).toMatchObject({
+      itemsOut: 0,
+      detail: { stage: "replies", threadsOpened: 0, threadsSkipped: 1, pagesBought: 0 },
+    });
   }, 20_000);
 
   /**

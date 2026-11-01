@@ -1,0 +1,723 @@
+{
+  "post_stream": {
+    "posts": [
+      {
+        "id": 1,
+        "name": "member16",
+        "username": "member12",
+        "avatar_template": "/letter_avatar/member/{size}/1.png",
+        "created_at": "2026-10-30T03:13:31.385Z",
+        "cooked": "<p>I recently ran into a situation where my email service provider suddenly disabled my account, forcing me to switch to a different provider. I can’t change the email server configuration on the fly; instead, I have to modify the app.yaml configuration and rebuild, which causes the website to go down for several minutes—unacceptable during daytime hours. Meanwhile, the number of failed email send attempts keeps piling up, which is really frustrating me.</p>",
+        "post_number": 1,
+        "post_type": 1,
+        "posts_count": 2,
+        "updated_at": "2026-10-30T03:13:31.385Z",
+        "reply_count": 0,
+        "reply_to_post_number": null,
+        "quote_count": 0,
+        "incoming_link_count": 2,
+        "reads": 4,
+        "readers_count": 3,
+        "score": 10.6,
+        "yours": false,
+        "topic_id": 416139,
+        "topic_slug": "topic",
+        "display_username": "member16",
+        "primary_group_name": null,
+        "flair_name": "translators",
+        "flair_url": "globe",
+        "flair_bg_color": "ddd",
+        "flair_color": "111",
+        "flair_group_id": 50,
+        "badges_granted": [],
+        "version": 1,
+        "can_edit": false,
+        "can_delete": false,
+        "can_recover": false,
+        "can_see_hidden_post": false,
+        "can_wiki": false,
+        "read": true,
+        "user_title": "Bug Reporter",
+        "title_is_group": false,
+        "bookmarked": false,
+        "actions_summary": [],
+        "moderator": false,
+        "admin": false,
+        "staff": false,
+        "user_id": 1,
+        "hidden": false,
+        "trust_level": 2,
+        "deleted_at": null,
+        "user_deleted": false,
+        "edit_reason": null,
+        "can_view_edit_history": true,
+        "wiki": false,
+        "post_url": "/t/topic/416139/1",
+        "locale": "zh_CN",
+        "is_localized": true,
+        "language": "zh_CN",
+        "localization_outdated": false,
+        "customer_flair_customer": null,
+        "event": null,
+        "calendar_details": [],
+        "reactions": [],
+        "current_user_reaction": null,
+        "reaction_users_count": 0,
+        "current_user_used_main_reaction": false,
+        "can_accept_answer": false,
+        "can_unaccept_answer": false,
+        "accepted_answer": false,
+        "topic_accepted_answer": null,
+        "can_vote": false
+      },
+      {
+        "id": 1,
+        "name": "member6",
+        "username": "member2",
+        "avatar_template": "/letter_avatar/member/{size}/1.png",
+        "created_at": "2026-10-30T03:41:36.779Z",
+        "cooked": "<p>iirc if you don’t add the env variables (or remove them after the fact) from the yml file, the settings are then exposed in the admin ui.</p>",
+        "post_number": 2,
+        "post_type": 1,
+        "posts_count": 2,
+        "updated_at": "2026-10-30T03:41:36.779Z",
+        "reply_count": 0,
+        "reply_to_post_number": null,
+        "quote_count": 0,
+        "incoming_link_count": 0,
+        "reads": 3,
+        "readers_count": 2,
+        "score": 0,
+        "yours": false,
+        "topic_id": 416139,
+        "topic_slug": "topic",
+        "display_username": "member6",
+        "primary_group_name": null,
+        "flair_name": null,
+        "flair_url": null,
+        "flair_bg_color": null,
+        "flair_color": null,
+        "flair_group_id": null,
+        "badges_granted": [],
+        "version": 1,
+        "can_edit": false,
+        "can_delete": false,
+        "can_recover": false,
+        "can_see_hidden_post": false,
+        "can_wiki": false,
+        "read": true,
+        "user_title": "",
+        "bookmarked": false,
+        "actions_summary": [],
+        "moderator": false,
+        "admin": false,
+        "staff": false,
+        "user_id": 1,
+        "hidden": false,
+        "trust_level": 3,
+        "deleted_at": null,
+        "user_deleted": false,
+        "edit_reason": null,
+        "can_view_edit_history": true,
+        "wiki": false,
+        "post_url": "/t/topic/416139/2",
+        "locale": "en",
+        "is_localized": false,
+        "language": "en",
+        "customer_flair_customer": null,
+        "event": null,
+        "reactions": [],
+        "current_user_reaction": null,
+        "reaction_users_count": 0,
+        "current_user_used_main_reaction": false,
+        "can_accept_answer": false,
+        "can_unaccept_answer": false,
+        "accepted_answer": false,
+        "topic_accepted_answer": null
+      }
+    ],
+    "stream": [
+      2059140,
+      2059142
+    ]
+  },
+  "timeline_lookup": [
+    [
+      1,
+      0
+    ]
+  ],
+  "suggested_topics": [],
+  "tags": [
+    {
+      "id": 39,
+      "name": "email",
+      "slug": "email"
+    }
+  ],
+  "tags_descriptions": {},
+  "fancy_title": "Can email server settings be made configurable for easy modification?",
+  "fancy_title_localized": true,
+  "locale": "zh_CN",
+  "id": 416139,
+  "title": "电子邮件服务器设置可以做成随时可以修改的配置吗？",
+  "posts_count": 2,
+  "created_at": "2026-10-30T03:13:31.307Z",
+  "views": 7,
+  "reply_count": 0,
+  "like_count": 0,
+  "last_posted_at": "2026-10-30T03:41:36.779Z",
+  "visible": true,
+  "closed": false,
+  "archived": false,
+  "has_summary": false,
+  "archetype": "regular",
+  "slug": "topic",
+  "category_id": 6,
+  "word_count": 42,
+  "deleted_at": null,
+  "user_id": 1,
+  "featured_link": null,
+  "pinned_globally": false,
+  "pinned_at": null,
+  "pinned_until": null,
+  "image_url": null,
+  "slow_mode_seconds": 0,
+  "draft": null,
+  "draft_key": "topic_416139",
+  "draft_sequence": null,
+  "unpinned": null,
+  "pinned": false,
+  "current_post_number": 1,
+  "highest_post_number": 2,
+  "deleted_by": null,
+  "actions_summary": [
+    {
+      "id": 4,
+      "count": 0,
+      "hidden": false,
+      "can_act": false
+    },
+    {
+      "id": 8,
+      "count": 0,
+      "hidden": false,
+      "can_act": false
+    },
+    {
+      "id": 10,
+      "count": 0,
+      "hidden": false,
+      "can_act": false
+    },
+    {
+      "id": 7,
+      "count": 0,
+      "hidden": false,
+      "can_act": false
+    },
+    {
+      "id": 1002,
+      "count": 0,
+      "hidden": false,
+      "can_act": false
+    }
+  ],
+  "chunk_size": 20,
+  "bookmarked": false,
+  "topic_timer": null,
+  "message_bus_last_id": 34,
+  "participant_count": 2,
+  "show_read_indicator": false,
+  "thumbnails": null,
+  "slow_mode_enabled_until": null,
+  "has_localized_content": true,
+  "board_memberships": [],
+  "related_topics": [
+    {
+      "fancy_title": "Allow changing SMTP provider without recompiling app",
+      "fancy_title_localized": false,
+      "locale": null,
+      "id": 61752,
+      "title": "Allow changing SMTP provider without recompiling app",
+      "slug": "allow-changing-smtp-provider-without-recompiling-app",
+      "posts_count": 2,
+      "reply_count": 0,
+      "highest_post_number": 2,
+      "image_url": null,
+      "created_at": "2017-04-27T22:05:59.825Z",
+      "last_posted_at": "2017-04-27T22:08:31.290Z",
+      "bumped": true,
+      "bumped_at": "2017-04-27T22:08:31.290Z",
+      "archetype": "regular",
+      "unseen": false,
+      "pinned": false,
+      "unpinned": null,
+      "excerpt": "I run my own mail server and I make a lot of changes frequently to test things. It is somewhat of a hassle to have to recompile the app constantly. \nJust a suggestion, might not be on your roadmap.",
+      "visible": true,
+      "closed": true,
+      "archived": false,
+      "bookmarked": null,
+      "liked": null,
+      "thumbnails": null,
+      "tags": [],
+      "tags_descriptions": {},
+      "like_count": 4,
+      "views": 1097,
+      "category_id": 2,
+      "featured_link": null,
+      "op_like_count": 0,
+      "has_accepted_answer": false,
+      "posters": [
+        {
+          "extras": null,
+          "description": "Original Poster",
+          "user": {
+            "id": 1,
+            "username": "member20",
+            "name": "member20",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 1
+          }
+        },
+        {
+          "extras": null,
+          "description": "Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member7",
+            "name": "member13",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "admin": true,
+            "trust_level": 2
+          }
+        },
+        {
+          "extras": "latest",
+          "description": "Most Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member3",
+            "name": "member14",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 2
+          }
+        }
+      ]
+    },
+    {
+      "fancy_title": "How to change the email bot&rsquo;s address / port etc",
+      "fancy_title_localized": false,
+      "locale": "en",
+      "id": 123690,
+      "title": "How to change the email bot's address / port etc",
+      "slug": "how-to-change-the-email-bots-address-port-etc",
+      "posts_count": 5,
+      "reply_count": 3,
+      "highest_post_number": 5,
+      "image_url": "https://global.discourse-cdn.com/meta/original/3X/6/2/6299b61d229e2d5bce657f371c5b871f6ea1a00b.png",
+      "created_at": "2019-07-22T22:52:11.689Z",
+      "last_posted_at": "2019-07-23T10:48:30.800Z",
+      "bumped": true,
+      "bumped_at": "2019-07-23T10:48:30.800Z",
+      "archetype": "regular",
+      "unseen": false,
+      "pinned": false,
+      "unpinned": null,
+      "excerpt": "Hello! im quite new at Discourse, sorry if this sounds like a noob question. \nI’ve seen that the email config isn’t editable from the admin pannel: \n  \nis there a way to edit the email bot’s config? \nbest regards!",
+      "visible": true,
+      "closed": true,
+      "archived": false,
+      "bookmarked": null,
+      "liked": null,
+      "thumbnails": [
+        {
+          "max_width": null,
+          "max_height": null,
+          "width": 585,
+          "height": 250,
+          "url": "https://global.discourse-cdn.com/meta/original/3X/6/2/6299b61d229e2d5bce657f371c5b871f6ea1a00b.png"
+        },
+        {
+          "max_width": 400,
+          "max_height": 400,
+          "width": 400,
+          "height": 170,
+          "url": "https://global.discourse-cdn.com/meta/optimized/3X/6/2/6299b61d229e2d5bce657f371c5b871f6ea1a00b_2_400x170.png"
+        },
+        {
+          "max_width": 300,
+          "max_height": 300,
+          "width": 300,
+          "height": 128,
+          "url": "https://global.discourse-cdn.com/meta/optimized/3X/6/2/6299b61d229e2d5bce657f371c5b871f6ea1a00b_2_300x128.png"
+        },
+        {
+          "max_width": 200,
+          "max_height": 200,
+          "width": 200,
+          "height": 85,
+          "url": "https://global.discourse-cdn.com/meta/optimized/3X/6/2/6299b61d229e2d5bce657f371c5b871f6ea1a00b_2_200x85.png"
+        }
+      ],
+      "tags": [],
+      "tags_descriptions": {},
+      "like_count": 6,
+      "views": 793,
+      "category_id": 31,
+      "featured_link": null,
+      "op_like_count": 1,
+      "has_accepted_answer": true,
+      "posters": [
+        {
+          "extras": "latest",
+          "description": "Original Poster, Most Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member4",
+            "name": "member5",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 1
+          }
+        },
+        {
+          "extras": null,
+          "description": "Frequent Poster, Accepted Answer",
+          "user": {
+            "id": 1,
+            "username": "member19",
+            "name": "member19",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "flair_name": "support-experts",
+            "flair_url": "https://global.discourse-cdn.com/meta/original/3X/e/2/e250ec403580530d19e6a9ed42d0d525a51a9dbe.svg",
+            "flair_bg_color": "FFFFFF",
+            "flair_group_id": 142,
+            "trust_level": 4
+          }
+        },
+        {
+          "extras": null,
+          "description": "Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member21",
+            "name": "member21",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "admin": true,
+            "moderator": true,
+            "trust_level": 4
+          }
+        },
+        {
+          "extras": null,
+          "description": "Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member2",
+            "name": "member6",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 3
+          }
+        }
+      ]
+    },
+    {
+      "fancy_title": "Change the email settings",
+      "fancy_title_localized": false,
+      "locale": "en",
+      "id": 128099,
+      "title": "Change the email settings",
+      "slug": "change-the-email-settings",
+      "posts_count": 7,
+      "reply_count": 5,
+      "highest_post_number": 7,
+      "image_url": null,
+      "created_at": "2019-09-09T21:40:27.526Z",
+      "last_posted_at": "2019-09-11T02:17:53.749Z",
+      "bumped": true,
+      "bumped_at": "2019-09-11T02:17:53.749Z",
+      "archetype": "regular",
+      "unseen": false,
+      "pinned": false,
+      "unpinned": null,
+      "excerpt": "Continuing the discussion from Goodbye Sparkpost; how can I change the email settings from admin panel? \nIs there a way? :thinking: \nI checked: \n\n/admin/email \nNo editable.\n/admin/site_settings/category/email \nNo config &hellip;",
+      "visible": true,
+      "closed": true,
+      "archived": false,
+      "bookmarked": null,
+      "liked": null,
+      "thumbnails": null,
+      "tags": [],
+      "tags_descriptions": {},
+      "like_count": 14,
+      "views": 2193,
+      "category_id": 6,
+      "featured_link": null,
+      "op_like_count": 2,
+      "has_accepted_answer": true,
+      "posters": [
+        {
+          "extras": null,
+          "description": "Original Poster",
+          "user": {
+            "id": 1,
+            "username": "member25",
+            "name": "",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "flair_name": "translators",
+            "flair_url": "globe",
+            "flair_bg_color": "ddd",
+            "flair_color": "111",
+            "flair_group_id": 50,
+            "trust_level": 2
+          }
+        },
+        {
+          "extras": "latest",
+          "description": "Most Recent Poster, Accepted Answer",
+          "user": {
+            "id": 1,
+            "username": "member23",
+            "name": "member23",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "flair_name": "team",
+            "flair_url": "https://global.discourse-cdn.com/meta/original/3X/e/b/ebee30bd98aef20357e4a177a5a1e45b877ce088.svg",
+            "flair_color": "111",
+            "flair_group_id": 47,
+            "primary_group_name": "team",
+            "admin": true,
+            "trust_level": 4
+          }
+        },
+        {
+          "extras": null,
+          "description": "Frequent Poster",
+          "user": {
+            "id": 1,
+            "username": "member15",
+            "name": "member8",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 1
+          }
+        },
+        {
+          "extras": null,
+          "description": "Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member21",
+            "name": "member21",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "admin": true,
+            "moderator": true,
+            "trust_level": 4
+          }
+        }
+      ]
+    },
+    {
+      "fancy_title": "Enable email settings from the interface",
+      "fancy_title_localized": false,
+      "locale": "en",
+      "id": 286408,
+      "title": "Enable email settings from the interface",
+      "slug": "enable-email-settings-from-the-interface",
+      "posts_count": 2,
+      "reply_count": 0,
+      "highest_post_number": 2,
+      "image_url": null,
+      "created_at": "2023-11-23T08:39:06.260Z",
+      "last_posted_at": "2023-11-24T06:45:02.489Z",
+      "bumped": true,
+      "bumped_at": "2023-11-24T06:45:02.489Z",
+      "archetype": "regular",
+      "unseen": false,
+      "pinned": false,
+      "unpinned": null,
+      "excerpt": "Hello, \nThis is quite annoying to edit the app.yml file to edit email settings and the rebuild the app. \nWe already have a email settings screen that displays the information, what if we could update the information dire&hellip;",
+      "visible": true,
+      "closed": false,
+      "archived": false,
+      "bookmarked": null,
+      "liked": null,
+      "thumbnails": null,
+      "tags": [
+        {
+          "id": 39,
+          "name": "email",
+          "slug": "email"
+        }
+      ],
+      "tags_descriptions": {},
+      "like_count": 0,
+      "views": 450,
+      "category_id": 6,
+      "featured_link": null,
+      "op_like_count": 0,
+      "has_accepted_answer": false,
+      "posters": [
+        {
+          "extras": null,
+          "description": "Original Poster",
+          "user": {
+            "id": 1,
+            "username": "member17",
+            "name": "member1",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 1
+          }
+        },
+        {
+          "extras": "latest",
+          "description": "Most Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member22",
+            "name": "member24",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 2
+          }
+        }
+      ]
+    },
+    {
+      "fancy_title": "No &ldquo;./launcher rebuild app&rdquo; or restart on simple changes like SMTP settings",
+      "fancy_title_localized": false,
+      "locale": "en",
+      "id": 345423,
+      "title": "No \"./launcher rebuild app\" or restart on simple changes like SMTP settings",
+      "slug": "no-launcher-rebuild-app-or-restart-on-simple-changes-like-smtp-settings",
+      "posts_count": 2,
+      "reply_count": 0,
+      "highest_post_number": 2,
+      "image_url": null,
+      "created_at": "2025-01-03T12:06:37.656Z",
+      "last_posted_at": "2025-01-03T13:37:43.414Z",
+      "bumped": true,
+      "bumped_at": "2025-01-03T13:37:43.414Z",
+      "archetype": "regular",
+      "unseen": false,
+      "pinned": false,
+      "unpinned": null,
+      "excerpt": "If you have problems with your e-mail SMTP configuration it takes quite a while to test a new setting since you have to completely destroy/restart or even rebuild the app to apply the configuration changes. \nYou can setu&hellip;",
+      "visible": true,
+      "closed": false,
+      "archived": false,
+      "bookmarked": null,
+      "liked": null,
+      "thumbnails": null,
+      "tags": [],
+      "tags_descriptions": {},
+      "like_count": 6,
+      "views": 136,
+      "category_id": 2,
+      "featured_link": null,
+      "op_like_count": 1,
+      "has_accepted_answer": false,
+      "posters": [
+        {
+          "extras": null,
+          "description": "Original Poster",
+          "user": {
+            "id": 1,
+            "username": "member9",
+            "name": "member10",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "trust_level": 2
+          }
+        },
+        {
+          "extras": "latest",
+          "description": "Most Recent Poster",
+          "user": {
+            "id": 1,
+            "username": "member18",
+            "name": "member11",
+            "avatar_template": "/letter_avatar/member/{size}/1.png",
+            "flair_name": "support-experts",
+            "flair_url": "https://global.discourse-cdn.com/meta/original/3X/e/2/e250ec403580530d19e6a9ed42d0d525a51a9dbe.svg",
+            "flair_bg_color": "FFFFFF",
+            "flair_group_id": 142,
+            "trust_level": 4
+          }
+        }
+      ]
+    }
+  ],
+  "summarizable": false,
+  "has_cached_summary": false,
+  "has_livestream": null,
+  "livestream_chat_active": false,
+  "valid_reactions": [
+    "heart",
+    "laughing",
+    "cry",
+    "exploding_head",
+    "clap",
+    "confetti_ball",
+    "hugs",
+    "chefs_kiss",
+    "100",
+    "+1",
+    "rocket",
+    "star_struck",
+    "discourse",
+    "eyes"
+  ],
+  "has_accepted_answer": false,
+  "shared_issue_count": 0,
+  "can_create_shared_issue": false,
+  "shared_issue_visible": true,
+  "can_vote": false,
+  "vote_count": 0,
+  "user_voted": false,
+  "discourse_zendesk_plugin_zendesk_id": null,
+  "discourse_zendesk_plugin_zendesk_url": "https://your-url.zendesk.com/agent/tickets/",
+  "details": {
+    "can_edit": false,
+    "notification_level": 1,
+    "participants": [
+      {
+        "id": 1,
+        "username": "member2",
+        "name": "member6",
+        "avatar_template": "/letter_avatar/member/{size}/1.png",
+        "post_count": 1,
+        "primary_group_name": null,
+        "flair_name": null,
+        "flair_url": null,
+        "flair_color": null,
+        "flair_bg_color": null,
+        "flair_group_id": null,
+        "trust_level": 3
+      },
+      {
+        "id": 1,
+        "username": "member12",
+        "name": "member16",
+        "avatar_template": "/letter_avatar/member/{size}/1.png",
+        "post_count": 1,
+        "primary_group_name": null,
+        "flair_name": "translators",
+        "flair_url": "globe",
+        "flair_color": "111",
+        "flair_bg_color": "ddd",
+        "flair_group_id": 50,
+        "trust_level": 2
+      }
+    ],
+    "created_by": {
+      "id": 1,
+      "username": "member12",
+      "name": "member16",
+      "avatar_template": "/letter_avatar/member/{size}/1.png"
+    },
+    "last_poster": {
+      "id": 1,
+      "username": "member2",
+      "name": "member6",
+      "avatar_template": "/letter_avatar/member/{size}/1.png"
+    }
+  },
+  "bookmarks": []
+}

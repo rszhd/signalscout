@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" class="text-size-normal anon">
+  <head>
+    <meta charset="utf-8">
+    <title>Product Support - Discourse Meta</title>
+    <meta name="description" content="Ask the community for help with anything related to Discourse.To help others help you, share as much detail as you can about the issue and what is occurring, including what you have tried so far from searching, reading the documentation or asking our AI bot.">
+    <meta name="discourse_theme_id" content="331">
+    <meta name="discourse_current_homepage" content="custom">
+
+    <meta name="generator" content="Discourse 2026.11.0-latest - https://github.com/discourse/discourse version 3b80490392826d90bd4ead486dfbd2c220e38b18">
+<link rel="icon" type="image/png" href="https://global.discourse-cdn.com/meta/optimized/3X/b/3/b33be9538df3547fcf9d1a51a4637d77392ac6f9_2_32x32.png">
+<link rel="apple-touch-icon" type="image/png" href="https://global.discourse-cdn.com/meta/optimized/4X/b/1/2/b12885a6f292ceffc222608846855f25a272835b_2_180x180.jpeg">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a1a">
+
+<meta name="color-scheme" content="light dark">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+<link rel="canonical" href="https://meta.discourse.org/c/support/6" />
+
+<meta name="discourse-track-view-session-id" content="lkyyWr6OlQgMuAgF8D76VwK3mMsgT1gH">
+  <link rel="search" type="application/opensearchdescription+xml" href="https://meta.discourse.org/opensearch.xml" title="Discourse Meta Search">
+
+    
+
+      <meta name="fragment" content="!">
+
+
+    
+  <script type="importmap" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+    {
+  "imports": {
+    "discourse/plugins/automation": "https://global.discourse-cdn.com/meta/assets/br/plugins/automation_main.CLmKs9-bzurbpel.digested.js",
+    "discourse/plugins/boards": "https://global.discourse-cdn.com/meta/assets/br/plugins/boards_main.CKPgeU-3f2fw0xt.digested.js",
+    "discourse/plugins/chat": "https://global.discourse-cdn.com/meta/assets/br/plugins/chat_main.D_JWVi-h64viflx.digested.js",
+    "discourse/plugins/checklist": "https://global.discourse-cdn.com/meta/assets/br/plugins/checklist_main.BehS7Y-nokyg0yp.digested.js",
+    "discourse/plugins/discourse-ai": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-ai_main.CD5GNk-8k8tqe6p.digested.js",
+    "discourse/plugins/discourse-assign": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-assign_main.Cdy99s-oa98y9wb.digested.js",
+    "discourse/plugins/discourse-cakeday": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-cakeday_main.C7imP_-i8783b7e.digested.js",
+    "discourse/plugins/discourse-chat-integration": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-chat-integration_main.CF1XId-mqcowcre.digested.js",
+    "discourse/plugins/discourse-customer-flair-plugin": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-customer-flair-plugin_main.DbWu0m-ram4ac3w.digested.js",
+    "discourse/plugins/discourse-data-explorer": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-data-explorer_main.BygLiW-c12qbg10.digested.js",
+    "discourse/plugins/discourse-deprecation-collector": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-deprecation-collector_main.UsZAHM-jh9nv16f.digested.js",
+    "discourse/plugins/discourse-details": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-details_main.efw4kb-7zm9ab4p.digested.js",
+    "discourse/plugins/discourse-doc-categories": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-doc-categories_main.BraA2b-4h9rey8j.digested.js",
+    "discourse/plugins/discourse-events": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-events_main.CfzYYM-h5nwrzwk.digested.js",
+    "discourse/plugins/discourse-gamification": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-gamification_main.CgOW6x-nkqefksa.digested.js",
+    "discourse/plugins/discourse-github": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-github_main.C1gIAx-seddfuqt.digested.js",
+    "discourse/plugins/discourse-hubspot": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-hubspot_main.BU2Bgy-dfsteza4.digested.js",
+    "discourse/plugins/discourse-lazy-videos": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-lazy-videos_main.CKBcYx-ptjbxuv4.digested.js",
+    "discourse/plugins/discourse-local-dates": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-local-dates_main.DYZuSF-prqzg0i7.digested.js",
+    "discourse/plugins/discourse-math": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-math_main.BjvgOh-ohcx3829.digested.js",
+    "discourse/plugins/discourse-new-features-feeds": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-new-features-feeds_main.C5iXmo-9igpdie7.digested.js",
+    "discourse/plugins/discourse-personalized-feed": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-personalized-feed_main.i-E9yg-c8u55sdd.digested.js",
+    "discourse/plugins/discourse-presence": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-presence_main.D728s2-eoumxxb6.digested.js",
+    "discourse/plugins/discourse-reactions": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-reactions_main.D4TDtl-2otq3y08.digested.js",
+    "discourse/plugins/discourse-rewind": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-rewind_main.Cjzd0Q-s9psmpdq.digested.js",
+    "discourse/plugins/discourse-saved-searches": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-saved-searches_main.BpaVCp-t1pmfatc.digested.js",
+    "discourse/plugins/discourse-solved": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-solved_main.BGXoyC-gxc9mk9i.digested.js",
+    "discourse/plugins/discourse-suggested-edits": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-suggested-edits_main.C_EVDR-6pez75t7.digested.js",
+    "discourse/plugins/discourse-templates": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-templates_main.C_-B4P-9amhdceq.digested.js",
+    "discourse/plugins/discourse-theme-install-button": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-theme-install-button_main.DRH1MS-qkn1lx51.digested.js",
+    "discourse/plugins/discourse-topic-voting": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-topic-voting_main.CLvXEI-86wllzdq.digested.js",
+    "discourse/plugins/discourse-user-notes": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-user-notes_main.BeQTsb-h06xysju.digested.js",
+    "discourse/plugins/discourse-workflows": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-workflows_main.BoS6zo-r0ch29u6.digested.js",
+    "discourse/plugins/discourse-yearly-review": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-yearly-review_main.n4aEk9-eg6ds0j0.digested.js",
+    "discourse/plugins/footnote": "https://global.discourse-cdn.com/meta/assets/br/plugins/footnote_main.DE1qtG-6mp2p38s.digested.js",
+    "discourse/plugins/hosted-site": "https://global.discourse-cdn.com/meta/assets/br/plugins/hosted-site_main.BCd7Vx-lznqep4u.digested.js",
+    "discourse/plugins/live": "https://global.discourse-cdn.com/meta/assets/br/plugins/live_main.CyVStg-bo4cut8d.digested.js",
+    "discourse/plugins/poll": "https://global.discourse-cdn.com/meta/assets/br/plugins/poll_main.BLzW0P-8hn0usja.digested.js",
+    "discourse/plugins/spoiler-alert": "https://global.discourse-cdn.com/meta/assets/br/plugins/spoiler-alert_main.ZQrGaG-o7tp5b2b.digested.js",
+    "discourse/plugins/discourse-lazy-videos?": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-lazy-videos_main.CKBcYx-ptjbxuv4.digested.js",
+    "discourse/plugins/discourse-local-dates?": "https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-local-dates_main.DYZuSF-prqzg0i7.digested.js",
+    "discourse/plugins/styleguide?": "data:text/javascript,/* autogenerated missing optional plugin stub */const m=new Proxy({},{get:()=>null});export default new Proxy({},{get:()=>m});",
+    "discourse/plugins/styleguide": "data:text/javascript, /* autogenerated missing required plugin stub */ export default null; throw new Error(\"Plugin 'styleguide' is imported by another bundle, but it is not installed on this site. If this dependency is optional, import it with `with { discourseImport: \\\"optional\\\" }`.\");",
+    "discourse/plugins/spoiler-alert?": "https://global.discourse-cdn.com/meta/assets/br/plugins/spoiler-alert_main.ZQrGaG-o7tp5b2b.digested.js",
+    "discourse/plugins/chat?": "https://global.discourse-cdn.com/meta/assets/br/plugins/chat_main.D_JWVi-h64viflx.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/app-workers-media-optimization-entrypoint-1skjmstn.digested.js": "https://global.discourse-cdn.com/meta/assets/br/app-workers-media-optimization-entrypoint-bgg7iqfw.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/discourse-16vfrns5.digested.js": "https://global.discourse-cdn.com/meta/assets/br/discourse-gd9evxs7.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/ace-editor-bundle-1ln0ydgd.digested.js": "https://global.discourse-cdn.com/meta/assets/br/ace-editor-bundle-o08gyn9s.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/admin-1iofa06q.digested.js": "https://global.discourse-cdn.com/meta/assets/br/admin-i3g3g76l.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chart-js-bundle-17t0ihjq.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chart-js-bundle-joi0qjry.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-49rm5io6.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-bb9t2kqv.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-4l3g0811.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-blhg1o24.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-358fg2cz.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-bwjt70tg.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-25boyeqz.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-cg0nijkb.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-11n2dj65.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-cr172qgk.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-5efp6414.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-dbbsr7f5.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-1ky7aywl.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-eit0uw3d.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-4nzn6y4l.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-ewjttrcb.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-6cdqcmou.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-f4jyyy1h.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-9r56unok.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-f96lzs6p.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-4fiwvwh0.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-fedd12xf.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-11tpravv.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-foun5rt2.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-5baa7wbw.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-gi8grdoi.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-57dy8f9e.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-hocy6kyx.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-4i6ase0o.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-hq41ku7d.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-1nxepucn.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-idv4yw5q.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-4zspfum6.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-j6ggzsul.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-39nvp8h8.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-ksb8d0va.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-26hmt1wq.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-lsixrhgn.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-5t4y9ihs.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-mc609r7x.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-63c302gt.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-mz7s63j6.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-366gzlbv.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-o3g8rb15.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-36cbz3pe.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-oaam4vic.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-4o5u717n.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-ofv2boqo.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/chunk-xz1bt5bd.digested.js": "https://global.discourse-cdn.com/meta/assets/br/chunk-otih1b7z.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/codemirror-editor-2utf12c4.digested.js": "https://global.discourse-cdn.com/meta/assets/br/codemirror-editor-b0dofweh.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/dev-tools-2ckrw9i6.digested.js": "https://global.discourse-cdn.com/meta/assets/br/dev-tools-iao63tx6.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/diff-26302727.digested.js": "https://global.discourse-cdn.com/meta/assets/br/diff-bz2bnrwp.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/dist-4z8kb594.digested.js": "https://global.discourse-cdn.com/meta/assets/br/dist-h7vi0yy8.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/ember-inspector-support-2i29fx6a.digested.js": "https://global.discourse-cdn.com/meta/assets/br/ember-inspector-support-b0lw15x2.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/faker-qccr27so.digested.js": "https://global.discourse-cdn.com/meta/assets/br/faker-nn0129gy.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/full-calendar-bundle-3hf37gw5.digested.js": "https://global.discourse-cdn.com/meta/assets/br/full-calendar-bundle-jsmy3bfj.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/highlightjs-1ri37umz.digested.js": "https://global.discourse-cdn.com/meta/assets/br/highlightjs-fl8q1i9d.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/js-yaml-16y2bx9a.digested.js": "https://global.discourse-cdn.com/meta/assets/br/js-yaml-qoo0lxuu.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/jsoneditor-5c34ipoh.digested.js": "https://global.discourse-cdn.com/meta/assets/br/jsoneditor-ewm47qge.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/minimasonry-4m2y1ofd.digested.js": "https://global.discourse-cdn.com/meta/assets/br/minimasonry-bpdcqtmi.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/morphlex-2anc6gig.digested.js": "https://global.discourse-cdn.com/meta/assets/br/morphlex-m7h93uwv.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/photoswipe-4u4yxvqn.digested.js": "https://global.discourse-cdn.com/meta/assets/br/photoswipe-b36q5pc1.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/photoswipe-lightbox-32d44b2q.digested.js": "https://global.discourse-cdn.com/meta/assets/br/photoswipe-lightbox-omiq7iv9.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/pikaday-2q0pkcji.digested.js": "https://global.discourse-cdn.com/meta/assets/br/pikaday-dev2dbrh.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/prosemirror-editor-2pls5k5x.digested.js": "https://global.discourse-cdn.com/meta/assets/br/prosemirror-editor-jm8hpbef.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/prosemirror-extensions-2l406lqi.digested.js": "https://global.discourse-cdn.com/meta/assets/br/prosemirror-extensions-g9ykzzvh.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/rete-bundle-5l057ed9.digested.js": "https://global.discourse-cdn.com/meta/assets/br/rete-bundle-fl1fr10z.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/route-wizard-js-11691yub.digested.js": "https://global.discourse-cdn.com/meta/assets/br/route-wizard-js-cfogptu6.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/tags-admin-dropdown-4smh3z3v.digested.js": "https://global.discourse-cdn.com/meta/assets/br/tags-admin-dropdown-h0qpxoiz.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/to-markdown-14j82ui3.digested.js": "https://global.discourse-cdn.com/meta/assets/br/to-markdown-jdv1uio0.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/webp_enc-2f1xb7e6.digested.js": "https://global.discourse-cdn.com/meta/assets/br/webp_enc-hqpac58j.digested.js",
+    "https://global.discourse-cdn.com/meta/assets/br/webp_enc_simd-5zjca1nu.digested.js": "https://global.discourse-cdn.com/meta/assets/br/webp_enc_simd-m7rn96ub.digested.js"
+  }
+}
+  </script>
+
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/automation_main.CLmKs9-bzurbpel.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="automation"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/boards_main.CKPgeU-3f2fw0xt.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="boards"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/chat_main.D_JWVi-h64viflx.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="chat"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/checklist_main.BehS7Y-nokyg0yp.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="checklist"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-ai_main.CD5GNk-8k8tqe6p.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-ai"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-assign_main.Cdy99s-oa98y9wb.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-assign"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-cakeday_main.C7imP_-i8783b7e.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-cakeday"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-chat-integration_main.CF1XId-mqcowcre.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-chat-integration"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-customer-flair-plugin_main.DbWu0m-ram4ac3w.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-customer-flair-plugin"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-data-explorer_main.BygLiW-c12qbg10.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-data-explorer"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-deprecation-collector_main.UsZAHM-jh9nv16f.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-deprecation-collector"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-details_main.efw4kb-7zm9ab4p.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-details"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-doc-categories_main.BraA2b-4h9rey8j.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="false" data-plugin-name="discourse-doc-categories"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-events_main.CfzYYM-h5nwrzwk.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-events"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-gamification_main.CgOW6x-nkqefksa.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-gamification"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-github_main.C1gIAx-seddfuqt.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-github"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-hubspot_main.BU2Bgy-dfsteza4.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-hubspot"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-lazy-videos_main.CKBcYx-ptjbxuv4.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-lazy-videos"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-local-dates_main.DYZuSF-prqzg0i7.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-local-dates"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-math_main.BjvgOh-ohcx3829.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-math"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-new-features-feeds_main.C5iXmo-9igpdie7.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-new-features-feeds"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-personalized-feed_main.i-E9yg-c8u55sdd.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-personalized-feed"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-presence_main.D728s2-eoumxxb6.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-presence"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-reactions_main.D4TDtl-2otq3y08.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-reactions"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-rewind_main.Cjzd0Q-s9psmpdq.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-rewind"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-saved-searches_main.BpaVCp-t1pmfatc.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="false" data-plugin-name="discourse-saved-searches"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-solved_main.BGXoyC-gxc9mk9i.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-solved"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-suggested-edits_main.C_EVDR-6pez75t7.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-suggested-edits"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-templates_main.C_-B4P-9amhdceq.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-templates"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-theme-install-button_main.DRH1MS-qkn1lx51.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="discourse-theme-install-button"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-topic-voting_main.CLvXEI-86wllzdq.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-topic-voting"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-user-notes_main.BeQTsb-h06xysju.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="discourse-user-notes"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-workflows_main.BoS6zo-r0ch29u6.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="true" data-plugin-name="discourse-workflows"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-yearly-review_main.n4aEk9-eg6ds0j0.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="false" data-plugin-name="discourse-yearly-review"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/footnote_main.DE1qtG-6mp2p38s.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="footnote"
+      >
+      <script defer src="https://global.discourse-cdn.com/meta/assets/plugins/footnote_extra-95ffab71.js" data-discourse-entrypoint="plugins/footnote_extra" data-official="true" data-preinstalled="true" data-plugin-name="footnote" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/hosted-site_main.BCd7Vx-lznqep4u.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="false" data-plugin-name="hosted-site"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/live_main.CyVStg-bo4cut8d.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="false" data-preinstalled="true" data-plugin-name="live"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/poll_main.BLzW0P-8hn0usja.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="poll"
+      >
+      <link
+        rel="modulepreload"
+        href="https://global.discourse-cdn.com/meta/assets/br/plugins/spoiler-alert_main.ZQrGaG-o7tp5b2b.digested.js"
+        nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+        data-official="true" data-preinstalled="true" data-plugin-name="spoiler-alert"
+      >
+
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/automation_chunk.DvFpQj-bzurbpel.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/boards_chunk.DWqQPb-3f2fw0xt.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/chat_chunk.B4lzNz-h64viflx.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-ai_chunk.CrxIjp-8k8tqe6p.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-data-explorer_chunk.BUkeZu-c12qbg10.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-gamification_chunk.C9h4DZ-nkqefksa.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-hubspot_chunk.Cxn9vU-dfsteza4.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-new-features-feeds_chunk.H8ayJH-9igpdie7.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-solved_chunk.DL-z0A-gxc9mk9i.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/discourse-user-notes_chunk.Dbexa0-h06xysju.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/hosted-site_chunk.XtHBxd-lznqep4u.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+    <link
+      rel="modulepreload"
+      href="https://global.discourse-cdn.com/meta/assets/br/plugins/live_chunk.g12RsR-bo4cut8d.digested.js"
+      nonce="bcG4fa4oOAHSqjcac2CHyJK3m"
+    >
+
+
+    
+
+      <script id="bfcache-stale-document-check" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        {
+          const nav = performance.getEntriesByType("navigation")[0];
+          if (nav?.type === "back_forward" && nav.transferSize === 0) {
+            location.reload();
+          }
+        }
+      </script>
+
+    <script nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+      window.EmberENV ??= {};
+      window.EmberENV._DEFAULT_ASYNC_OBSERVERS = true;
+    </script>
+
+    <script type="module" src="https://sea3.discourse-cdn.com/meta/extra-locales/6edd10b3c2dd1cdfba7650c0445b2fff5caf195f/en/main.js"  nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+    <script type="module" src="https://sea3.discourse-cdn.com/meta/extra-locales/0ffe7a21317d2af4f704e60d5a6802a6b9fa84f4/en/mf.js?__ws=meta.discourse.org"  nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+      <script type="module" src="https://sea3.discourse-cdn.com/meta/extra-locales/e3437df97f295622d713b6c7e440c013d779b567/en/overrides.js?__ws=meta.discourse.org"  nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+      <script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/3df6c89a83a8f88674dd01dc855426cfd35950d3.js?__ws=meta.discourse.org" data-theme-id="331" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/5e78116a348973d8934b6d34338885fe4a6d6911.js?__ws=meta.discourse.org" data-theme-id="129" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/c6aa827eda329c0d79fec3d0345dfed2fcef411b.js?__ws=meta.discourse.org" data-theme-id="155" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/115a8ea82b073ce8ad69d8a5128ca54669c1240a.js?__ws=meta.discourse.org" data-theme-id="180" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/a18361ccefa6b276de32005d6dff0ffcee23286f.js?__ws=meta.discourse.org" data-theme-id="184" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/b2242bcef5ca0a6ab2b23780fba0e2f48d6217d1.js?__ws=meta.discourse.org" data-theme-id="186" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/a0c9701da0368d748976877e3559bc8acf1a0abc.js?__ws=meta.discourse.org" data-theme-id="202" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/a78e38e839ce15db6c165b5db26b36b15e6e917d.js?__ws=meta.discourse.org" data-theme-id="222" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/585f6be152514022ad63f723c35ecfe71679e320.js?__ws=meta.discourse.org" data-theme-id="230" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/fb0ec67e021147b5aa285af494d4a5cf69bf1cbe.js?__ws=meta.discourse.org" data-theme-id="231" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/b397b9640d02095799edc499fe76bd34468f5d0e.js?__ws=meta.discourse.org" data-theme-id="236" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/45459a23bf9a41354b88548031e3f0482098d159.js?__ws=meta.discourse.org" data-theme-id="264" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/c54439ee013612c61a8514d3ba522e80fc058549.js?__ws=meta.discourse.org" data-theme-id="279" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/baffd000b15a798d0fc0e19ee8fdbf39b591d251.js?__ws=meta.discourse.org" data-theme-id="309" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/98cd7a0b1504af1054039233b9539b9c6ef254d5.js?__ws=meta.discourse.org" data-theme-id="334" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/617f3fb0988093ca98e33e1c6db65bc60446ae57.js?__ws=meta.discourse.org" data-theme-id="367" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/23c67ff1c801186d7d2a60c6ff7cad8f4c8e1593.js?__ws=meta.discourse.org" data-theme-id="409" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/3f27e8f34e2bee5f0c88811d2c826d5ca244d33b.js?__ws=meta.discourse.org" data-theme-id="412" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/8b4e517d8e4940cf9db2cf7071af9ce1a1384544.js?__ws=meta.discourse.org" data-theme-id="421" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/eb8ddc6326cfdfa62a6e568ccb4f3351541db955.js?__ws=meta.discourse.org" data-theme-id="425" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/82ca6470861b395f818c9602c4047b5823af6e6d.js?__ws=meta.discourse.org" data-theme-id="427" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/d51baf919c65d28c19ed28697b418f715df1d15e.js?__ws=meta.discourse.org" data-theme-id="428" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/5ac958db5224f0058ffdc7b78cf1d295f456a529.js?__ws=meta.discourse.org" data-theme-id="439" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+<script type="module" src="https://sea3.discourse-cdn.com/meta/theme-javascripts/fd53dd278fb5fd8ffdf8ad0badc56c99a247a942.js?__ws=meta.discourse.org" data-theme-id="440" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+
+    <link rel="preload" href="https://global.discourse-cdn.com/meta/assets/br/browser-update-91688f13.js" as="script" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+    <script defer src="https://global.discourse-cdn.com/meta/assets/br/browser-detect-47cf9e6d.js" data-discourse-entrypoint="js/browser-detect" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+
+    <link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/discourse-gd9evxs7.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-f96lzs6p.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-hq41ku7d.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-mz7s63j6.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-bwjt70tg.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-otih1b7z.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-cr172qgk.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-dbbsr7f5.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-oaam4vic.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-o3g8rb15.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-foun5rt2.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-fedd12xf.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-eit0uw3d.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-bb9t2kqv.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-ksb8d0va.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-idv4yw5q.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-cg0nijkb.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-ofv2boqo.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-lsixrhgn.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-hocy6kyx.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-f4jyyy1h.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-mc609r7x.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+<link rel="modulepreload" href="https://global.discourse-cdn.com/meta/assets/br/chunk-blhg1o24.digested.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+
+
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/514234836fd0bdcf41f1e73d2cfa567d76ebe1be.js?__ws=meta.discourse.org" data-theme-id="331" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/aaae1fa144191cf44002bf1aad103e85c57f636d.js?__ws=meta.discourse.org" data-theme-id="129" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/bd437e5b477838dc68b86119d3cb205c1b52c4ee.js?__ws=meta.discourse.org" data-theme-id="138" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/c19f23a310f4b4e9a1772b1023723e5097fa1bad.js?__ws=meta.discourse.org" data-theme-id="155" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/aff00f6024ca67b44c89e423a9ceb107695040dd.js?__ws=meta.discourse.org" data-theme-id="165" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/4d8de3a8dffab552bad7af95a801ab1a14941073.js?__ws=meta.discourse.org" data-theme-id="171" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/b40af6617fbf14806b2e63a2770248766c902f84.js?__ws=meta.discourse.org" data-theme-id="180" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/52838ccd8468accca159026e1f0b40765b615bcb.js?__ws=meta.discourse.org" data-theme-id="184" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/646b47a272da4c2c83ed50571d136552126ebd94.js?__ws=meta.discourse.org" data-theme-id="186" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/808ee2dfeaf22308025e8f043b756b8c65c2bd6c.js?__ws=meta.discourse.org" data-theme-id="202" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/cca5d0e44bcf35d377b66ad2021baa92242a4b46.js?__ws=meta.discourse.org" data-theme-id="208" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/e6eceac1ad88abb6f8934120bd6f51b97fe94263.js?__ws=meta.discourse.org" data-theme-id="222" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/57a0c8d960c486cfe9ff977ddcdae13a433c1d4a.js?__ws=meta.discourse.org" data-theme-id="230" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/658f4198f4aae200776acea2b10943d2b5daad55.js?__ws=meta.discourse.org" data-theme-id="231" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/36b49492d33c46d55b563cda0416df1b853fde33.js?__ws=meta.discourse.org" data-theme-id="236" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/a31ff8dfbb18baf296af901655ea920c3da5af2a.js?__ws=meta.discourse.org" data-theme-id="264" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/1cc2a90bdcfd7db676f8cd254ba4848739620a75.js?__ws=meta.discourse.org" data-theme-id="266" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/fb9e5cda3d00c2344b621528187b141bba3ffd35.js?__ws=meta.discourse.org" data-theme-id="279" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/a3cf2917422b84f55a7188c60c0caa65af54f325.js?__ws=meta.discourse.org" data-theme-id="309" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/70b4b357b91145f710805f783a15c0afebf3a37b.js?__ws=meta.discourse.org" data-theme-id="333" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/5186c109dfd26ed671a31ade2fdf25372b4e09f8.js?__ws=meta.discourse.org" data-theme-id="334" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/99b9208828f4f4be89b313ae8b44583efc5a08a2.js?__ws=meta.discourse.org" data-theme-id="367" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/0679e288a889bfe13bd9545cc9f4a3581a73a9ff.js?__ws=meta.discourse.org" data-theme-id="404" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/0aa3a88a97fd4184b29d359d2d8cfc6a46d20879.js?__ws=meta.discourse.org" data-theme-id="409" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/d0a35745a5235c2033e46661503f4f784f0d05e5.js?__ws=meta.discourse.org" data-theme-id="412" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/e6474b7e6082524d9415c17e5e0c673bf4fa751d.js?__ws=meta.discourse.org" data-theme-id="421" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/d95d12d5f187cb60409c4c76d967bc1034216370.js?__ws=meta.discourse.org" data-theme-id="425" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/26199f49594c30f46cfe19f5c7c7849c3c1c1a32.js?__ws=meta.discourse.org" data-theme-id="427" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/88f7843ec2dbd259c11e942871a1e9569c6f7ed2.js?__ws=meta.discourse.org" data-theme-id="428" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/8ffab18c54b0b9292fcf172a2c8526dc451181ec.js?__ws=meta.discourse.org" data-theme-id="431" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/f5ce304e19e08ea7f096966cf39e140d6ccf284a.js?__ws=meta.discourse.org" data-theme-id="439" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+        <link rel="modulepreload" href="https://sea3.discourse-cdn.com/meta/theme-javascripts/e075c0b2fc0da2817cf0aca05852a01badef6291.js?__ws=meta.discourse.org" data-theme-id="440" nonce="bcG4fa4oOAHSqjcac2CHyJK3m">
+      <meta http-equiv="origin-trial" content="Avxkn9pqiyK+1F1LLCIuXTFKanihzkcBp9P63oOYbFG3xZdBX56KG7ffcvWPy2R1QrcGCtLSXEEx+BEz8m95+AwAAABTeyJvcmlnaW4iOiJodHRwczovL21ldGEuZGlzY291cnNlLm9yZzo0NDMiLCJmZWF0dXJlIjoiQmFkZ2luZyIsImV4cGlyeSI6MTU1NjIyNDYwM30=">
+<script defer="" data-domain="meta.discourse.org,rollup-meta.discourse.org,rollup-all.discourse.org" src="https://www.discourse.org/js/script.outbound-links.tagged-events.js" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+<meta name="ahrefs-site-verification" content="07293e630779edf08a6b9b4d1e302e1a182ba6e2861118d7a92b66ea08fb11b0">
+
+    
+    
+    
+
+    <link id="manifest-link" rel="manifest" href=/manifest.webmanifest crossorigin="use-credentials">
+
+
+        <link rel="next" href="/c/support/6?page=1">
+    <link rel="alternate" type="application/rss+xml" title="Latest posts" href="https://meta.discourse.org/posts.rss" />
+      <link rel="alternate" type="application/rss+xml" title="Latest topics" href="https://meta.discourse.org/latest.rss" />
+    <link rel="alternate nofollow" type="application/rss+xml" title="RSS feed of topics in the &#39;Product Support&#39; category" href="https://meta.discourse.org/c/support/6.rss" />
+    <meta property="og:site_name" content="Discourse Meta" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:image" content="https://global.discourse-cdn.com/meta/original/4X/c/8/9/c899fb03a18cb86f3e071e2c8bc20a09fd9975d0.jpeg" />
+<meta property="og:image" content="https://global.discourse-cdn.com/meta/original/4X/c/8/9/c899fb03a18cb86f3e071e2c8bc20a09fd9975d0.jpeg" />
+<meta property="og:url" content="https://meta.discourse.org/c/support/6" />
+<meta name="twitter:url" content="https://meta.discourse.org/c/support/6" />
+<meta property="og:title" content="Product Support" />
+<meta name="twitter:title" content="Product Support" />
+<meta property="og:description" content="Ask the community for help with anything related to Discourse.To help others help you, share as much detail as you can about the issue and what is occurring, including what you have tried so far from searching, reading the documentation or asking our AI bot." />
+<meta name="twitter:description" content="Ask the community for help with anything related to Discourse.To help others help you, share as much detail as you can about the issue and what is occurring, including what you have tried so far from searching, reading the documentation or asking our AI bot." />
+
+    <link rel="alternate" type="text/markdown" href="https://meta.discourse.org/c/support/6.md">
+
+    <script async src="/plugins/discourse-client-performance/javascripts/discourse-client-performance.js?v=a7b922e8787e07682fc55636ddbe93c4307c315489def4c7a44d5d46bf814e3c" nonce="bcG4fa4oOAHSqjcac2CHyJK3m"></script>
+
+
+
+
+
+    <meta id="data-discourse-setup" data-cdn="https://sea3.discourse-cdn.com/meta" data-base-url="https://meta.discourse.org" data-base-uri="" data-environment="production" data-letter-avatar-version="6_22734026db12803ebb3e059622ac3534" data-service-worker-url="service-worker.js" data-default-locale="en" data-asset-version="7d4e846bb5c2b64d7e79b19c14bf1090" data-disable-custom-css="false" data-highlight-js-path="/highlight-js/meta.discourse.org/d125c3422119592da271b68fa9500c957dd748c0.js" data-svg-sprite-path="/svg-sprite/meta.discourse.org/svg-331-c7df254e4eb31b227b5d69c99f3093e001c04893.js" data-color-scheme-is-dark="false" data-user-color-scheme-id="-1" data-user-dark-scheme-id="-1" data-s3-cdn="https://global.discourse-cdn.com/meta" data-s3-base-url="//cdck-file-uploads-global.s3.dualstack.us-west-2.amazonaws.com/meta">
+
+    <meta name="discourse/config/environment" content="%7B%22modulePrefix%22%3A%22discourse%22%2C%22environment%22%3A%22production%22%2C%22rootURL%22%3A%22%22%2C%22locationType%22%3A%22history%22%2C%22EmberENV%22%3A%7B%22FEATURES%22%3A%7B%7D%2C%22EXTEND_PROTOTYPES%22%3Afalse%7D%2C%22APP%22%3A%7B%22name%22%3A%22discourse%22%2C%22version%22%3A%222026.11.0-latest%203b80490392826d90bd4ead486dfbd2c220e38b18%22%7D%7D" />
+  </head>
+
+  

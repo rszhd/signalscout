@@ -83,8 +83,6 @@ raise the number only when your inbox has too much noise.
 :::
 
 Before you start, press **Test this plan** to see what a month would cost.
-[What it costs you](../self-hosting/costs#test-a-plan-before-it-runs)
-explains the numbers.
 
 ## The monitor page
 

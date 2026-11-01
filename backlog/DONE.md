@@ -2,10 +2,25 @@
 
 # Done
 
-258 finished.
+273 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-492 | [A release carries high and critical dependency holes](done/2026-11/BUG-492-a-release-carries-high-and-critical-dependency-holes.md) | bug | shipped | 2026-11 |
+| BUG-484 | [A Bright Data 5xx answer skips the browser](done/2026-11/BUG-484-a-bright-data-5xx-skips-the-browser.md) | bug | shipped | 2026-11 |
+| BUG-483 | [vBulletin 3 and 5 home pages are not detected](done/2026-11/BUG-483-vbulletin-3-and-5-home-pages-are-not-detected.md) | bug | shipped | 2026-11 |
+| BUG-482 | [Discourse in a subfolder gets the site root's feed](done/2026-11/BUG-482-discourse-in-a-subfolder-gets-the-site-root-s-feed.md) | bug | shipped | 2026-11 |
+| BUG-481 | [An empty page from Bright Data loses the forum](done/2026-11/BUG-481-an-empty-page-from-bright-data-loses-the-forum.md) | bug | shipped | 2026-11 |
+| BUG-480 | [Completing partial posts starts one browser a page](done/2026-11/BUG-480-completing-partial-posts-starts-one-browser-a-page.md) | bug | shipped | 2026-11 |
+| BUG-479 | [XenForo 2 threads in VerticalScope's theme are not read](done/2026-11/BUG-479-xenforo-2-threads-in-verticalscope-s-theme-are-not-read.md) | bug | shipped | 2026-11 |
+| US-485 | [An Invision forum is read through its activity stream](done/2026-11/US-485-an-invision-forum-is-read-through-its-activity-stream.md) | feature | shipped | 2026-11 |
+| BUG-475 | [The pre-filter drops forum posts for missing address words](done/2026-10/BUG-475-the-pre-filter-drops-forum-posts-for-missing-address-words.md) | bug | shipped | 2026-10 |
+| US-476 | [A forum thread page is read only for a post that passed the filters](done/2026-10/US-476-a-forum-thread-page-is-read-only-for-a-post-that-passed-the-filters.md) | feature | shipped | 2026-10 |
+| US-473 | [A monitor reads a whole forum through its newest-threads feed](done/2026-10/US-473-a-monitor-reads-a-whole-forum-through-its-newest-threads-feed.md) | feature | shipped | 2026-10 |
+| US-468 | [ScrapeCreators' Reddit connector stops on the first page that reaches posts it has read](done/2026-10/US-468-scrapecreators-reddit-stops-on-the-first-page-that-reaches-read-posts.md) | feature | shipped | 2026-10 |
+| US-467 | [SocialCrawl's Reddit connector stops at posts it has already read](done/2026-10/US-467-socialcrawl-reddit-stops-at-posts-it-has-already-read.md) | feature | shipped | 2026-10 |
+| US-459 | [The docs site shows SignalScout Cloud only](done/2026-10/US-459-the-docs-site-shows-signalscout-cloud-only.md) | chore | shipped | 2026-10 |
+| US-449 | [Intent means wanting a product, not asking for advice](done/2026-10/US-449-intent-means-wanting-a-product-not-asking-for-advice.md) | feature | shipped | 2026-10 |
 | BUG-437 | [One reason over 160 characters refuses a whole classification](done/2026-09/BUG-437-one-long-reason-refuses-a-whole-classification.md) | bug | shipped | 2026-09 |
 | BUG-436 | [A source that fails part way through a poll loses the pages it already billed](done/2026-09/BUG-436-a-source-that-fails-mid-walk-loses-the-pages-it-already-billed.md) | bug | shipped | 2026-09 |
 | BUG-431 | [A thread test reads the previous test's continuation](done/2026-09/BUG-431-a-thread-test-reads-the-previous-test-s-continuation.md) | bug | shipped | 2026-09 |

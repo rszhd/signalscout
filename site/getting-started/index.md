@@ -46,14 +46,8 @@ you can export them and see how often the score was right.
 - **It is not a brand dashboard.** There are no sentiment charts, no share of
   voice and no competitor reports.
 
-## Two ways to use it
+## Where to use it
 
-| | SignalScout Cloud | Self-hosted |
-|---|---|---|
-| Who runs it | We do | You do, on your own server |
-| Data and model keys | Included | You bring your own |
-| Cost | A monthly plan | Free software; you pay your providers |
-| Start | [signalscout.run](https://www.signalscout.run) | [The install on GitHub](https://github.com/rszhd/signalscout#running-it) |
-
-Everything else in these guides is the same for both, and a page says so when
-it is not.
+SignalScout runs at [app.signalscout.run](https://app.signalscout.run). The
+data providers and the AI model are included in your plan, so you bring no
+keys. [SignalScout Cloud](../cloud/) says what the plan covers.

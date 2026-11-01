@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-gb">
+	<link rel="self" type="application/atom+xml" href="https://forums.gentoo.org/app.php/feed/topics" />
+
+	<title>member2</title>
+	<subtitle>Welcome to member2, the mailing-list alternative.</subtitle>
+	<link href="https://forums.gentoo.org/index.php" />
+	<updated>2026-10-27T07:17:04+00:00</updated>
+
+	<author><name><![CDATA[member2]]></name></author>
+	<id>https://forums.gentoo.org/app.php/feed/topics</id>
+
+		<entry>
+		<author><name><![CDATA[member3]]></name></author>
+		<updated>2026-10-27T07:17:04+00:00</updated>
+
+		<published>2026-10-27T07:17:04+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8895257#p8895257</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8895257#p8895257"/>
+		<title type="html"><![CDATA[Installing Gentoo • New to Gentoo, installing on an old office PC, where do I start with partitioning?]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8895257#p8895257"><![CDATA[
+Hi everyone, I am Member and I am new here. I have an old office PC that runs Windows very slowly now, and I would like to try Gentoo on it for basic daily work, browser, documents and email, nothing fancy.<br><br>I have booted the Gentoo Live GUI and started reading the handbook, but I am stuck at the partitioning step. I am not sure whether to keep Windows as a dual boot or wipe the disk completely, and I do not want to lose the files already on the PC.<br><br>A few beginner questions:<br><br>For a simple desktop setup, is dual boot worth the extra trouble, or is it easier for a first install to use the whole disk?<br>How do I know if my PC is UEFI or BIOS, and does that change what I should choose for partitioning?<br>For a basic desktop, which stage3 and profile should I start with, so I do not pick something meant for a server?<br>I have backed up the important files already, I just do not want to make a basic mistake at the start. Any simple guidance for a first-time installer would be really helpful. Thanks in advance.<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member3</a> — Tue Oct 27, 2026 7:17 am — Replies 8 — Views 1384</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member6]]></name></author>
+		<updated>2026-10-20T02:39:27+00:00</updated>
+
+		<published>2026-10-20T02:39:27+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894915#p8894915</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894915#p8894915"/>
+		<title type="html"><![CDATA[Installing Gentoo • Can no longer shutdown]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894915#p8894915"><![CDATA[
+[This is not an "Installing" issue, but it's not the kernel either. Not sure where to post.]<br><br>"<code style="font-family:monospace">reboot</code>", "<code style="font-family:monospace">shutdown now</code>" and "<code style="font-family:monospace">shutdown -hp now</code>" used to reboot, drop to single-user mode and poweroff, respectively. Now all three stop short of the end goal. They stop all services, then hang. The last message is "<code style="font-family:monospace">Deactivating swap devices ...</code>". Workaround is count to ten, then press and hold the power button to poweroff. No apparent damage, the filesystems are clean when powering back on.<br><br>I should have jumped on it when it first happened a few months ago, now it's a little late. It doesn't seem to be a kernel panic, there is nothing in <code style="font-family:monospace">/sys/fs/pstore</code>. I tried old kernels from backups, all the way back to 6.6.62 (2024, definitely worked then) but no difference. So it's not the kernel.<br><br>openrc? sysvinit? I can't easily downgrade either one, the earlier versions dropped out of ::gentoo. Not sure where else to look.<br><br>Any ideas? Here's <a href="https://bpa.st/U2NMU" class="postlink">emerge --info</a>.<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member6</a> — Tue Oct 20, 2026 2:39 am — Replies 6 — Views 14169</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member8]]></name></author>
+		<updated>2026-10-17T23:47:19+00:00</updated>
+
+		<published>2026-10-17T23:47:19+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894789#p8894789</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894789#p8894789"/>
+		<title type="html"><![CDATA[Installing Gentoo • X Windows and dead '_' cursor]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894789#p8894789"><![CDATA[
+I run X windows, I also run nvidia-xconfig. Nothing is starting my X windows successfully. I just spent like, 15  minutes getting nvidia drivers to install on Gentoo. Then I was using nouveau so I removed it entirely and put the kernel .config to use amdgpu and nvidia. "nouveau" was causing trouble with my setup of X Windows.<br><br> I think it is because I have a MUX switch from NVIDIA 4070 RTX to Radeon AMD Gpu second to my Vega bus.   How can I make sure everything is good before locking up my machine next time? I tried using generative AI chat to solve this, and its been a little tough.<br>My machine is a Zephyrus G16 (ASUS) with AMD.<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member8</a> — Sat Oct 17, 2026 11:47 pm — Replies 1 — Views 8840</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member8]]></name></author>
+		<updated>2026-10-11T16:53:57+00:00</updated>
+
+		<published>2026-10-11T16:53:57+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894441#p8894441</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894441#p8894441"/>
+		<title type="html"><![CDATA[Installing Gentoo • Won't boot past initramfs screen]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894441#p8894441"><![CDATA[
+I can't get past the boot screen where it says "Loading initramfs". What could the problem be? I can hit the capslock so its not a kernel panic. I tried adding 'nomodeset' to the "linux ..." directive  in 'e' of Grub. But nope!<br><a href="https://www.limitsite.com/images/pics%20share/PXL_20261011_160911970.MP.jpg" class="postlink">https://www.limitsite.com/images/pics%2 ... 970.MP.jpg</a>  <img class="smilies" src="https://forums.gentoo.org/images/smilies/icon_idea.gif" width="15" height="15" alt=":idea:" title="Idea"><p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member8</a> — Sun Oct 11, 2026 4:53 pm — Replies 5 — Views 12149</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member9]]></name></author>
+		<updated>2026-10-10T16:13:11+00:00</updated>
+
+		<published>2026-10-10T16:13:11+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894356#p8894356</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894356#p8894356"/>
+		<title type="html"><![CDATA[Installing Gentoo • Dracut error at initial install]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894356#p8894356"><![CDATA[
+Please, if anybody would be willing to help me, I have been at this since last night trying to get past 'refusing to continue' after it notifying me it cannot find the system. Everything is there and I made sure to write to the flashdrive with the dd command. If there is a solution to this, I would be grateful. I am new to Gentoo and would like to experience it. I am trying to boot the live gui cd and it gets to the selection menu, but the bootloader just gives up.<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member9</a> — Sat Oct 10, 2026 4:13 pm — Replies 6 — Views 14785</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member7]]></name></author>
+		<updated>2026-10-09T22:02:38+00:00</updated>
+
+		<published>2026-10-09T22:02:38+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894321#p8894321</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894321#p8894321"/>
+		<title type="html"><![CDATA[Installing Gentoo • Upgrading to gcc16 *during* install - emerge --emptytree a good idea?]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894321#p8894321"><![CDATA[
+Hi, I've got a rather convoluted install, which takes over a day of continuous work to get it booted. One of the (many side quest) activities I perform is tupgrading from gcc 15 to gcc16 <em class="text-italics">during</em> the install.<br><br>Previous installs I always performed an <code style="font-family:monospace">emerge --emptytree --usepkg=n @system</code> (and during some installation attempts,  <code style="font-family:monospace">@world</code> instead).<br><br>Is there a way to do this but skip all binary packages that are installed? I have my make.conf set to install binary packages system-wide by default, so the vast majority of my system is <code style="font-family:monospace">x64 v3</code> binary packages, and performing an <code style="font-family:monospace">emptytree</code> re-install of Gentoo pre-built binaries seems like a waste of time (and bandwidth, to boot). Of course, if there is a reason I should reinstall all the installed binaries too, I'd like to know.<br><br>Also, a separate question:<br><br>Also, in my trials and tribulations over the last year with Gentoo installs, I've learned that (the currently available builds of) one particular app, wget2, does not like gcc16 at all - previously, version 2.2.0 was available to install, and it installed with gcc16 enabled just fine, though there was a bug report in that build that had a different issue. but both 2.2.1 and 2.3.0 fail to build on gcc16. My work-around this time during installation was to simply emerge 2.3.0 before upgrading to gcc16, since it seems to work just fine after building. As such, I currently have both gcc15 and gcc16 installed, gcc16 set to enabled, so I can quickly swap to 15 if a new release of wget2 drops that still has issues with gcc16. But will this cause me any problems in the long run?<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member7</a> — Fri Oct 09, 2026 10:02 pm — Replies 11 — Views 23927</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member1]]></name></author>
+		<updated>2026-10-08T10:29:12+00:00</updated>
+
+		<published>2026-10-08T10:29:12+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894254#p8894254</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894254#p8894254"/>
+		<title type="html"><![CDATA[Installing Gentoo • Help for boot looping on first ever reboot]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894254#p8894254"><![CDATA[
+Hiya, I've just worked my way through the Gentoo Handbook and started the system for the first time.<br><br>I also followed the handbook on using LUKS.<br><br>When I boot the system, I'm prompted by my BIOS to enter the admin password. Then I'm prompted to decrypt my LUKS volume. These I do successfully.<br><br>I am then shown a fullscreen Gentoo logo with an option for UEFI boot options and a short countdown to boot.<br><br>When the timer expires, the system reboots and I'm back to the beginning.<br><br>I'm currently running my system off my live USB. It's an aged HP Pavilion 15 laptop that, until recently, ran Windows 10.<br><br>I would greatly appreciate any assistance in getting my system to boot. I'm a Gentoo and forum newbie so I apologise if I broke any etiquette with this post and will do better next time.<br><br>Thank you.<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member1</a> — Thu Oct 08, 2026 10:29 am — Replies 12 — Views 37702</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member4]]></name></author>
+		<updated>2026-10-08T04:36:56+00:00</updated>
+
+		<published>2026-10-08T04:36:56+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894249#p8894249</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894249#p8894249"/>
+		<title type="html"><![CDATA[News &amp; Announcements • Gentoo infrastructure sponsors wanted!]]></title>
+
+					<category term="News &amp; Announcements" scheme="https://forums.gentoo.org/viewforum.php?f=16" label="News &amp; Announcements"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894249#p8894249"><![CDATA[
+Copy-pasting <a href="https://www.gentoo.org/news/2026/10/07/infrastructure-sponsors-wanted.html" class="postlink">the relevant news item</a>:<br><blockquote class="uncited"><div>Gentoo Linux is made possible by many community donations and sponsors, together with the enthusiastic work of our developers. Unfortunately, this year several long-running sponsors were unable to continue their prior support, and at the moment we are looking for replacements. Are you or your organization interested in supporting Gentoo via an infrastructure sponsorship? There are <a href="https://wiki.gentoo.org/wiki/Project:Infrastructure/Sponsorship" class="postlink">many ways to do that</a>, ranging from providing rack space or servers in a data center to donating server hardware; details and typical arrangements are described on a <a href="https://wiki.gentoo.org/wiki/Project:Infrastructure/Sponsorship" class="postlink">wiki page of the Infrastructure project</a>. Partnerships with organizations aligning with Gentoo’s goals are strongly preferred. We can be reached at <a href="mailto:member@example.com">member@example.com</a>. Please help us continue to provide the best source-based Linux distribution ever!</div></blockquote><em class="text-italics">Moved and made an announcement -- NeddySeagoon</em><br><br>As replies are limited to mods and admins, there is a <span><a href="/viewtopic.php?t=1178732">Gentoo infrastructure sponsors wanted - Discussion</a></span> to collect all the discussion.<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member4</a> — Thu Oct 08, 2026 4:36 am — Replies 0 — Views 36496</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member7]]></name></author>
+		<updated>2026-10-07T18:07:11+00:00</updated>
+
+		<published>2026-10-07T01:48:26+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894194#p8894194</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894194#p8894194"/>
+		<title type="html"><![CDATA[Installing Gentoo • [SOLVED] New install error installing kde-apps/kdepim-meta]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894194#p8894194"><![CDATA[
+Performing a new install since the weekend, grinding down to apps to install now. <br><br>Performing installation of <code style="font-family:monospace">kde-apps/kdepim-meta</code>, and it immediately fails every time on <code style="font-family:monospace">acct-group/spamd</code> with the following:<br><div class="codebox"><p>Code: </p><pre><code>&gt;&gt;&gt; Running pre-merge checks for acct-group/spamd-0-r3--2026-10-06 21:40:17--  https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64-v3/acct-user/spamd/spamd-0-r3-2.gpkg.tarResolving distfiles.gentoo.org... 2a02:6ea0:d200::28, 2a02:6ea0:d200::27, 2a02:6ea0:d200::26, ...Connecting to distfiles.gentoo.org|2a02:6ea0:d200::28|:443... connected.HTTP request sent, awaiting response... 200 OKLength: 20480 (20K) [application/x-tar]Saving to: ‘/var/cache/binhost/gentoo-x86-64-v3/acct-user/spamd/spamd-0-r3-2.gpkg.tar.partial’/var/cache/binhost/gentoo-x86-64-v3/acct-user/spamd/spamd-0-r3-2.gpkg. 100%[=========================================================================================================================================================================&gt;]  20.00K  --.-KB/s    in 0.003s  2026-10-06 21:40:18 (6.12 MB/s) - ‘/var/cache/binhost/gentoo-x86-64-v3/acct-user/spamd/spamd-0-r3-2.gpkg.tar.partial’ saved [20480/20480]!!! Digest verification failed:!!! /var/cache/binhost/gentoo-x86-64-v3/acct-user/spamd/spamd-0-r3-2.gpkg.tar.partial!!! Reason: Failed on MD5 verification!!! Got: 825449a36899f8ece5084c36c5f56d1c!!! Expected: df30bed48ddcd52834f5dae22f2695f7File renamed to '/var/cache/binhost/gentoo-x86-64-v3/acct-user/spamd/spamd-0-r3-2.gpkg.tar.partial._checksum_failure_.rym8xn_n'&gt;&gt;&gt; Failed to emerge acct-group/spamd-0-r3</code></pre></div>I searched Bugzilla for spamd but found no references to <code style="font-family:monospace">acct-group/spamd</code>, and searching the package list shows <code style="font-family:monospace">0-r3</code> is the current version.<br><br>In order to move forward with my installation, is there an easy way to install a 'meta' pakg like <code style="font-family:monospace">kde-apps/kdepim-meta</code> while excluding specific pkgs from that meta pkg, without having to list them individually?<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member7</a> — Wed Oct 07, 2026 1:48 am — Replies 6 — Views 15681</p><hr />
+]]></content>
+	</entry>
+		<entry>
+		<author><name><![CDATA[member5]]></name></author>
+		<updated>2026-10-04T19:20:43+00:00</updated>
+
+		<published>2026-10-04T19:20:43+00:00</published>
+		<id>https://forums.gentoo.org/viewtopic.php?p=8894102#p8894102</id>
+		<link href="https://forums.gentoo.org/viewtopic.php?p=8894102#p8894102"/>
+		<title type="html"><![CDATA[Installing Gentoo • Questions about /etc/fstab and UUID]]></title>
+
+					<category term="Installing Gentoo" scheme="https://forums.gentoo.org/viewforum.php?f=14" label="Installing Gentoo"/>
+		
+		<content type="html" xml:base="https://forums.gentoo.org/viewtopic.php?p=8894102#p8894102"><![CDATA[
+I installed Gentoo for the first time now, following the handbook to the letter and I believe it to have been with initramfs(if that matters). I eventually had a look at <em class="text-italics">/etc/fstab</em> and was dumbfounded that it was all commented out and even some boot-time terminal message mentioned blank <em class="text-italics">fstab</em>. How can Gentoo function without it and am I going to run into some conflicts if I use one? I uncommented my root partition while adding new entries and it was mounted read-only next time.  <img class="smilies" src="https://forums.gentoo.org/images/smilies/icon_redface.gif" width="15" height="15" alt=":oops:" title="Embarassed">  What baffles me the most that my <em class="text-italics">/</em> partition (sdd3) has one UUID (which we are supposed to rely on rather then <em class="text-italics">/dev</em>) in the auto-generated <em class="text-italics">fstab</em> and completely different one in output of  <em class="text-italics">lsblk -o</em> - that makes a sham out of the "unique id" concept. Also, which one is true?<p>Statistics: Posted by <a href="https://forums.gentoo.org/memberlist.php?mode=viewprofile&amp;u=1">member5</a> — Sun Oct 04, 2026 7:20 pm — Replies 2 — Views 16691</p><hr />
+]]></content>
+	</entry>
+	</feed>

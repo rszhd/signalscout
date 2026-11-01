@@ -6,7 +6,7 @@ priority: p1
 created: 2026-10-02T16:42+08:00
 parent:
 area: ai
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -49,7 +49,7 @@ now?") is the lever, not the model.
       (deepseek-flash, gpt-6-luna); the Log gives the leads kept and lost.
 - [x] `live:triage-score` runs once on the new prompt; the Log gives its numbers.
 - [x] `ai/triage-scores.test.ts`'s fixtures are captured again, not edited.
-- [ ] Released; the owner decided it ships to both applications (a).
+- [x] Released; the owner decided it ships to both applications (a).
 
 ## Notes
 
@@ -130,3 +130,12 @@ now?") is the lever, not the model.
   line does not fully hold back. No earlier run on terra to compare with.
 
   The fixtures are captured again; the engine suite passes (822).
+- 2026-10-02 18:02 — The owner edited the cloud production `.env` (backup
+  `.env.bak-gpt61`): AI_QUERY_MODEL and AI_DESCRIBE_MODEL are gpt-6.1-sol;
+  AI_MODEL stays gpt-6-luna. The running container keeps the old values
+  until the next deploy; production waits for the owner to promote staging
+  (0.22.0, commit 900142c).
+- 2026-10-02 18:18 — Shipped in 0.22.0 to both applications. The
+  experiment runs 0.22.0 since this afternoon. Cloud production deployed
+  900142c at 18:12; the running container has AI_QUERY_MODEL and
+  AI_DESCRIBE_MODEL gpt-6.1-sol, AI_MODEL gpt-6-luna.

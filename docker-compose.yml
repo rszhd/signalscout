@@ -108,6 +108,7 @@ x-app-environment: &app-environment
   # stored on the connections screen is read first; this is the machine's copy
   # and the only one a fresh instance has. docs/secrets.md.
   BRIGHTDATA_API_KEY: ${BRIGHTDATA_API_KEY:-}
+  BRIGHTDATA_UNLOCKER_ZONE: ${BRIGHTDATA_UNLOCKER_ZONE:-}
   SCRAPECREATORS_API_KEY: ${SCRAPECREATORS_API_KEY:-}
   SOCIALCRAWL_API_KEY: ${SOCIALCRAWL_API_KEY:-}
   SOCIALDATA_API_KEY: ${SOCIALDATA_API_KEY:-}

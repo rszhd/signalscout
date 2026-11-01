@@ -110,6 +110,7 @@ const newMonitor = {
     youtube: [],
     tiktok: [],
     instagram: [],
+    forum: [],
   },
   subreddits: ["SaaS"],
   sources: ["reddit"],
@@ -268,11 +269,11 @@ describe("the monitor routes", () => {
         // Three providers each for Reddit and LinkedIn, two for X, and one
         // each for the rest: eleven connectors make six rows. US-006 added the second platform, US-028
         // the third, US-034 the fourth, US-044 the fifth and US-049 the sixth,
-        // which is why this list grew; a platform appearing twice is the
+        // which is why this list grew, and US-470 the seventh, forums; a platform appearing twice is the
         // failure it guards. SocialCrawl fetching five of the six is exactly
         // the collapse this asserts.
         const ids = body.sources.map((source: { id: string }) => source.id);
-        expect(ids).toEqual(["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"]);
+        expect(ids).toEqual(["reddit", "x", "linkedin", "youtube", "tiktok", "instagram", "forum"]);
         expect(new Set(ids).size).toBe(ids.length);
         // And no price beside it. Two providers do not agree about what a
         // Reddit record costs, so a figure printed here would be one
@@ -521,6 +522,7 @@ describe("the monitor routes", () => {
           youtube: [],
           tiktok: [],
           instagram: [],
+          forum: [],
         });
       });
     });
@@ -604,6 +606,7 @@ describe("the monitor routes", () => {
           youtube: [],
           tiktok: [],
           instagram: [],
+          forum: [],
         });
         expect(response.json().product).toBe(newMonitor.product);
       });
@@ -1309,6 +1312,7 @@ describe("the monitor routes", () => {
           "youtube",
           "tiktok",
           "instagram",
+          "forum",
         ]);
       });
     });

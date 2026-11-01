@@ -12,6 +12,7 @@ import { putSourceCredential } from "../secrets/store.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   classifyQueue,
+  completeQueue,
   deadLetterQueue,
   estimateQueue,
   filterQueue,
@@ -96,6 +97,9 @@ describe("the worker's queues", () => {
     expect(created).toEqual(
       [
         classifyQueue,
+        // US-476. Partial forum posts read whole before the classifier: it
+        // spends at a provider, so it retries apart from the model's steps.
+        completeQueue,
         deadLetterQueue,
         // US-014's cost test. Not a pipeline step: it runs when a person
         // presses a button, and it holds a run rather than a monitor.

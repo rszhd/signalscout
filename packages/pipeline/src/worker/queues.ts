@@ -32,6 +32,13 @@ export const classifyQueue = "classify";
  * refused.
  */
 export const repliesQueue = "replies";
+
+/**
+ * US-476: the partial posts the filter kept, read whole before the
+ * classifier. Its own queue because it pays a provider, as the replies step
+ * does, and a page that fails must not retry the model calls before it.
+ */
+export const completeQueue = "complete";
 export const notifyQueue = "notify";
 
 /**
@@ -73,6 +80,7 @@ export const scheduleTickCron = "* * * * *";
 export const pipelineQueues = [
   pollQueue,
   filterQueue,
+  completeQueue,
   repliesQueue,
   classifyQueue,
   notifyQueue,
@@ -223,6 +231,7 @@ export function queueDefinitions(retry: RetryPolicy = retryPolicy): readonly Que
     // twice, and one queued, so a resume booked twice is booked once.
     { name: estimateQueue, policy: pollQueuePolicy, deadLetter: deadLetterQueue, ...retry },
     { name: filterQueue, deadLetter: deadLetterQueue, ...retry },
+    { name: completeQueue, deadLetter: deadLetterQueue, ...retry },
     { name: repliesQueue, deadLetter: deadLetterQueue, ...retry },
     { name: classifyQueue, deadLetter: deadLetterQueue, ...retry },
     { name: notifyQueue, policy: "stately", deadLetter: deadLetterQueue, ...retry },

@@ -123,7 +123,7 @@ const lines: Array<Record<string, unknown>> = [];
 async function insertPost(
   post: (typeof fakePosts)[number],
   externalId: string,
-  source: "reddit" | "x" = "reddit",
+  source: "reddit" | "x" | "forum" = "reddit",
 ): Promise<string> {
   const [row] = await db
     .insert(posts)
@@ -305,6 +305,42 @@ describe("a post is checked against its own platform's queries", () => {
     const reached = await filterPosts(monitorId, [sourdoughId, testsId]);
 
     expect(reached.postIds).toEqual([testsId]);
+  }, 30_000);
+
+  it("keeps a forum post: a forum's queries are addresses, with no words a post would use", async () => {
+    // BUG-475. A forum query is a feed or a section address. Its "words",
+    // "sawmillcreek", "forums", "rss", dropped 28 of 29 posts in a live scan.
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: { forum: ["https://www.sawmillcreek.org/forums/-/index.rss"] },
+      generatedSubreddits: ["SaaS"],
+      preFilterEnabled: true,
+      similarityThreshold: 0,
+    });
+
+    const testsId = await insertPost(brokenTestsPost, "platform-forum-tests", "forum");
+
+    const reached = await filterPosts(monitorId, [testsId]);
+
+    expect(reached.postIds).toEqual([testsId]);
+  }, 30_000);
+
+  it("sends a batch holding a partial post through the complete step to the classifier", async () => {
+    // US-476. No connector here reads a page, so the post goes on as it is.
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: perPlatform,
+      generatedSubreddits: [],
+      preFilterEnabled: true,
+      similarityThreshold: 0,
+    });
+    const testsId = await insertPost(brokenTestsPost, "platform-reddit-partial", "reddit");
+    await db.update(posts).set({ textPartial: true }).where(eq(posts.id, testsId));
+
+    const reached = await filterPosts(monitorId, [testsId]);
+
+    expect(reached.postIds).toEqual([testsId]);
+    expect(
+      lines.some((line) => line.msg === "partial posts completed" && line.monitorId === monitorId),
+    ).toBe(true);
   }, 30_000);
 
   it("still filters a monitor whose queries were written before the split", async () => {

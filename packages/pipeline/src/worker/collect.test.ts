@@ -11,7 +11,7 @@ import {
   type SocialSource,
 } from "@signalscout/engine";
 import { unreachableFetch } from "@signalscout/engine/testing";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { setBudget } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
@@ -156,6 +156,35 @@ describe("the poll step", () => {
     const handed = sentTo(boss, filterQueue).postIds;
     expect(handed).toHaveLength(2);
     expect(new Set(handed).size).toBe(2);
+  });
+
+  it("stores a partial post as partial, with the window it came with", async () => {
+    // US-476: a forum feed that cuts its text gives the cut; the filter
+    // judges it, and the complete step reads the page only if it passes.
+    const monitorId = await insertMonitor(database);
+    const boss = stubBoss();
+    const since = new Date("2026-10-30T00:00:00.000Z");
+    const cut = { ...(fakePosts[2] as CandidatePost), externalId: "partial-1", partial: { since } };
+    const whole = { ...(fakePosts[3] as CandidatePost), externalId: "whole-1" };
+    const registry = fakeRegistry({ posts: [cut, whole] });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, boss),
+    );
+
+    const stored = await db
+      .select({
+        externalId: posts.externalId,
+        textPartial: posts.textPartial,
+        partialSince: posts.partialSince,
+      })
+      .from(posts)
+      .where(inArray(posts.externalId, ["partial-1", "whole-1"]));
+    expect(stored.sort((a, b) => a.externalId.localeCompare(b.externalId))).toEqual([
+      { externalId: "partial-1", textPartial: true, partialSince: since },
+      { externalId: "whole-1", textPartial: false, partialSince: null },
+    ]);
   });
 
   it("keeps two platforms' posts that happen to share an id", async () => {

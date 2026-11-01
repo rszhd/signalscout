@@ -18,6 +18,7 @@ import { createDatabase, type Database } from "../db/client.js";
 import { filterDrops, matches, pollRuns, posts } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createClassifyStep } from "./classify.js";
+import { validateMatchCaps } from "./match-cap.js";
 import type { StepContext } from "./steps.js";
 import { insertMonitor, silentLogger } from "./testing.js";
 
@@ -109,6 +110,7 @@ describe("a cap on the matches one collection makes", () => {
     const cheap = passingClassifier();
     const step = createClassifyStep({
       classifierFor: async () => cheap.classifier,
+      firstMatchesPerCollection: 2,
       matchesPerCollection: 2,
     });
 
@@ -122,6 +124,7 @@ describe("a cap on the matches one collection makes", () => {
     const { monitorId, walkId } = await monitorWithWalk();
     const step = createClassifyStep({
       classifierFor: async () => passingClassifier().classifier,
+      firstMatchesPerCollection: 3,
       matchesPerCollection: 3,
     });
 
@@ -135,6 +138,7 @@ describe("a cap on the matches one collection makes", () => {
     const { monitorId, walkId } = await monitorWithWalk();
     const step = createClassifyStep({
       classifierFor: async () => passingClassifier().classifier,
+      firstMatchesPerCollection: 1,
       matchesPerCollection: 1,
     });
     await step({ monitorId, postIds: await somePosts(2), walkId }, contextFor(db));
@@ -146,6 +150,54 @@ describe("a cap on the matches one collection makes", () => {
     await step({ monitorId, postIds: await somePosts(2), walkId: next }, contextFor(db));
 
     expect(await outcomeOf(monitorId)).toEqual({ matches: 2, capped: 2 });
+  });
+
+  it("uses the first cap on the first walk and the later cap after it", async () => {
+    const { monitorId, walkId } = await monitorWithWalk();
+    const step = createClassifyStep({
+      classifierFor: async () => passingClassifier().classifier,
+      firstMatchesPerCollection: 2,
+      matchesPerCollection: 1,
+    });
+
+    await step({ monitorId, postIds: await somePosts(4), walkId }, contextFor(db));
+
+    const next = crypto.randomUUID();
+    await db
+      .insert(pollRuns)
+      .values({ monitorId, userId: "user-1", walkId: next, outcome: "collected" });
+    await step({ monitorId, postIds: await somePosts(4), walkId: next }, contextFor(db));
+
+    // Two on the first walk, one on the second, and the rest are capped.
+    expect(await outcomeOf(monitorId)).toEqual({ matches: 3, capped: 5 });
+  });
+
+  it("leaves a later walk uncapped when only the first cap is set", async () => {
+    const { monitorId } = await monitorWithWalk();
+    const step = createClassifyStep({
+      classifierFor: async () => passingClassifier().classifier,
+      firstMatchesPerCollection: 1,
+    });
+
+    const next = crypto.randomUUID();
+    await db
+      .insert(pollRuns)
+      .values({ monitorId, userId: "user-1", walkId: next, outcome: "collected" });
+    await step({ monitorId, postIds: await somePosts(3), walkId: next }, contextFor(db));
+
+    expect(await outcomeOf(monitorId)).toEqual({ matches: 3, capped: 0 });
+  });
+
+  it("caps the first walk too when only the general cap is set, as before US-490", async () => {
+    const { monitorId, walkId } = await monitorWithWalk();
+    const step = createClassifyStep({
+      classifierFor: async () => passingClassifier().classifier,
+      matchesPerCollection: 1,
+    });
+
+    await step({ monitorId, postIds: await somePosts(3), walkId }, contextFor(db));
+
+    expect(await outcomeOf(monitorId)).toEqual({ matches: 1, capped: 2 });
   });
 
   it("reads everything with no cap", async () => {
@@ -164,5 +216,10 @@ describe("a cap on the matches one collection makes", () => {
         matchesPerCollection: 0,
       }),
     ).toThrow(RangeError);
+  });
+
+  it.each([0, 1.5, -1])("refuses %s for each cap", (value) => {
+    expect(() => validateMatchCaps({ firstMatchesPerCollection: value })).toThrow(RangeError);
+    expect(() => validateMatchCaps({ matchesPerCollection: value })).toThrow(RangeError);
   });
 });

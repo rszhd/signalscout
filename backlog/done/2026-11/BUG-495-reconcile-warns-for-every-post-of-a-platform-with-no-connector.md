@@ -6,6 +6,7 @@ priority: p2
 created: 2026-11-02T00:26+08:00
 parent:
 area: pipeline
+resolution: shipped
 resolution:
 ---
 
@@ -36,7 +37,7 @@ with two connectors and no choice is a fault, and keeps its warning.
       the warning.
 - [x] Tests for both cases in `reconcile.test.ts`, written first: the step
       is correctness-critical.
-- [ ] Released as a patch, and BuyerFinder on it.
+- [x] Released as a patch, and BuyerFinder on it.
 
 ## Notes
 
@@ -49,3 +50,5 @@ with two connectors and no choice is a fault, and keeps its warning.
 - 2026-11-02T01:34+08:00 — Built: the job filters out posts of a platform the registry
   has no connector for, and logs their count per platform once at debug. Tests
   first: the no-connector one failed with two warn lines before the change.
+- 2026-11-02T02:00+08:00 — Released in 0.23.1 (PR #123, tag v0.23.1). BuyerFinder runs on
+  it since b98dbe9; its deploy passed.

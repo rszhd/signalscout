@@ -2,10 +2,11 @@
 
 # Done
 
-273 finished.
+275 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-495 | [Reconcile warns for every post of a platform with no connector](done/2026-11/BUG-495-reconcile-warns-for-every-post-of-a-platform-with-no-connector.md) | bug | shipped | 2026-11 |
 | BUG-492 | [A release carries high and critical dependency holes](done/2026-11/BUG-492-a-release-carries-high-and-critical-dependency-holes.md) | bug | shipped | 2026-11 |
 | BUG-484 | [A Bright Data 5xx answer skips the browser](done/2026-11/BUG-484-a-bright-data-5xx-skips-the-browser.md) | bug | shipped | 2026-11 |
 | BUG-483 | [vBulletin 3 and 5 home pages are not detected](done/2026-11/BUG-483-vbulletin-3-and-5-home-pages-are-not-detected.md) | bug | shipped | 2026-11 |
@@ -13,6 +14,7 @@
 | BUG-481 | [An empty page from Bright Data loses the forum](done/2026-11/BUG-481-an-empty-page-from-bright-data-loses-the-forum.md) | bug | shipped | 2026-11 |
 | BUG-480 | [Completing partial posts starts one browser a page](done/2026-11/BUG-480-completing-partial-posts-starts-one-browser-a-page.md) | bug | shipped | 2026-11 |
 | BUG-479 | [XenForo 2 threads in VerticalScope's theme are not read](done/2026-11/BUG-479-xenforo-2-threads-in-verticalscope-s-theme-are-not-read.md) | bug | shipped | 2026-11 |
+| US-496 | [A capped collection scores its platforms in turn](done/2026-11/US-496-a-capped-collection-scores-its-platforms-in-turn.md) | feature | shipped | 2026-11 |
 | US-485 | [An Invision forum is read through its activity stream](done/2026-11/US-485-an-invision-forum-is-read-through-its-activity-stream.md) | feature | shipped | 2026-11 |
 | BUG-475 | [The pre-filter drops forum posts for missing address words](done/2026-10/BUG-475-the-pre-filter-drops-forum-posts-for-missing-address-words.md) | bug | shipped | 2026-10 |
 | US-476 | [A forum thread page is read only for a post that passed the filters](done/2026-10/US-476-a-forum-thread-page-is-read-only-for-a-post-that-passed-the-filters.md) | feature | shipped | 2026-10 |

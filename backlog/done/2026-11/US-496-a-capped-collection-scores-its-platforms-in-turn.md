@@ -6,6 +6,7 @@ priority: p1
 created: 2026-11-02T01:20+08:00
 parent: US-490
 area: pipeline
+resolution: shipped
 ---
 
 ## Context
@@ -58,3 +59,5 @@ platform, so taking platforms in turn changes no ceiling outcome.
 - 2026-11-02T01:28+08:00 — Built (DeepSeek Flash, reviewed): `inTurn` in collect.ts orders the
   rows by platform in turn; the filter step sorts its candidates by the handed
   order. Lint, type check and 2,799 tests pass. Not yet run live.
+- 2026-11-02T02:00+08:00 — Released in 0.23.1 (PR #123, tag v0.23.1). BuyerFinder runs on
+  it since b98dbe9; its deploy passed.

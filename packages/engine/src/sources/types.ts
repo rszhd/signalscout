@@ -116,6 +116,11 @@ export interface SearchRequest {
   readonly query: SourceQuery;
   readonly credentials: SourceCredentials;
   /**
+   * The monitor asking, for an application that keeps its own costs per
+   * monitor (US-503). Never sent to a provider.
+   */
+  readonly monitorId?: string;
+  /**
    * Opaque. It came from a previous `SearchResult` and means nothing to the
    * caller. Absent starts the query from the beginning.
    */
@@ -653,6 +658,8 @@ export interface CompleteRequest {
     readonly since?: Date;
   }[];
   readonly credentials: SourceCredentials;
+  /** The monitor asking, as on `SearchRequest`. Never sent to a provider. */
+  readonly monitorId?: string;
   readonly signal?: AbortSignal;
 }
 

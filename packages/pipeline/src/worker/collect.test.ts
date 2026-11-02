@@ -443,6 +443,8 @@ describe("the poll step", () => {
 
       expect(source.calls[0]?.cursor).toBe(kept?.cursor);
       expect(source.calls[0]?.cursor).toBeDefined();
+      // Every request names its monitor, for a connector that tells its costs. US-503.
+      expect(source.calls.map((call) => call.monitorId)).toEqual(source.calls.map(() => monitorId));
     });
 
     it("keeps nothing and remembers nothing when the first page fails, as before", async () => {

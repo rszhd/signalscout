@@ -125,6 +125,7 @@ export function createCompleteStep({
           ...(post.since ? { since: post.since } : {}),
         })),
         credentials,
+        monitorId,
       })) {
         const post = group[at];
         at += 1;

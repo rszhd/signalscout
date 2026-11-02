@@ -20,6 +20,29 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.24.0 — 2026-11-03
+
+No migration.
+
+**Changed: a forum page read through the cloud browser is no Bright Data
+unit** (US-503). The forum connector's units, and the `units` on
+`ForumPageEvent` and `FetchedPage`, count only the pages Bright Data read. A
+browser page counted one unit, and a browser started one more, at Bright
+Data's price, so a usage row named Bright Data for Browser Use's pages.
+`maxUnitsPerQueryPoll` drops to one unit a page. **An application that
+passes `browser` now counts the browser's cost itself**, from `onBrowser`.
+
+**Added.** `ForumOptions.onBrowser` tells the application each browser when
+it stops: Browser Use's id, start, stop, pages, and the monitor that asked
+(`ForumBrowserEvent`). `openForumFetcher` takes `onBrowser` and `monitorId`
+too. `SearchRequest` and `CompleteRequest` take an optional `monitorId`,
+which the collect and complete steps fill; a connector never sends it to a
+provider.
+
+**Changed.** A browser starts with Browser Use's own proxy off
+(`proxyCountryCode: null`) beside `customProxy`. Browsers sent our proxy
+were billed at Browser Use's own proxy rate.
+
 ## 0.23.1 — 2026-11-02
 
 No migration.

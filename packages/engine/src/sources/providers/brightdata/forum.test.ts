@@ -13,6 +13,7 @@ import type { OpenPageBrowser } from "../browseruse/pages.js";
 import {
   BrightDataForumSource,
   createBrightDataForum,
+  type ForumBrowserEvent,
   type ForumPageEvent,
   maxStreamPagesPerPoll,
   maxThreadsPerSection,
@@ -441,7 +442,8 @@ describe("reading a forum's activity stream", () => {
         streamPagesPerPoll: 5,
         browser: { credentials: browserCredentials },
       }).maxUnitsPerQueryPoll,
-    ).toBe(15);
+      // A browser page is no Bright Data unit. US-503.
+    ).toBe(5);
     expect(() => createBrightDataForum({ streamPagesPerPoll: 0 })).toThrow(RangeError);
     expect(() => createBrightDataForum({ streamPagesPerPoll: 1.5 })).toThrow(RangeError);
   });
@@ -721,15 +723,17 @@ function fakeBrowser(pages: Record<string, string>, threads?: string) {
   const read: string[] = [];
   let opened = 0;
   let closed = 0;
-  const open: OpenPageBrowser = () => {
+  const open: OpenPageBrowser = (_runtime, _credentials, _signal, onBrowser) => {
     opened += 1;
     let started = 0;
+    let asked = 0;
     return {
       get started() {
         return started;
       },
       async read(url) {
         if (started === 0) started = 1;
+        asked += 1;
         read.push(url);
         const body = pages[url] ?? threads;
         if (body === "throw") throw new Error("Browser Use answered 402");
@@ -745,6 +749,11 @@ function fakeBrowser(pages: Record<string, string>, threads?: string) {
       },
       async close() {
         closed += 1;
+        if (started === 0) return;
+        const at = new Date("2026-11-03T00:00:00.000Z");
+        onBrowser?.({ id: `fake-${opened}`, startedAt: at, stoppedAt: at, pages: asked });
+        started = 0;
+        asked = 0;
       },
     };
   };
@@ -775,8 +784,8 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
     ]);
     // Bright Data asked first each time; the browser read what it refused.
     expect(stub.asked.map((call) => call.url)).toEqual(browser.read);
-    // A page, and the browser the call started: one unit each.
-    expect(results.map((result) => result.unitsConsumed)).toEqual([2, 2]);
+    // A browser page is no Bright Data unit: the browser is told apart. US-503.
+    expect(results.map((result) => result.unitsConsumed)).toEqual([0, 0]);
     expect(browser.calls()).toEqual({ opened: 2, closed: 2 });
     expect(
       events.map(({ page, via, outcome, program }) => ({ page, via, outcome, program })),
@@ -784,7 +793,7 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
       { page: "section", via: "browser", outcome: "read", program: "xenforo2" },
       { page: "thread", via: "browser", outcome: "read", program: "xenforo2" },
     ]);
-    expect(events[0]).toMatchObject({ host: "forums.macrumors.com", threads: 1, units: 2 });
+    expect(events[0]).toMatchObject({ host: "forums.macrumors.com", threads: 1, units: 0 });
   });
 
   it("skips Bright Data for a forum the application sends to the browser", async () => {
@@ -815,7 +824,8 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
     expect(stub.asked.map((call) => call.url)).toEqual([xenforoList]);
     expect(page.answer.ok).toBe(true);
     expect(page.via).toBe("unlocker");
-    expect(page.units).toBe(2);
+    // Bright Data's page only; the browser that tried first is told apart.
+    expect(page.units).toBe(1);
   });
 
   it("reads through Bright Data a page the browser throws on", async () => {
@@ -832,7 +842,8 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
     expect(stub.asked.map((call) => call.url)).toEqual([xenforoList]);
     expect(page.answer.ok).toBe(true);
     expect(page.via).toBe("unlocker");
-    expect(page.units).toBe(2);
+    // Bright Data's page only; the browser that tried first is told apart.
+    expect(page.units).toBe(1);
   });
 
   it("reads through the browser a page Bright Data answers empty", async () => {
@@ -958,19 +969,60 @@ describe("a page Bright Data cannot pass, read through the cloud browser", () =>
     await fetcher.close();
 
     expect([first.via, second.via]).toEqual(["browser", "browser"]);
-    // The browser's start is counted once, on the page that started it.
-    expect([first.units, second.units]).toEqual([2, 1]);
+    // Browser pages are no Bright Data units.
+    expect([first.units, second.units]).toEqual([0, 0]);
     expect(browser.calls()).toEqual({ opened: 1, closed: 1 });
   });
 
-  it("allows for a retry and a browser in its worst case", () => {
+  it("allows one Bright Data unit a page in its worst case, browser or not", () => {
     expect(createBrightDataForum({ threadsPerSection: 8 }).maxUnitsPerQueryPoll).toBe(9);
     expect(
       createBrightDataForum({
         threadsPerSection: 8,
         browser: { credentials: browserCredentials },
       }).maxUnitsPerQueryPoll,
-    ).toBe(2 * 9 + 1 + 2);
+    ).toBe(9);
+  });
+
+  it("tells the application each browser, with the monitor that asked", async () => {
+    const stub = brightData({ [xenforoList]: challenge }, challenge);
+    const browser = fakeBrowser(
+      { [xenforoList]: captured("xenforo2-list.html") },
+      captured("xenforo2-thread.html"),
+    );
+    const told: ForumBrowserEvent[] = [];
+    const source = new BrightDataForumSource(runtimeWith(stub.fetch), {
+      browser: { credentials: browserCredentials, open: browser.open },
+      onBrowser: (event) => {
+        told.push(event);
+        throw new Error("a broken handler is not the poll's problem");
+      },
+    });
+
+    const first = await source.search({
+      ...request([xenforoList], "2026-10-28T18:00:00.000Z"),
+      monitorId: "monitor-1",
+    });
+    const read = await source.search(request([xenforoList]));
+
+    expect(first.unitsConsumed).toBe(0);
+    expect(read.unitsConsumed).toBe(0);
+    expect(told).toEqual([
+      {
+        id: "fake-1",
+        startedAt: new Date("2026-11-03T00:00:00.000Z"),
+        stoppedAt: new Date("2026-11-03T00:00:00.000Z"),
+        pages: 1,
+        monitorId: "monitor-1",
+      },
+      // No monitor on the request: none on the event.
+      {
+        id: "fake-2",
+        startedAt: new Date("2026-11-03T00:00:00.000Z"),
+        stoppedAt: new Date("2026-11-03T00:00:00.000Z"),
+        pages: 1,
+      },
+    ]);
   });
 });
 
@@ -1010,8 +1062,8 @@ describe("a Bright Data 5xx refuses that page only", () => {
 
     expect(page.answer).toEqual({ ok: false, reason: "Bright Data answered 504." });
     expect(page.via).toBe("unlocker");
-    // The browser started; the failed Bright Data request is not billed.
-    expect(page.units).toBe(1);
+    // The browser is told apart; the failed Bright Data request is not billed.
+    expect(page.units).toBe(0);
   });
 
   it("is a refusal, billing nothing, when no browser is set", async () => {

@@ -18,9 +18,11 @@
  * A page Bright Data cannot pass, a bot check or a refusal, is read again
  * through Browser Use's cloud browser when the application hands its
  * credentials over with a proxy of its own (US-471). One browser serves a
- * call and is stopped when the call ends. A browser page is counted as one
- * Bright Data unit, and each browser started as one more: the measured cost
- * was below that, and Browser Use's own figure settles too late to read here.
+ * call and is stopped when the call ends. The units a call reports are
+ * Bright Data's pages only: a browser page counts none, so the usage row
+ * names what Bright Data billed. Browser Use's cost settles minutes after a
+ * browser stops, so each browser is told to the application (`onBrowser`),
+ * which reads and keeps that cost itself (US-503).
  * A browser failure goes back to Bright Data when the browser went first;
  * otherwise the page is skipped. Neither stops the poll.
  *
@@ -56,7 +58,12 @@ import type {
   SourceRuntime,
 } from "../../types.js";
 import { hasBrowserCredentials } from "../browseruse/cloud.js";
-import { type OpenPageBrowser, openBrowserUse, type PageBrowser } from "../browseruse/pages.js";
+import {
+  type BrowserUsage,
+  type OpenPageBrowser,
+  openBrowserUse,
+  type PageBrowser,
+} from "../browseruse/pages.js";
 import { brightDataProvider } from "./provider.js";
 import { fetchThroughUnlocker, UnlockerError } from "./unlocker.js";
 
@@ -89,6 +96,7 @@ export interface ForumPageEvent {
   readonly threads?: number;
   /** Posts a feed gave without a page of their own. */
   readonly posts?: number;
+  /** Bright Data units: one for a page Bright Data read, none for the browser's. */
   readonly units: number;
   readonly reason?: string;
 }
@@ -114,9 +122,21 @@ export interface ForumOptions {
   readonly fetcherFor?: (host: string) => ForumFetcher | undefined;
   /** Told of every page fetched. A throw here is logged and ignored. */
   readonly onPage?: (event: ForumPageEvent) => void;
+  /**
+   * Told of every browser when it stops, with the monitor that asked. The
+   * engine counts no unit for a browser page, so an application that passes
+   * `browser` counts the browser's cost from this. A throw here is logged and
+   * ignored.
+   */
+  readonly onBrowser?: (event: ForumBrowserEvent) => void;
 }
 
-/** One page, how it came, and the Bright Data units it is counted as. */
+/** One browser, stopped, and the monitor whose call started it. */
+export interface ForumBrowserEvent extends BrowserUsage {
+  readonly monitorId?: string;
+}
+
+/** One page, how it came, and the Bright Data units it cost: none through the browser. */
 export interface FetchedPage {
   readonly answer:
     | { readonly ok: true; readonly body: string }
@@ -144,7 +164,10 @@ export interface ForumPageFetcher {
 export function openForumFetcher(
   runtime: SourceRuntime,
   unlocker: SourceCredentials,
-  options: Pick<ForumOptions, "browser" | "fetcherFor">,
+  options: Pick<ForumOptions, "browser" | "fetcherFor" | "onBrowser"> & {
+    /** Put on every browser this fetcher reports. */
+    readonly monitorId?: string;
+  },
   signal?: AbortSignal,
 ): ForumPageFetcher {
   const browser =
@@ -167,8 +190,12 @@ export function openForumFetcher(
           "forum page refused through Bright Data; reading it through the browser",
         );
       }
-      pages ??= (browser.open ?? openBrowserUse)(runtime, browser.credentials, signal);
-      const before = pages.started;
+      pages ??= (browser.open ?? openBrowserUse)(runtime, browser.credentials, signal, (used) =>
+        options.onBrowser?.({
+          ...used,
+          ...(options.monitorId ? { monitorId: options.monitorId } : {}),
+        }),
+      );
       let answer: FetchedPage["answer"];
       try {
         answer = await pages.read(url);
@@ -178,21 +205,16 @@ export function openForumFetcher(
           // Browser Use out of credit, or a browser that stopped answering:
           // this page is lost, the rest of the poll is not.
           runtime.logger.error({ url, err: error }, "forum page not read through the browser");
-          return { answer, via: "browser", units: pages.started - before };
+          return { answer, via: "browser", units: 0 };
         }
       }
-      if (answer.ok || !browserFirst)
-        return { answer, via: "browser", units: 1 + (pages.started - before) };
+      if (answer.ok || !browserFirst) return { answer, via: "browser", units: 0 };
       runtime.logger.info(
         { url, reason: answer.reason },
         "forum page not read through the browser; reading it through Bright Data",
       );
       const fallback = await unlockerPage(runtime, unlocker, url, signal);
-      return {
-        answer: fallback,
-        via: "unlocker",
-        units: pages.started - before + (fallback.ok ? 1 : 0),
-      };
+      return { answer: fallback, via: "unlocker", units: fallback.ok ? 1 : 0 };
     },
     async close() {
       await pages?.close();
@@ -293,11 +315,7 @@ export class BrightDataForumSource implements SocialSource {
   ) {
     this.threadsPerSection = options.threadsPerSection ?? maxThreadsPerSection;
     this.streamPagesPerPoll = options.streamPagesPerPoll ?? maxStreamPagesPerPoll;
-    this.maxUnitsPerQueryPoll = maxUnitsFor(
-      this.threadsPerSection,
-      Boolean(options.browser),
-      this.streamPagesPerPoll,
-    );
+    this.maxUnitsPerQueryPoll = maxUnitsFor(this.threadsPerSection, this.streamPagesPerPoll);
     if (options.browser && !hasBrowserCredentials(options.browser.credentials)) {
       runtime.logger.warn(
         "forum browser fallback off: it needs a Browser Use key and a proxy's host, port, user and password",
@@ -336,7 +354,7 @@ export class BrightDataForumSource implements SocialSource {
     const fetcher = openForumFetcher(
       this.runtime,
       request.credentials,
-      { ...(this.browser ? { browser: this.browser } : {}), ...this.fetcherFor() },
+      this.fetcherOptions(request.monitorId),
       request.signal,
     );
     try {
@@ -346,8 +364,24 @@ export class BrightDataForumSource implements SocialSource {
     }
   }
 
-  private fetcherFor(): Pick<ForumOptions, "fetcherFor"> {
-    return this.options.fetcherFor ? { fetcherFor: this.options.fetcherFor } : {};
+  private fetcherOptions(monitorId: string | undefined): Parameters<typeof openForumFetcher>[2] {
+    const { fetcherFor, onBrowser } = this.options;
+    return {
+      ...(this.browser ? { browser: this.browser } : {}),
+      ...(fetcherFor ? { fetcherFor } : {}),
+      ...(onBrowser
+        ? {
+            onBrowser: (event: ForumBrowserEvent) => {
+              try {
+                onBrowser(event);
+              } catch (error) {
+                this.runtime.logger.error({ err: error }, "forum browser event handler failed");
+              }
+            },
+          }
+        : {}),
+      ...(monitorId ? { monitorId } : {}),
+    };
   }
 
   private async walk(request: SearchRequest, fetcher: ForumPageFetcher): Promise<SearchResult> {
@@ -623,7 +657,7 @@ export class BrightDataForumSource implements SocialSource {
     const fetcher = openForumFetcher(
       this.runtime,
       request.credentials,
-      { ...(this.browser ? { browser: this.browser } : {}), ...this.fetcherFor() },
+      this.fetcherOptions(request.monitorId),
       request.signal,
     );
     try {
@@ -668,15 +702,9 @@ function feedPost(
  * The worst case of the list path and the stream path. With the browser each
  * page may be read twice (a retry) and each call may start a browser.
  */
-function maxUnitsFor(
-  threadsPerSection: number,
-  browser: boolean,
-  streamPagesPerPoll: number,
-): number {
-  const pages = 1 + threadsPerSection;
-  const list = browser ? 2 * pages + 1 + Math.ceil(threadsPerSection / threadsPerCall) : pages;
-  const stream = browser ? 3 * streamPagesPerPoll : streamPagesPerPoll;
-  return Math.max(list, stream);
+/** Bright Data bills a page once at most, whichever fetcher read it, and a browser page nothing. */
+function maxUnitsFor(threadsPerSection: number, streamPagesPerPoll: number): number {
+  return Math.max(1 + threadsPerSection, streamPagesPerPoll);
 }
 
 /**
@@ -706,11 +734,7 @@ export function createBrightDataForum(options: ForumOptions = {}): ConnectorDefi
     /** One thread page is one post. A list page is a request with none. */
     postsPerUnit: 1,
     discovery: ["channel"],
-    maxUnitsPerQueryPoll: maxUnitsFor(
-      threadsPerSection,
-      Boolean(options.browser),
-      streamPagesPerPoll,
-    ),
+    maxUnitsPerQueryPoll: maxUnitsFor(threadsPerSection, streamPagesPerPoll),
     create: (runtime) =>
       new BrightDataForumSource(runtime, { ...options, threadsPerSection, streamPagesPerPoll }),
   };

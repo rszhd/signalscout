@@ -203,6 +203,8 @@ async function readSource(
   source: SocialSource,
   query: SourceQuery,
   credentials: SourceCredentials,
+  /** On every request, for a connector that tells the application its own costs. US-503. */
+  monitorId: string,
   startCursor: string | undefined,
   /**
    * Write one page's units to the ledger, called as each page comes back
@@ -229,6 +231,7 @@ async function readSource(
       result = await source.search({
         query,
         credentials,
+        monitorId,
         cursor,
         ...(limits.perInput === undefined ? {} : { pagesPerInput: limits.perInput }),
       });
@@ -1270,6 +1273,7 @@ export function createCollectStep({
           source,
           { queries, channels: unitChannels, ...(window ? { since: window } : {}) },
           credentials,
+          monitorId,
           continuation?.cursor,
           (units) => {
             sourceUnits += units;

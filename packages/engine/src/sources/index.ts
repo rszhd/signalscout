@@ -78,12 +78,19 @@ export {
   toCandidatePost,
 } from "./providers/brightdata/reddit.js";
 export {
+  challengeIn,
   fetchThroughUnlocker,
   type UnlockerAnswer,
   UnlockerError,
 } from "./providers/brightdata/unlocker.js";
+export type { BrowserAnswer } from "./providers/browseruse/cdp.js";
 export { BrowserUseError, hasBrowserCredentials } from "./providers/browseruse/cloud.js";
-export type { BrowserUsage, OpenPageBrowser, PageBrowser } from "./providers/browseruse/pages.js";
+export {
+  type BrowserUsage,
+  type OpenPageBrowser,
+  openBrowserUse,
+  type PageBrowser,
+} from "./providers/browseruse/pages.js";
 export {
   HarvestApiLinkedInSource,
   harvestApiLinkedIn,

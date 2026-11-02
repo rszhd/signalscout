@@ -36,24 +36,33 @@ function refusalIn(body: string): string | null {
   if (/^\s*(?:<html><head><\/head><body><\/body><\/html>)?\s*$/.test(body)) {
     return "the site answered with an empty page";
   }
-  // Read from a challenge's title or script only, never the words of a real
-  // page: Cloudflare's "Just a moment…" and "Checking your browser", a
-  // proof-of-work script, and a plain "Please refresh to continue", all seen
-  // through Bright Data on 2026-10-30, and a host's "One moment, please…" seen
-  // through a browser on 2026-10-31. A thread titled "Checking your browser
-  // cache…" would be taken for one too; such a title was judged rare enough.
+  return challengeIn(body) ? "the site answered with a challenge page" : null;
+}
+
+/**
+ * Whether an HTML page is a bot check rather than the site.
+ *
+ * Read from a challenge's title or script only, never the words of a real
+ * page: Cloudflare's "Just a moment…" and "Checking your browser", a
+ * proof-of-work script, and a plain "Please refresh to continue", all seen
+ * through Bright Data on 2026-10-30, and a host's "One moment, please…" seen
+ * through a browser on 2026-10-31. A thread titled "Checking your browser
+ * cache…" would be taken for one too; such a title was judged rare enough.
+ * Cloudflare's "Enable JavaScript and cookies to continue" can follow a long
+ * script, so it is looked for further down; it came titled "Challenge - <site>"
+ * through a browser on 2026-11-03.
+ */
+export function challengeIn(body: string): boolean {
   const head = body.slice(0, 4000);
   const title = head.match(/<title[^>]*>([^<]*)</i)?.[1] ?? "";
-  if (
+  return (
     /Please refresh to continue/.test(head) ||
+    /Enable JavaScript and cookies to continue/.test(body.slice(0, 20_000)) ||
     /^(Just a moment|Checking your browser|Attention Required|One moment, please)/i.test(
       title.trim(),
     ) ||
     /POW_CHALLENGE|cf-chl-/.test(head)
-  ) {
-    return "the site answered with a challenge page";
-  }
-  return null;
+  );
 }
 
 /** Exported for the tests: the refusals that arrive as a 200. */

@@ -26,6 +26,7 @@
 
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { challengeIn } from "@signalscout/engine";
 
 /** Long enough for a slow page, short enough that nobody watches a spinner. */
 export const fetchTimeoutMs = 10_000;
@@ -51,11 +52,20 @@ export const maximumRedirects = 3;
  */
 export const acceptedTextTypes = ["text/plain", "text/markdown", "text/html"] as const;
 
+/** Answers a bot protection gives a plain request, rather than "no such page". */
+export const blockingStatuses: readonly number[] = [403, 429, 503];
+
 export type DocumentFailure =
   | { readonly kind: "scheme"; readonly message: string }
   | { readonly kind: "address"; readonly message: string }
   | { readonly kind: "unreachable"; readonly message: string }
   | { readonly kind: "status"; readonly message: string }
+  /**
+   * The site is there but refuses a plain request: a 403, 429 or 503, or a
+   * bot check (Cloudflare's "Just a moment…") answered as a 200. An
+   * application with a real browser may read it another way.
+   */
+  | { readonly kind: "blocked"; readonly message: string }
   | { readonly kind: "type"; readonly message: string }
   | { readonly kind: "tooLarge"; readonly message: string };
 
@@ -231,7 +241,10 @@ export async function fetchDocument(
     if (!response.ok) {
       return {
         ok: false,
-        failure: { kind: "status", message: `That page answered ${response.status}.` },
+        failure: {
+          kind: blockingStatuses.includes(response.status) ? "blocked" : "status",
+          message: `That page answered ${response.status}.`,
+        },
       };
     }
 
@@ -251,6 +264,13 @@ export async function fetchDocument(
     const bytes = Buffer.byteLength(body, "utf8");
     const cut = bytes > maximumDocumentBytes;
     const usable = cut ? body.slice(0, maximumDocumentBytes) : body;
+
+    if (contentType === "text/html" && challengeIn(usable)) {
+      return {
+        ok: false,
+        failure: { kind: "blocked", message: "That page answered with a bot check." },
+      };
+    }
 
     return {
       ok: true,

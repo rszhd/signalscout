@@ -48,12 +48,16 @@ function refusalIn(body: string): string | null {
  * through Bright Data on 2026-10-30, and a host's "One moment, please…" seen
  * through a browser on 2026-10-31. A thread titled "Checking your browser
  * cache…" would be taken for one too; such a title was judged rare enough.
+ * Cloudflare's "Enable JavaScript and cookies to continue" can follow a long
+ * script, so it is looked for further down; it came titled "Challenge - <site>"
+ * through a browser on 2026-11-03.
  */
 export function challengeIn(body: string): boolean {
   const head = body.slice(0, 4000);
   const title = head.match(/<title[^>]*>([^<]*)</i)?.[1] ?? "";
   return (
     /Please refresh to continue/.test(head) ||
+    /Enable JavaScript and cookies to continue/.test(body.slice(0, 20_000)) ||
     /^(Just a moment|Checking your browser|Attention Required|One moment, please)/i.test(
       title.trim(),
     ) ||

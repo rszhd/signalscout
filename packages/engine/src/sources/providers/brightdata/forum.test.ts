@@ -688,6 +688,12 @@ describe("a challenge page is a refusal, not a page", () => {
     expect(
       refusalIn("<html><head><script>window.POW_CHALLENGE_DATA = {}</script></head></html>"),
     ).not.toBeNull();
+    // Cloudflare's page behind a long script, with a title that names the site.
+    expect(
+      refusalIn(
+        `<html><head><title>Challenge - Shop</title><script>${"x".repeat(6000)}</script></head><body><noscript>Enable JavaScript and cookies to continue</noscript></body></html>`,
+      ),
+    ).toBe("the site answered with a challenge page");
     // An empty answer, or a browser's page with nothing in it (BUG-481).
     expect(refusalIn("")).toBe("the site answered with an empty page");
     expect(refusalIn("  \n")).toBe("the site answered with an empty page");

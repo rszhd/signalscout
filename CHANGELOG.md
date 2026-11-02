@@ -20,6 +20,22 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.24.1 — 2026-11-03
+
+No migration.
+
+**Changed: a site that refuses a plain request is `blocked`** (US-509).
+`fetchDocument` returns `{ kind: "blocked" }` for a 403, 429 or 503, with
+the same message as before, and for a bot check answered as a 200, which it
+used to return as the page's text. A caller that switches on
+`failure.kind` has one more case; one that shows `failure.message` needs
+nothing.
+
+**Added.** `openBrowserUse`, the cloud browser the forum connector uses,
+and `challengeIn`, which tells a bot check's HTML from a page. Cloudflare's
+"Enable JavaScript and cookies to continue" page counts as a challenge now,
+so a browser read waits on it.
+
 ## 0.24.0 — 2026-11-03
 
 No migration.

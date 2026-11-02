@@ -233,6 +233,38 @@ describe("reading a document from a URL", () => {
     }
   });
 
+  it("calls a 403 blocked, so an application can try a real browser", async () => {
+    const { fetchImpl } = serving({ "*": { status: 403 } });
+
+    const result = await fetchDocument("https://example.test/", {
+      fetchImpl,
+      allowAddress: anywhere,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("blocked");
+      expect(result.failure.message).toContain("403");
+    }
+  });
+
+  it("calls a bot check answered as a 200 blocked, not the site's text", async () => {
+    const { fetchImpl } = serving({
+      "*": {
+        type: "text/html",
+        body: '<html><head><title>Just a moment...</title></head><body><div id="cf-chl-widget"></div>Enable JavaScript and cookies to continue</body></html>',
+      },
+    });
+
+    const result = await fetchDocument("https://example.test/", {
+      fetchImpl,
+      allowAddress: anywhere,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.kind).toBe("blocked");
+  });
+
   it("tells an unreachable host apart from a refused one", async () => {
     const failing = (async () => {
       throw new Error("getaddrinfo ENOTFOUND");

@@ -12,6 +12,8 @@
  *
  * Only with our own proxy (`customProxy`): Browser Use's own costs about ten
  * times more a page, so without one this module refuses to start a browser.
+ * `proxyCountryCode: null` turns Browser Use's own proxy off beside ours:
+ * browsers that were sent ours were still billed at its rate (US-503).
  */
 import type { SourceCredentials, SourceRuntime } from "../../types.js";
 import { ProviderError, retryAfterDate } from "../core.js";
@@ -122,6 +124,7 @@ export async function startCloudBrowser(
         username: proxyUsername,
         password: proxy.password,
       },
+      proxyCountryCode: null,
     }),
     ...(signal ? { signal } : {}),
   });

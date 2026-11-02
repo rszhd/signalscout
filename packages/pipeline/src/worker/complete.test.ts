@@ -268,6 +268,8 @@ describe("completing the partial posts the filter kept", () => {
     await run(monitorId, [id]);
 
     expect(calls).toHaveLength(1);
+    // The monitor rides on the request, for a connector that tells its costs. US-503.
+    expect(calls[0]?.monitorId).toBe(monitorId);
     expect(sent[0]?.payload.postIds).toEqual([id]);
   });
 

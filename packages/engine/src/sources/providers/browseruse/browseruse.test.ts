@@ -3,7 +3,7 @@ import { createLogger } from "../../../logger.js";
 import type { SourceRuntime } from "../../types.js";
 import { CdpTab } from "./cdp.js";
 import { BrowserUseError, proxyFor, startCloudBrowser, stopCloudBrowser } from "./cloud.js";
-import { openBrowserUse } from "./pages.js";
+import { type BrowserUsage, openBrowserUse } from "./pages.js";
 
 const credentials = {
   apiKey: "bu-key",
@@ -25,7 +25,7 @@ function runtimeWith(
 }
 
 describe("Browser Use's cloud browser", () => {
-  it("starts a browser on our proxy, with a session of its own, and stops it", async () => {
+  it("starts a browser on our proxy only, with a session of its own, and stops it", async () => {
     const asked: { url: string; method: string; body: unknown; key: string | null }[] = [];
     const fetch: typeof globalThis.fetch = async (url, init) => {
       asked.push({
@@ -53,6 +53,8 @@ describe("Browser Use's cloud browser", () => {
             username: "user",
             password: "secret_country-US_session-abc123",
           },
+          // Browser Use's own proxy off: it bills ten times ours. US-503.
+          proxyCountryCode: null,
         },
         key: "bu-key",
       },
@@ -265,12 +267,19 @@ describe("a tab of the cloud browser", () => {
       return new Response(JSON.stringify({ id: `b${browsers}`, cdpUrl: `wss://cdp/b${browsers}` }));
     });
 
-    const browser = openBrowserUse(runtime, credentials);
+    const used: BrowserUsage[] = [];
+    const browser = openBrowserUse(runtime, credentials, undefined, (one) => used.push(one));
     const answer = await browser.read("https://a.example/");
     await browser.close();
 
     expect(answer).toEqual({ ok: true, body: forumPage });
     expect(browser.started).toBe(2);
+    // Each browser told once, when it stopped, with the pages it was asked for.
+    const at = new Date("2026-10-31T01:00:00.000Z");
+    expect(used).toEqual([
+      { id: "b1", startedAt: at, stoppedAt: at, pages: 1 },
+      { id: "b2", startedAt: at, stoppedAt: at, pages: 1 },
+    ]);
     expect(asked).toEqual([
       "POST https://api.browser-use.com/api/v4/browsers",
       "PATCH https://api.browser-use.com/api/v4/browsers/b1",

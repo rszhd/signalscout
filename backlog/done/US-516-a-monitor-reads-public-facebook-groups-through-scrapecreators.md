@@ -6,7 +6,7 @@ priority: p2
 created: 2026-11-04T13:35+08:00
 parent:
 area: sources
-resolution:
+resolution: done
 ---
 
 ## Context
@@ -139,3 +139,6 @@ and on Radar, hiding author names. The hosted repository is retired
   lint, type check and `pnpm test` (2,821) pass. Not run live through the
   pipeline yet, and `packages/ui` has no label or icon for it (nor for
   forums).
+- 2026-11-04T18:51+08:00 — Released in 0.25.0 (PR #126, tag v0.25.0, Release run
+  41815790642). BuyerFinder runs on it (US-517). Case 2, the time of a shared
+  post, is still the owner's decision; US-517's Notes carry it.

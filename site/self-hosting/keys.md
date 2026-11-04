@@ -14,6 +14,7 @@ You bring a key for each provider you want to use.
 | YouTube | ScrapeCreators, SocialCrawl | |
 | TikTok | ScrapeCreators, SocialCrawl | |
 | Instagram | SocialCrawl | Comments cost more than posts. See [costs](./costs). |
+| Facebook groups | ScrapeCreators | Public groups only. Each query is the address of one group. |
 
 **Start small.** One Reddit provider and one AI model key already give you a
 working product. A platform with no key simply cannot be ticked on the monitor
@@ -37,7 +38,7 @@ flowchart TD
 ### In `.env`
 
 ```bash
-SCRAPECREATORS_API_KEY=   # Reddit, YouTube, TikTok
+SCRAPECREATORS_API_KEY=   # Reddit, YouTube, TikTok, Facebook groups
 SOCIALCRAWL_API_KEY=      # Reddit, X, YouTube, TikTok, Instagram
 SOCIALDATA_API_KEY=''     # X. Keep the quotes: the key can contain a "|"
 HARVESTAPI_API_KEY=       # LinkedIn

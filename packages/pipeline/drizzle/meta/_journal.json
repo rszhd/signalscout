@@ -540,6 +540,13 @@
       "when": 1793438028394,
       "tag": "0076_a_forum_post_can_be_partial",
       "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1793771755777,
+      "tag": "0077_a_monitor_can_read_facebook_groups",
+      "breakpoints": true
     }
   ]
 }

@@ -42,21 +42,21 @@ skipped.
 
 ## Acceptance
 
-- [ ] `facebook` is a platform; `posts.source` accepts it, with its
+- [x] `facebook` is a platform; `posts.source` accepts it, with its
       migration.
-- [ ] The platform declares address queries, and `searchQuerySchemaFor`
+- [x] The platform declares address queries, and `searchQuerySchemaFor`
       holds each one to an `https://www.facebook.com/groups/` address.
-- [ ] The connector reads a group's posts by the rule above and returns each
+- [x] The connector reads a group's posts by the rule above and returns each
       post with its group as the channel. Its id is the Facebook post id.
-- [ ] A page with an older post above newer ones does not stop the read: a
+- [x] A page with an older post above newer ones does not stop the read: a
       test replays such a page and gets the newer posts, and the next page
       is read.
-- [ ] Pages a group a poll are capped (default 5), and an application can
+- [x] Pages a group a poll are capped (default 5), and an application can
       set a lower cap; the price estimate uses the cap.
-- [ ] Each page is one unit, counted from `credits_charged`.
-- [ ] A private or missing group is skipped with a log line naming the
+- [x] Each page is one unit, counted from `credits_charged`.
+- [x] A private or missing group is skipped with a log line naming the
       address, and the other groups in the poll still run.
-- [ ] Tests replay captured pages through a fake ScrapeCreators; no test
+- [x] Tests replay captured pages through a fake ScrapeCreators; no test
       fetches.
 
 ## Notes
@@ -123,3 +123,19 @@ and on Radar, hiding author names. The hosted repository is retired
   cursor, and billed 1; a refused key answers 401 and bills 0. No group
   known to be private was captured; the 500 message names both cases.
   `topComments` held 2 of a post's 9 comments, so it is not the thread.
+- 2026-11-04T14:00+08:00 — Built. `facebook` platform with
+  `search.input: "address"` and a new `addressPrefix`, so
+  `searchQuerySchemaFor` refuses an address outside
+  `https://www.facebook.com/groups/`. Migration 0077 adds `facebook` to the
+  six source constraints. `ScrapeCreatorsFacebookSource`: one page a call,
+  the cursor carries the group, the pages read and the post ids already
+  returned; `createScrapeCreatorsFacebook({ pagesPerGroup })` takes 1 to 5.
+  A 500 naming "isn't available" bills 0 and skips the group with a
+  warning; any other provider error throws. 15 connector tests replay the
+  captured pages, and 2 query tests check the prefix. Six existing tests in
+  `apps/api/src/monitors.test.ts` changed with the behaviour (an eighth platform in two lists, an empty
+  `facebook` query list on a monitor). AGENTS.md and PLAN.md name the eighth
+  platform and the sixth crossing; the keys page names the provider. Root
+  lint, type check and `pnpm test` (2,821) pass. Not run live through the
+  pipeline yet, and `packages/ui` has no label or icon for it (nor for
+  forums).

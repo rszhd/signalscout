@@ -28,6 +28,8 @@ export {
 } from "./offering.js";
 export { maximumPagesPerInput, pagesPerInputFor } from "./pages.js";
 export {
+  facebookPlatform,
+  facebookPlatformId,
   forumPlatform,
   forumPlatformId,
   groupByPlatform,
@@ -96,6 +98,12 @@ export {
   harvestApiLinkedIn,
 } from "./providers/harvestapi/linkedin.js";
 export { harvestApiProvider, harvestApiProviderId } from "./providers/harvestapi/provider.js";
+export {
+  createScrapeCreatorsFacebook,
+  ScrapeCreatorsFacebookSource,
+  scrapeCreatorsFacebook,
+  toCandidatePost as toScrapeCreatorsFacebookCandidatePost,
+} from "./providers/scrapecreators/facebook.js";
 export {
   scrapeCreatorsProvider,
   scrapeCreatorsProviderId,
@@ -185,6 +193,7 @@ import { apifyLinkedIn } from "./providers/apify/linkedin.js";
 import { brightDataForum } from "./providers/brightdata/forum.js";
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { harvestApiLinkedIn } from "./providers/harvestapi/linkedin.js";
+import { scrapeCreatorsFacebook } from "./providers/scrapecreators/facebook.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
 import { scrapeCreatorsTikTok } from "./providers/scrapecreators/tiktok.js";
 import { scrapeCreatorsYouTube } from "./providers/scrapecreators/youtube.js";
@@ -238,4 +247,5 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   scrapeCreatorsTikTok,
   socialCrawlInstagram,
   brightDataForum,
+  scrapeCreatorsFacebook,
 ];

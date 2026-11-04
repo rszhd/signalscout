@@ -263,6 +263,30 @@ export const forumPlatform: PlatformDescriptor = {
   },
 };
 
+export const facebookPlatformId = "facebook";
+
+/**
+ * Facebook groups, read one public group at a time through its address.
+ * A group has no keyword search a connector can rely on, so its queries are
+ * the addresses of the groups to read.
+ */
+export const facebookPlatform: PlatformDescriptor = {
+  id: facebookPlatformId,
+  displayName: "Facebook groups",
+  search: {
+    input: "address",
+    addressPrefix: "https://www.facebook.com/groups/",
+    maxQueryWords: 1,
+    hint:
+      "The address of a public Facebook group, such as " +
+      "https://www.facebook.com/groups/856491544939621/. Every new post in it is read.",
+    note:
+      "A Facebook group is read by address, not searched: each query is the full https address " +
+      "of one public group where the customer asks for products like this one. Name only groups " +
+      "you know exist and are public; a private group reads nothing.",
+  },
+};
+
 /** Every platform the schema accepts, for a screen that lists them. */
 export const platforms: readonly PlatformDescriptor[] = [
   redditPlatform,
@@ -272,6 +296,7 @@ export const platforms: readonly PlatformDescriptor[] = [
   tikTokPlatform,
   instagramPlatform,
   forumPlatform,
+  facebookPlatform,
 ];
 
 /** One platform, with every provider a build has for it. */

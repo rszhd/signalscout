@@ -1,0 +1,11 @@
+{
+  "status": 500,
+  "body": {
+    "success": false,
+    "credits_remaining": 10351,
+    "credits_charged": 0,
+    "error": "internal_server_error",
+    "errorStatus": 500,
+    "message": "This Facebook group isn't available. It may not exist or may require logging in."
+  }
+}

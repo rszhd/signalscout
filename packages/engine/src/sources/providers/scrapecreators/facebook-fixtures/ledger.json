@@ -1,0 +1,43 @@
+[
+  {
+    "file": "group-page-1.json",
+    "creditsBefore": 10354,
+    "creditsAfter": 10353,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "group-page-2.json",
+    "creditsBefore": 10353,
+    "creditsAfter": 10352,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "group-top-post.json",
+    "creditsBefore": 10352,
+    "creditsAfter": 10351,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "group-missing.json",
+    "creditsBefore": 10351,
+    "creditsAfter": 10351,
+    "spent": 0,
+    "creditsCharged": 0
+  },
+  {
+    "file": "group-maybe-private.json",
+    "creditsBefore": 10351,
+    "creditsAfter": 10350,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "credentials-rejected.json",
+    "creditsBefore": 10350,
+    "creditsAfter": 10350,
+    "spent": 0
+  }
+]

@@ -109,3 +109,17 @@ and on Radar, hiding author names. The hosted repository is retired
   group's post ids fell in strict order over three pages while its times did
   not (Notes). The owner chose to handle the top post now and decide the
   post-time question when more groups are read.
+- 2026-11-04T13:48+08:00 — Started. The posts with an old time in the
+  buy/sell group all carry `shared_post_id`: they are shares, and
+  `publishTime` and `creation_time` both give the shared post's time.
+  `facebook-fixtures/capture.mjs` captured the fixtures, 4 credits a run,
+  run twice: the first run's scrubber left fbcdn addresses inside arrays and
+  about 250 member names in the Ninja group's welcome post, so the scrubber
+  now walks arrays and replaces a list of name lines, and the second run is
+  the one committed. Answers: a page is 3 or 4 posts for 1 credit; page two
+  repeated nothing of page one; a missing group answers 500 "This Facebook
+  group isn't available. It may not exist or may require logging in." and
+  bills 0; `groups/baristahustle` answered 200 with no posts and a null
+  cursor, and billed 1; a refused key answers 401 and bills 0. No group
+  known to be private was captured; the 500 message names both cases.
+  `topComments` held 2 of a post's 9 comments, so it is not the thread.

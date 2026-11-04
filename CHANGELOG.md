@@ -20,6 +20,31 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.25.0 — 2026-11-04
+
+**Migration 0077.** It adds `facebook` to the six source constraints
+(`posts`, `api_usage`, `source_providers`, `source_coverage`,
+`source_continuations`, `query_estimate_probes`). Nothing else in a
+database changes.
+
+**Added: public Facebook groups, the eighth platform** (US-516).
+`facebookPlatform` (id `facebook`) reads one public group at a time: each
+query is the full address of a group, such as
+`https://www.facebook.com/groups/856491544939621/`. No provider searches
+groups by keyword. `createScrapeCreatorsFacebook({ pagesPerGroup })` reads
+it through ScrapeCreators, 1 to 5 pages of 3 or 4 posts a group a poll, one
+credit a page, with the `SCRAPECREATORS_API_KEY` Reddit already uses.
+`scrapeCreatorsFacebook` is the same with 5 pages, and it is in
+`builtInSources`, so a registry built from that list can read Facebook.
+A missing or private group is skipped with a warning and billed nothing.
+A post carries the group's key as its `channel` and the poster's name as
+its `author`.
+
+**Changed: a platform may name the address its queries start with.**
+`addressPrefix` on a platform's `search`; `searchQuerySchemaFor` refuses an
+address outside it. A consumer with an exhaustive `switch` over the platform
+ids has one more case.
+
 ## 0.24.1 — 2026-11-03
 
 No migration.

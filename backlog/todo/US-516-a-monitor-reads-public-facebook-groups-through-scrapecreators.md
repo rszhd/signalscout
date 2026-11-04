@@ -31,9 +31,12 @@ keyword. A monitor names the groups to read, so the platform declares
 group's `https://www.facebook.com/groups/<id or name>/` address.
 
 **The read pages back to `since`, with a cap.** One credit buys one page of 3
-or 4 posts. `sort_by=CHRONOLOGICAL` is not strictly ordered (Log), so the
-read stops on the first page whose posts are all older than `since`, or on a
-page cap, and drops a post id it has already returned in the same read.
+or 4 posts. `sort_by=CHRONOLOGICAL` can put an older post above newer ones:
+a group's top post came first on its page, and newer posts followed it
+(Log). So one old post does not end the read. The read stops on the first
+page whose posts are all older than `since`, or on a page cap. It keeps each
+post newer than `since` on every page it reads, and drops a post id it has
+already returned in the same read.
 A post with no text is a photo or a video and has nothing to score: it is
 skipped.
 
@@ -45,6 +48,9 @@ skipped.
       holds each one to an `https://www.facebook.com/groups/` address.
 - [ ] The connector reads a group's posts by the rule above and returns each
       post with its group as the channel. Its id is the Facebook post id.
+- [ ] A page with an older post above newer ones does not stop the read: a
+      test replays such a page and gets the newer posts, and the next page
+      is read.
 - [ ] Pages a group a poll are capped (default 5), and an application can
       set a lower cap; the price estimate uses the cap.
 - [ ] Each page is one unit, counted from `credits_charged`.
@@ -57,6 +63,13 @@ skipped.
 
 **Probe pages.** The five groups in the Log. Capture fixtures again with the
 connector's own request; the probe ran from a scratch script.
+
+**Open decision: a post time older than its place.** In the buy/sell group,
+post ids went down in strict order, but some post times did not: two posts
+added among others on 2026-11-04 carried times of 2026-10-25 and 2026-10-27.
+A read by post time drops such a post; a read by the last post id seen keeps
+it. The owner decides when more groups are read (2026-11-04). Until then
+the read uses post time, as every other connector does.
 
 **Author names.** Each post carries the author's name and id. The connector
 keeps them as every other platform does. An application that must not show
@@ -89,3 +102,10 @@ and on Radar, hiding author names. The hosted repository is retired
   newer oldest post than page 1, so the sort is not strict.
 - 2026-11-04T13:35+08:00 — Written, on the owner's decision to add public
   groups.
+- 2026-11-04T13:42+08:00 — The probe pages, read again, show two kinds of
+  disorder. Ninja Luxe Café's page 1: an admin welcome post (3 Nov 13:04),
+  then a post from 1 Nov 11:54 with 31 comments, then 2 Nov 20:12 and
+  2 Nov 13:21. The other three owner groups were newest first. The buy/sell
+  group's post ids fell in strict order over three pages while its times did
+  not (Notes). The owner chose to handle the top post now and decide the
+  post-time question when more groups are read.

@@ -1,0 +1,220 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 10351,
+    "credits_charged": 1,
+    "posts": [
+      {
+        "id": "984138630882927",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Let's give a warm welcome to our new members! Feel free to share your questions, pictures, and experiences with the Ninja Luxe Café!\n\nBe sure to check out our recommended accessories and ingredients here: https://curatedby.us/sizzleandear/c/af1nx23c6q (ad)\n\nDisclaimer: Product links take you to our affiliate partners. We may earn a commission from your purchase.\n\nScrubbed by capture.mjs. See docs/testing.md.\n",
+        "url": "https://www.facebook.com/groups/ninjaespressoenthusiasts/permalink/984138630882927/",
+        "author": {
+          "__typename": "User",
+          "name": "member-1",
+          "short_name": "member-1",
+          "id": "member-2"
+        },
+        "reactionCount": 0,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 0,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 0,
+        "videoViewCount": null,
+        "publishTime": 1793711054,
+        "creation_time": "2026-11-03T13:04:14.000Z",
+        "videoDetails": {},
+        "image": "https://scrubbed.invalid/media-url-expired.bin",
+        "topComments": []
+      },
+      {
+        "id": "982242244405899",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Where to add syrups??\nJust curious as to if it matters or what the correct way is. When adding in some flavored syrup to your latte or cappuccino do you add it to the espresso directly or do you add it in to your frothed milk??",
+        "url": "https://www.facebook.com/groups/ninjaespressoenthusiasts/permalink/982242244405899/",
+        "author": {
+          "__typename": "User",
+          "name": "member-3",
+          "short_name": "member-4",
+          "id": "member-5"
+        },
+        "reactionCount": 9,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 9,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 31,
+        "videoViewCount": null,
+        "publishTime": 1793534077,
+        "creation_time": "2026-11-01T11:54:37.000Z",
+        "videoDetails": {},
+        "image": null,
+        "topComments": [
+          {
+            "id": "Y29tbWVudDo5ODIyNDIyNDQ0MDU4OTlfOTg0MTMwNzc3NTUwMzc5",
+            "text": "I put it in my cup and brew the espresso over it then the milk",
+            "publishTime": 1793710472,
+            "author": {
+              "id": "member-6",
+              "name": "member-7",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          },
+          {
+            "id": "Y29tbWVudDo5ODIyNDIyNDQ0MDU4OTlfOTg0MTI1NTY0MjE3NTY3",
+            "text": "99% of the time syrup first, espresso shots, milk",
+            "publishTime": 1793710083,
+            "author": {
+              "id": "member-8",
+              "name": "member-9",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "983526610944129",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "What cleaning tablets does anyone recommend please",
+        "url": "https://www.facebook.com/groups/ninjaespressoenthusiasts/permalink/983526610944129/",
+        "author": {
+          "__typename": "User",
+          "name": "member-10",
+          "short_name": "member-11",
+          "id": "member-12"
+        },
+        "reactionCount": 2,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 2,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 9,
+        "videoViewCount": null,
+        "publishTime": 1793650333,
+        "creation_time": "2026-11-02T20:12:13.000Z",
+        "videoDetails": {},
+        "image": null,
+        "topComments": [
+          {
+            "id": "Y29tbWVudDo5ODM1MjY2MTA5NDQxMjlfOTg0MTY1NjQwODgwMjI2",
+            "text": "Seriously, buy cleaning vinegar, it’s so much better than any cleaning tablet I’ve ever used. Completely gets rid of scale , calcium and lime build up. It’s super cheap.",
+            "publishTime": 1793713180,
+            "author": {
+              "id": "member-13",
+              "name": "member-14",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": "https://www.facebook.com/member-15"
+            }
+          },
+          {
+            "id": "Y29tbWVudDo5ODM1MjY2MTA5NDQxMjlfOTg0MTU1MDY0MjE0NjE3",
+            "text": "Amazon",
+            "publishTime": 1793712350,
+            "author": {
+              "id": "member-16",
+              "name": "member-17",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "983230240973766",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Wrapped my Ninja Luxe Cafe!\nSaw others doing it and gave it a shot. Took like 4 hours (messed up a ton and had to restart) but I love it!\n\nThe wrap I used was 3M 2080 Satin Komodo Green, the 1x5 foot roll was plenty",
+        "url": "https://www.facebook.com/groups/ninjaespressoenthusiasts/permalink/983230240973766/",
+        "author": {
+          "__typename": "User",
+          "name": "member-18",
+          "short_name": "member-19",
+          "id": "member-20"
+        },
+        "reactionCount": 83,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 59,
+          "love": 22,
+          "care": 0,
+          "haha": 0,
+          "wow": 2,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 18,
+        "videoViewCount": null,
+        "publishTime": 1793625696,
+        "creation_time": "2026-11-02T13:21:36.000Z",
+        "videoDetails": {},
+        "image": "https://scrubbed.invalid/media-url-expired.bin",
+        "images": [
+          "https://scrubbed.invalid/media-url-expired.bin",
+          "https://scrubbed.invalid/media-url-expired.bin"
+        ],
+        "topComments": [
+          {
+            "id": "Y29tbWVudDo5ODMyMzAyNDA5NzM3NjZfOTg0NDUxMjY0MTg0OTk3",
+            "text": "Wait, I love this! I need to do mine cause I hate the ugly blue color I got 😂",
+            "publishTime": 1793734124,
+            "author": {
+              "id": "member-21",
+              "name": "member-22",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          },
+          {
+            "id": "Y29tbWVudDo5ODMyMzAyNDA5NzM3NjZfOTg0MzE0MTM0MTk4NzEw",
+            "text": "I absolutely love the color!! 😍😍",
+            "publishTime": 1793723900,
+            "author": {
+              "id": "member-23",
+              "name": "member-24",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          }
+        ]
+      }
+    ],
+    "cursor": "AQHT-p2d8CYNmi7yGoAtk4QsYD-csdOb13RkLz_sv1R6DFYlAFD2zLNn4O_dccu1LAs11OCBQcUHmzSk2f-UZtnLlQ:eyIwIjoxNzkzNzcxMjQ3LCIxIjo3NjgyLCIzIjoxLCI0IjoxLCI1IjoyLCI2IjotMSwiNyI6LTEsIjgiOi0xfQ=="
+  }
+}

@@ -28,6 +28,7 @@ export const sources = [
   "tiktok",
   "instagram",
   "forum",
+  "facebook",
 ] as const;
 export type Source = (typeof sources)[number];
 

@@ -117,7 +117,15 @@ export const addressQuerySchema = z
  * model must obey and a person may bypass is a suggestion with a test.
  */
 export function searchQuerySchemaFor(style: PlatformSearchStyle | undefined) {
-  if (style?.input === "address") return addressQuerySchema;
+  if (style?.input === "address") {
+    const prefix = style.addressPrefix;
+    if (prefix === undefined) return addressQuerySchema;
+
+    return addressQuerySchema.refine((value) => value.startsWith(prefix), {
+      message: `a query here is the address of a page starting with ${prefix}`,
+    });
+  }
+
   const ceiling = style?.maxQueryWords ?? defaultMaxQueryWords;
 
   return searchQuerySchema.refine((value) => wordsIn(value) <= ceiling, {

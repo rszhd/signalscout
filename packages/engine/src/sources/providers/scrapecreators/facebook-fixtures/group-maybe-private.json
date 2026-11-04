@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 10350,
+    "credits_charged": 1,
+    "posts": [],
+    "cursor": null
+  }
+}

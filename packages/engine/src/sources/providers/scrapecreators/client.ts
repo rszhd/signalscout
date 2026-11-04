@@ -50,6 +50,7 @@ const apiBase = "https://api.scrapecreators.com";
 const redditBase = `${apiBase}/v1/reddit`;
 const tikTokBase = `${apiBase}/v1/tiktok`;
 const youTubeBase = `${apiBase}/v1/youtube`;
+const facebookBase = `${apiBase}/v1/facebook`;
 
 /**
  * Every endpoint a monitor needs from this provider, grouped by platform.
@@ -89,6 +90,7 @@ export const endpoints = {
    * connector sends `newest` and trusts nothing about the ordering.
    */
   youTubeComments: `${youTubeBase}/video/comments`,
+  facebookGroupPosts: `${facebookBase}/group/posts`,
 } as const;
 
 /**
@@ -122,6 +124,12 @@ function textAt(body: Record<string, unknown>, key: string): string | undefined 
 export const redditPageShape: PageShape = {
   recordsOf: (body) => arrayAt(body, "posts"),
   cursorOf: (body) => textAt(body, "after"),
+};
+
+/** A Facebook group's page: the posts, and a string cursor that ends as null. */
+export const facebookGroupShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "posts"),
+  cursorOf: (body) => textAt(body, "cursor"),
 };
 
 /**

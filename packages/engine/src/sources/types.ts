@@ -430,6 +430,11 @@ export interface PlatformSearchStyle {
    * reads, held to an `https` address rather than a word count. US-470.
    */
   readonly input?: "phrase" | "address";
+  /**
+   * The address every query must start with, when the platform reads one kind
+   * of page. Absent means any `https` address is accepted.
+   */
+  readonly addressPrefix?: string;
 }
 
 /**

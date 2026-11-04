@@ -1,0 +1,93 @@
+[
+  {
+    "file": "group-page-1.json",
+    "capturedAt": "2026-11-04T05:47:22.475Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/group/posts",
+      "params": {
+        "url": "https://www.facebook.com/groups/856491544939621/",
+        "sort_by": "CHRONOLOGICAL"
+      }
+    },
+    "status": 200,
+    "posts": 4,
+    "pseudonyms": 28,
+    "elapsedMs": 5075
+  },
+  {
+    "file": "group-page-2.json",
+    "capturedAt": "2026-11-04T05:47:25.513Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/group/posts",
+      "params": {
+        "url": "https://www.facebook.com/groups/856491544939621/",
+        "sort_by": "CHRONOLOGICAL",
+        "cursor": "<page 1 cursor>"
+      }
+    },
+    "status": 200,
+    "posts": 3,
+    "pseudonyms": 19,
+    "elapsedMs": 2489
+  },
+  {
+    "file": "group-top-post.json",
+    "capturedAt": "2026-11-04T05:47:30.881Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/group/posts",
+      "params": {
+        "url": "https://www.facebook.com/groups/ninjaespressoenthusiasts/",
+        "sort_by": "CHRONOLOGICAL"
+      }
+    },
+    "status": 200,
+    "posts": 4,
+    "pseudonyms": 24,
+    "elapsedMs": 4844
+  },
+  {
+    "file": "group-missing.json",
+    "capturedAt": "2026-11-04T05:47:33.600Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/group/posts",
+      "params": {
+        "url": "https://www.facebook.com/groups/intentwatch-no-such-group-zqxjkv/",
+        "sort_by": "CHRONOLOGICAL"
+      }
+    },
+    "status": 500,
+    "posts": 0,
+    "pseudonyms": 0,
+    "elapsedMs": 1316
+  },
+  {
+    "file": "group-maybe-private.json",
+    "capturedAt": "2026-11-04T05:47:50.901Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/group/posts",
+      "params": {
+        "url": "https://www.facebook.com/groups/baristahustle/",
+        "sort_by": "CHRONOLOGICAL"
+      }
+    },
+    "status": 200,
+    "posts": 0,
+    "pseudonyms": 0,
+    "elapsedMs": 16329
+  },
+  {
+    "file": "credentials-rejected.json",
+    "capturedAt": "2026-11-04T05:47:51.720Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/group/posts",
+      "params": {
+        "url": "https://www.facebook.com/groups/856491544939621/",
+        "sort_by": "CHRONOLOGICAL"
+      }
+    },
+    "status": 401,
+    "posts": 0,
+    "pseudonyms": 0,
+    "elapsedMs": 217
+  }
+]

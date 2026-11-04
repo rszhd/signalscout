@@ -1,0 +1,228 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 10353,
+    "credits_charged": 1,
+    "posts": [
+      {
+        "id": "2180152929240136",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Help!\nHi all, gave my barista pro a real good clean at the weekend alongside the flush and descale. Got into the hopper and wiped down / brushed the burrs etc so get all old residue off. \n\nSince then it’s like I can’t grind the beans fine enough, and my shots are just pissing out. Have I done something wrong in cleaning it?\n\nI have fresh roasted beans and usually have grjnd set at 3 and this gives me lovely shots but I’ve clearly cocked something up!",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2180152929240136/",
+        "author": {
+          "__typename": "User",
+          "name": "member-1",
+          "short_name": "member-2",
+          "id": "member-3"
+        },
+        "reactionCount": 1,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 1,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 5,
+        "videoViewCount": null,
+        "publishTime": 1793699858,
+        "creation_time": "2026-11-03T09:57:38.000Z",
+        "videoDetails": {},
+        "image": null,
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTgwMTUyOTI5MjQwMTM2XzIxODAyNjA1MDkyMjkzNzg=",
+            "text": "Did you get moisture in the grinder?",
+            "publishTime": 1793708546,
+            "author": {
+              "id": "member-4",
+              "name": "member-5",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          },
+          {
+            "id": "Y29tbWVudDoyMTgwMTUyOTI5MjQwMTM2XzIxODA0MTcwNTI1NDcwNTc=",
+            "text": "This is what I used to do with my barista express..\nRemove the hopper.. The hoover up the left over beans. Remove the top burr then hoover again.\nPut the burr back and lock it in. Put the hopper back. Go to the finest setting and grind out some beans. The back to your normal setting. Grind some more beans and then start using as normal",
+            "publishTime": 1793720186,
+            "author": {
+              "id": "member-6",
+              "name": "member-7",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "2180073629248066",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Hello I have a 6 year old Oracle Touch on which the tamping is no longer working properly. The fan whirrs and the coffee is pressed down but the tamp is not flat and instead is very lumpy and I have to press it flat with a manual tamper. I have dismantled and cleaned all relevant parts of the machine thoroughly but it is still happening. Any ideas on why and what I could do ? Many thanks",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2180073629248066/",
+        "author": {
+          "__typename": "User",
+          "name": "member-8",
+          "short_name": "member-9",
+          "id": "member-10"
+        },
+        "reactionCount": 1,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 1,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 3,
+        "videoViewCount": null,
+        "publishTime": 1793693397,
+        "creation_time": "2026-11-03T08:09:57.000Z",
+        "videoDetails": {},
+        "image": null,
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTgwMDczNjI5MjQ4MDY2XzIxODAxNDIyMzI1NzQ1Mzk=",
+            "text": "Show us a video please",
+            "publishTime": 1793699006,
+            "author": {
+              "id": "member-11",
+              "name": "member-12",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": "https://www.facebook.com/member-13"
+            }
+          }
+        ]
+      },
+      {
+        "id": "2179516795970416",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "This came up on my Facebook. Anyone use these or is it just a gimmick. The video showed that this makes the extraction more evenly spread then sgaes one.",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2179516795970416/",
+        "author": {
+          "__typename": "User",
+          "name": "member-14",
+          "short_name": "member-15",
+          "id": "member-16"
+        },
+        "reactionCount": 3,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 3,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 9,
+        "videoViewCount": null,
+        "publishTime": 1793640344,
+        "creation_time": "2026-11-02T17:25:44.000Z",
+        "videoDetails": {},
+        "image": "https://scrubbed.invalid/media-url-expired.bin",
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTc5NTE2Nzk1OTcwNDE2XzIxNzk3MzU5NjkyODE4MzI=",
+            "text": "Gimmick. They ruin machines.",
+            "publishTime": 1793659788,
+            "author": {
+              "id": "member-17",
+              "name": "member-18",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          },
+          {
+            "id": "Y29tbWVudDoyMTc5NTE2Nzk1OTcwNDE2XzIxNzk2NjQzNTU5NTU2NjA=",
+            "text": "I bought and fitted one a couple of weeks ago. It has definitely slowed down the extraction which for me is a good thing as my shots were always coming through too quickly no matter how fine I set the grinder. It’s expensive at £60 including shipping but it’s definitely improved the flavour of my coffee.",
+            "publishTime": 1793653292,
+            "author": {
+              "id": "member-19",
+              "name": "member-20",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "2179492672639495",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Hi all, I have a hand me down sage barista that can make some great coffee but I find it pretty difficult to get consistent. \n\nOne minute I’m getting perfect 1/2 ratio 30 second shots then the next time I use it, I just can’t get a shot out. Pressure shoot’s up after pre infusion and I just get a dribble. The pucks are not soggy after that either. \n\nThrowing 18g in then running grinder until it spins. \n\nCurrently stuck and not wanting to waste any more coffee (at £9/250g it hurts)",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2179492672639495/",
+        "author": {
+          "__typename": "User",
+          "name": "member-21",
+          "short_name": "member-22",
+          "id": "member-23"
+        },
+        "reactionCount": 0,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 0,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 14,
+        "videoViewCount": null,
+        "publishTime": 1793638397,
+        "creation_time": "2026-11-02T16:53:17.000Z",
+        "videoDetails": {},
+        "image": "https://scrubbed.invalid/media-url-expired.bin",
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTc5NDkyNjcyNjM5NDk1XzIxNzk1MzkwODI2MzQ4NTQ=",
+            "text": "I used to get this with certain coffees, and not others, the only thing i can think is that the coffee varies in the same batch. At 2:1 in 30-35seconds you are almost choking the machine anyway so it only takes a small variance to stop the flow completely",
+            "publishTime": 1793642132,
+            "author": {
+              "id": "member-24",
+              "name": "member-25",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          },
+          {
+            "id": "Y29tbWVudDoyMTc5NDkyNjcyNjM5NDk1XzIxNzk1NDE1MDkzMDEyNzg=",
+            "text": "If it’s any consolation I have a similar issue with my express.\nPre infusion sometimes pushes the pressure way up!\nThat said I’ve been dialing up and down on the grinder to get that sweet spot.\nOh I do use a puck screen which is delivering dry pucks .\nNot sure this is any help to you but I’m aware these machines/beans do fluctuate at all price points.\nPresently using Illy beans, nice flavour for supermarket beans though fairly good crema too",
+            "publishTime": 1793642317,
+            "author": {
+              "id": "member-26",
+              "name": "member-27",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": "https://www.facebook.com/member-28"
+            }
+          }
+        ]
+      }
+    ],
+    "cursor": "AQHTa4ICkgWJpWI41vGiQuEwe880Ij3L50ncra4WaBYVAcJ58du2hOh986Cg8HteSb7RIt77nCEgxG6mWWS5JzwPNg:eyIwIjoxNzkzNzcxMjM3LCIxIjo3NjgyLCIzIjoxLCI0IjoxLCI1IjoyLCI2IjotMSwiNyI6LTEsIjgiOi0xfQ=="
+  }
+}

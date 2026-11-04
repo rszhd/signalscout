@@ -15,10 +15,15 @@
 import { APICallError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
-import { redditPlatform, xPlatform } from "../sources/platforms.js";
+import { facebookPlatform, redditPlatform, xPlatform } from "../sources/platforms.js";
 import type { AiConfig } from "./config.js";
 import type { MonitorProfile } from "./prompt.js";
-import { buildQuerySystemPrompt, createQueryGenerator, queryPlanSchemaFor } from "./queries.js";
+import {
+  buildQuerySystemPrompt,
+  createQueryGenerator,
+  queryPlanSchemaFor,
+  searchQuerySchemaFor,
+} from "./queries.js";
 
 /** Both platforms the build ships, which is what a monitor may watch. */
 const bothPlatforms = [redditPlatform, xPlatform];
@@ -154,6 +159,19 @@ describe("what a query may be", () => {
   it("refuses a plan with fewer than three queries", () => {
     // One query is a keyword alert, which PLAN.md says is not this product.
     expect(parse(withQueries("flaky e2e tests", "manual qa before release")).success).toBe(false);
+  });
+});
+
+describe("an address query on Facebook", () => {
+  const schema = searchQuerySchemaFor(facebookPlatform.search);
+
+  it("accepts a public group's address", () => {
+    expect(schema.safeParse("https://www.facebook.com/groups/856491544939621/").success).toBe(true);
+  });
+
+  it("refuses another site's address and a Facebook page that is not a group", () => {
+    expect(schema.safeParse("https://forum.example.com/forums/watches.12/").success).toBe(false);
+    expect(schema.safeParse("https://www.facebook.com/somepage/").success).toBe(false);
   });
 });
 

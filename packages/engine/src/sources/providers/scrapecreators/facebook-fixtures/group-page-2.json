@@ -1,0 +1,167 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 10352,
+    "credits_charged": 1,
+    "posts": [
+      {
+        "id": "2179387209316708",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "☕ Coffee drinkers, a quick question!\n\nWhere do you put your wet coffee filter after brewing, while it’s still dripping? And do you use paper or a reusable filter?\n\n#coffeetime \n#coffeeaddict \n#coffeeconnoisseur \n#CoffeeLovers \n#CoffeeQuestion #CoffeeRoutine\n#pourovercoffee",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2179387209316708/",
+        "author": {
+          "__typename": "User",
+          "name": "member-1",
+          "short_name": "member-2",
+          "id": "member-3"
+        },
+        "reactionCount": 0,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 0,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 1,
+        "videoViewCount": null,
+        "publishTime": 1793630991,
+        "creation_time": "2026-11-02T14:49:51.000Z",
+        "videoDetails": {},
+        "image": "https://scrubbed.invalid/media-url-expired.bin",
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTc5Mzg3MjA5MzE2NzA4XzIxNzk0NDUzOTI2NDQyMjM=",
+            "text": "Paper filter. \n\nI leave mine in the filter funnel. \nWith my machine there is a valve that is open only when the jug is present.\nOn holiday when I use a kettle and a funnel on a jug, I leave it on the jug (holding on whilst pouring)",
+            "publishTime": 1793634946,
+            "author": {
+              "id": "member-4",
+              "name": "member-5",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": "https://www.facebook.com/member-6"
+            }
+          }
+        ]
+      },
+      {
+        "id": "2179271282661634",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Any ideas on what's going on with my grinder? Have replaced the upper and lower burr. Thanks.",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2179271282661634/",
+        "permalink": "https://www.facebook.com/member-7/videos/28908588882141976/?idorvanity=856491544939621",
+        "author": {
+          "__typename": "User",
+          "name": "member-8",
+          "short_name": "member-9",
+          "id": "member-10"
+        },
+        "reactionCount": 1,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 1,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 20,
+        "videoViewCount": null,
+        "publishTime": 1793622968,
+        "creation_time": "2026-11-02T12:36:08.000Z",
+        "videoDetails": {
+          "sdUrl": "https://scrubbed.invalid/media-url-expired.bin",
+          "hdUrl": "https://scrubbed.invalid/media-url-expired.bin",
+          "thumbnailUrl": "https://scrubbed.invalid/media-url-expired.bin"
+        },
+        "image": "https://scrubbed.invalid/media-url-expired.bin",
+        "images": [
+          "https://scrubbed.invalid/media-url-expired.bin"
+        ],
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTc5MjcxMjgyNjYxNjM0XzIxNzkyOTc0MjkzMjU2ODY=",
+            "text": "Theres no beans in the hopper",
+            "publishTime": 1793624855,
+            "author": {
+              "id": "member-11",
+              "name": "member-12",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          },
+          {
+            "id": "Y29tbWVudDoyMTc5MjcxMjgyNjYxNjM0XzIxNzkyOTc1NDI2NTkwMDg=",
+            "text": "Installed the washer properly?",
+            "publishTime": 1793624858,
+            "author": {
+              "id": "member-13",
+              "name": "member-14",
+              "url": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "2178699689385460",
+        "shared_post_id": null,
+        "shared_post_url": null,
+        "is_paid_partnership": null,
+        "text": "Hey!\nI’ve got a Barista Pro, had it for a couple of months now with no issues and recently I’ve noticed anytime I remove the portafilter the basket comes loose, pops out about 4-5mm and I have to push it back in, is there something lose that needs fixing? \n\nThanks 🙏🏻",
+        "url": "https://www.facebook.com/groups/856491544939621/permalink/2178699689385460/",
+        "author": {
+          "__typename": "User",
+          "name": "member-15",
+          "short_name": "member-16",
+          "id": "member-17"
+        },
+        "reactionCount": 0,
+        "reaction_counts": {
+          "thankful": 0,
+          "like": 0,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        },
+        "commentCount": 1,
+        "videoViewCount": null,
+        "publishTime": 1793569496,
+        "creation_time": "2026-11-01T21:44:56.000Z",
+        "videoDetails": {},
+        "image": null,
+        "topComments": [
+          {
+            "id": "Y29tbWVudDoyMTc4Njk5Njg5Mzg1NDYwXzIxNzg3MzU4MDI3MTUxODI=",
+            "text": "There’s a piece of wire around the upper inner edge of the portafilter that acts as a spring to hold the basket in place. You can remove it and bend it slightly to put more tension on the basket.",
+            "publishTime": 1793573141,
+            "author": {
+              "id": "member-18",
+              "name": "member-19",
+              "gender": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "url": null
+            }
+          }
+        ]
+      }
+    ],
+    "cursor": "AQHTeddTz2IMs0jcPAK10L6FzpcGpmv_l-1PpCACLzbCxgFZXypsuB41i0aCX8jHZQU6uF7t-ythr6zvZvYCKP5CmQ:eyIwIjoxNzkzNzcxMjM3LCIxIjo3NjgyLCIzIjoyLCI0IjoxLCI1IjoyLCI2IjotMSwiNyI6LTEsIjgiOi0xfQ=="
+  }
+}

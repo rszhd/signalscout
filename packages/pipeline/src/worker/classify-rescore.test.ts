@@ -17,13 +17,13 @@ import {
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { matches, modelCalls, pollRuns, posts } from "../db/schema.js";
+import { filterDrops, matches, modelCalls, pollRuns, posts } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createClassifyStep } from "./classify.js";
 import type { StepContext } from "./steps.js";
 import { insertMonitor, silentLogger } from "./testing.js";
 
-function answer(level: number): Classification {
+function answer(level: number, productFit: "yes" | "no" = "yes"): Classification {
   return {
     reasons: ["Asks which tool to use", "Small team with the problem"],
     relevance: level,
@@ -31,16 +31,19 @@ function answer(level: number): Classification {
     icpFit: level,
     intent: level,
     urgency: level,
+    asks: "A tool for this",
+    nextStep: "Point them to the product",
+    productFit,
     intentType: "recommendation_request",
   };
 }
 
 /** A classifier that gives every post the same answer, and counts its calls. */
-function fixedClassifier(model: string, result: "fail" | number) {
+function fixedClassifier(model: string, result: "fail" | number, productFit: "yes" | "no" = "yes") {
   const classify = vi.fn(async (): Promise<ClassificationOutcome> => {
     const call = { provider: "openai" as const, model, latencyMs: 5, estimatedCostMicros: 100 };
     if (result === "fail") return { status: "failed", error: "the provider timed out", call };
-    const classification = answer(result);
+    const classification = answer(result, productFit);
     return {
       status: "scored",
       classification,
@@ -87,11 +90,15 @@ async function onePost(): Promise<string> {
   return row.id;
 }
 
-async function run(first: "fail" | number, second?: "fail" | number) {
+async function run(
+  first: "fail" | number,
+  second?: "fail" | number,
+  fit: { first?: "yes" | "no"; second?: "yes" | "no" } = {},
+) {
   const monitorId = await insertMonitor(database, { minScore: 50 });
   const postId = await onePost();
-  const cheap = fixedClassifier("cheap", first);
-  const strong = second === undefined ? undefined : fixedClassifier("strong", second);
+  const cheap = fixedClassifier("cheap", first, fit.first);
+  const strong = second === undefined ? undefined : fixedClassifier("strong", second, fit.second);
   const step = createClassifyStep({
     classifierFor: async () => cheap.classifier,
     ...(strong ? { rescorerFor: async () => strong.classifier } : {}),
@@ -106,7 +113,11 @@ async function run(first: "fail" | number, second?: "fail" | number) {
     .select({ purpose: modelCalls.purpose, model: modelCalls.model, outcome: modelCalls.outcome })
     .from(modelCalls)
     .where(eq(modelCalls.monitorId, monitorId));
-  return { match, calls, strong };
+  const drops = await db
+    .select({ stage: filterDrops.stage, reason: filterDrops.reason })
+    .from(filterDrops)
+    .where(eq(filterDrops.monitorId, monitorId));
+  return { match, calls, strong, drops };
 }
 
 describe("a second model for the posts the first one passes", () => {
@@ -147,6 +158,28 @@ describe("a second model for the posts the first one passes", () => {
     expect(match).toBeUndefined();
     expect(strong?.classify).not.toHaveBeenCalled();
     expect(calls).toEqual([{ purpose: "classification", model: "cheap", outcome: "scored" }]);
+  });
+
+  it("writes no match when the first model says the product cannot help, at any score", async () => {
+    const { match, strong, drops } = await run(90, 90, { first: "no" });
+
+    expect(match).toBeUndefined();
+    expect(strong?.classify).not.toHaveBeenCalled();
+    expect(drops).toEqual([{ stage: "no_fit", reason: "A tool for this" }]);
+  });
+
+  it("writes no match when the second model says the product cannot help", async () => {
+    const { match, drops } = await run(90, 90, { second: "no" });
+
+    expect(match).toBeUndefined();
+    expect(drops).toEqual([{ stage: "no_fit", reason: "A tool for this" }]);
+  });
+
+  it("leaves no drop when the product fits but the score is below the bar", async () => {
+    const { match, drops } = await run(10);
+
+    expect(match).toBeUndefined();
+    expect(drops).toEqual([]);
   });
 
   it("scores as before with no second model", async () => {

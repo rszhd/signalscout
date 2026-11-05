@@ -18,6 +18,7 @@ export {
   leadScore,
   maximumReasons,
   minimumReasons,
+  productFitAnswers,
   relevanceFloor,
   relevanceGate,
   restatesTheScores,
@@ -58,6 +59,8 @@ export {
   maximumDocumentCharacters,
   type ProjectDescriber,
   type ProjectDraft,
+  pageKinds,
+  projectDraftSchema,
 } from "./ai/describe.js";
 export { createDrafter, type Drafter, type DraftOutcome, type DraftRequest } from "./ai/draft.js";
 export {

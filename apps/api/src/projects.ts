@@ -263,6 +263,13 @@ export async function registerProjectRoutes(
         return reply.code(502).send({ message: result.error });
       }
 
+      if (result.object.page === "refusal") {
+        return reply.code(422).send({
+          message:
+            "That page did not let us read it: it shows a block or error page, not the business. Paste the text instead.",
+        });
+      }
+
       return {
         ...result.object,
         charactersRead: Math.min(document.text.length, maximumDocumentCharacters),

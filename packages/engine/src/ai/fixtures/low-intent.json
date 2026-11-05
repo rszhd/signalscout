@@ -2,23 +2,27 @@
   "slug": "low-intent",
   "provider": "openai",
   "model": "gpt-5.6-terra",
-  "capturedAt": "2026-09-05T18:54:42.088Z",
+  "capturedAt": "2026-11-05T07:02:00.666Z",
   "object": {
+    "asks": "No explicit ask; the author is praising Playwright.",
+    "nextStep": "",
+    "productFit": "no",
     "reasons": [
-      "The post mentions Playwright, a browser testing tool.",
-      "The author only says “Playwright is awesome” and does not describe broken tests, UI changes, manual release testing, or a request for alternatives."
+      "The post only says “Playwright is awesome.”",
+      "It does not describe broken end-to-end tests, UI-change maintenance, or manual release testing.",
+      "It does not ask for a recommendation, alternative, or help."
     ],
-    "relevance": 45,
+    "relevance": 35,
     "problemFit": 0,
-    "icpFit": 5,
+    "icpFit": 20,
     "intent": 0,
     "urgency": 0,
     "intentType": "none"
   },
   "usage": {
-    "inputTokens": 670,
-    "outputTokens": 118
+    "inputTokens": 1195,
+    "outputTokens": 108
   },
-  "latencyMs": 2381,
-  "estimatedCostMicros": 2756
+  "latencyMs": 4986,
+  "estimatedCostMicros": 3686
 }

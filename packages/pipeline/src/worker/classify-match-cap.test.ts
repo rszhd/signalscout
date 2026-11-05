@@ -29,6 +29,9 @@ const strong: Classification = {
   icpFit: 95,
   intent: 95,
   urgency: 95,
+  asks: "A tool for this",
+  nextStep: "Point them to the product",
+  productFit: "yes",
   intentType: "recommendation_request",
 };
 

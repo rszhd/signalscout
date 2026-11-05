@@ -2,24 +2,28 @@
   "slug": "strong-intent",
   "provider": "openai",
   "model": "gpt-5.6-terra",
-  "capturedAt": "2026-09-05T18:54:47.227Z",
+  "capturedAt": "2026-11-05T07:02:09.916Z",
   "object": {
+    "asks": "They want an easier alternative to their hard-to-maintain Playwright test suite.",
+    "nextStep": "Recommend the runner as a lower-maintenance way to keep browser-flow tests working through UI changes.",
+    "productFit": "yes",
     "reasons": [
-      "Says their Playwright test suite is “becoming impossible to maintain.”",
-      "Asks whether there is “something easier,” indicating they are seeking an alternative.",
-      "Posts in the QualityAssurance subreddit, suggesting they are involved with software testing."
+      "They say their Playwright suite is becoming “impossible to maintain.”",
+      "They explicitly ask whether there is “something easier.”",
+      "The post is in the QualityAssurance subreddit.",
+      "They are currently using Playwright for automated browser testing."
     ],
-    "relevance": 94,
-    "problemFit": 84,
-    "icpFit": 38,
-    "intent": 91,
-    "urgency": 83,
+    "relevance": 98,
+    "problemFit": 94,
+    "icpFit": 52,
+    "intent": 97,
+    "urgency": 91,
     "intentType": "alternative_search"
   },
   "usage": {
-    "inputTokens": 681,
-    "outputTokens": 171
+    "inputTokens": 1206,
+    "outputTokens": 210
   },
-  "latencyMs": 3070,
-  "estimatedCostMicros": 3414
+  "latencyMs": 4982,
+  "estimatedCostMicros": 4932
 }

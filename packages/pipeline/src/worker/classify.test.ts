@@ -52,6 +52,9 @@ const strongAnswer = JSON.stringify({
   icpFit: 91,
   intent: 88,
   urgency: 82,
+  asks: "A tool for this",
+  nextStep: "Point them to the product",
+  productFit: "yes",
   intentType: "recommendation_request",
 });
 
@@ -62,6 +65,9 @@ const weakAnswer = JSON.stringify({
   icpFit: 50,
   intent: 3,
   urgency: 0,
+  asks: "A tool for this",
+  nextStep: "Point them to the product",
+  productFit: "yes",
   intentType: "none",
 });
 

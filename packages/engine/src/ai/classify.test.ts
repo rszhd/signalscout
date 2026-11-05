@@ -47,6 +47,9 @@ const goodAnswer = JSON.stringify({
   icpFit: 91,
   intent: 88,
   urgency: 82,
+  asks: "A testing tool that keeps working when the UI changes",
+  nextStep: "Point them to the product",
+  productFit: "yes",
   intentType: "recommendation_request",
 });
 

@@ -150,6 +150,8 @@ export const filterDrops = pgTable(
     stage: text("stage").$type<FilterStage>().notNull(),
     /** Cosine similarity, 0 to 1. Null at the keyword stage: nothing was measured. */
     similarity: real("similarity"),
+    /** What the author asked, for a `no_fit` drop. US-523. Null at every other stage. */
+    reason: text("reason"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [

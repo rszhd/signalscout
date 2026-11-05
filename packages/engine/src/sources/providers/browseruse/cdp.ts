@@ -19,6 +19,9 @@ const loadTimeoutMs = 45_000;
 /** A bot check passes within seconds in a real browser, or not at all. */
 const challengeWaitMs = 25_000;
 const challengePollMs = 2_500;
+/** How long a page may stay half-parsed before it is read anyway. */
+const parseWaitMs = 15_000;
+const parsePollMs = 500;
 
 /** A page, a page still behind a check, or no connection through the proxy. */
 export type BrowserAnswer =
@@ -83,10 +86,10 @@ export class CdpTab {
       return { ok: false, reason: navigated.errorText, connection: true };
     }
     await loaded;
-    let body = await this.html();
+    let body = await this.parsedHtml();
     for (let waited = 0; refusalIn(body) && waited < challengeWaitMs; waited += challengePollMs) {
       await this.runtime.sleep(challengePollMs);
-      body = await this.html();
+      body = await this.parsedHtml();
     }
     // Chromium's own page for a connection that failed, the proxy's included.
     if (/<body[^>]*class="neterror"/.test(body.slice(0, 3000))) {
@@ -101,6 +104,36 @@ export class CdpTab {
       this.socket.close();
     } catch {
       // Already closed.
+    }
+  }
+
+  /**
+   * The document's HTML once the browser has parsed all of it.
+   *
+   * A passed check loads the real page, and the load event above was the
+   * check's: read at once, the new page can still be arriving. Etsy's came
+   * back cut off inside its <head> (BUG-526). A page still loading after
+   * `parseWaitMs` is read as it stands.
+   */
+  private async parsedHtml(): Promise<string> {
+    for (let waited = 0; waited < parseWaitMs; waited += parsePollMs) {
+      const state = await this.readyState();
+      if (state !== "loading") break;
+      await this.runtime.sleep(parsePollMs);
+    }
+    return this.html();
+  }
+
+  /** `document.readyState`, or null when there is no document to ask yet. */
+  private async readyState(): Promise<string | null> {
+    try {
+      const answer = (await this.send("Runtime.evaluate", {
+        expression: "document.readyState",
+        returnByValue: true,
+      })) as { result?: { value?: unknown } };
+      return typeof answer.result?.value === "string" ? answer.result.value : null;
+    } catch {
+      return null;
     }
   }
 

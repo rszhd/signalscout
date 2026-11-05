@@ -117,6 +117,8 @@ class FakeChromium {
     readonly url: string,
     private readonly pages: string[] = [],
     private readonly navigationError?: string,
+    /** `document.readyState` for each time it is asked, then "complete". */
+    private readonly states: string[] = [],
   ) {
     FakeChromium.current = this;
     setTimeout(() => this.emit("open", {}), 0);
@@ -145,6 +147,9 @@ class FakeChromium {
       this.event("Page.javascriptDialogOpening", { message: "Welcome!" });
       return this.event("Page.domContentEventFired", {});
     }
+    if (method === "Runtime.evaluate" && params.expression === "document.readyState") {
+      return answer({ result: { value: this.states.shift() ?? "complete" } });
+    }
     if (method === "Runtime.evaluate") {
       const page = this.pages.shift();
       return answer(page === undefined ? {} : { result: { value: page } });
@@ -171,16 +176,39 @@ const challenge = "<html><head><title>Just a moment...</title></head><body></bod
 describe("a tab of the cloud browser", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  function chromium(pages: string[], navigationError?: string) {
+  function chromium(pages: string[], navigationError?: string, states: string[] = []) {
     vi.stubGlobal(
       "WebSocket",
       class extends FakeChromium {
         constructor(url: string) {
-          super(url, pages, navigationError);
+          super(url, pages, navigationError, states);
         }
       },
     );
   }
+
+  it("reads a page only once the browser has parsed all of it (BUG-526)", async () => {
+    // After the check passed, Etsy's page was still arriving, cut off in <head>.
+    chromium([forumPage], undefined, ["loading", "loading", "interactive"]);
+    const tab = await CdpTab.open("wss://cdp.example/b1", runtimeWith());
+
+    expect(await tab.read("https://shop.example/")).toEqual({ ok: true, body: forumPage });
+    const asked = FakeChromium.current.sent.filter(
+      (call) => call.params.expression === "document.readyState",
+    );
+    expect(asked).toHaveLength(3);
+  });
+
+  it("reads a page that never finishes parsing, after the wait", async () => {
+    chromium(
+      [forumPage],
+      undefined,
+      Array.from({ length: 100 }, () => "loading"),
+    );
+    const tab = await CdpTab.open("wss://cdp.example/b1", runtimeWith());
+
+    expect(await tab.read("https://shop.example/")).toEqual({ ok: true, body: forumPage });
+  });
 
   it("reads a page once its bot check has passed, refusing images and dismissing alerts", async () => {
     chromium([challenge, challenge, forumPage]);

@@ -20,6 +20,12 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.26.2 — 2026-11-05
+
+**Fixed: a browser read waits for the page to be parsed** (BUG-526). After a
+bot check passed, the read could catch the real page still arriving, with no
+body yet. Nothing to do to take it.
+
 ## 0.26.1 — 2026-11-05
 
 **Changed: the describe call reads up to 60,000 characters of a document**,

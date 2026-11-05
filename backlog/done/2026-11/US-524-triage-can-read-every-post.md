@@ -6,7 +6,7 @@ priority: p2
 created: 2026-11-05T16:06+08:00
 parent:
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context

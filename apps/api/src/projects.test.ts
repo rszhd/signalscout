@@ -63,6 +63,7 @@ describe("the project routes", () => {
   const draft = {
     status: "ok" as const,
     object: {
+      page: "site" as const,
       name: "Acme QA",
       product: "A test runner for small teams",
       idealCustomer: "Small SaaS teams",
@@ -423,6 +424,7 @@ describe("drafting a project from a document", () => {
   const good = {
     status: "ok" as const,
     object: {
+      page: "site" as const,
       name: "Acme QA",
       product: "A test runner",
       idealCustomer: "Small SaaS teams",
@@ -485,6 +487,16 @@ describe("drafting a project from a document", () => {
       // guessed at before they save it.
       missing: ["how it is priced"],
     });
+  });
+
+  it("refuses a page that refused the reader, rather than draft from it", async () => {
+    const response = await describing(
+      { ...good, object: { ...good.object, page: "refusal" } },
+      { text: "Unsupported client. Please update your browser.", contentType: "text/plain" },
+    );
+
+    expect(response.statusCode).toBe(422);
+    expect(response.json().message).toContain("block or error page");
   });
 
   it("records the call, because no monitor and no budget will", async () => {

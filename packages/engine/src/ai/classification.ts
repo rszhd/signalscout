@@ -122,7 +122,22 @@ const reason = z.preprocess(cutToLimit, z.string().trim().min(shortestReason).ma
  * it; the other order lets it pick a number and then justify it. The fields
  * after it are PLAN.md's list, unchanged.
  */
+/** The classifier's answer to whether this post is a match at all. US-523. */
+export const productFitAnswers = ["yes", "no"] as const;
+
 export const classificationSchema = z.object({
+  asks: z
+    .string()
+    .min(1)
+    .max(1000)
+    .describe("What the author is asking for or needs, in one short sentence."),
+  nextStep: z
+    .string()
+    .max(1000)
+    .describe("The product's place in a helpful reply, in one short sentence. Empty for no."),
+  productFit: z
+    .enum(productFitAnswers)
+    .describe("Can the seller write a helpful reply where this product is the natural next step?"),
   reasons: z
     .array(reason)
     .min(minimumReasons)

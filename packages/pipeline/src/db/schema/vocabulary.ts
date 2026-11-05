@@ -70,6 +70,8 @@ export const minimumPollIntervalSeconds = 60;
 /**
  * `old_thread` is a partial post whose own page showed it started before the
  * poll's window: a feed lists an old thread again when someone replies. US-476.
+ *
+ * `no_fit` is a post the classifier said this product cannot help. US-523.
  */
 export const filterStages = [
   "keyword",
@@ -78,6 +80,7 @@ export const filterStages = [
   "ceiling",
   "match_cap",
   "old_thread",
+  "no_fit",
 ] as const;
 
 export type FilterStage = (typeof filterStages)[number];

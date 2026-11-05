@@ -20,6 +20,29 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.26.0 — 2026-11-05
+
+**Migration 0078.** It adds the `no_fit` stage to `filter_drops` and a
+nullable `reason` column beside it. Nothing else in a database changes.
+
+**Changed: a match needs a yes from the classifier** (US-523). The
+classification has three new required fields: `asks`, `nextStep` and
+`productFit` (`"yes"` or `"no"`). A `no` writes no match at any score, skips
+the second model, and leaves a `no_fit` filter drop whose `reason` is what
+the author asked. The score still decides among the yeses and against
+`min_score`. Code that builds a `Classification` by hand needs the three
+fields; `productFitAnswers` lists the two answers.
+
+**Changed: the project draft says whether the page refused the reader.**
+`ProjectDraft` has a required `page` field (`"site"` or `"refusal"`), and
+`pageKinds` lists both. The API refuses to draft from a refusal page.
+
+**Added: `startWorker({ triageOnly: true })`** (US-524). It skips the keyword
+and embedding stages and lets triage read every post. Unset, nothing changes.
+
+**Fixed: a browser read waits out DataDome's check** (BUG-525). The check's
+page was taken for the site.
+
 ## 0.25.0 — 2026-11-04
 
 **Migration 0077.** It adds `facebook` to the six source constraints

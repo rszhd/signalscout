@@ -2,24 +2,27 @@
   "slug": "mild-problem-signal",
   "provider": "openai",
   "model": "gpt-5.6-terra",
-  "capturedAt": "2026-09-05T18:54:44.156Z",
+  "capturedAt": "2026-11-05T07:02:04.934Z",
   "object": {
+    "asks": "They need end-to-end tests that do not break whenever the UI changes.",
+    "nextStep": "Explain how recording resilient browser flows can reduce Playwright maintenance after UI changes.",
+    "productFit": "yes",
     "reasons": [
-      "Says their Playwright tests break whenever the UI changes.",
-      "Describes the exact instability that makes end-to-end tests difficult to maintain.",
-      "Posts in the QualityAssurance community, suggesting involvement with software testing."
+      "They say their Playwright tests break whenever the UI changes.",
+      "The post describes fragile end-to-end browser tests rather than a one-off bug.",
+      "They posted in the QualityAssurance subreddit."
     ],
     "relevance": 98,
-    "problemFit": 98,
+    "problemFit": 100,
     "icpFit": 45,
-    "intent": 38,
-    "urgency": 80,
+    "intent": 48,
+    "urgency": 82,
     "intentType": "problem"
   },
   "usage": {
-    "inputTokens": 678,
-    "outputTokens": 85
+    "inputTokens": 1203,
+    "outputTokens": 196
   },
-  "latencyMs": 2068,
-  "estimatedCostMicros": 2376
+  "latencyMs": 4267,
+  "estimatedCostMicros": 4758
 }

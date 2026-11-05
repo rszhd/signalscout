@@ -19,6 +19,8 @@ export interface FilterDrop {
   readonly stage: FilterStage;
   /** Cosine similarity. Null at the keyword stage: nothing was embedded. */
   readonly similarity?: number | null;
+  /** What the author asked, for a `no_fit` drop. Null at every other stage. */
+  readonly reason?: string | null;
 }
 
 /**
@@ -44,6 +46,7 @@ export async function recordFilterDrops(
         postId: drop.postId,
         stage: drop.stage,
         similarity: drop.similarity ?? null,
+        reason: drop.reason ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -51,6 +54,7 @@ export async function recordFilterDrops(
       set: {
         stage: sql`excluded.stage`,
         similarity: sql`excluded.similarity`,
+        reason: sql`excluded.reason`,
         createdAt: sql`now()`,
       },
     });
@@ -103,8 +107,11 @@ export async function filterDropCounts(
   for (const row of rows) {
     // Not filters a person tunes: the classify step's match cap (US-443)
     // writes its drops here only so a screen counts the post as seen, and an
-    // old thread is one a feed listed again when someone replied (US-476).
-    if (row.stage === "match_cap" || row.stage === "old_thread") continue;
+    // old thread is one a feed listed again when someone replied (US-476), and
+    // no fit is the classifier's own answer on a post it read (US-523).
+    if (row.stage === "match_cap" || row.stage === "old_thread" || row.stage === "no_fit") {
+      continue;
+    }
     const entry = counts.get(row.monitorId) ?? { ...noFilterDrops };
     entry[row.stage] = Number(row.dropped);
     counts.set(row.monitorId, entry);

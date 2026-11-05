@@ -681,7 +681,11 @@ export function createClassifyStep({
        * classification row is written below and nothing would ever ask again.
        */
       let final = outcome;
-      if (rescorer && outcome.score >= monitor.minScore) {
+      if (
+        rescorer &&
+        outcome.classification.productFit === "yes" &&
+        outcome.score >= monitor.minScore
+      ) {
         const second = await rescorer.classify(request);
         // The reservation above reads this: with a second model, a post that
         // passes costs both calls.
@@ -705,7 +709,20 @@ export function createClassifyStep({
         }
       }
 
-      if (final.score < monitor.minScore) {
+      /**
+       * The model says this product cannot help this author, so there is no
+       * match at any score. US-523. The row keeps what the author asked: a post
+       * dropped here leaves nothing in an inbox, and it is the only way to read
+       * whether the rule is too strict.
+       */
+      const noFit = final.classification.productFit === "no";
+      if (noFit) {
+        await recordFilterDrops(db, monitorId, [
+          { postId: post.id, stage: "no_fit", reason: final.classification.asks },
+        ]);
+      }
+
+      if (noFit || final.score < monitor.minScore) {
         if (key) {
           belowHere.set(key, [
             ...(belowHere.get(key) ?? []),

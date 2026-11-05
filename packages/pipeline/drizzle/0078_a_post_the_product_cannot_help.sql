@@ -1,0 +1,3 @@
+ALTER TABLE "filter_drops" DROP CONSTRAINT "filter_drops_stage_known";--> statement-breakpoint
+ALTER TABLE "filter_drops" ADD COLUMN "reason" text;--> statement-breakpoint
+ALTER TABLE "filter_drops" ADD CONSTRAINT "filter_drops_stage_known" CHECK (stage IN ('keyword', 'embedding', 'triage', 'ceiling', 'match_cap', 'old_thread', 'no_fit'));

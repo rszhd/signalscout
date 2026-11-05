@@ -2,25 +2,28 @@
   "slug": "very-strong-intent",
   "provider": "openai",
   "model": "gpt-5.6-terra",
-  "capturedAt": "2026-09-05T18:54:51.259Z",
+  "capturedAt": "2026-11-05T07:02:12.666Z",
   "object": {
+    "asks": "Recommendations for automating signup and checkout testing before releases.",
+    "nextStep": "Suggest the test runner as a way to record their critical browser flows and keep them reliable as the UI changes.",
+    "productFit": "yes",
     "reasons": [
-      "The author says they are a \"four-person SaaS,\" matching a small software team.",
-      "They still \"manually test signup and checkout every release,\" which are critical end-to-end browser flows.",
-      "They ask, \"What tools are other small teams using?\"",
-      "The testing happens \"every release,\" indicating an ongoing current workflow."
+      "They describe themselves as a four-person SaaS team.",
+      "They manually test signup and checkout on every release.",
+      "They ask what tools other small teams are using.",
+      "Signup and checkout are critical end-to-end browser flows."
     ],
-    "relevance": 95,
-    "problemFit": 88,
-    "icpFit": 98,
+    "relevance": 98,
+    "problemFit": 91,
+    "icpFit": 97,
     "intent": 96,
-    "urgency": 90,
+    "urgency": 88,
     "intentType": "recommendation_request"
   },
   "usage": {
-    "inputTokens": 692,
-    "outputTokens": 112
+    "inputTokens": 1217,
+    "outputTokens": 131
   },
-  "latencyMs": 4031,
-  "estimatedCostMicros": 2728
+  "latencyMs": 2749,
+  "estimatedCostMicros": 4006
 }

@@ -54,6 +54,12 @@ export interface FilterOptions {
    * and on a comment this is the only paid stage in front of the classifier.
    */
   readonly triagerFor?: (userId: string) => Promise<Triager | undefined>;
+  /**
+   * Skip the keyword and embedding stages, and let triage read every post.
+   * US-524. For a deployment whose triage model costs less than the leads the
+   * two free stages drop. Unset, all three stages run, as before.
+   */
+  readonly triageOnly?: boolean;
 }
 
 /** A post as both stages read it, which is a row minus what neither needs. */
@@ -575,6 +581,7 @@ async function embeddingStage(
 export function createFilterStep({
   embedderFor,
   triagerFor,
+  triageOnly = false,
 }: FilterOptions = {}): Step<FilterPayload> {
   return async function filter(
     { monitorId, postIds, walkId, pollRunId },
@@ -638,6 +645,16 @@ export function createFilterStep({
     }
 
     const candidates = await readCandidates(db, ids);
+
+    if (triageOnly) {
+      logger.info(
+        { monitorId, posts: candidates.length },
+        "keyword and embedding stages are off: triage reads every post",
+      );
+      await pass(run, triager, candidates, []);
+      return;
+    }
+
     const { kept, drops } = keywordStage(monitor, candidates);
 
     if (!embedder || kept.length === 0) {

@@ -37,6 +37,9 @@ const strongAnswer = JSON.stringify({
   icpFit: 91,
   intent: 88,
   urgency: 82,
+  asks: "A testing tool for a small team",
+  nextStep: "Point them to the product",
+  productFit: "yes",
   intentType: "recommendation_request",
 });
 

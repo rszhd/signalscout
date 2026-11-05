@@ -32,6 +32,9 @@ const planExample = {
   icpFit: 91,
   intent: 88,
   urgency: 82,
+  asks: "A testing tool that keeps working when the UI changes",
+  nextStep: "Point them to the product",
+  productFit: "yes",
   intentType: "recommendation_request",
 };
 
@@ -80,6 +83,14 @@ describe("the classification schema", () => {
 
   it("rejects an intent type outside the list PLAN.md gives", () => {
     expect(classificationSchema.safeParse(withScores({ intentType: "spam" })).success).toBe(false);
+  });
+
+  it("refuses an answer that does not say whether the product fits", () => {
+    const { productFit: _productFit, ...without } = planExample;
+    expect(classificationSchema.safeParse(without).success).toBe(false);
+    expect(classificationSchema.safeParse({ ...planExample, productFit: "maybe" }).success).toBe(
+      false,
+    );
   });
 
   it("accepts every intent type PLAN.md gives", () => {
@@ -318,6 +329,9 @@ describe("the lead score", () => {
           icpFit: 50,
           intent: 3,
           urgency: 0,
+          asks: "A testing tool that keeps working when the UI changes",
+          nextStep: "Point them to the product",
+          productFit: "yes",
           intentType: "none",
         }),
       ),

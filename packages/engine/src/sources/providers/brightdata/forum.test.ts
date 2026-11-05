@@ -694,6 +694,18 @@ describe("a challenge page is a refusal, not a page", () => {
         `<html><head><title>Challenge - Shop</title><script>${"x".repeat(6000)}</script></head><body><noscript>Enable JavaScript and cookies to continue</noscript></body></html>`,
       ),
     ).toBe("the site answered with a challenge page");
+    // DataDome's check, as Etsy sent it to a browser (BUG-525), shortened.
+    expect(
+      refusalIn(
+        `<html lang="en"><head><title>etsy.com</title></head><body style="margin:0"><script data-cfasync="false">var dd={'rt':'i'}</script><script data-cfasync="false" src="https://ct.captcha-delivery.com/i.js"></script><iframe src="https://geo.captcha-delivery.com/interstitial/?initialCid=x" title="DataDome Device Check" width="100%" height="100%"></iframe></body></html>`,
+      ),
+    ).toBe("the site answered with a challenge page");
+    // A real page that loads DataDome's script is still the page.
+    expect(
+      refusalIn(
+        `<html><head><title>HappyBeeInnovations - Etsy</title><script src="https://js.datadome.co/tags.js"></script></head><body>Handmade bee gear</body></html>`,
+      ),
+    ).toBeNull();
     // An empty answer, or a browser's page with nothing in it (BUG-481).
     expect(refusalIn("")).toBe("the site answered with an empty page");
     expect(refusalIn("  \n")).toBe("the site answered with an empty page");

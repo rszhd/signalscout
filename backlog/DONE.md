@@ -2,10 +2,11 @@
 
 # Done
 
-278 finished.
+279 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-526 | [A browser read waits for the page to be parsed](done/2026-11/BUG-526-a-browser-read-waits-for-the-page-to-be-parsed.md) | bug | shipped | 2026-11 |
 | BUG-525 | [A browser read waits out DataDome's check](done/2026-11/BUG-525-a-browser-read-waits-out-datadome-s-check.md) | bug | shipped | 2026-11 |
 | BUG-495 | [Reconcile warns for every post of a platform with no connector](done/2026-11/BUG-495-reconcile-warns-for-every-post-of-a-platform-with-no-connector.md) | bug | shipped | 2026-11 |
 | BUG-492 | [A release carries high and critical dependency holes](done/2026-11/BUG-492-a-release-carries-high-and-critical-dependency-holes.md) | bug | shipped | 2026-11 |

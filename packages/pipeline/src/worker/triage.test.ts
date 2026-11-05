@@ -25,16 +25,18 @@ import {
   type TriageVerdict,
 } from "@signalscout/engine";
 import { and, eq } from "drizzle-orm";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { monitorSpend } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { filterDrops, modelCalls, posts } from "../db/schema.js";
 import { filterDropCounts } from "../filter/drops.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { createFilterStep } from "./filter.js";
 import type { ClassifyPayload } from "./queues.js";
 import { filterQueue } from "./queues.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
-import { fakeRegistry, fastRetries, insertMonitor, until } from "./testing.js";
+import type { StepContext } from "./steps.js";
+import { fakeRegistry, fastRetries, insertMonitor, silentLogger, until } from "./testing.js";
 
 /** "Playwright is awesome" and "Our Playwright tests break…": both pass the keywords. */
 const weakPost = fakePosts[0] as (typeof fakePosts)[number];
@@ -331,5 +333,42 @@ describe("what triage is never asked about", () => {
 
     expect(payload.postIds).toEqual([postId]);
     expect(asked).toEqual([]);
+  });
+});
+
+describe("a deployment that skips the keyword and embedding stages", () => {
+  async function triageOnly(monitorId: string, postIds: string[]) {
+    const send = vi.fn(async (_queue: string, _payload: Record<string, unknown>) => "job-1");
+    const context = { db, boss: { send } as unknown as StepContext["boss"], logger: silentLogger };
+    await createFilterStep({ triagerFor: async () => triager, triageOnly: true })(
+      { monitorId, postIds },
+      context,
+    );
+    return send.mock.calls.map(([, payload]) => payload);
+  }
+
+  it("lets triage read a post the keyword stage would drop", async () => {
+    const monitorId = await insertTriageMonitor();
+    const unrelated = await insertPost(unrelatedPost, "t3_only_unrelated");
+
+    const [payload] = await triageOnly(monitorId, [unrelated]);
+
+    expect(asked).toEqual([unrelatedPost.text]);
+    expect(payload?.postIds).toEqual([unrelated]);
+    expect(await db.select().from(filterDrops).where(eq(filterDrops.monitorId, monitorId))).toEqual(
+      [],
+    );
+  });
+
+  it("still drops what triage refuses", async () => {
+    const monitorId = await insertTriageMonitor();
+    const unrelated = await insertPost(unrelatedPost, "t3_only_refused");
+    answer = () => "no";
+
+    const [payload] = await triageOnly(monitorId, [unrelated]);
+
+    expect(payload?.postIds).toEqual([]);
+    const drops = await db.select().from(filterDrops).where(eq(filterDrops.monitorId, monitorId));
+    expect(drops.map((drop) => drop.stage)).toEqual(["triage"]);
   });
 });

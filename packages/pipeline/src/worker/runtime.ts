@@ -223,6 +223,11 @@ export interface StartWorkerOptions {
    */
   classifyConcurrency?: number;
   /**
+   * Skip the keyword and embedding stages, so triage reads every post. US-524.
+   * Unset, all three stages run, as before.
+   */
+  triageOnly?: boolean;
+  /**
    * A second model that reads again every post the classifier passes, for
    * every owner on the instance. US-441. The match takes its scores. Unset,
    * the classifier's score stands, as before.
@@ -456,6 +461,7 @@ export async function startWorker({
   firstPollWindowDays,
   pollPagesPerInput,
   classifyConcurrency,
+  triageOnly,
   rescorer,
   rescorePolls,
   matchesPerCollection,
@@ -653,6 +659,7 @@ export async function startWorker({
       createFilterStep({
         embedderFor: async (userId) => (await modelsFor(userId)).embedder,
         triagerFor: async (userId) => (await modelsFor(userId)).triager,
+        ...(triageOnly ? { triageOnly } : {}),
       }),
     replies:
       steps.replies ??

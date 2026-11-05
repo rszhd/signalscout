@@ -61,7 +61,11 @@ export function challengeIn(body: string): boolean {
     /^(Just a moment|Checking your browser|Attention Required|One moment, please)/i.test(
       title.trim(),
     ) ||
-    /POW_CHALLENGE|cf-chl-/.test(head)
+    /POW_CHALLENGE|cf-chl-/.test(head) ||
+    // DataDome's check, a short page whose frame comes from captcha-delivery.com.
+    // Etsy answered a browser with it on 2026-11-05, and it passed by itself
+    // within 30 seconds. BUG-525.
+    /<iframe[^>]+captcha-delivery\.com\/(?:interstitial|captcha)/i.test(head)
   );
 }
 

@@ -38,15 +38,17 @@ import { createModel } from "./provider.js";
 /**
  * The most document text the model is shown.
  *
- * A landing page is a few thousand characters and a README rarely more. The
- * cap is money rather than capability: a 400-page PDF is a large bill for four
- * sentences, and the answers this asks for are in the first pages of anything
- * written to explain a product.
+ * A landing page is a few thousand characters and a README rarely more, but a
+ * caller may send a page's cleaned HTML, which keeps its layout and runs two
+ * or three times longer: a marketplace shop page was about 20,000 characters.
+ * The cap is money rather than capability: a 400-page PDF is a large bill for
+ * four sentences, and the answers this asks for are in the first pages of
+ * anything written to explain a product.
  *
  * Cut rather than refused, because a long document is still a good document.
  * The caller says how much was read so the screen can too.
  */
-export const maximumDocumentCharacters = 24_000;
+export const maximumDocumentCharacters = 60_000;
 
 const signalIds = signals;
 

@@ -125,6 +125,13 @@ export interface CollectOptions {
    * still reads each channel. Unset, every poll reads each channel, as before.
    */
   readonly combineChannelsAfterFirstPoll?: boolean | undefined;
+  /**
+   * The same, on a monitor's first poll. US-536. The first poll reads further
+   * back, so a busy channel can fill the pages a quiet one would have had;
+   * the caller takes that for the saving. Unset, the first poll reads each
+   * channel.
+   */
+  readonly combineChannelsOnFirstPoll?: boolean | undefined;
 }
 
 /** The longest window a first poll may be given. */
@@ -1009,6 +1016,7 @@ export function createCollectStep({
   firstPollWindowDays,
   pollPagesPerInput,
   combineChannelsAfterFirstPoll = false,
+  combineChannelsOnFirstPoll = false,
 }: CollectOptions): Step<PollPayload> {
   // Refused at start-up, with the connectors' own rule, rather than on the
   // first monitor that meets it.
@@ -1342,7 +1350,9 @@ export function createCollectStep({
               countFor(firstPoll ? firstPages : pollPagesPerInput, source.platform.id),
               queries.length + unitChannels.length,
             ),
-            ...(combineChannelsAfterFirstPoll && !firstPoll ? { combineChannels: true } : {}),
+            ...((firstPoll ? combineChannelsOnFirstPoll : combineChannelsAfterFirstPoll)
+              ? { combineChannels: true }
+              : {}),
           },
           /**
            * One platform's failure, kept to itself. BUG-016.

@@ -1087,6 +1087,7 @@ describe("the poll step", () => {
     async function callsFor(
       monitor: Parameters<typeof insertMonitor>[1],
       combineChannelsAfterFirstPoll?: boolean,
+      combineChannelsOnFirstPoll?: boolean,
     ): Promise<readonly SearchRequest[]> {
       const monitorId = await insertMonitor(database, monitor);
       const registry = fakeRegistry();
@@ -1096,10 +1097,25 @@ describe("the poll step", () => {
         registry,
         credentialsFor: credentials,
         ...(combineChannelsAfterFirstPoll === undefined ? {} : { combineChannelsAfterFirstPoll }),
+        ...(combineChannelsOnFirstPoll === undefined ? {} : { combineChannelsOnFirstPoll }),
       })({ monitorId }, contextFor(db, stubBoss()));
 
       return source.calls;
     }
+
+    it("asks on the first poll when the application asks for that too", async () => {
+      const calls = await callsFor({}, false, true);
+
+      expect(calls.length).toBeGreaterThan(0);
+      expect(calls.every((call) => call.combineChannels === true)).toBe(true);
+    });
+
+    it("keeps the first poll's choice to the first poll", async () => {
+      const calls = await callsFor(later, false, true);
+
+      expect(calls.length).toBeGreaterThan(0);
+      expect(calls.every((call) => call.combineChannels === undefined)).toBe(true);
+    });
 
     it("asks the connector to combine on a later poll", async () => {
       const calls = await callsFor(later, true);

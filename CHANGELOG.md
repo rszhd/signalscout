@@ -20,7 +20,7 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
-## Unreleased
+## 0.26.5 — 2026-11-06
 
 **Added: a first poll may combine its channels too** (US-536).
 `combineChannelsOnFirstPoll` on the collect step and the worker runtime sends

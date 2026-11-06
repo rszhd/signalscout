@@ -22,15 +22,17 @@ import { createEmbedder, createLogger, type EmbeddingConfig, fakePosts } from "@
 import { APICallError } from "ai";
 import { MockEmbeddingModelV4 } from "ai/test";
 import { and, eq } from "drizzle-orm";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { monitorSpend } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { embeddingDimensions, filterDrops, modelCalls, monitors, posts } from "../db/schema.js";
 import { filterDropCounts } from "../filter/drops.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { createFilterStep } from "./filter.js";
 import type { ClassifyPayload } from "./queues.js";
 import { filterQueue } from "./queues.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
+import type { StepContext } from "./steps.js";
 import { fakeRegistry, fastRetries, insertMonitor, silentLogger, until } from "./testing.js";
 
 /**
@@ -247,6 +249,44 @@ describe("the keyword stage", () => {
 
     const embedded = batches.flat();
     expect(embedded).not.toContain(sourdoughPost.text);
+  }, 30_000);
+});
+
+describe("a deployment that skips only the keyword stage (US-539)", () => {
+  /** One filter job run directly, with the same embedder and no triager. */
+  async function withoutKeywords(monitorId: string, postIds: string[]) {
+    const send = vi.fn(async (_queue: string, _payload: Record<string, unknown>) => "job-1");
+    const context = { db, boss: { send } as unknown as StepContext["boss"], logger: silentLogger };
+    await createFilterStep({
+      embedderFor: async () => createEmbedder({ config: embeddingConfig, model }),
+      skipKeywordStage: true,
+    })({ monitorId, postIds }, context);
+    return send.mock.calls.map(([, payload]) => payload as unknown as ClassifyPayload);
+  }
+
+  it("keeps a post that names none of the monitor's words but is about its subject", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const sourdoughId = await insertPost(sourdoughPost, "skip-keyword-near");
+    // Near the monitor, as "need gift ideas" is near a gift shop.
+    embeddingFor = (value) => (value.startsWith("Product:") ? vectorFor(1) : vectorFor(0.6));
+
+    const [payload] = await withoutKeywords(monitorId, [sourdoughId]);
+
+    expect(payload?.postIds).toEqual([sourdoughId]);
+    expect(await db.select().from(filterDrops).where(eq(filterDrops.monitorId, monitorId))).toEqual(
+      [],
+    );
+  }, 30_000);
+
+  it("still drops a post the embedding stage finds far from the monitor", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const sourdoughId = await insertPost(sourdoughPost, "skip-keyword-far");
+
+    const [payload] = await withoutKeywords(monitorId, [sourdoughId]);
+
+    expect(payload?.postIds).toEqual([]);
+    const drops = await db.select().from(filterDrops).where(eq(filterDrops.monitorId, monitorId));
+    expect(drops.map((drop) => drop.stage)).toEqual(["embedding"]);
   }, 30_000);
 });
 

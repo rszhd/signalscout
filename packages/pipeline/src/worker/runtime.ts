@@ -237,6 +237,11 @@ export interface StartWorkerOptions {
    */
   triageOnly?: boolean;
   /**
+   * Skip only the keyword stage; the embedding stage and triage still run.
+   * US-539. Unset, all three stages run, as before.
+   */
+  skipKeywordStage?: boolean;
+  /**
    * A second model that reads again every post the classifier passes, for
    * every owner on the instance. US-441. The match takes its scores. Unset,
    * the classifier's score stands, as before.
@@ -473,6 +478,7 @@ export async function startWorker({
   combineChannelsOnFirstPoll,
   classifyConcurrency,
   triageOnly,
+  skipKeywordStage,
   rescorer,
   rescorePolls,
   matchesPerCollection,
@@ -673,6 +679,7 @@ export async function startWorker({
         embedderFor: async (userId) => (await modelsFor(userId)).embedder,
         triagerFor: async (userId) => (await modelsFor(userId)).triager,
         ...(triageOnly ? { triageOnly } : {}),
+        ...(skipKeywordStage ? { skipKeywordStage } : {}),
       }),
     replies:
       steps.replies ??

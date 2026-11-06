@@ -60,6 +60,14 @@ export interface FilterOptions {
    * two free stages drop. Unset, all three stages run, as before.
    */
   readonly triageOnly?: boolean;
+  /**
+   * Skip only the keyword stage: the embedding stage and triage still run.
+   * US-539. The keyword stage drops a post that names none of the monitor's
+   * words, which can be a lead in other words ("need gift ideas" for a gift
+   * shop); the embedding stage judges what the post is about. `triageOnly`
+   * wins when both are set. Unset, all three stages run, as before.
+   */
+  readonly skipKeywordStage?: boolean;
 }
 
 /** A post as both stages read it, which is a row minus what neither needs. */
@@ -582,6 +590,7 @@ export function createFilterStep({
   embedderFor,
   triagerFor,
   triageOnly = false,
+  skipKeywordStage = false,
 }: FilterOptions = {}): Step<FilterPayload> {
   return async function filter(
     { monitorId, postIds, walkId, pollRunId },
@@ -655,7 +664,9 @@ export function createFilterStep({
       return;
     }
 
-    const { kept, drops } = keywordStage(monitor, candidates);
+    const { kept, drops } = skipKeywordStage
+      ? { kept: [...candidates], drops: [] as FilterDrop[] }
+      : keywordStage(monitor, candidates);
 
     if (!embedder || kept.length === 0) {
       if (!embedder) {

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-90 open — 20 doing, 61 todo, 9 parked (11 p1, 61 p2, 18 p3).
+91 open — 21 doing, 61 todo, 9 parked (12 p1, 61 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -12,6 +12,7 @@
 | p1 | US-503 | [A forum page read by the browser is counted as the browser's, not Bright Data's](doing/US-503-a-forum-page-read-by-the-browser-is-counted-as-the-browser-s.md) | feature | doing | 2026-11-03T00:18+08:00 |
 | p1 | US-523 | [A match is a post the product can help](doing/US-523-a-match-is-a-post-the-product-can-help.md) | bug | doing | 2026-11-05T14:58+08:00 |
 | p1 | US-536 | [Subreddits are read in one search after the first poll](doing/US-536-subreddits-are-read-in-one-search-after-the-first-poll.md) | feature | doing | 2026-11-06T23:02+08:00 |
+| p1 | US-539 | [The keyword stage can be skipped alone](doing/US-539-the-keyword-stage-can-be-skipped-alone.md) | feature | doing | 2026-11-07T00:30+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |

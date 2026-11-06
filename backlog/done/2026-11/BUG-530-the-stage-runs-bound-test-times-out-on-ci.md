@@ -6,6 +6,7 @@ priority: p2
 created: 2026-11-06T15:09+08:00
 parent:
 area: pipeline
+resolution: shipped
 ---
 
 ## Context
@@ -25,7 +26,7 @@ It also checks that the oldest rows went, not the newest.
 - [x] The test fills the bound in one statement and writes the rows past it through `recordStageRun`.
 - [x] It checks the count and that the three oldest rows were trimmed.
 - [x] It runs in well under a second locally.
-- [ ] The release CI run passes with it.
+- [x] The release CI run passes with it (run 42179027794).
 
 ## Notes
 

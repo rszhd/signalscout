@@ -20,6 +20,13 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## Unreleased
+
+**Added: the keyword stage can be skipped alone** (US-539).
+`skipKeywordStage` on the filter step and the worker runtime skips the
+keyword stage; the embedding stage and triage still run. `triageOnly` still
+skips both. Unset, all three stages run. Nothing to do to take it.
+
 ## 0.26.5 — 2026-11-06
 
 **Added: a first poll may combine its channels too** (US-536).

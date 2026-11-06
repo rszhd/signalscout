@@ -20,7 +20,7 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
-## Unreleased
+## 0.26.4 — 2026-11-06
 
 **Added: a monitor's subreddits may be read in one search after its first
 poll** (US-536). `combineChannelsAfterFirstPoll` on the collect step and the

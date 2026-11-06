@@ -48,8 +48,9 @@ measures the share over a longer window before it ships.
       subreddit with its own request, as before.
 - [x] A walk already inside one channel mode finishes in it, whatever a
       resumed request asks.
-- [x] The pipeline sets `combineChannels` only on a poll after the first, and
-      only when `combineChannelsAfterFirstPoll` is on. Unset, it never does.
+- [x] The pipeline sets `combineChannels` on a poll after the first when
+      `combineChannelsAfterFirstPoll` is on, and on a first poll when
+      `combineChannelsOnFirstPoll` is on. Unset, it never does.
 - [x] Each post from a combined read carries `foundBy` with the monitor's own
       subreddit text for the post's subreddit, matched without case. A post
       from a subreddit the monitor did not name is dropped. The pipeline
@@ -103,3 +104,7 @@ measures the share over a longer window before it ships.
   replaces addresses in every string, and a second capture (2 more credits)
   replaced the files. Lint, typecheck and the full suite pass. Not yet run
   against a live poll.
+- 2026-11-06T23:42+08:00 — Released in 0.26.4. Then the owner asked to
+  combine first polls too, to save on BuyerFinder's free searches, without
+  the first-poll measurement. Added `combineChannelsOnFirstPoll`, a separate
+  option, so a caller can take the first-poll trade or leave it.

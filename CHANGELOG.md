@@ -20,6 +20,14 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## Unreleased
+
+**Added: a first poll may combine its channels too** (US-536).
+`combineChannelsOnFirstPoll` on the collect step and the worker runtime sends
+`combineChannels` on a monitor's first poll. The first poll reads further
+back, so a busy subreddit can fill the pages a quiet one would have had.
+Unset, the first poll reads each channel. Nothing to do to take it.
+
 ## 0.26.4 — 2026-11-06
 
 **Added: a monitor's subreddits may be read in one search after its first

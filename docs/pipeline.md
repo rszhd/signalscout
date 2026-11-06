@@ -138,8 +138,10 @@ before any source is asked.
 `combineChannelsAfterFirstPoll` asks each connector to read a monitor's
 channels with one request on every poll after the first (US-536). Only
 ScrapeCreators Reddit can: it reads up to ten subreddits in one search and
-gives the group the pages its subreddits would have had one by one. The
-first poll still reads each channel, because the search can miss a post.
+gives the group the pages its subreddits would have had one by one.
+`combineChannelsOnFirstPoll` does the same on the first poll. It is a separate
+choice because the first poll reads further back, where a busy channel can
+fill the pages a quiet one would have had.
 A walk keeps the mode its cursor was issued in, so a resumed walk never
 skips or repeats a subreddit.
 

@@ -223,6 +223,8 @@ export interface StartWorkerOptions {
    * a post; unset, every poll reads each channel, as before.
    */
   combineChannelsAfterFirstPoll?: boolean;
+  /** The same on a monitor's first poll. US-536. Unset, it reads each channel. */
+  combineChannelsOnFirstPoll?: boolean;
   /**
    * How many posts one classify job may score at the same time, 1 to 16.
    * US-438. Raise it only for a model provider whose rate limit allows it.
@@ -468,6 +470,7 @@ export async function startWorker({
   firstPollWindowDays,
   pollPagesPerInput,
   combineChannelsAfterFirstPoll,
+  combineChannelsOnFirstPoll,
   classifyConcurrency,
   triageOnly,
   rescorer,
@@ -661,6 +664,7 @@ export async function startWorker({
         firstPollWindowDays,
         pollPagesPerInput,
         combineChannelsAfterFirstPoll,
+        combineChannelsOnFirstPoll,
       }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter:

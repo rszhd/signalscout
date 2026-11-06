@@ -53,7 +53,7 @@ import { webhookSecretFor } from "../notifications/secret.js";
 import { createNotificationTransport } from "../notifications/transport.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { createClassifyStep } from "./classify.js";
-import { createCollectStep, type PageCount } from "./collect.js";
+import { createCollectStep, type PageCount, type PagePlan } from "./collect.js";
 import { createCompleteStep } from "./complete.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { admitEveryone, type EntitlementGate } from "./entitlement.js";
@@ -203,9 +203,10 @@ export interface StartWorkerOptions {
   /**
    * How many pages of each input a monitor's first poll may read, 1 to 20,
    * in place of each connector's own cap. US-435. Unset, a first poll is
-   * like every other, which is what both applications want.
+   * like every other, which is what both applications want. A function
+   * plans the count for each monitor, on its first poll (US-528).
    */
-  firstPollPagesPerInput?: PageCount;
+  firstPollPagesPerInput?: PageCount | PagePlan;
   /**
    * How many days back a monitor's first poll may look, 1 to 365. US-435.
    * Unset, the first poll has no window, as before.

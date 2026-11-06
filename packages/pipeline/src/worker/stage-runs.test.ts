@@ -603,21 +603,34 @@ describe("what a stage records about itself", () => {
     it("keeps a monitor's rows bounded, so the table cannot become the largest", async () => {
       const monitorId = await insertMonitor(database);
       const extra = 3;
+      const now = Date.now();
+      const startedAt = (index: number) =>
+        new Date(now - (stageRunsKeptPerMonitor + extra - index) * 1_000);
+      const run = (index: number) => ({
+        monitorId,
+        userId: "user-1",
+        stage: "notify" as const,
+        startedAt: startedAt(index),
+        finishedAt: new Date(),
+        outcome: "done" as const,
+        itemsIn: 1,
+        itemsOut: 1,
+      });
 
-      for (let index = 0; index < stageRunsKeptPerMonitor + extra; index++) {
-        await recordStageRun(db, {
-          monitorId,
-          userId: "user-1",
-          stage: "notify",
-          startedAt: new Date(Date.now() - (stageRunsKeptPerMonitor + extra - index) * 1_000),
-          finishedAt: new Date(),
-          outcome: "done",
-          itemsIn: 1,
-          itemsOut: 1,
-        });
+      // The table filled to the bound in one statement: 803 writes one by
+      // one passed the five-second limit on CI (BUG-530). The trim is
+      // `recordStageRun`'s, so the writes past the bound go through it.
+      await db
+        .insert(stageRuns)
+        .values(Array.from({ length: stageRunsKeptPerMonitor }, (_, index) => run(index)));
+      for (let index = stageRunsKeptPerMonitor; index < stageRunsKeptPerMonitor + extra; index++) {
+        await recordStageRun(db, run(index));
       }
 
-      expect((await runsOf(monitorId)).length).toBe(stageRunsKeptPerMonitor);
+      const kept = await runsOf(monitorId);
+      expect(kept.length).toBe(stageRunsKeptPerMonitor);
+      // The oldest went, not the newest.
+      expect(kept[0]?.startedAt.getTime()).toBe(startedAt(extra).getTime());
     });
   });
 });

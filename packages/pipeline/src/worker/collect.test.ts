@@ -877,6 +877,90 @@ describe("the poll step", () => {
       expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
     });
 
+    describe("planned for each monitor (US-528)", () => {
+      it("reads the pages the plan returns, and asks it with the monitor", async () => {
+        const monitorId = await insertMonitor(database);
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+        const asked: { id: string; userId: string }[] = [];
+
+        await createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          firstPollPagesPerInput: async (monitor) => {
+            asked.push({ id: monitor.id, userId: monitor.userId });
+            return { reddit: 3 };
+          },
+        })({ monitorId }, contextFor(db, stubBoss()));
+
+        expect(asked).toEqual([{ id: monitorId, userId: expect.any(String) }]);
+        expect(source.calls).toHaveLength(3);
+        expect(source.calls.every((call) => call.pagesPerInput === 3)).toBe(true);
+      });
+
+      it("is not asked on a later poll", async () => {
+        const monitorId = await insertMonitor(database, {
+          lastPolledAt: new Date("2026-08-10T08:00:00.000Z"),
+        });
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+        let calls = 0;
+
+        await createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          firstPollPagesPerInput: () => {
+            calls += 1;
+            return 8;
+          },
+        })({ monitorId }, contextFor(db, stubBoss()));
+
+        expect(calls).toBe(0);
+        expect(source.calls).toHaveLength(maxPagesPerPoll);
+        expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+      });
+
+      it("leaves the connectors' caps when the plan returns nothing", async () => {
+        const monitorId = await insertMonitor(database);
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+
+        await createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          firstPollPagesPerInput: () => undefined,
+        })({ monitorId }, contextFor(db, stubBoss()));
+
+        expect(source.calls).toHaveLength(maxPagesPerPoll);
+        expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+      });
+
+      it("asks no source when the plan returns a count out of range", async () => {
+        for (const count of [0, 21, { reddit: 2, x: 0 }]) {
+          const monitorId = await insertMonitor(database);
+          const registry = fakeRegistry({ posts: many, pageSize: 1 });
+          const source = registry.only("reddit") as SocialSource & {
+            calls: readonly SearchRequest[];
+          };
+
+          await expect(
+            createCollectStep({
+              registry,
+              credentialsFor: credentials,
+              firstPollPagesPerInput: () => count,
+            })({ monitorId }, contextFor(db, stubBoss())),
+          ).rejects.toThrow(RangeError);
+          expect(source.calls).toHaveLength(0);
+        }
+      });
+    });
+
     it("refuses a count the connectors would refuse", () => {
       expect(() =>
         createCollectStep({

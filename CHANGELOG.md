@@ -20,6 +20,18 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.26.4 — 2026-11-06
+
+**Added: a monitor's subreddits may be read in one search after its first
+poll** (US-536). `combineChannelsAfterFirstPoll` on the collect step and the
+worker runtime hands `combineChannels` to the connector on every poll after
+the first. The ScrapeCreators Reddit connector then reads two or more
+subreddits with one search, `subreddit:a OR subreddit:b`, up to ten a
+request, and credits each post to its own subreddit. A poll that finds few
+new posts pays one credit instead of one for each subreddit. The search can
+miss a post that a read of each subreddit returns; the ticket's Log has the
+measured share. Unset, nothing changes. Nothing to do to take it.
+
 ## 0.26.3 — 2026-11-06
 
 **Added: a first poll's pages may be planned for each monitor** (US-528).

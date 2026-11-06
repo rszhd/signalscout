@@ -135,6 +135,13 @@ platform a record leaves out keeps its connector's cap.
 monitor's first poll to its own budget (US-528). The collect step calls it
 once, before it marks `last_polled_at`, and checks the count it returns
 before any source is asked.
+`combineChannelsAfterFirstPoll` asks each connector to read a monitor's
+channels with one request on every poll after the first (US-536). Only
+ScrapeCreators Reddit can: it reads up to ten subreddits in one search and
+gives the group the pages its subreddits would have had one by one. The
+first poll still reads each channel, because the search can miss a post.
+A walk keeps the mode its cursor was issued in, so a resumed walk never
+skips or repeats a subreddit.
 
 **A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an

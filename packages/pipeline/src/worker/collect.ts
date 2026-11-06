@@ -117,6 +117,14 @@ export interface CollectOptions {
    * Unset, later polls use the connectors' caps, as before.
    */
   readonly pollPagesPerInput?: PageCount | undefined;
+  /**
+   * Ask each connector to read a monitor's channels with one request, on
+   * every poll after the first. US-536. A connector that cannot ignores it.
+   * Cheaper for a monitor with many quiet channels, but the combined read
+   * may miss a post that a read of each channel returns, so the first poll
+   * still reads each channel. Unset, every poll reads each channel, as before.
+   */
+  readonly combineChannelsAfterFirstPoll?: boolean | undefined;
 }
 
 /** The longest window a first poll may be given. */
@@ -155,6 +163,8 @@ interface PageLimits {
   /** Handed to the connector as `pagesPerInput`. Absent means its own cap. */
   readonly perInput?: number;
   readonly perPoll: number;
+  /** Handed to the connector as `combineChannels`. US-536. */
+  readonly combineChannels?: boolean;
 }
 
 /**
@@ -251,6 +261,7 @@ async function readSource(
         monitorId,
         cursor,
         ...(limits.perInput === undefined ? {} : { pagesPerInput: limits.perInput }),
+        ...(limits.combineChannels ? { combineChannels: true } : {}),
       });
     } catch (error) {
       // Nothing read yet: the source failed, as it always has. BUG-016.
@@ -997,6 +1008,7 @@ export function createCollectStep({
   firstPollPagesPerInput,
   firstPollWindowDays,
   pollPagesPerInput,
+  combineChannelsAfterFirstPoll = false,
 }: CollectOptions): Step<PollPayload> {
   // Refused at start-up, with the connectors' own rule, rather than on the
   // first monitor that meets it.
@@ -1325,10 +1337,13 @@ export function createCollectStep({
               pricePerUnitMicros: source.pricePerUnitMicros,
             });
           },
-          pageLimits(
-            countFor(firstPoll ? firstPages : pollPagesPerInput, source.platform.id),
-            queries.length + unitChannels.length,
-          ),
+          {
+            ...pageLimits(
+              countFor(firstPoll ? firstPages : pollPagesPerInput, source.platform.id),
+              queries.length + unitChannels.length,
+            ),
+            ...(combineChannelsAfterFirstPoll && !firstPoll ? { combineChannels: true } : {}),
+          },
           /**
            * One platform's failure, kept to itself. BUG-016.
            *

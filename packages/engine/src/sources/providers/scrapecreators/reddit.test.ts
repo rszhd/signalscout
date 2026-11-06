@@ -42,6 +42,9 @@ const unknownSubreddit = fixture("unknown-subreddit");
 const credentialsAccepted = fixture("credentials-accepted");
 const credentialsRejected = fixture("credentials-rejected");
 const timeframeRejected = fixture("timeframe-rejected");
+/** Captured 2026-11-06 for US-536: softwaretesting, QualityAssurance, ExperiencedDevs. */
+const combinedPage1 = fixture("subreddits-combined");
+const combinedPage2 = fixture("subreddits-combined-page-2");
 
 function bodyOf(captured: Captured): Record<string, unknown> {
   return captured.body as Record<string, unknown>;
@@ -107,7 +110,12 @@ function request(overrides: Partial<SearchRequest> = {}): SearchRequest {
 }
 
 /** The cursor grammar, written out here so a test reads as the caller sees it. */
-function cursorAt(phase: "keyword" | "subreddit", index: number, pages: number, after = "") {
+function cursorAt(
+  phase: "keyword" | "subreddit" | "subreddits",
+  index: number,
+  pages: number,
+  after = "",
+) {
   return `${phase}|${index}|${pages}|${after}`;
 }
 
@@ -464,6 +472,218 @@ describe("searching", () => {
     await expect(source.search(request())).rejects.toThrow(
       "You need to sort by 'top' to provide a timeframe",
     );
+  });
+});
+
+describe("reading several subreddits in one search", () => {
+  /** Read out of `subreddits-combined.json` by eye. */
+  const combinedCursor = bodyOf(combinedPage1).after as string;
+  const three = ["softwaretesting", "r/QualityAssurance", "ExperiencedDevs"];
+
+  function combined(overrides: Partial<SearchRequest> = {}): SearchRequest {
+    return request({
+      query: { queries: [], channels: three },
+      combineChannels: true,
+      ...overrides,
+    });
+  }
+
+  function searchParams(call: Call | undefined): URLSearchParams {
+    return new URL(call?.url ?? "https://invalid.example").searchParams;
+  }
+
+  it("asks the search endpoint once, naming each subreddit, newest first", async () => {
+    const stub = scrapeCreators([combinedPage1]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.search(combined());
+
+    expect(stub.calls).toHaveLength(1);
+    expect(stub.calls[0]?.url).toContain("/v1/reddit/search");
+    const params = searchParams(stub.calls[0]);
+    expect(params.get("query")).toBe(
+      "subreddit:softwaretesting OR subreddit:QualityAssurance OR subreddit:ExperiencedDevs",
+    );
+    expect(params.get("filter")).toBe("posts");
+    expect(params.get("sort")).toBe("new");
+    expect(result.posts).toHaveLength(25);
+    expect(result.unitsConsumed).toBe(1);
+  });
+
+  it("credits each post to the monitor's own text for its subreddit, not the page", async () => {
+    const stub = scrapeCreators([combinedPage1]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.search(combined());
+
+    expect(result.foundBy).toBeUndefined();
+    const credited = new Map<string, number>();
+    for (const post of result.posts) {
+      expect(post.foundBy?.kind).toBe("channel");
+      const value = post.foundBy?.value as string;
+      credited.set(value, (credited.get(value) ?? 0) + 1);
+    }
+    // 18, 6 and 1 in the captured page. The monitor wrote "r/QualityAssurance",
+    // and that is the text the post is credited to.
+    expect(Object.fromEntries(credited)).toEqual({
+      "r/QualityAssurance": 18,
+      ExperiencedDevs: 6,
+      softwaretesting: 1,
+    });
+  });
+
+  it("matches a subreddit without regard to case", async () => {
+    const stub = scrapeCreators([combinedPage1]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.search(
+      combined({
+        query: {
+          queries: [],
+          channels: ["SOFTWARETESTING", "qualityassurance", "experienceddevs"],
+        },
+      }),
+    );
+
+    expect(result.posts).toHaveLength(25);
+  });
+
+  it("drops a post from a subreddit the monitor did not name", async () => {
+    const stub = scrapeCreators([combinedPage1]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.search(
+      combined({ query: { queries: [], channels: ["softwaretesting", "QualityAssurance"] } }),
+    );
+
+    // The page's 6 ExperiencedDevs posts are gone; the credit is still billed.
+    expect(result.posts).toHaveLength(19);
+    expect(result.posts.some((post) => post.channel === "ExperiencedDevs")).toBe(false);
+    expect(result.unitsConsumed).toBe(1);
+  });
+
+  it("follows the provider's cursor inside the group", async () => {
+    const stub = scrapeCreators([combinedPage1, combinedPage2]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const first = await source.search(combined());
+    expect(first.next).toEqual({
+      status: "ready",
+      cursor: cursorAt("subreddits", 0, 1, combinedCursor),
+    });
+
+    const second = await source.search(
+      combined({ cursor: (first.next as { cursor: string }).cursor }),
+    );
+
+    expect(searchParams(stub.calls[1]).get("after")).toBe(combinedCursor);
+    expect(second.posts[0]?.externalId).toBe("t3_1xo7mrv");
+  });
+
+  it("gives a group the pages its subreddits would have had one by one", async () => {
+    const stub = scrapeCreators([combinedPage1]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    // One page each, three subreddits: the group's third page is still allowed.
+    const third = await source.search(
+      combined({ pagesPerInput: 1, cursor: cursorAt("subreddits", 0, 1, combinedCursor) }),
+    );
+    expect(third.next).toEqual({
+      status: "ready",
+      cursor: cursorAt("subreddits", 0, 2, combinedCursor),
+    });
+
+    // And after it, the group is done.
+    const fourth = await source.search(
+      combined({ pagesPerInput: 1, cursor: cursorAt("subreddits", 0, 2, combinedCursor) }),
+    );
+    expect(fourth.next).toEqual({ status: "done" });
+  });
+
+  it("stops on the first page that reaches posts the last poll read", async () => {
+    const stub = scrapeCreators([combinedPage1]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    // Inside the page, which runs from 2026-11-06 14:56 back to 2026-11-05 03:42.
+    const since = new Date("2026-11-06T00:00:00.000Z");
+    const result = await source.search(
+      combined({ query: { queries: [], channels: three, since } }),
+    );
+
+    expect(result.posts.length).toBeGreaterThan(0);
+    expect(result.posts.length).toBeLessThan(25);
+    for (const post of result.posts)
+      expect(post.postedAt.getTime()).toBeGreaterThan(since.getTime());
+    expect(result.next).toEqual({ status: "done" });
+  });
+
+  it("names at most ten subreddits in one search, and goes on to the next group", async () => {
+    const stub = scrapeCreators([
+      { httpStatus: 200, body: { ...bodyOf(combinedPage1), after: null } },
+    ]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+    const twelve = Array.from({ length: 12 }, (_, n) => `sub${n + 1}`);
+
+    const first = await source.search(combined({ query: { queries: [], channels: twelve } }));
+
+    expect(searchParams(stub.calls[0]).get("query")?.split(" OR ")).toHaveLength(10);
+    expect(first.next).toEqual({ status: "ready", cursor: cursorAt("subreddits", 1, 0) });
+
+    await source.search(
+      combined({
+        query: { queries: [], channels: twelve },
+        cursor: (first.next as { cursor: string }).cursor,
+      }),
+    );
+    expect(searchParams(stub.calls[1]).get("query")).toBe("subreddit:sub11 OR subreddit:sub12");
+  });
+
+  it("reads the keywords first, then the group", async () => {
+    const exhausted: Captured = {
+      httpStatus: 200,
+      body: { ...bodyOf(searchPage1), after: null },
+    };
+    const stub = scrapeCreators([exhausted]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.search(
+      combined({ query: { queries: ["a keyword"], channels: three } }),
+    );
+
+    expect(result.next).toEqual({ status: "ready", cursor: cursorAt("subreddits", 0, 0) });
+  });
+
+  it("reads one subreddit by itself, because one search would save nothing", async () => {
+    const stub = scrapeCreators([subredditPage]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    await source.search(combined({ query: { queries: [], channels: ["softwaretesting"] } }));
+
+    expect(stub.calls[0]?.url).toContain("/v1/reddit/subreddit");
+  });
+
+  it("reads each subreddit by itself when the caller does not ask to combine", async () => {
+    const stub = scrapeCreators([subredditPage]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    await source.search(combined({ combineChannels: false }));
+
+    expect(stub.calls[0]?.url).toContain("/v1/reddit/subreddit");
+    expect(stub.calls[0]?.url).toContain("subreddit=softwaretesting");
+  });
+
+  it("finishes a walk in the mode its cursor was issued in", async () => {
+    const stub = scrapeCreators([
+      { httpStatus: 200, body: { ...bodyOf(subredditPage), after: null } },
+    ]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+
+    // A walk that began one subreddit at a time, resumed by a caller that now
+    // asks to combine: it reads the second subreddit, then the third, alone.
+    const result = await source.search(combined({ cursor: cursorAt("subreddit", 1, 0) }));
+
+    expect(stub.calls[0]?.url).toContain("subreddit=QualityAssurance");
+    expect(result.next).toEqual({ status: "ready", cursor: cursorAt("subreddit", 2, 0) });
   });
 });
 

@@ -149,6 +149,9 @@ const personalTextFields = new Set(["author_flair_text", "public_description", "
 
 const scrubbedText = "Scrubbed by capture.mjs. See docs/testing.md.";
 
+const emailPattern = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+const scrubbedEmail = "scrubbed@example.invalid";
+
 /**
  * `name` is Reddit's fullname for a post — `t3_abc123` — and it is also the
  * key an author object uses for a person. Only the second is identity, and
@@ -183,6 +186,8 @@ function createScrubber() {
             return [key, `https://scrubbed.invalid/${pseudonym(child)}`];
           }
           if (personalTextFields.has(key)) return [key, scrubbedText];
+          // A post body can carry its author's address. US-536's capture did.
+          return [key, child.replace(emailPattern, scrubbedEmail)];
         }
         return [key, scrub(child)];
       }),
@@ -416,6 +421,40 @@ if (wanted("subreddit-search")) {
   } else {
     failures.push(
       "subreddit-search: the first page reported no cursor, so page two was not captured.",
+    );
+  }
+}
+
+/**
+ * Several subreddits in one search, newest first, and the page its cursor
+ * gives. US-536.
+ *
+ * The subreddit endpoint refuses Reddit's `a+b` form with a free 404, so a
+ * poll that wants one request for many subreddits asks the search endpoint
+ * with `subreddit:` terms joined by OR. The fixture is what shows each post
+ * still names its own subreddit.
+ */
+if (wanted("subreddits-combined")) {
+  const params = {
+    query: [subreddit, "QualityAssurance", "ExperiencedDevs"]
+      .map((name) => `subreddit:${name}`)
+      .join(" OR "),
+    filter: "posts",
+    sort: "new",
+  };
+  const first = await capture("subreddits-combined", endpoints.search, params);
+  const after = first.body?.after;
+
+  if (typeof after === "string" && after !== "") {
+    await capture(
+      "subreddits-combined-page-2",
+      endpoints.search,
+      { ...params, after },
+      { note: "followed the cursor from subreddits-combined.json" },
+    );
+  } else {
+    failures.push(
+      "subreddits-combined: the first page reported no cursor, so page two was not captured.",
     );
   }
 }

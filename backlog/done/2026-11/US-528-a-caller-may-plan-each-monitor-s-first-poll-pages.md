@@ -6,6 +6,7 @@ priority: p1
 created: 2026-11-06T14:54+08:00
 parent: US-435
 area: sources
+resolution: shipped
 ---
 
 ## Context

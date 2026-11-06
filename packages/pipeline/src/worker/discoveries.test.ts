@@ -11,7 +11,15 @@
  * what makes it visible.
  */
 
-import { fakePosts } from "@signalscout/engine";
+import {
+  createSourceRegistry,
+  createSourceRuntime,
+  fakePosts,
+  fakeSourceDefinition,
+  type SearchRequest,
+  type SocialSource,
+} from "@signalscout/engine";
+import { unreachableFetch } from "@signalscout/engine/testing";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
@@ -103,6 +111,57 @@ describe("which input found a post", () => {
 
     expect((await discoveriesOf(mine)).every((row) => row.value === "mine")).toBe(true);
     expect((await discoveriesOf(theirs)).every((row) => row.value === "theirs")).toBe(true);
+  });
+
+  /**
+   * A combined read carries several channels in one request, so the
+   * connector credits each post and leaves the page uncredited. US-536.
+   */
+  it("records each post's own channel when the page names none", async () => {
+    const fake = fakeSourceDefinition({
+      id: "reddit",
+      displayName: "Reddit",
+      providerId: "brightdata",
+      providerName: "Bright Data",
+    });
+    const channels = ["r/first", "second"];
+    const registry = createSourceRegistry({
+      definitions: [
+        {
+          ...fake,
+          create: (runtime) => {
+            const inner = fake.create(runtime);
+            return Object.assign(Object.create(inner) as SocialSource, {
+              async search(request: SearchRequest) {
+                const { foundBy: _page, ...result } = await inner.search(request);
+                return {
+                  ...result,
+                  posts: result.posts.map((post, index) => ({
+                    ...post,
+                    foundBy: { kind: "channel" as const, value: channels[index % 2] as string },
+                  })),
+                };
+              },
+            });
+          },
+        },
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+    const monitorId = await insertMonitor(database, {
+      generatedQueries: [],
+      generatedSubreddits: channels,
+    });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db),
+    );
+
+    const rows = await discoveriesOf(monitorId);
+    expect(rows.length).toBe(fakePosts.length);
+    expect(new Set(rows.map((row) => row.value))).toEqual(new Set(channels));
+    expect(rows.every((row) => row.kind === "channel")).toBe(true);
   });
 
   it("writes nothing new when the same poll runs again", async () => {

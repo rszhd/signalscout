@@ -131,6 +131,10 @@ read fewer pages than the connectors' two. With either count set, the
 platform's cap for that poll is the count times its inputs, not five.
 Either option takes one number, or a count for each platform by id; a
 platform a record leaves out keeps its connector's cap.
+`firstPollPagesPerInput` may also be a function, so a caller can size each
+monitor's first poll to its own budget (US-528). The collect step calls it
+once, before it marks `last_polled_at`, and checks the count it returns
+before any source is asked.
 
 **A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an

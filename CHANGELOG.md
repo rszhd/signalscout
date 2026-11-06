@@ -20,6 +20,15 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## Unreleased
+
+**Added: a first poll's pages may be planned for each monitor** (US-528).
+`firstPollPagesPerInput` also takes a function. The collect step calls it
+once, on a monitor's first poll, with `{ id, userId }`, and reads the count it
+returns; `undefined` leaves the connectors' caps. A count out of range throws
+before any source is asked. The type is exported as `PagePlan`. A number or a
+record works as before. Nothing to do to take it.
+
 ## 0.26.2 — 2026-11-05
 
 **Fixed: a browser read waits for the page to be parsed** (BUG-526). After a

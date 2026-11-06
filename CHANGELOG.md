@@ -20,7 +20,7 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
-## Unreleased
+## 0.26.3 — 2026-11-06
 
 **Added: a first poll's pages may be planned for each monitor** (US-528).
 `firstPollPagesPerInput` also takes a function. The collect step calls it

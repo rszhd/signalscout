@@ -71,6 +71,25 @@
       "identitiesReplaced": 14
     },
     {
+      "file": "subreddits-combined-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/search?query=subreddit%3Asoftwaretesting+OR+subreddit%3AQualityAssurance+OR+subreddit%3AExperiencedDevs&filter=posts&sort=new&after=eyJ0eXBlIjoicmVkZGl0X2d1ZXN0X3NlYXJjaCIsImZpbHRlciI6InBvc3RzIiwiY3Vyc29yIjoiTWpRPSIsIm9mZnNldCI6MjV9",
+        "note": "followed the cursor from subreddits-combined.json"
+      },
+      "capturedAt": "2026-11-06T15:15:39.661Z",
+      "identitiesReplaced": 50
+    },
+    {
+      "file": "subreddits-combined.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/search?query=subreddit%3Asoftwaretesting+OR+subreddit%3AQualityAssurance+OR+subreddit%3AExperiencedDevs&filter=posts&sort=new"
+      },
+      "capturedAt": "2026-11-06T15:15:39.022Z",
+      "identitiesReplaced": 44
+    },
+    {
       "file": "timeframe-rejected.json",
       "request": {
         "method": "GET",

@@ -114,16 +114,44 @@ export const scrapeCreatorsReddit: ConnectorDefinition = {
 };
 
 /**
- * Keywords and subreddits are two discovery modes, and one request carries one
- * input from one of them. A monitor may name both, so the connector walks
- * them in turn.
+ * Keywords and subreddits are two discovery modes. A monitor may name both, so
+ * the connector walks them in turn: the keywords, then the subreddits.
+ *
+ * The subreddits are walked one of two ways. `subreddit` reads one subreddit
+ * a request, from its own newest list. `subreddits` reads a group of them in
+ * one search, `subreddit:a OR subreddit:b`, when the caller asks with
+ * `combineChannels`. The subreddit endpoint refuses `a+b`, which is why the
+ * group goes through search. US-536.
  */
-const phases = ["keyword", "subreddit"] as const;
+const phases = ["keyword", "subreddit", "subreddits"] as const;
 type Phase = (typeof phases)[number];
+type ChannelPhase = Exclude<Phase, "keyword">;
 
 /**
- * Where the caller is: which phase, which input inside it, how many pages of
- * that input this poll has already bought, and the provider's own cursor.
+ * The most subreddits one combined search names. Search queries have a length
+ * limit that is not measured here; nine names, 232 characters, were accepted.
+ * US-536.
+ */
+export const subredditsPerSearch = 10;
+
+/** A monitor's subreddits in groups for combined searches, in order. */
+function groupsOf(channels: readonly string[]): readonly (readonly string[])[] {
+  const groups: string[][] = [];
+  for (let start = 0; start < channels.length; start += subredditsPerSearch) {
+    groups.push(channels.slice(start, start + subredditsPerSearch));
+  }
+  return groups;
+}
+
+/** The bare name the provider wants: "softwaretesting", never "r/…". */
+function bareSubreddit(term: string): string {
+  return term.replace(/^\/?r\//, "");
+}
+
+/**
+ * Where the caller is: which phase, which input inside it (a group, in the
+ * `subreddits` phase), how many pages of that input this poll has already
+ * bought, and the provider's own cursor.
  *
  * All four are load-bearing. The phase lets a monitor that named both keywords
  * and subreddits reach its subreddits at all. The index stops the second poll
@@ -302,8 +330,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
    */
   async search(request: SearchRequest): Promise<SearchResult> {
     const client = this.client(request.credentials);
-    const start =
-      request.cursor === undefined ? this.first(request.query) : decodeCursor(request.cursor);
+    const start = request.cursor === undefined ? this.first(request) : decodeCursor(request.cursor);
 
     if (!start) return { posts: [], unitsConsumed: 0, next: { status: "done" } };
 
@@ -344,7 +371,8 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
 
     const collected = page.records
       .map((record) => toCandidatePost(record))
-      .filter((post): post is CandidatePost => post !== undefined);
+      .filter((post): post is CandidatePost => post !== undefined)
+      .flatMap((post) => input.attribute(post));
 
     const wanted = collected.filter(
       (post) => !request.query.since || post.postedAt > request.query.since,
@@ -358,7 +386,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
 
     return {
       posts,
-      foundBy: input.foundBy,
+      ...(input.foundBy ? { foundBy: input.foundBy } : {}),
       unitsConsumed: page.creditsCharged,
       next: this.nextAfter(request, start, page, collected, wanted.length),
     };
@@ -386,25 +414,29 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
   ): SearchResult["next"] {
     const pages = at.pages + 1;
     const reachedSince = request.query.since !== undefined && kept < collected.length;
+    // A group shares one list, so it gets the pages its subreddits would have
+    // had one by one. It still stops at `since`, which is where the saving is.
+    const share =
+      at.phase === "subreddits" ? (groupsOf(request.query.channels)[at.index]?.length ?? 1) : 1;
     const exhausted =
-      !page.after || pages >= pagesPerInputFor(request, maxPagesPerInput) || reachedSince;
+      !page.after || pages >= pagesPerInputFor(request, maxPagesPerInput) * share || reachedSince;
 
     if (!exhausted && page.after) {
       return { status: "ready", cursor: encodeCursor({ ...at, pages, after: page.after }) };
     }
 
-    const onward = this.advance(request.query, at);
+    const onward = this.advance(request, at);
     return onward ? { status: "ready", cursor: encodeCursor(onward) } : { status: "done" };
   }
 
   /** The first position that has anything to ask for, or nothing. */
-  private first(query: SourceQuery): Cursor | undefined {
-    return this.settle(query, { phase: "keyword", index: 0, pages: 0 });
+  private first(request: SearchRequest): Cursor | undefined {
+    return this.settle(request, { phase: "keyword", index: 0, pages: 0 });
   }
 
   /** The position after this one, skipping phases the monitor left empty. */
-  private advance(query: SourceQuery, at: Cursor): Cursor | undefined {
-    return this.settle(query, { phase: at.phase, index: at.index + 1, pages: 0 });
+  private advance(request: SearchRequest, at: Cursor): Cursor | undefined {
+    return this.settle(request, { phase: at.phase, index: at.index + 1, pages: 0 });
   }
 
   /**
@@ -413,38 +445,78 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
    * A monitor with no keywords and three subreddits, or with keywords and no
    * subreddits, both arrive here. Skipping is pure: it makes no request, so an
    * empty phase costs nothing.
+   *
+   * The request chooses the channel phase only on the way in from the
+   * keywords. A walk already inside one channel phase finishes in it, so a
+   * resumed walk never skips or repeats a subreddit because the caller's
+   * choice changed between two jobs.
    */
-  private settle(query: SourceQuery, from: Cursor): Cursor | undefined {
+  private settle(request: SearchRequest, from: Cursor): Cursor | undefined {
+    const { query } = request;
     let { phase, index } = from;
 
     for (;;) {
       if (index < this.listFor(query, phase).length) return { phase, index, pages: 0 };
+      if (phase !== "keyword") return undefined;
 
-      const next = phases[phases.indexOf(phase) + 1];
-      if (!next) return undefined;
-
-      phase = next;
+      phase = this.channelPhaseFor(request);
       index = 0;
     }
   }
 
-  private listFor(query: SourceQuery, phase: Phase): readonly string[] {
-    return phase === "keyword" ? query.queries : query.channels;
+  /** One request per subreddit, unless the caller asked to combine two or more. */
+  private channelPhaseFor(request: SearchRequest): ChannelPhase {
+    return request.combineChannels === true && request.query.channels.length >= 2
+      ? "subreddits"
+      : "subreddit";
   }
 
-  /** The endpoint and parameters for the input a cursor points at. */
+  private listFor(query: SourceQuery, phase: Phase): readonly unknown[] {
+    if (phase === "keyword") return query.queries;
+    return phase === "subreddit" ? query.channels : groupsOf(query.channels);
+  }
+
   /**
-   * The one input this request is for, and what to call it afterwards.
+   * The one input this request is for, and how to credit each post it returns.
    *
-   * `foundBy` travels back to the caller with the page. US-212: this is the
-   * only moment anything knows which phrase or subreddit produced a post, and
-   * a request carries exactly one of them.
+   * US-212: this is the only moment anything knows which phrase or subreddit
+   * produced a post. A keyword or one subreddit credits the whole page, as
+   * `foundBy`. A group credits each post by its own subreddit, and drops a
+   * post from a subreddit the monitor did not name.
    */
   private inputAt(
     query: SourceQuery,
     at: Cursor,
-  ): { endpoint: string; params: Record<string, string>; foundBy: Discovery } | undefined {
-    const term = this.listFor(query, at.phase)[at.index];
+  ):
+    | {
+        endpoint: string;
+        params: Record<string, string>;
+        foundBy?: Discovery;
+        attribute: (post: CandidatePost) => CandidatePost[];
+      }
+    | undefined {
+    const keep = (post: CandidatePost) => [post];
+
+    if (at.phase === "subreddits") {
+      const group = groupsOf(query.channels)[at.index];
+      if (group === undefined) return undefined;
+
+      const byName = new Map(group.map((term) => [bareSubreddit(term).toLowerCase(), term]));
+      return {
+        endpoint: endpoints.search,
+        params: {
+          query: group.map((term) => `subreddit:${bareSubreddit(term)}`).join(" OR "),
+          filter: "posts",
+          sort: sortNewest,
+        },
+        attribute: (post) => {
+          const term = post.channel ? byName.get(post.channel.toLowerCase()) : undefined;
+          return term === undefined ? [] : [{ ...post, foundBy: { kind: "channel", value: term } }];
+        },
+      };
+    }
+
+    const term = (at.phase === "keyword" ? query.queries : query.channels)[at.index];
     if (term === undefined) return undefined;
 
     if (at.phase === "keyword") {
@@ -454,14 +526,15 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
         endpoint: endpoints.search,
         params: { query: term, filter: "posts", sort: sortNewest },
         foundBy: { kind: "query", value: term },
+        attribute: keep,
       };
     }
 
-    // The provider wants a bare name: "softwaretesting", never "r/…".
     return {
       endpoint: endpoints.subreddit,
-      params: { subreddit: term.replace(/^\/?r\//, ""), sort: sortNewest },
+      params: { subreddit: bareSubreddit(term), sort: sortNewest },
       foundBy: { kind: "channel", value: term },
+      attribute: keep,
     };
   }
 }

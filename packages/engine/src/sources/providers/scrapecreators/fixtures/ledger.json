@@ -72,6 +72,22 @@
       "creditsCharged": 1,
       "creditsRemaining": 88,
       "note": "followed the cursor from subreddit-search.json"
+    },
+    {
+      "call": "subreddits-combined",
+      "httpStatus": 200,
+      "elapsedMs": 2223,
+      "creditsCharged": 1,
+      "creditsRemaining": 7592,
+      "note": null
+    },
+    {
+      "call": "subreddits-combined-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 635,
+      "creditsCharged": 1,
+      "creditsRemaining": 7591,
+      "note": "followed the cursor from subreddits-combined.json"
     }
   ]
 }

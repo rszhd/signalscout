@@ -136,6 +136,14 @@ export interface SearchRequest {
    * fixed batch per input ignores it. `pages.ts` holds the rule. US-435.
    */
   readonly pagesPerInput?: number;
+  /**
+   * Read several channels with one request where the connector can. A
+   * connector that cannot ignores it. The combined read may miss a post that
+   * a read of each channel would return, so the caller chooses. It decides
+   * only where a walk enters its channels: a cursor already inside them
+   * keeps the mode it was issued in. US-536.
+   */
+  readonly combineChannels?: boolean;
   readonly signal?: AbortSignal;
 }
 
@@ -149,10 +157,11 @@ export interface CandidatePost {
   /**
    * Which of the monitor's inputs returned it. US-212.
    *
-   * A connector answers this once per page, on `SearchResult`, because one
+   * A connector answers this once per page, on `SearchResult`, when one
    * request carries one input. The collector copies it onto each post as it
    * merges pages, which is why it is here as well: by the time a batch is
-   * stored, the pages it came from are gone.
+   * stored, the pages it came from are gone. A request that carries several
+   * channels sets it on each post instead, and none on the page. US-536.
    */
   readonly foundBy?: Discovery;
   readonly url: string;

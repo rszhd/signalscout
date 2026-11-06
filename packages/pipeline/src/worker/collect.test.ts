@@ -1081,6 +1081,48 @@ describe("the poll step", () => {
     });
   });
 
+  describe("channels read with one request after the first poll (US-536)", () => {
+    const later = { lastPolledAt: new Date("2026-08-10T08:00:00.000Z") };
+
+    async function callsFor(
+      monitor: Parameters<typeof insertMonitor>[1],
+      combineChannelsAfterFirstPoll?: boolean,
+    ): Promise<readonly SearchRequest[]> {
+      const monitorId = await insertMonitor(database, monitor);
+      const registry = fakeRegistry();
+      const source = registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] };
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        ...(combineChannelsAfterFirstPoll === undefined ? {} : { combineChannelsAfterFirstPoll }),
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      return source.calls;
+    }
+
+    it("asks the connector to combine on a later poll", async () => {
+      const calls = await callsFor(later, true);
+
+      expect(calls.length).toBeGreaterThan(0);
+      expect(calls.every((call) => call.combineChannels === true)).toBe(true);
+    });
+
+    it("reads each channel on the first poll, so its results do not change", async () => {
+      const calls = await callsFor({}, true);
+
+      expect(calls.length).toBeGreaterThan(0);
+      expect(calls.every((call) => call.combineChannels === undefined)).toBe(true);
+    });
+
+    it("never asks when the application did not", async () => {
+      const calls = await callsFor(later);
+
+      expect(calls.length).toBeGreaterThan(0);
+      expect(calls.every((call) => call.combineChannels === undefined)).toBe(true);
+    });
+  });
+
   describe("a first poll with a window (US-435)", () => {
     const day = 86_400_000;
     const recentAndOld = (): CandidatePost[] => [

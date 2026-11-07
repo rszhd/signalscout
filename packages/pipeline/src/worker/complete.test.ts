@@ -255,6 +255,22 @@ describe("completing the partial posts the filter kept", () => {
     expect(post?.textPartial).toBe(true);
   });
 
+  it("reads the page of a monitor with no match cap, though the walk has its matches", async () => {
+    const monitorId = await forumMonitor();
+    const id = await insertPost("forums.macrumors.com:2493064-no-cap", {});
+    await startWalk(monitorId, id);
+    const calls: CompleteRequest[] = [];
+    const { run } = harness(threadPage, recordingConnector(calls), {
+      firstMatchesPerCollection: 1,
+      matchesPerCollection: 1,
+      noMatchCap: async (asked) => asked === monitorId,
+    });
+
+    await run(monitorId, [id]);
+
+    expect(calls).toHaveLength(1);
+  });
+
   it("reads a partial post as before when the walk has no matches yet", async () => {
     const monitorId = await forumMonitor();
     const id = await insertPost("forums.macrumors.com:2493064-under-cap", {});

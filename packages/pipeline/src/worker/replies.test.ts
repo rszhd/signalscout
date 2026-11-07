@@ -30,6 +30,9 @@ const owner = "user-1";
 
 const postedAt = new Date("2026-09-05T09:00:00.000Z");
 
+/** Monitors the worker's `noMatchCap` exempts from the one-match cap. */
+const uncapped = new Set<string>();
+
 /**
  * A two-reply thread whose ids belong to the post it hangs under.
  *
@@ -119,6 +122,7 @@ beforeAll(async () => {
     scheduleTicks: false,
     firstMatchesPerCollection: 1,
     matchesPerCollection: 1,
+    noMatchCap: async (monitorId) => uncapped.has(monitorId),
   });
 }, 60_000);
 
@@ -491,6 +495,38 @@ describe("what is never bought", () => {
       itemsOut: 0,
       detail: { stage: "replies", threadsOpened: 0, threadsSkipped: 1, pagesBought: 0 },
     });
+  }, 20_000);
+
+  it("opens the thread of a monitor with no match cap, though the walk has its matches", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    uncapped.add(monitorId);
+    const walkId = crypto.randomUUID();
+    await db.insert(pollRuns).values({
+      monitorId,
+      userId: owner,
+      walkId,
+      outcome: "collected",
+      startedAt: new Date(Date.now() - 60_000),
+    });
+    const matched = await insertPost("t3_no_cap_matched", { replyCount: 0 });
+    await db.insert(matches).values({
+      monitorId,
+      postId: matched,
+      score: 80,
+      relevance: 80,
+      problemFit: 80,
+      icpFit: 80,
+      intent: 80,
+      urgency: 50,
+      intentType: "problem",
+      reasons: ["A person describing the problem."],
+    });
+    replyRequests.length = 0;
+
+    await run(monitorId, [await insertPost("t3_no_cap_fresh", { replyCount: 3 })], walkId);
+
+    await until("the thread to be opened", () => replyRequests.at(-1));
+    expect(replyRequests).toHaveLength(1);
   }, 20_000);
 
   /**

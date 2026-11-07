@@ -258,6 +258,43 @@ describe("a cap on the matches one collection makes", () => {
     expect(await outcomeOf(monitorId)).toEqual({ matches: 4, capped: 0 });
   });
 
+  it("reads every post of a monitor the deployment exempts, on the first walk and after", async () => {
+    const { monitorId, walkId } = await monitorWithWalk();
+    const asked: string[] = [];
+    const step = createClassifyStep({
+      classifierFor: async () => passingClassifier().classifier,
+      firstMatchesPerCollection: 1,
+      matchesPerCollection: 1,
+      noMatchCap: async (id) => {
+        asked.push(id);
+        return true;
+      },
+    });
+
+    await step({ monitorId, postIds: await somePosts(3), walkId }, contextFor(db));
+    const next = crypto.randomUUID();
+    await db
+      .insert(pollRuns)
+      .values({ monitorId, userId: "user-1", walkId: next, outcome: "collected" });
+    await step({ monitorId, postIds: await somePosts(3), walkId: next }, contextFor(db));
+
+    expect(await outcomeOf(monitorId)).toEqual({ matches: 6, capped: 0 });
+    expect(new Set(asked)).toEqual(new Set([monitorId]));
+  });
+
+  it("keeps the cap on a monitor the deployment does not exempt", async () => {
+    const { monitorId, walkId } = await monitorWithWalk();
+    const step = createClassifyStep({
+      classifierFor: async () => passingClassifier().classifier,
+      matchesPerCollection: 1,
+      noMatchCap: async () => false,
+    });
+
+    await step({ monitorId, postIds: await somePosts(3), walkId }, contextFor(db));
+
+    expect(await outcomeOf(monitorId)).toEqual({ matches: 1, capped: 2 });
+  });
+
   it("refuses a cap below one", () => {
     expect(() =>
       createClassifyStep({

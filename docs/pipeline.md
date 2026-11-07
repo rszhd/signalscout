@@ -220,7 +220,10 @@ takes `matchesPerCollection`. Once a walk has that many matches, the classify st
 its posts and writes each as a `match_cap` drop, so it is never paid for and a
 screen counts it as seen. Every job of one walk shares the count; the next walk
 starts again. Calls already in flight finish, so a walk can end a few over.
-With neither number set, there is no cap.
+With neither number set, there is no cap. `noMatchCap`, when set, is asked
+for a monitor at each check; a monitor it answers true for has no cap on any
+walk (US-542). The deployment decides who that is, for example a paying
+account.
 
 The replies and complete steps stop too, batch by batch. A batch that arrives
 after the walk has its matches opens no thread and reads no partial post. The

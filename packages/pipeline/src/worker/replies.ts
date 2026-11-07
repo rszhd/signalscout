@@ -609,6 +609,7 @@ export function createRepliesStep({
   newPostsPerPairPerDay,
   firstMatchesPerCollection,
   matchesPerCollection,
+  noMatchCap,
 }: CollectOptions & MatchCaps): Step<RepliesPayload> {
   return async function replies(
     { monitorId, postIds, walkId, pollRunId },
@@ -677,6 +678,7 @@ export function createRepliesStep({
       await walkHasItsMatches(db, monitorId, walkId, {
         firstMatchesPerCollection,
         matchesPerCollection,
+        noMatchCap,
       })
     ) {
       logger.info(

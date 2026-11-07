@@ -70,7 +70,13 @@ import {
 import { recordFilterDrops } from "../filter/drops.js";
 import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
 import { loadCeiling } from "./ceiling.js";
-import { capForWalk, isFirstWalk, matchesInWalk, validateMatchCaps } from "./match-cap.js";
+import {
+  capForWalk,
+  isFirstWalk,
+  type MatchCaps,
+  matchesInWalk,
+  validateMatchCaps,
+} from "./match-cap.js";
 import { sendNotify } from "./notify.js";
 import type { ClassifyPayload } from "./queues.js";
 import { forMonitor, repliesQueue } from "./queues.js";
@@ -155,6 +161,8 @@ export interface ClassifyOptions {
    * `matchesPerCollection`.
    */
   readonly firstMatchesPerCollection?: number | undefined;
+  /** A monitor this answers true for has no cap on any walk. US-542. */
+  readonly noMatchCap?: MatchCaps["noMatchCap"];
 }
 
 /** The most calls one classify job may keep in flight. */
@@ -412,6 +420,7 @@ export function createClassifyStep({
   rescorePolls = "every",
   matchesPerCollection,
   firstMatchesPerCollection,
+  noMatchCap,
 }: ClassifyOptions): Step<ClassifyPayload> {
   if (
     !Number.isInteger(concurrency) ||
@@ -422,7 +431,7 @@ export function createClassifyStep({
       `concurrency must be a whole number from 1 to ${maximumClassifyConcurrency}, not ${concurrency}`,
     );
   }
-  const caps = { firstMatchesPerCollection, matchesPerCollection };
+  const caps = { firstMatchesPerCollection, matchesPerCollection, noMatchCap };
   validateMatchCaps(caps);
 
   return async function classify(

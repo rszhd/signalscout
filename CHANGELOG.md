@@ -20,6 +20,21 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.26.7 — 2026-11-07
+
+**Added: a deployment may exempt a monitor from the match cap** (US-542).
+`noMatchCap` on `startWorker` and the classify, replies and complete steps is
+a function of the monitor id. A monitor it answers true for has no match cap
+on any walk. A throw fails the job, which retries; it never lifts a cap.
+Unset, every monitor takes the caps. Nothing to do to take it.
+
+**Added: the pages of every later poll may be planned for each monitor**
+(US-543). `pollPagesPerInput` on the collect step and the worker runtime may
+be a `PagePlan`, as `firstPollPagesPerInput` already may. It is asked on
+every poll after the first, a resumed walk included, and its count is
+checked before any source is asked. A plain count works as before. Nothing
+to do to take it.
+
 ## 0.26.6 — 2026-11-07
 
 **Added: the keyword stage can be skipped alone** (US-539).

@@ -134,7 +134,10 @@ platform a record leaves out keeps its connector's cap.
 `firstPollPagesPerInput` may also be a function, so a caller can size each
 monitor's first poll to its own budget (US-528). The collect step calls it
 once, before it marks `last_polled_at`, and checks the count it returns
-before any source is asked.
+before any source is asked. `pollPagesPerInput` may be a function too, asked
+the same way on every later poll, a resumed walk included (US-543). A count
+it cuts short loses nothing: the page cap keeps the cursor, and the next
+poll carries on from it.
 `combineChannelsAfterFirstPoll` asks each connector to read a monitor's
 channels with one request on every poll after the first (US-536). Only
 ScrapeCreators Reddit can: it reads up to ten subreddits in one search and
@@ -220,7 +223,10 @@ takes `matchesPerCollection`. Once a walk has that many matches, the classify st
 its posts and writes each as a `match_cap` drop, so it is never paid for and a
 screen counts it as seen. Every job of one walk shares the count; the next walk
 starts again. Calls already in flight finish, so a walk can end a few over.
-With neither number set, there is no cap.
+With neither number set, there is no cap. `noMatchCap`, when set, is asked
+for a monitor at each check; a monitor it answers true for has no cap on any
+walk (US-542). The deployment decides who that is, for example a paying
+account.
 
 The replies and complete steps stop too, batch by batch. A batch that arrives
 after the walk has its matches opens no thread and reads no partial post. The

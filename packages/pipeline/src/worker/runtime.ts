@@ -214,9 +214,10 @@ export interface StartWorkerOptions {
   firstPollWindowDays?: number;
   /**
    * How many pages of each input every later poll may read, 1 to 20. US-435.
-   * Unset, later polls use the connectors' caps, as before.
+   * Unset, later polls use the connectors' caps, as before. A function plans
+   * the count for each monitor, on every later poll (US-543).
    */
-  pollPagesPerInput?: PageCount;
+  pollPagesPerInput?: PageCount | PagePlan;
   /**
    * Read a monitor's channels with one request on every poll after the first,
    * where the connector can. US-536. Cheaper, but the combined read may miss
@@ -263,6 +264,11 @@ export interface StartWorkerOptions {
    * US-490. Unset, the first collection takes `matchesPerCollection`.
    */
   firstMatchesPerCollection?: number;
+  /**
+   * True for a monitor that has no match cap on any walk, whatever the two
+   * numbers say. US-542. Unset, every monitor takes the caps.
+   */
+  noMatchCap?: (monitorId: string) => Promise<boolean>;
   /**
    * How many jobs of each pipeline queue (poll, filter, replies, classify,
    * notify) the worker runs at the same time, 1 to 16. US-439. Two jobs of
@@ -483,6 +489,7 @@ export async function startWorker({
   rescorePolls,
   matchesPerCollection,
   firstMatchesPerCollection,
+  noMatchCap,
   queueConcurrency,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
@@ -689,6 +696,7 @@ export async function startWorker({
         newPostsPerPairPerDay,
         firstMatchesPerCollection,
         matchesPerCollection,
+        noMatchCap,
       }),
     complete:
       steps.complete ??
@@ -697,6 +705,7 @@ export async function startWorker({
         credentialsFor: lookup,
         firstMatchesPerCollection,
         matchesPerCollection,
+        noMatchCap,
       }),
     classify:
       steps.classify ??
@@ -707,6 +716,7 @@ export async function startWorker({
         ...(rescorer === undefined ? {} : { rescorerFor: async () => rescorer, rescorePolls }),
         firstMatchesPerCollection,
         matchesPerCollection,
+        noMatchCap,
       }),
     notify:
       steps.notify ??

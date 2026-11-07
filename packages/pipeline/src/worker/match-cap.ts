@@ -15,6 +15,13 @@ export interface MatchCaps {
   readonly firstMatchesPerCollection?: number | undefined;
   /** The cap of every walk, or of every later one when the first has its own. Unset: no cap. */
   readonly matchesPerCollection?: number | undefined;
+  /**
+   * True for a monitor that has no cap on any walk, whatever the two numbers
+   * say: the deployment decides, for example for a paying account. US-542.
+   * Asked once per check, so a change takes effect at the next batch. A
+   * throw fails the job, which retries; it never lifts a cap by accident.
+   */
+  readonly noMatchCap?: ((monitorId: string) => Promise<boolean>) | undefined;
 }
 
 /**
@@ -76,6 +83,8 @@ export async function capForWalk(
   if (!walkId) return undefined;
   // Unset, the first walk keeps the one cap, as it did before US-490.
   const first = caps.firstMatchesPerCollection ?? caps.matchesPerCollection;
+  if (first === undefined && caps.matchesPerCollection === undefined) return undefined;
+  if (caps.noMatchCap && (await caps.noMatchCap(monitorId))) return undefined;
   // One cap is the same on every walk, so the first walk's row is not needed.
   if (first === caps.matchesPerCollection) return first;
   return (await isFirstWalk(db, monitorId, walkId)) ? first : caps.matchesPerCollection;

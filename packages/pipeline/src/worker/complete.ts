@@ -39,6 +39,7 @@ export function createCompleteStep({
   credentialsFor,
   firstMatchesPerCollection,
   matchesPerCollection,
+  noMatchCap,
 }: Pick<CollectOptions, "registry" | "credentialsFor"> & MatchCaps): Step<ClassifyPayload> {
   return async function complete(payload, { db, boss, logger }: StepContext): Promise<void> {
     const { monitorId } = payload;
@@ -74,6 +75,7 @@ export function createCompleteStep({
       await walkHasItsMatches(db, monitorId, payload.walkId, {
         firstMatchesPerCollection,
         matchesPerCollection,
+        noMatchCap,
       })
     ) {
       logger.info(

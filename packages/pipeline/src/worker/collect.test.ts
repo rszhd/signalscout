@@ -1028,6 +1028,113 @@ describe("the poll step", () => {
         }),
       ).toThrow(RangeError);
     });
+
+    describe("planned for each poll (US-543)", () => {
+      const later = { lastPolledAt: new Date("2026-08-10T08:00:00.000Z") };
+
+      it("reads the pages the plan returns, and asks it with the monitor", async () => {
+        const monitorId = await insertMonitor(database, later);
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+        const asked: { id: string; userId: string }[] = [];
+
+        await createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          pollPagesPerInput: async (monitor) => {
+            asked.push({ id: monitor.id, userId: monitor.userId });
+            return { reddit: 3 };
+          },
+        })({ monitorId }, contextFor(db, stubBoss()));
+
+        expect(asked).toEqual([{ id: monitorId, userId: expect.any(String) }]);
+        expect(source.calls).toHaveLength(3);
+        expect(source.calls.every((call) => call.pagesPerInput === 3)).toBe(true);
+      });
+
+      it("is asked again on the poll that resumes a walk the count cut short", async () => {
+        const monitorId = await insertMonitor(database, later);
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+        const counts = [2, 1];
+        const step = createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          pollPagesPerInput: () => counts.shift(),
+        });
+
+        await step({ monitorId }, contextFor(db, stubBoss()));
+        await step({ monitorId }, contextFor(db, stubBoss()));
+
+        // The second poll carries on from the first one's cursor, at its own
+        // count: three different posts, none bought twice.
+        expect(counts).toEqual([]);
+        expect(source.calls.map((call) => call.pagesPerInput)).toEqual([2, 2, 1]);
+        expect(await db.select().from(posts)).toHaveLength(3);
+      });
+
+      it("is not asked on a first poll", async () => {
+        const monitorId = await insertMonitor(database);
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+        let calls = 0;
+
+        await createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          firstPollPagesPerInput: 8,
+          pollPagesPerInput: () => {
+            calls += 1;
+            return 1;
+          },
+        })({ monitorId }, contextFor(db, stubBoss()));
+
+        expect(calls).toBe(0);
+        expect(source.calls).toHaveLength(8);
+      });
+
+      it("leaves the connectors' caps when the plan returns nothing", async () => {
+        const monitorId = await insertMonitor(database, later);
+        const registry = fakeRegistry({ posts: many, pageSize: 1 });
+        const source = registry.only("reddit") as SocialSource & {
+          calls: readonly SearchRequest[];
+        };
+
+        await createCollectStep({
+          registry,
+          credentialsFor: credentials,
+          pollPagesPerInput: () => undefined,
+        })({ monitorId }, contextFor(db, stubBoss()));
+
+        expect(source.calls).toHaveLength(maxPagesPerPoll);
+        expect(source.calls.every((call) => call.pagesPerInput === undefined)).toBe(true);
+      });
+
+      it("asks no source when the plan returns a count out of range", async () => {
+        for (const count of [0, 21, { reddit: 2, x: 0 }]) {
+          const monitorId = await insertMonitor(database, later);
+          const registry = fakeRegistry({ posts: many, pageSize: 1 });
+          const source = registry.only("reddit") as SocialSource & {
+            calls: readonly SearchRequest[];
+          };
+
+          await expect(
+            createCollectStep({
+              registry,
+              credentialsFor: credentials,
+              pollPagesPerInput: () => count,
+            })({ monitorId }, contextFor(db, stubBoss())),
+          ).rejects.toThrow(RangeError);
+          expect(source.calls).toHaveLength(0);
+        }
+      });
+    });
   });
 
   describe("a page count for each platform (US-435)", () => {

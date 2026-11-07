@@ -134,7 +134,10 @@ platform a record leaves out keeps its connector's cap.
 `firstPollPagesPerInput` may also be a function, so a caller can size each
 monitor's first poll to its own budget (US-528). The collect step calls it
 once, before it marks `last_polled_at`, and checks the count it returns
-before any source is asked.
+before any source is asked. `pollPagesPerInput` may be a function too, asked
+the same way on every later poll, a resumed walk included (US-543). A count
+it cuts short loses nothing: the page cap keeps the cursor, and the next
+poll carries on from it.
 `combineChannelsAfterFirstPoll` asks each connector to read a monitor's
 channels with one request on every poll after the first (US-536). Only
 ScrapeCreators Reddit can: it reads up to ten subreddits in one search and

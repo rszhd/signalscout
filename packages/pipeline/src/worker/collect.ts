@@ -114,9 +114,10 @@ export interface CollectOptions {
    * How many pages of each input every poll after the first may read, in
    * place of each connector's own cap. US-435. Lower than the cap makes a
    * daily poll cheaper; the first poll keeps `firstPollPagesPerInput`.
-   * Unset, later polls use the connectors' caps, as before.
+   * Unset, later polls use the connectors' caps, as before. A plan is asked
+   * on every later poll, resumed walks too (US-543).
    */
-  readonly pollPagesPerInput?: PageCount | undefined;
+  readonly pollPagesPerInput?: PageCount | PagePlan | undefined;
   /**
    * Ask each connector to read a monitor's channels with one request, on
    * every poll after the first. US-536. A connector that cannot ignores it.
@@ -144,8 +145,9 @@ export const maximumFirstPollWindowDays = 365;
 export type PageCount = number | Readonly<Record<string, number>>;
 
 /**
- * A first poll's count, worked out for one monitor by the caller. US-528.
- * Called once, on the monitor's first poll, before any source is asked.
+ * A poll's count, worked out for one monitor by the caller. US-528, US-543.
+ * Called once a poll, before any source is asked: on the first poll for
+ * `firstPollPagesPerInput`, on every later one for `pollPagesPerInput`.
  * `undefined` leaves every platform to its connector's cap.
  */
 export type PagePlan = (monitor: {
@@ -1020,9 +1022,9 @@ export function createCollectStep({
 }: CollectOptions): Step<PollPayload> {
   // Refused at start-up, with the connectors' own rule, rather than on the
   // first monitor that meets it.
-  // A plan's count is checked on each first poll instead, before any source.
+  // A plan's count is checked on each poll instead, before any source.
   if (typeof firstPollPagesPerInput !== "function") checkPageCount(firstPollPagesPerInput);
-  checkPageCount(pollPagesPerInput);
+  if (typeof pollPagesPerInput !== "function") checkPageCount(pollPagesPerInput);
   if (
     firstPollWindowDays !== undefined &&
     (!Number.isInteger(firstPollWindowDays) ||
@@ -1123,19 +1125,17 @@ export function createCollectStep({
       const covered = await coverageFor(db, monitorId);
 
       /**
-       * This poll's page count. US-528. A plan is asked here, before
+       * This poll's page count. US-528, US-543. A plan is asked here, before
        * `last_polled_at` is marked: a plan that throws leaves the poll a
        * first poll, so the retry asks it again instead of reading at the
        * later polls' count.
        */
-      let firstPages: PageCount | undefined;
-      if (firstPoll) {
-        firstPages =
-          typeof firstPollPagesPerInput === "function"
-            ? await firstPollPagesPerInput({ id: monitor.id, userId: monitor.userId })
-            : firstPollPagesPerInput;
-        checkPageCount(firstPages);
-      }
+      const option = firstPoll ? firstPollPagesPerInput : pollPagesPerInput;
+      const pages =
+        typeof option === "function"
+          ? await option({ id: monitor.id, userId: monitor.userId })
+          : option;
+      checkPageCount(pages);
 
       const channels = monitor.generatedSubreddits;
 
@@ -1347,7 +1347,7 @@ export function createCollectStep({
           },
           {
             ...pageLimits(
-              countFor(firstPoll ? firstPages : pollPagesPerInput, source.platform.id),
+              countFor(pages, source.platform.id),
               queries.length + unitChannels.length,
             ),
             ...((firstPoll ? combineChannelsOnFirstPoll : combineChannelsAfterFirstPoll)

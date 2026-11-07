@@ -214,9 +214,10 @@ export interface StartWorkerOptions {
   firstPollWindowDays?: number;
   /**
    * How many pages of each input every later poll may read, 1 to 20. US-435.
-   * Unset, later polls use the connectors' caps, as before.
+   * Unset, later polls use the connectors' caps, as before. A function plans
+   * the count for each monitor, on every later poll (US-543).
    */
-  pollPagesPerInput?: PageCount;
+  pollPagesPerInput?: PageCount | PagePlan;
   /**
    * Read a monitor's channels with one request on every poll after the first,
    * where the connector can. US-536. Cheaper, but the combined read may miss

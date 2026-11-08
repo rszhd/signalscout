@@ -234,9 +234,13 @@ export function leadScore(classification: Classification): number {
   return Math.round(total * relevanceGate(classification.relevance));
 }
 
-/** The scores as the `matches` columns hold them: integers, 0 to 100. */
+/**
+ * The verdict as the `matches` columns hold it: the scores as integers, 0 to
+ * 100, the reasons, and what the author asks for (US-549).
+ */
 export function scoreColumns(classification: Classification) {
   return {
+    asks: classification.asks,
     score: leadScore(classification),
     relevance: Math.round(classification.relevance),
     problemFit: Math.round(classification.problemFit),

@@ -361,6 +361,20 @@ describe("a post the model scores", () => {
     // 0.35 x 88 + 0.25 x 96 + 0.20 x 98 + 0.10 x 91 + 0.10 x 82 = 91.7
     expect(match?.score).toBe(92);
     expect(match?.reasons).toContain("Asks what tools other small teams use");
+    expect(match?.asks).toBe("A tool for this");
+  }, 30_000);
+
+  it("rewrites what the author asks for when a new version scores it again (US-549)", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(strongPost, "asks-rewritten");
+
+    await classifyAndWait(monitorId, [postId]);
+    answer = () => strongAnswer.replace("A tool for this", "Tests that survive a UI change");
+    await updateMonitor(db, monitorId, { problem: "Tests that break when the UI moves" });
+    await classifyAndWait(monitorId, [postId]);
+
+    const rows = await db.select().from(matches).where(eq(matches.monitorId, monitorId));
+    expect(rows.map((row) => row.asks)).toEqual(["Tests that survive a UI change"]);
   }, 30_000);
 
   it("records what the call cost, whatever it scored", async () => {

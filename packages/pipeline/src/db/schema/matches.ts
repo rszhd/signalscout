@@ -49,6 +49,11 @@ export const matches = pgTable(
     intentType: text("intent_type").$type<IntentType>().notNull(),
     /** Specific claims about this post, not a restatement of the scores. US-011. */
     reasons: text("reasons").array().notNull(),
+    /**
+     * What the author asks for, in the classifier's one sentence. Null on a
+     * row written before it was kept. US-549.
+     */
+    asks: text("asks"),
     /** Set by the reconciliation job when the post is gone. The row stays. US-015. */
     hidden: boolean("hidden").notNull().default(false),
     /** Null until the user opens it. Drives the unread filter and the re-check rate. */

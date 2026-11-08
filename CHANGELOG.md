@@ -20,6 +20,16 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.27.0 — 2026-11-08
+
+**Added: a match keeps what the author asks for** (US-549). `matches.asks`
+holds the classifier's one sentence on what the author is asking for or
+needs, written with the scores on insert and on re-classification.
+`scoreColumns` returns it. A row written before this version is null.
+**Run the pipeline migrations** to take it: migration 0079 adds the column.
+A caller that writes its own `update matches` from `scoreColumns` may set
+`asks` too.
+
 ## 0.26.7 — 2026-11-07
 
 **Added: a deployment may exempt a monitor from the match cap** (US-542).

@@ -1,0 +1,61 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 5406,
+    "credits_charged": 1,
+    "results": [
+      {
+        "title": "What is the best 3D printer for beginners that can grow with the user?",
+        "url": "https://www.facebook.com/groups/3041147622853548/posts/4156419877992978/",
+        "description": "9 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "What are some good starter 3D printers for scale models? - Facebook",
+        "url": "https://www.facebook.com/groups/812442282225658/posts/4407449416058242/",
+        "description": "22 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "Looking at a 3D printer for first time user. What do people make of ...",
+        "url": "https://www.facebook.com/groups/3041147622853548/posts/4156362661332033/",
+        "description": "12 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "What would recommend for a multi color printer for a beginner ?",
+        "url": "https://www.facebook.com/groups/482533505156388/posts/29126251550357868/",
+        "description": "13 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "Best 3D printers for a 9-year-old's Christmas gift - Facebook",
+        "url": "https://www.facebook.com/groups/kernersville411/posts/1843058420063837/",
+        "description": "9 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "What are the best beginner-friendly 3D printers with multi-color ...",
+        "url": "https://www.facebook.com/groups/3041147622853548/posts/4156726651295634/",
+        "description": "5 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "What 3D printer is best for a 10-year-old beginner? - Facebook",
+        "url": "https://www.facebook.com/groups/3041147622853548/posts/4156418594659773/",
+        "description": "8 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "Anycubic Kobra X vs which 3D printer is recommended? - Facebook",
+        "url": "https://www.facebook.com/groups/482533505156388/posts/29116689694647387/",
+        "description": "18 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "Bambu Lab A1 Combo vs P2S Combo: Which 3D printer to buy?",
+        "url": "https://www.facebook.com/groups/482533505156388/posts/29116047328044957/",
+        "description": "19 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      },
+      {
+        "title": "Best 3D printer for beginners and kids to make 1-inch items?",
+        "url": "https://www.facebook.com/groups/3041147622853548/posts/4156607847974181/",
+        "description": "7 hours ago ... Scrubbed by capture-search.mjs: a snippet can name commenters."
+      }
+    ],
+    "next_page": 2
+  }
+}

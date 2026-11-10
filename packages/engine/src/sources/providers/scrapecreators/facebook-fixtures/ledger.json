@@ -39,5 +39,40 @@
     "creditsBefore": 10350,
     "creditsAfter": 10350,
     "spent": 0
+  },
+  {
+    "file": "search-page-1.json",
+    "creditsBefore": 5407,
+    "creditsAfter": 5406,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "search-page-2.json",
+    "creditsBefore": 5406,
+    "creditsAfter": 5405,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "search-nothing.json",
+    "creditsBefore": 5405,
+    "creditsAfter": 5405,
+    "spent": 0,
+    "creditsCharged": 0
+  },
+  {
+    "file": "post-read.json",
+    "creditsBefore": 5405,
+    "creditsAfter": 5404,
+    "spent": 1,
+    "creditsCharged": 1
+  },
+  {
+    "file": "post-missing.json",
+    "creditsBefore": 5404,
+    "creditsAfter": 5404,
+    "spent": 0,
+    "creditsCharged": 0
   }
 ]

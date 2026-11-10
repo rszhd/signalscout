@@ -91,6 +91,14 @@ export const endpoints = {
    */
   youTubeComments: `${youTubeBase}/video/comments`,
   facebookGroupPosts: `${facebookBase}/group/posts`,
+  /** One public post by its address. US-557: 1 credit, an unknown post 404 and unbilled. */
+  facebookPost: `${facebookBase}/post`,
+  /**
+   * A Google search. US-557. Ten results a page, 1 credit, ranked by Google's
+   * relevance and not by date; a search that finds nothing answers 404,
+   * unbilled. `page` runs 1 to 11 and page 12 is refused.
+   */
+  googleSearch: `${apiBase}/v1/google/search`,
 } as const;
 
 /**
@@ -131,6 +139,25 @@ export const facebookGroupShape: PageShape = {
   recordsOf: (body) => arrayAt(body, "posts"),
   cursorOf: (body) => textAt(body, "cursor"),
 };
+
+/** A Google search page: `results`, and the next page as a number. US-557. */
+export const googleSearchShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "results"),
+  cursorOf: (body) => {
+    const next = body.next_page;
+    if (typeof next === "number" && Number.isInteger(next) && next > 0) return String(next);
+    return textAt(body, "next_page");
+  },
+};
+
+/** One record by itself, or the provider's word that there is none. */
+export type RecordAnswer =
+  | {
+      readonly found: true;
+      readonly record: Record<string, unknown>;
+      readonly creditsCharged: number;
+    }
+  | { readonly found: false; readonly creditsCharged: number };
 
 /**
  * TikTok: `search_item_list`, and a cursor that is a count.
@@ -396,6 +423,37 @@ export class ScrapeCreatorsClient {
       ...(after ? { after } : {}),
       creditsCharged: this.chargeOf(body),
     };
+  }
+
+  /**
+   * One record whose answer is the record itself, such as one Facebook post.
+   *
+   * A 404 is the provider's "not found" (a post that is gone or behind a
+   * login, measured unbilled on 2026-11-10), so it is an answer and not an
+   * error. Every other failure throws as `fetchPage` does.
+   */
+  async fetchRecord(
+    endpoint: string,
+    params: Record<string, string>,
+    signal?: AbortSignal,
+  ): Promise<RecordAnswer> {
+    const answer = await this.call(endpoint, params, signal);
+    const body =
+      typeof answer.body === "object" && answer.body !== null
+        ? (answer.body as Record<string, unknown>)
+        : {};
+
+    if (answer.httpStatus === 404) {
+      const charged = body.credits_charged;
+      return {
+        found: false,
+        creditsCharged:
+          typeof charged === "number" && Number.isFinite(charged) && charged >= 0 ? charged : 0,
+      };
+    }
+    if (answer.httpStatus !== 200) throw this.fail(answer);
+
+    return { found: true, record: body, creditsCharged: this.chargeOf(body) };
   }
 
   /**

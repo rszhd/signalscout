@@ -1,0 +1,168 @@
+{
+  "status": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 5404,
+    "credits_charged": 1,
+    "post_id": "4156419877992978",
+    "shared_post_id": null,
+    "shared_post_url": null,
+    "is_paid_partnership": null,
+    "like_count": 0,
+    "comment_count": 6,
+    "reaction_counts": {
+      "thankful": 0,
+      "like": 0,
+      "love": 0,
+      "care": 0,
+      "haha": 0,
+      "wow": 0,
+      "sad": 0,
+      "anger": 0,
+      "pride": 0,
+      "confused": 0
+    },
+    "creation_time": "2026-11-09T18:19:36.000Z",
+    "share_count": 0,
+    "view_count": null,
+    "description": "What is the best 3D printer for beginners that can grow with the user?",
+    "feedback_id": "ZmVlZGJhY2s6cGZiaWQwdmlSeUxTa01TNnlENXA5ZVd1YlZkNHpiYXVhSDZtYWtDTmR6d1BLeGpyZzhLQnVhUDNNTUpUclVEWXIyVHBWRGw=",
+    "comments": [
+      {
+        "id": "Y29tbWVudDo0MTU2NDE5ODc3OTkyOTc4XzQxNTY0MjQ5MTQ2NTkxNDE=",
+        "author": {
+          "__typename": "User",
+          "id": "member-1",
+          "name": "member-2",
+          "__isActor": "member-3",
+          "profile_picture_depth_0": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "profile_picture_depth_0_increased": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "profile_picture_depth_1": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "gender": "member-4",
+          "__isEntity": "member-3",
+          "url": null,
+          "work_info": null,
+          "profile_picture": "https://scrubbed.invalid/media-url-expired.bin"
+        },
+        "text": "DIY",
+        "reaction_count": 1,
+        "reactions": {
+          "thankful": 0,
+          "like": 1,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        }
+      },
+      {
+        "id": "Y29tbWVudDo0MTU2NDE5ODc3OTkyOTc4XzQxNTY1NDkyODEzMTMzNzE=",
+        "author": {
+          "__typename": "User",
+          "id": "member-5",
+          "name": "member-6",
+          "__isActor": "member-3",
+          "profile_picture_depth_0": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "profile_picture_depth_0_increased": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "profile_picture_depth_1": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "gender": "member-4",
+          "__isEntity": "member-3",
+          "url": null,
+          "work_info": null,
+          "profile_picture": "https://scrubbed.invalid/media-url-expired.bin"
+        },
+        "text": "Any Bambu.",
+        "reaction_count": 0,
+        "reactions": {
+          "thankful": 0,
+          "like": 0,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        }
+      },
+      {
+        "id": "Y29tbWVudDo0MTU2NDE5ODc3OTkyOTc4XzQxNTY0MzgxMzQ2NTc4MTk=",
+        "author": {
+          "__typename": "User",
+          "id": "member-7",
+          "name": "member-8",
+          "__isActor": "member-3",
+          "profile_picture_depth_0": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "profile_picture_depth_0_increased": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "profile_picture_depth_1": {
+            "uri": "https://scrubbed.invalid/media-url-expired.bin"
+          },
+          "gender": "member-4",
+          "__isEntity": "member-3",
+          "url": null,
+          "work_info": null,
+          "profile_picture": "https://scrubbed.invalid/media-url-expired.bin"
+        },
+        "text": "TikTok shop",
+        "reaction_count": 0,
+        "reactions": {
+          "thankful": 0,
+          "like": 0,
+          "love": 0,
+          "care": 0,
+          "haha": 0,
+          "wow": 0,
+          "sad": 0,
+          "anger": 0,
+          "pride": 0,
+          "confused": 0
+        }
+      }
+    ],
+    "url": "https://www.facebook.com/groups/3041147622853548/posts/4156419877992978/",
+    "link_attachment": null,
+    "videos": [],
+    "image_url": null,
+    "images": [],
+    "thumbnail": null,
+    "author": {
+      "id": "member-9",
+      "name": "member-10",
+      "handle": null,
+      "is_verified": null,
+      "url": null,
+      "image": "https://scrubbed.invalid/media-url-expired.bin"
+    },
+    "video": {
+      "id": null,
+      "sd_url": null,
+      "hd_url": null,
+      "height": null,
+      "width": null,
+      "length_in_second": null,
+      "thumbnail": null,
+      "captions_url": null
+    }
+  }
+}

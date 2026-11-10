@@ -246,6 +246,14 @@ platform holds a query to lives on its `PlatformDescriptor`:
 search: { maxQueryWords: 4, note: "An X post is a few sentences, so a long phrase..." }
 ```
 
+**An address platform may also take a phrase.** A forum's queries are
+section addresses and nothing else. Facebook's are a group's address, read
+as a channel, or a phrase, searched in public groups through Google; the
+connector tells them apart by form, and `acceptsPhrases` on the search style
+lets a person write either (US-557). A phrase's results are partial posts:
+the filter judges the snippet, and `completePosts` buys the whole post only
+for the ones it keeps.
+
 **A connector never edits a person's words to fit.** The generator writes for
 somewhere; the connector asks for what it was given. A connector that quietly
 shortened a phrase would hide from everyone that the phrase returned nothing.

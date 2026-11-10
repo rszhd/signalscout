@@ -89,5 +89,76 @@
     "posts": 0,
     "pseudonyms": 0,
     "elapsedMs": 217
+  },
+  {
+    "file": "search-page-1.json",
+    "capturedAt": "2026-11-10T05:40:43.241Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/google/search",
+      "params": {
+        "query": "3d printer recommend site:facebook.com/groups",
+        "date_posted": "last-day"
+      }
+    },
+    "status": 200,
+    "results": 10,
+    "pseudonyms": 0,
+    "elapsedMs": 3482
+  },
+  {
+    "file": "search-page-2.json",
+    "capturedAt": "2026-11-10T05:40:46.514Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/google/search",
+      "params": {
+        "query": "3d printer recommend site:facebook.com/groups",
+        "date_posted": "last-day",
+        "page": "2"
+      }
+    },
+    "status": 200,
+    "results": 10,
+    "pseudonyms": 0,
+    "elapsedMs": 2545
+  },
+  {
+    "file": "search-nothing.json",
+    "capturedAt": "2026-11-10T05:40:52.964Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/google/search",
+      "params": {
+        "query": "zqxjkv intentwatch qqqq site:facebook.com/groups",
+        "date_posted": "last-day"
+      }
+    },
+    "status": 404,
+    "pseudonyms": 0,
+    "elapsedMs": 5149
+  },
+  {
+    "file": "post-read.json",
+    "capturedAt": "2026-11-10T05:40:57.285Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/post",
+      "params": {
+        "url": "https://www.facebook.com/groups/3041147622853548/posts/4156419877992978/"
+      }
+    },
+    "status": 200,
+    "pseudonyms": 10,
+    "elapsedMs": 3607
+  },
+  {
+    "file": "post-missing.json",
+    "capturedAt": "2026-11-10T05:41:01.127Z",
+    "request": {
+      "endpoint": "https://api.scrapecreators.com/v1/facebook/post",
+      "params": {
+        "url": "https://www.facebook.com/groups/856491544939621/posts/1/"
+      }
+    },
+    "status": 404,
+    "pseudonyms": 0,
+    "elapsedMs": 3295
   }
 ]

@@ -172,6 +172,24 @@ describe("searching a phrase", () => {
     expect(pages).toBe(11);
   });
 
+  it("starts an input over when an edit put a phrase where a group's cursor was", async () => {
+    const group = provider([groupPage]);
+    const groupSource = new ScrapeCreatorsFacebookSource(runtimeWith(group.fetch));
+    const groupRead = await groupSource.search(
+      request({ query: { queries: [groupAddress], channels: [], since: new Date(0) } }),
+    );
+    const groupCursor = groupRead.next.status === "ready" ? groupRead.next.cursor : undefined;
+    expect(groupCursor).toBeDefined();
+
+    // The same position now holds a phrase.
+    const { fetch, calls } = provider([pageOne]);
+    await new ScrapeCreatorsFacebookSource(runtimeWith(fetch)).search(
+      request({ cursor: groupCursor }),
+    );
+    expect(calls[0]?.pathname).toBe("/v1/google/search");
+    expect(calls[0]?.searchParams.has("page")).toBe(false);
+  });
+
   it("pays nothing for a search that finds nothing, and moves on", async () => {
     const { fetch } = provider([nothing]);
     const result = await new ScrapeCreatorsFacebookSource(runtimeWith(fetch)).search(request());

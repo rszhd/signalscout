@@ -116,8 +116,10 @@ interface Cursor {
   readonly index: number;
   readonly pages: number;
   readonly after?: string;
-  /** Post ids already returned for this group in this read. */
+  /** Post ids already returned for this input in this read. */
   readonly seen?: readonly string[];
+  /** Set when `after` is a search page, not a group's cursor (US-557). */
+  readonly phrase?: true;
 }
 
 function encodeCursor(cursor: Cursor): string {
@@ -188,18 +190,27 @@ export class ScrapeCreatorsFacebookSource implements SocialSource {
   }
 
   async search(request: SearchRequest): Promise<SearchResult> {
-    const start =
+    const saved =
       request.cursor === undefined ? this.first(request.query) : decodeCursor(request.cursor);
 
-    if (!start) return { posts: [], unitsConsumed: 0, next: { status: "done" } };
+    if (!saved) return { posts: [], unitsConsumed: 0, next: { status: "done" } };
 
-    const query = request.query.queries[start.index];
+    const query = request.query.queries[saved.index];
 
     // The monitor's queries changed between two polls. Finishing is safe: the
     // next poll starts again from the first query.
     if (query === undefined) return { posts: [], unitsConsumed: 0, next: { status: "done" } };
 
-    if (!isGroupAddress(query)) return this.searchPhrase(request, start, query);
+    // A list edited between two polls can put a phrase where a group was, or
+    // the reverse. A group's cursor sent as a search page, or a page number as
+    // a group's cursor, is billed for nothing, so that input starts over.
+    const phrase = !isGroupAddress(query);
+    const start: Cursor =
+      saved.after !== undefined && (saved.phrase === true) !== phrase
+        ? { index: saved.index, pages: 0 }
+        : saved;
+
+    if (phrase) return this.searchPhrase(request, start, query);
 
     const foundBy = { kind: "channel" as const, value: query };
     const cap = pagesPerInputFor(request, this.pagesPerGroup);
@@ -341,7 +352,13 @@ export class ScrapeCreatorsFacebookSource implements SocialSource {
       page.records.length > 0 && page.after && pages < cap
         ? {
             status: "ready",
-            cursor: encodeCursor({ index: start.index, pages, after: page.after, seen: [...seen] }),
+            cursor: encodeCursor({
+              index: start.index,
+              pages,
+              after: page.after,
+              seen: [...seen],
+              phrase: true,
+            }),
           }
         : this.afterInput(request.query, start);
 

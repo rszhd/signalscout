@@ -2,7 +2,7 @@
 
 # Open tickets
 
-94 open — 24 doing, 61 todo, 9 parked (14 p1, 62 p2, 18 p3).
+94 open — 24 doing, 61 todo, 9 parked (15 p1, 61 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -15,6 +15,7 @@
 | p1 | US-539 | [The keyword stage can be skipped alone](doing/US-539-the-keyword-stage-can-be-skipped-alone.md) | feature | doing | 2026-11-07T00:30+08:00 |
 | p1 | US-542 | [A deployment may exempt a monitor from the match cap](doing/US-542-a-deployment-may-exempt-a-monitor-from-the-match-cap.md) | feature | doing | 2026-11-07T11:08+08:00 |
 | p1 | US-543 | [A caller may plan the pages of every later poll](doing/US-543-a-caller-may-plan-the-pages-of-every-later-poll.md) | feature | doing | 2026-11-07T11:32+08:00 |
+| p1 | US-557 | [Facebook posts are found by keyword, through Google](doing/US-557-facebook-posts-are-found-by-keyword-through-google.md) | feature | doing | 2026-11-10T13:29+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |
@@ -32,7 +33,6 @@
 | p2 | US-470 | [A monitor reads forum sections through Bright Data](doing/US-470-a-monitor-reads-forum-sections-through-bright-data.md) | feature | doing | 2026-10-30T15:28+08:00 |
 | p2 | US-471 | [A forum page Bright Data cannot pass is read through a cloud browser](doing/US-471-a-forum-page-bright-data-cannot-pass-is-read-through-a-cloud-browser.md) | feature | doing | 2026-10-31T09:06+08:00 |
 | p2 | US-478 | [A forum no parser reads is read through the feed its home page names](doing/US-478-a-forum-no-parser-reads-is-read-through-the-feed-its-home-page-names.md) | feature | doing | 2026-10-31T19:30+08:00 |
-| p2 | US-549 | [A match keeps what the author asks for](doing/US-549-a-match-keeps-what-the-author-asks-for.md) | feature | doing | 2026-11-08T14:14+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](doing/BUG-021-classify-tests-time-out-on-ci.md) | bug | doing | 2026-09-19T02:01+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |

@@ -105,17 +105,19 @@ describe("the connector's declared economics", () => {
     expect(scrapeCreatorsFacebook.billableUnit).toBe("request");
     expect(scrapeCreatorsFacebook.pricePerUnitMicros).toBe(1880);
     expect(scrapeCreatorsFacebook.postsPerUnit).toBe(3);
-    expect(scrapeCreatorsFacebook.discovery).toEqual(["channel"]);
+    expect(scrapeCreatorsFacebook.discovery).toEqual(["keyword", "channel"]);
     expect(scrapeCreatorsFacebook.linksToComments).toBe(false);
     expect(scrapeCreatorsFacebook.canFetchReplies).toBe(false);
     expect(scrapeCreatorsFacebook.maxUnitsPerQueryPoll).toBe(5);
   });
 
-  it("lets an application set a lower page cap", () => {
-    const lower = createScrapeCreatorsFacebook({ pagesPerGroup: 1 });
+  it("lets an application set lower page caps", () => {
+    const lower = createScrapeCreatorsFacebook({ pagesPerGroup: 1, pagesPerPhrase: 1 });
 
     expect(lower.maxUnitsPerQueryPoll).toBe(1);
+    expect(createScrapeCreatorsFacebook({ pagesPerGroup: 1 }).maxUnitsPerQueryPoll).toBe(2);
     expect(() => createScrapeCreatorsFacebook({ pagesPerGroup: 6 })).toThrow(RangeError);
+    expect(() => createScrapeCreatorsFacebook({ pagesPerPhrase: 12 })).toThrow(RangeError);
   });
 });
 

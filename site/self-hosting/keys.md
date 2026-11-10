@@ -14,7 +14,7 @@ You bring a key for each provider you want to use.
 | YouTube | ScrapeCreators, SocialCrawl | |
 | TikTok | ScrapeCreators, SocialCrawl | |
 | Instagram | SocialCrawl | Comments cost more than posts. See [costs](./costs). |
-| Facebook groups | ScrapeCreators | Public groups only. Each query is the address of one group. |
+| Facebook groups | ScrapeCreators | Public groups only. A query is the address of one group, or a short phrase searched in public groups. |
 
 **Start small.** One Reddit provider and one AI model key already give you a
 working product. A platform with no key simply cannot be ticked on the monitor

@@ -2,7 +2,7 @@
 
 # Done
 
-281 finished.
+282 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -17,6 +17,7 @@
 | BUG-481 | [An empty page from Bright Data loses the forum](done/2026-11/BUG-481-an-empty-page-from-bright-data-loses-the-forum.md) | bug | shipped | 2026-11 |
 | BUG-480 | [Completing partial posts starts one browser a page](done/2026-11/BUG-480-completing-partial-posts-starts-one-browser-a-page.md) | bug | shipped | 2026-11 |
 | BUG-479 | [XenForo 2 threads in VerticalScope's theme are not read](done/2026-11/BUG-479-xenforo-2-threads-in-verticalscope-s-theme-are-not-read.md) | bug | shipped | 2026-11 |
+| US-549 | [A match keeps what the author asks for](done/2026-11/US-549-a-match-keeps-what-the-author-asks-for.md) | feature | shipped | 2026-11 |
 | US-528 | [A caller may plan each monitor's first-poll pages](done/2026-11/US-528-a-caller-may-plan-each-monitor-s-first-poll-pages.md) | feature | shipped | 2026-11 |
 | US-524 | [Triage can read every post](done/2026-11/US-524-triage-can-read-every-post.md) | feature | shipped | 2026-11 |
 | US-509 | [A site that refuses a plain request is reported as blocked](done/2026-11/US-509-a-site-that-refuses-a-plain-request-is-reported-as-blocked.md) | feature | shipped in 0.24.1 | 2026-11 |

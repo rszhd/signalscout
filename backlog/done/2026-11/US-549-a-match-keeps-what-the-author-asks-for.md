@@ -5,7 +5,7 @@ type: feature
 priority: p2
 created: 2026-11-08T14:14+08:00
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -28,7 +28,7 @@ nothing fills those, because the sentence was never stored.
 - [x] `matches.asks` exists, `text`, null allowed, in a pipeline migration.
 - [x] A new match stores the classifier's `asks`.
 - [x] A re-classified match has its `asks` rewritten with its scores.
-- [ ] The release that carries it is a minor version: it has a migration.
+- [x] The release that carries it is a minor version: it has a migration.
 
 ## Notes
 
@@ -38,3 +38,5 @@ Only one code path writes a match row: `writeMatch` in
 ## Log
 
 2026-11-08T14:22+08:00 — `asks` added to `scoreColumns`, column in migration 0079. Both classify tests fail without the change and pass with it; the full suite passes (2864).
+
+2026-11-08T15:20+08:00 — Released in 0.27.0 (PR #135, tag v0.27.0), a minor version for migration 0079.

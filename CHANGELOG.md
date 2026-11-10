@@ -20,6 +20,29 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.28.0 — 2026-11-10
+
+**Added: Facebook posts are found by phrase** (US-557). A Facebook query is
+now either the address of a public group, read as before, or a phrase,
+searched as `<phrase> site:facebook.com/groups` through Google on the same
+ScrapeCreators key. The connector tells them apart by form: a query that
+starts with `http` and names `/groups/` is a group. A phrase reads
+`pagesPerPhrase` pages of 10 results a poll (default 2, at most 11) for the
+past day, or the smallest window covering `since`; Google ranks by
+relevance, so every page up to the cap is bought. Each result is a partial
+post with an approximate date and no `since` cut, and
+`SocialSource.completePosts` reads it whole, 1 credit, once the filter keeps
+it. A post found by phrase and by its group has the same `externalId`.
+
+**A deployment that stored phrases in its Facebook list now spends on
+them**: before this version such a query failed as a group address. **A
+caller that wraps the Facebook connector must pass `completePosts` on**, or
+every phrase result reaches the classifier as Google's snippet.
+`PlatformSearchStyle.acceptsPhrases` is new and set on Facebook, so
+`searchQuerySchemaFor` accepts a group address or a phrase of up to six
+words there; the model is still asked for addresses. A saved cursor whose
+input changed kind between two polls starts that input over.
+
 ## 0.27.0 — 2026-11-08
 
 **Added: a match keeps what the author asks for** (US-549). `matches.asks`

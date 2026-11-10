@@ -117,22 +117,34 @@ export const addressQuerySchema = z
  * model must obey and a person may bypass is a suggestion with a test.
  */
 export function searchQuerySchemaFor(style: PlatformSearchStyle | undefined) {
-  if (style?.input === "address") {
-    const prefix = style.addressPrefix;
-    if (prefix === undefined) return addressQuerySchema;
-
-    return addressQuerySchema.refine((value) => value.startsWith(prefix), {
-      message: `a query here is the address of a page starting with ${prefix}`,
-    });
-  }
-
   const ceiling = style?.maxQueryWords ?? defaultMaxQueryWords;
-
-  return searchQuerySchema.refine((value) => wordsIn(value) <= ceiling, {
+  const phrase = searchQuerySchema.refine((value) => wordsIn(value) <= ceiling, {
     message:
       `a query here is at most ${ceiling} words: a longer phrase has to appear ` +
       "inside a post to match one, and on a short platform it never does",
   });
+
+  if (style?.input === "address") {
+    const prefix = style.addressPrefix;
+    const address =
+      prefix === undefined
+        ? addressQuerySchema
+        : addressQuerySchema.refine((value) => value.startsWith(prefix), {
+            message: `a query here is the address of a page starting with ${prefix}`,
+          });
+
+    // US-557: an address is read and anything else is searched, so a query
+    // that starts like an address is held to the address rule.
+    if (!style.acceptsPhrases) return address;
+    return z.union([
+      address,
+      phrase.refine((value) => !/^https?:\/\//i.test(value.trim()), {
+        message: `a query here is an address starting with ${prefix ?? "https://"}, or a phrase`,
+      }),
+    ]);
+  }
+
+  return phrase;
 }
 
 /**

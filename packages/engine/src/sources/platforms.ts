@@ -266,9 +266,9 @@ export const forumPlatform: PlatformDescriptor = {
 export const facebookPlatformId = "facebook";
 
 /**
- * Facebook groups, read one public group at a time through its address.
- * A group has no keyword search a connector can rely on, so its queries are
- * the addresses of the groups to read.
+ * Facebook groups. A query is the address of one public group, whose new
+ * posts are read, or a phrase, searched within public groups through Google
+ * (US-557). The model is asked for addresses; a person may write either.
  */
 export const facebookPlatform: PlatformDescriptor = {
   id: facebookPlatformId,
@@ -276,10 +276,12 @@ export const facebookPlatform: PlatformDescriptor = {
   search: {
     input: "address",
     addressPrefix: "https://www.facebook.com/groups/",
-    maxQueryWords: 1,
+    acceptsPhrases: true,
+    maxQueryWords: 6,
     hint:
       "The address of a public Facebook group, such as " +
-      "https://www.facebook.com/groups/856491544939621/. Every new post in it is read.",
+      "https://www.facebook.com/groups/856491544939621/, whose new posts are read, " +
+      "or a short phrase, searched in public groups.",
     note:
       "A Facebook group is read by address, not searched: each query is the full https address " +
       "of one public group where the customer asks for products like this one. Name only groups " +

@@ -444,6 +444,12 @@ export interface PlatformSearchStyle {
    * of page. Absent means any `https` address is accepted.
    */
   readonly addressPrefix?: string;
+  /**
+   * An address platform whose connector also searches a phrase of up to
+   * `maxQueryWords` words, told apart by its form (Facebook, US-557). Absent
+   * means every query is an address.
+   */
+  readonly acceptsPhrases?: boolean;
 }
 
 /**

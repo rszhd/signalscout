@@ -6,7 +6,7 @@ priority: p1
 created: 2026-11-11T15:48+08:00
 parent: US-557
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -42,3 +42,6 @@ post is dropped for its age, as before.
 ## Notes
 
 ## Log
+
+- 2026-11-11T16:12+08:00 Shipped in 0.29.0. The hosted application passes
+  its 3-day search window as the limit (its US-567).

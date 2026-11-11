@@ -68,6 +68,15 @@ export interface FilterOptions {
    * wins when both are set. Unset, all three stages run, as before.
    */
   readonly skipKeywordStage?: boolean;
+  /**
+   * Drop a post written more than this many days before the step runs, as
+   * `too_old`, before every other stage. US-566. For a deployment that shows
+   * only recent posts: a connector may return older ones (Google offers a
+   * week, not three days), and each would cost the paid stages. A fixed age,
+   * not the poll's `since`, so a post a provider listed late still passes.
+   * It drops with the pre-filter off too. Unset, no post is dropped for its age.
+   */
+  readonly maxPostAgeDays?: number;
 }
 
 /** A post as both stages read it, which is a row minus what neither needs. */
@@ -89,6 +98,7 @@ interface Candidate {
   readonly channel: string | null;
   readonly title: string | null;
   readonly excerpt: string;
+  readonly postedAt: Date;
   readonly embedded: boolean;
   /** The excerpt is a cut, read whole before the classifier. US-476. */
   readonly textPartial: boolean;
@@ -309,6 +319,7 @@ async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Prom
       channel: posts.channel,
       title: posts.title,
       excerpt: posts.excerpt,
+      postedAt: posts.postedAt,
       kind: posts.kind,
       textPartial: posts.textPartial,
       // The vector itself is never selected. It is a thousand numbers per
@@ -323,6 +334,27 @@ async function readCandidates(db: FilterRun["db"], ids: readonly string[]): Prom
   candidates.sort((a, b) => (handed.get(a.id) ?? 0) - (handed.get(b.id) ?? 0));
 
   return candidates;
+}
+
+/**
+ * The age limit, before every other stage. US-566. A post exactly at the
+ * limit goes on. No limit keeps every post.
+ */
+function ageStage(
+  candidates: readonly Candidate[],
+  maxPostAgeDays: number | undefined,
+  now: Date,
+): { kept: Candidate[]; drops: FilterDrop[] } {
+  if (maxPostAgeDays === undefined) return { kept: [...candidates], drops: [] };
+  const floor = now.getTime() - maxPostAgeDays * 86_400_000;
+  const kept: Candidate[] = [];
+  const drops: FilterDrop[] = [];
+  for (const candidate of candidates) {
+    if (candidate.postedAt.getTime() < floor) {
+      drops.push({ postId: candidate.id, stage: "too_old", similarity: null });
+    } else kept.push(candidate);
+  }
+  return { kept, drops };
 }
 
 /** The free stage: each post against the words that could have found it. */
@@ -591,7 +623,16 @@ export function createFilterStep({
   triagerFor,
   triageOnly = false,
   skipKeywordStage = false,
+  maxPostAgeDays,
 }: FilterOptions = {}): Step<FilterPayload> {
+  if (
+    maxPostAgeDays !== undefined &&
+    (!Number.isInteger(maxPostAgeDays) || maxPostAgeDays < 1 || maxPostAgeDays > 365)
+  ) {
+    throw new RangeError(
+      `maxPostAgeDays must be a whole number from 1 to 365, not ${maxPostAgeDays}`,
+    );
+  }
   return async function filter(
     { monitorId, postIds, walkId, pollRunId },
     { db, boss, logger }: StepContext,
@@ -641,29 +682,41 @@ export function createFilterStep({
       itemsIn: ids.length,
     };
 
+    // The rows are read even with the filter off, because `deliver` needs to
+    // know which of them are posts before it books a thread for one.
+    const { kept: recent, drops: aged } = ageStage(
+      await readCandidates(db, ids),
+      maxPostAgeDays,
+      startedAt,
+    );
+    if (aged.length > 0) {
+      logger.info(
+        { monitorId, posts: ids.length, droppedByAge: aged.length, maxPostAgeDays },
+        "posts older than the age limit were dropped",
+      );
+    }
+
     if (!monitor.preFilterEnabled) {
       // The person turned the pre-filter off, and triage is one of its stages.
       // Running it anyway would be this product deciding that one of the three
       // does not count as filtering, which is not a decision it gets to make.
-      logger.info({ monitorId, posts: ids.length }, "pre-filter is off for this monitor");
-
-      // The rows are read even with the filter off, because `deliver` needs to
-      // know which of them are posts before it books a thread for one.
-      await deliver(run, await readCandidates(db, ids), []);
+      logger.info({ monitorId, posts: recent.length }, "pre-filter is off for this monitor");
+      await deliver(run, recent, aged);
       return;
     }
 
-    const candidates = await readCandidates(db, ids);
+    const candidates = recent;
 
     if (triageOnly) {
       logger.info(
         { monitorId, posts: candidates.length },
         "keyword and embedding stages are off: triage reads every post",
       );
-      await pass(run, triager, candidates, []);
+      await pass(run, triager, candidates, aged);
       return;
     }
 
+    // The age drops join last: the stages below count `drops` as their own.
     const { kept, drops } = skipKeywordStage
       ? { kept: [...candidates], drops: [] as FilterDrop[] }
       : keywordStage(monitor, candidates);
@@ -680,10 +733,11 @@ export function createFilterStep({
         { monitorId, posts: candidates.length, kept: kept.length, droppedByKeyword: drops.length },
         "pre-filter finished",
       );
-      await pass(run, triager, kept, drops);
+      await pass(run, triager, kept, [...aged, ...drops]);
       return;
     }
 
-    await pass(run, triager, await embeddingStage(run, embedder, candidates, kept, drops), drops);
+    const survivors = await embeddingStage(run, embedder, candidates, kept, drops);
+    await pass(run, triager, survivors, [...aged, ...drops]);
   };
 }

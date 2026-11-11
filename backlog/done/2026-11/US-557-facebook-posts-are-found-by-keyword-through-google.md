@@ -6,7 +6,7 @@ priority: p1
 created: 2026-11-10T13:29+08:00
 parent: US-516
 area: engine
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -53,7 +53,7 @@ hold:
 - [x] Every request's credits reach `unitsConsumed`; the price per unit stays the key's.
 - [x] Fixtures are captured from the provider, not written: two search pages, an empty search, one post read, one unknown post.
 - [x] `docs/sources.md` and the site's keys page describe the two ways.
-- [ ] Released, with the owner's yes.
+- [x] Released, with the owner's yes.
 
 ## Notes
 
@@ -65,3 +65,4 @@ hold:
 
 - 2026-11-10T13:29+08:00 — Written after the owner's decision and the tests above.
 - 2026-11-10T13:55+08:00 — Built. `capture-search.mjs` spent 3 credits on its final run (two search pages 1 each, the post read 1, the empty search and the unknown post 0). Its first run kept commenters' names in Google's snippets ("<name> ▻ <group>"), so the scrubber now keeps only a snippet's age label and the capture was run again; that first run spent 5 credits. Page 2 repeated one post of page 1. Engine suite 1,040 tests, full suite 2,881, lint and typecheck clean.
+- 2026-11-10T14:42+08:00 — Released in 0.28.0 (PR #136, tag v0.28.0), a minor version: a caller that wraps the Facebook connector must pass `completePosts` on. A local search through an application found that wrapper gap; the application fixed it on its side.

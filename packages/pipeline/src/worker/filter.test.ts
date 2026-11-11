@@ -290,6 +290,99 @@ describe("a deployment that skips only the keyword stage (US-539)", () => {
   }, 30_000);
 });
 
+describe("a deployment with an age limit (US-566)", () => {
+  const dayMs = 86_400_000;
+
+  /** One filter job run directly, with no embedder and no triager. */
+  async function withAgeLimit(
+    monitorId: string,
+    postIds: string[],
+    options: { maxPostAgeDays?: number; triageOnly?: boolean } = { maxPostAgeDays: 3 },
+  ) {
+    const send = vi.fn(async (_queue: string, _payload: Record<string, unknown>) => "job-1");
+    const context = { db, boss: { send } as unknown as StepContext["boss"], logger: silentLogger };
+    await createFilterStep(options)({ monitorId, postIds }, context);
+    return send.mock.calls.map(([, payload]) => payload as unknown as ClassifyPayload);
+  }
+
+  /** A post that passes the keyword stage, written `days` ago. */
+  async function postWritten(days: number, externalId: string): Promise<string> {
+    const id = await insertPost(strongPost, externalId);
+    await db
+      .update(posts)
+      .set({ postedAt: new Date(Date.now() - days * dayMs) })
+      .where(eq(posts.id, id));
+    return id;
+  }
+
+  async function stagesOf(monitorId: string) {
+    const drops = await db.select().from(filterDrops).where(eq(filterDrops.monitorId, monitorId));
+    return drops.map((drop) => drop.stage);
+  }
+
+  it("drops a post older than the limit before the keyword stage, and a newer one goes on", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const old = await postWritten(5, "age-old");
+    const recent = await postWritten(2, "age-recent");
+
+    const [payload] = await withAgeLimit(monitorId, [old, recent]);
+
+    expect(payload?.postIds).toEqual([recent]);
+    expect(await stagesOf(monitorId)).toEqual(["too_old"]);
+  }, 30_000);
+
+  it("drops it with the pre-filter off", async () => {
+    const monitorId = await insertFilterMonitor(database, { preFilterEnabled: false });
+    const old = await postWritten(5, "age-off-old");
+    const recent = await postWritten(1, "age-off-recent");
+
+    const [payload] = await withAgeLimit(monitorId, [old, recent]);
+
+    expect(payload?.postIds).toEqual([recent]);
+    expect(await stagesOf(monitorId)).toEqual(["too_old"]);
+  }, 30_000);
+
+  it("drops it when triage reads every post", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const old = await postWritten(5, "age-triage-old");
+    const recent = await postWritten(1, "age-triage-recent");
+
+    const [payload] = await withAgeLimit(monitorId, [old, recent], {
+      maxPostAgeDays: 3,
+      triageOnly: true,
+    });
+
+    expect(payload?.postIds).toEqual([recent]);
+    expect(await stagesOf(monitorId)).toEqual(["too_old"]);
+  }, 30_000);
+
+  it("keeps an old post when no limit is set", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const old = await postWritten(30, "age-unset-old");
+
+    const [payload] = await withAgeLimit(monitorId, [old], {});
+
+    expect(payload?.postIds).toEqual([old]);
+    expect(await stagesOf(monitorId)).toEqual([]);
+  }, 30_000);
+
+  it("leaves the drop out of the monitor list's stage counts", async () => {
+    const monitorId = await insertFilterMonitor(database);
+    const old = await postWritten(5, "age-count-old");
+
+    await withAgeLimit(monitorId, [old]);
+
+    const counts = await filterDropCounts(db, [monitorId]);
+    expect(counts.get(monitorId)).toBeUndefined();
+  }, 30_000);
+
+  it("refuses a limit that is not a whole number of days from 1 to 365", () => {
+    expect(() => createFilterStep({ maxPostAgeDays: 0 })).toThrow(RangeError);
+    expect(() => createFilterStep({ maxPostAgeDays: 1.5 })).toThrow(RangeError);
+    expect(() => createFilterStep({ maxPostAgeDays: 366 })).toThrow(RangeError);
+  });
+});
+
 describe("the order the posts are handed on", () => {
   it("keeps the handed order even when it differs from insert order", async () => {
     const monitorId = await insertFilterMonitor(database);

@@ -243,6 +243,11 @@ export interface StartWorkerOptions {
    */
   skipKeywordStage?: boolean;
   /**
+   * Drop a post written more than this many days ago before the pre-filter's
+   * stages, 1 to 365. US-566. Unset, no post is dropped for its age.
+   */
+  maxPostAgeDays?: number;
+  /**
    * A second model that reads again every post the classifier passes, for
    * every owner on the instance. US-441. The match takes its scores. Unset,
    * the classifier's score stands, as before.
@@ -485,6 +490,7 @@ export async function startWorker({
   classifyConcurrency,
   triageOnly,
   skipKeywordStage,
+  maxPostAgeDays,
   rescorer,
   rescorePolls,
   matchesPerCollection,
@@ -687,6 +693,7 @@ export async function startWorker({
         triagerFor: async (userId) => (await modelsFor(userId)).triager,
         ...(triageOnly ? { triageOnly } : {}),
         ...(skipKeywordStage ? { skipKeywordStage } : {}),
+        ...(maxPostAgeDays !== undefined ? { maxPostAgeDays } : {}),
       }),
     replies:
       steps.replies ??

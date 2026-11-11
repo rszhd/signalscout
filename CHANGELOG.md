@@ -20,6 +20,18 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.29.0 — 2026-11-11
+
+**Added: an age limit before the pre-filter** (US-566). `maxPostAgeDays`
+on `startWorker` and `createFilterStep`, a whole number from 1 to 365, drops
+a post written more than that many days before the filter runs. The drop
+comes before every other stage, with the pre-filter off too, and is recorded
+in `filter_drops` with the new stage `too_old`. `filterDropCounts` leaves it
+out, as it leaves out `old_thread`. Unset, no post is dropped for its age.
+
+**Migration** 0080 adds `too_old` to the `filter_drops` stage check. A
+consumer that lists filter stages by name should know the new one.
+
 ## 0.28.0 — 2026-11-10
 
 **Added: Facebook posts are found by phrase** (US-557). A Facebook query is

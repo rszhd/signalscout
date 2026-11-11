@@ -72,6 +72,9 @@ export const minimumPollIntervalSeconds = 60;
  * poll's window: a feed lists an old thread again when someone replies. US-476.
  *
  * `no_fit` is a post the classifier said this product cannot help. US-523.
+ *
+ * `too_old` is a post written before the deployment's age limit
+ * (`maxPostAgeDays`). US-566.
  */
 export const filterStages = [
   "keyword",
@@ -81,6 +84,7 @@ export const filterStages = [
   "match_cap",
   "old_thread",
   "no_fit",
+  "too_old",
 ] as const;
 
 export type FilterStage = (typeof filterStages)[number];

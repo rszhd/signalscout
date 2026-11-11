@@ -108,8 +108,14 @@ export async function filterDropCounts(
     // Not filters a person tunes: the classify step's match cap (US-443)
     // writes its drops here only so a screen counts the post as seen, and an
     // old thread is one a feed listed again when someone replied (US-476), and
-    // no fit is the classifier's own answer on a post it read (US-523).
-    if (row.stage === "match_cap" || row.stage === "old_thread" || row.stage === "no_fit") {
+    // no fit is the classifier's own answer on a post it read (US-523), and
+    // too old is the deployment's age limit (US-566).
+    if (
+      row.stage === "match_cap" ||
+      row.stage === "old_thread" ||
+      row.stage === "no_fit" ||
+      row.stage === "too_old"
+    ) {
       continue;
     }
     const entry = counts.get(row.monitorId) ?? { ...noFilterDrops };

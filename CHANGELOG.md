@@ -20,6 +20,15 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.29.1 — 2026-11-12
+
+**Changed: a service delivered in person matches only posts from its place**
+(US-570). When the monitor's product must reach the customer in person (a
+cleaner, a repair, a clinic) and names its place, the classifier answers
+productFit no for a post that shows no sign of that place, and icpFit is
+10 or less. A product used online is scored as before. Scores move for
+such monitors only; nothing to change on upgrade.
+
 ## 0.29.0 — 2026-11-11
 
 **Added: an age limit before the pre-filter** (US-566). `maxPostAgeDays`

@@ -26,7 +26,7 @@ that writes them decides their language.
 ## Acceptance
 
 - [x] The describe prompt asks for every field in English and keeps names, places and local words.
-- [ ] A Malay and a non-Latin-script input each give English fields on the model the hosted product describes with.
+- [x] A Malay and a non-Latin-script input each give English fields on the model the hosted product describes with.
 - [ ] Released in a version.
 
 ## Notes
@@ -34,3 +34,5 @@ that writes them decides their language.
 - Prompt: `packages/engine/src/ai/describe.ts`, `buildDescribeSystemPrompt`.
 
 ## Log
+
+2026-11-12T15:55+08:00 — Four typed inputs on claude-opus-5-5, the hosted product's describe model: Malay (homestay cleaning), Indonesian (catering), Spanish (guitar lessons), Chinese (aircon cleaning). Product, ideal customer and problem came back in English for all four. Places stayed as typed: "Lembah Klang", "Jakarta Selatan". The name followed the input once ("Servis cuci homestay").

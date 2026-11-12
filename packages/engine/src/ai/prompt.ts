@@ -138,7 +138,7 @@ export function buildSystemPrompt(monitor: MonitorProfile): string {
     "post that does not say where the author is, is a no for such a product. A",
     "product used online or sent by post is not delivered in person: for it, an",
     "author who shows they are elsewhere is a no, and a post that does not say",
-    "where the author is can still be a yes.",
+    "where the author is gets no doubt for that; judge it on its problem alone.",
     "Then write nextStep: the product's place in that reply, in one short",
     "sentence, or an empty string for no.",
   ].join("\n");

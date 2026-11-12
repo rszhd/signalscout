@@ -20,6 +20,13 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.29.2 — 2026-11-12
+
+**Changed: a product description is written in English** (US-572). The
+describe prompt now asks for every field in English, whatever the page's
+language, and keeps names, places and local words as the page writes them.
+Nothing to change on upgrade.
+
 ## 0.29.1 — 2026-11-12
 
 **Changed: a service delivered in person matches only posts from its place**

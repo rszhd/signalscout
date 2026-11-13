@@ -2,7 +2,7 @@
 
 # Open tickets
 
-95 open — 25 doing, 61 todo, 9 parked (15 p1, 62 p2, 18 p3).
+96 open — 26 doing, 61 todo, 9 parked (16 p1, 62 p2, 18 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | p1 | US-542 | [A deployment may exempt a monitor from the match cap](doing/US-542-a-deployment-may-exempt-a-monitor-from-the-match-cap.md) | feature | doing | 2026-11-07T11:08+08:00 |
 | p1 | US-543 | [A caller may plan the pages of every later poll](doing/US-543-a-caller-may-plan-the-pages-of-every-later-poll.md) | feature | doing | 2026-11-07T11:32+08:00 |
 | p1 | US-570 | [A service delivered in person matches only posts from its place](doing/US-570-a-service-delivered-in-person-matches-only-posts-from-its-place.md) | feature | doing | 2026-11-12T14:35+08:00 |
+| p1 | US-576 | [A tool for sellers does not match the buyers it finds](doing/US-576-a-tool-for-sellers-does-not-match-the-buyers-it-finds.md) | feature | doing | 2026-11-13T15:32+08:00 |
 | p1 | BUG-383 | [One bad query refuses the whole plan](doing/BUG-383-one-bad-query-refuses-the-whole-plan.md) | bug | doing | 2026-09-23T22:59+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-321 | [Does the hosted plan charge for Slack, Discord or an API?](todo/US-321-does-the-hosted-plan-charge-for-slack-or-an-api.md) | spike | todo | 2026-09-23T05:44+08:00 |

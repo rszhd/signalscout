@@ -20,6 +20,14 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## 0.29.3 — 2026-11-13
+
+**Changed: the classifier judges whether the author would buy the product**
+(US-576). A post that is the kind of post a product finds for its customers
+is no longer a match when its author would not buy or use the product: a
+shopper's gift request is a lead for a shop, not for a tool that finds
+shoppers for shops. Nothing to change on upgrade.
+
 ## 0.29.2 — 2026-11-12
 
 **Changed: a product description is written in English** (US-572). The

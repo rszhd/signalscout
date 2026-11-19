@@ -178,10 +178,20 @@ while IFS= read -r -d '' file; do
         stale=1
         say "duplicate: #$other also carries $id; $rel names #$issue"
       done
-      have="$(gh issue view "$issue" --repo "$REPO" --json title,state,labels -q '.title + "\t" + .state + "\t" + ([.labels[].name] | sort | join(","))' 2>/dev/null || true)"
-      if [ -z "$have" ]; then
+      # gh says a missing issue on stderr. Any other failure (network, rate
+      # limit, auth) says nothing about the issue, so it is not reported as one.
+      view_err="$(mktemp)"
+      if have="$(gh issue view "$issue" --repo "$REPO" --json title,state,labels -q '.title + "\t" + .state + "\t" + ([.labels[].name] | sort | join(","))' 2>"$view_err")" && [ -n "$have" ]; then
+        rm -f "$view_err"
+      else
         stale=1
-        say "issue #$issue named by $rel does not exist"
+        if grep -q 'Could not resolve to an issue' "$view_err"; then
+          say "issue #$issue named by $rel does not exist"
+        else
+          first="$(head -n 1 "$view_err")"
+          say "could not check #$issue for $rel: ${first:-gh gave no error text}"
+        fi
+        rm -f "$view_err"
         continue
       fi
       IFS=$'\t' read -r have_title have_state have_labels <<< "$have"

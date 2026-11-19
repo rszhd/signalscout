@@ -43,7 +43,14 @@ if (verb === "list") {
     if (i.state === "OPEN" && i.labels.includes("ticket")) console.log(i.number + "\\t" + i.title);
   }
 } else if (verb === "view") {
-  if (!issue) process.exit(1);
+  if (process.env.FAKE_GH_FAIL) {
+    console.error(process.env.FAKE_GH_FAIL);
+    process.exit(1);
+  }
+  if (!issue) {
+    console.error("GraphQL: Could not resolve to an issue with the number of " + number + ". (repository.issue)");
+    process.exit(1);
+  }
   if (flag("--json") === "state") console.log(issue.state);
   else console.log([issue.title, issue.state, [...issue.labels].sort().join(",")].join("\\t"));
 } else if (verb === "create") {
@@ -92,7 +99,7 @@ afterAll(() => {
 });
 
 /** A backlog in a temporary folder, with its own copy of the script. */
-function backlog({ tickets, issues }) {
+function backlog({ tickets, issues, env = {} }) {
   const root = mkdtempSync(join(tmpdir(), "backlog-sync-"));
   roots.push(root);
   const dir = join(root, "backlog");
@@ -123,6 +130,7 @@ function backlog({ tickets, issues }) {
           PATH: `${bin}:${process.env.PATH}`,
           FAKE_GH_STATE: statePath,
           FAKE_GH_LOG: logPath,
+          ...env,
         },
       });
       return { status: result.status, output: result.stdout + result.stderr };
@@ -229,5 +237,52 @@ describe("a ticket that already names its issue", () => {
 
     expect(status).toBe(0);
     expect(output).toContain("the mirror matches the ticket files");
+  });
+});
+
+describe("a ticket whose issue cannot be looked up", () => {
+  it("says the issue does not exist when GitHub reports it missing, and fails --check", () => {
+    const b = backlog({
+      tickets: [{ id: "BUG-311", title: "A bug", issue: "99" }],
+      issues: [open(63, "BUG-311: A bug")],
+    });
+
+    const { status, output } = b.run("--check");
+
+    expect(status).toBe(1);
+    expect(output).toContain("issue #99 named by");
+    expect(output).toContain("does not exist");
+    expect(output).not.toContain("could not check");
+  });
+
+  it("says it could not check, with the first line of gh's error, and fails --check", () => {
+    const b = backlog({
+      tickets: [{ id: "BUG-311", title: "A bug", issue: "63" }],
+      issues: [open(63, "BUG-311: A bug")],
+      env: { FAKE_GH_FAIL: "error connecting to api.github.com\ncheck your internet connection" },
+    });
+
+    const { status, output } = b.run("--check");
+
+    expect(status).toBe(1);
+    expect(output).toContain("could not check #63 for");
+    expect(output).toContain("error connecting to api.github.com");
+    expect(output).not.toContain("does not exist");
+    expect(output).not.toContain("check your internet connection");
+  });
+
+  it("does not call a rate-limited lookup a missing issue, and a sync opens nothing", () => {
+    const b = backlog({
+      tickets: [{ id: "BUG-311", title: "A bug", issue: "63" }],
+      issues: [open(63, "BUG-311: A bug")],
+      env: { FAKE_GH_FAIL: "HTTP 403: API rate limit exceeded" },
+    });
+
+    const { output } = b.run();
+
+    expect(output).toContain("could not check #63");
+    expect(output).not.toContain("does not exist");
+    expect(created(b.calls())).toEqual([]);
+    expect(b.issues()).toEqual([open(63, "BUG-311: A bug")]);
   });
 });
